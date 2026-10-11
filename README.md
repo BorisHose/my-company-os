@@ -9,8 +9,8 @@ Stand: 11.10.2026 · Repository privat (github.com/BorisHose/my-company-os)
 |---|---|---|
 | `prototyp/company-os-prototyp.html` | Prototyp, startet als „Musterfirma“ (erfundene Daten), Knopf „Pilotdaten zeigen“ | https://claude.ai/artifact/9hY1WKqMz4Ziy4En4QGHwM |
 | `prototyp/company-os-prototyp-pilot.html` | Prototyp Pilot: Bodo Solutions und business//acts, echte Bodo-Daten (Projekt MIV Hagen Migration, Stand 11.10.2026) mit Links in Bodo – **nur intern** | https://claude.ai/artifact/WQY9F8gvWox6PKfiX9hnw7 |
-| `marketing/vorstellung-neutral/` | Detail-Präsentation, neutral mit Musterfirma (31 Folien); `gen.py` erzeugt die Bildschirm-Folien | https://claude.ai/artifact/KUxJuoTYq3SUdZd3md4wrR |
-| `marketing/vorstellung-pilot/` | Detail-Präsentation Pilot business//acts · Bodo (32 Folien, echte Daten) – **nur intern** | https://claude.ai/artifact/4tzo3KSdLWSyK5ZENyKW9X |
+| `marketing/vorstellung-neutral/` | Detail-Präsentation, neutral mit Musterfirma (32 Folien); `gen.py` erzeugt die Bildschirm-Folien | https://claude.ai/artifact/KUxJuoTYq3SUdZd3md4wrR |
+| `marketing/vorstellung-pilot/` | Detail-Präsentation Pilot business//acts · Bodo (33 Folien, echte Daten) – **nur intern** | https://claude.ai/artifact/4tzo3KSdLWSyK5ZENyKW9X |
 | `marketing/elevator-pitch/` | Elevator Pitch (8 Folien, neutral) | https://claude.ai/artifact/NBtdCmL1LTtGg5X94dYY4o |
 | `marketing/endlosschleife-ipad/` | Selbstablaufende Kurzfassung (12 Folien) als PowerPoint für Keynote; Video-Skript | – |
 | `konzepte/` | Gesamtkonzept „Prozesse, Prozesskette und Kundeninstanzen“ | Projekt „My Company OS“ auf claude.ai |
