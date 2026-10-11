@@ -169,6 +169,12 @@ Company OS ist das Zusammenspiel von Menschen und agentischen KI-Prozessen. Unte
 - Beide Präsentationen sind branchenneutral: Beispiele Kundenservice und Angebotsanfrage statt Mitgliederservice und Betriebskostenprüfung. Die Screenshots stammen aus dem Vorführmodus.
 - Wertschöpfung und Rechnung bleiben als gekennzeichneter Block „Branchenbeispiel Mieterverein“ am Ende des Detail-Decks; je Branche austauschbar (nächstes: Immobilienverwaltung).
 
+## Prozess „Anforderung → Lösung → Angebot“ mit Lösungs-Agent (Stand 11.10.2026)
+- Anforderung (Boris): Meldet ein Kunde eine Zusatzanforderung für Bodo oder sellify, gehören Konzeption und Ausarbeitung eines klickbaren Mock-ups/Prototyps dazu. Heute sehr zeitintensiv; mit agentischer Unterstützung deutlich schneller und in besserer Qualität, mit sehr wenig Zutun des Consultants, der nur die Lösungsidee einspricht.
+- Anforderung (Boris): Ein spezieller Agent versteht das und erstellt in einem definierten Ablauf die Konzeption bis zum fertigen klickbaren Prototyp, ein Dokument mit Ausgangslage, Lösung und Nutzen (Marketingdokument), die Materialien für den Kunden zur Freigabe und das Angebot – im Grunde automatisch.
+- Vorschlag Claude [Vorschlag]: Name „Lösungs-Agent“. Ablauf: Consultant spricht Idee ein → Agent erfasst und prüft auf Vorhandenes/Dubletten → Lösungs-Agent: Konzept und klickbarer Prototyp → Lösungsdokument mit Nutzen → Angebot und Kundenunterlagen (Aufwand von der Entwicklung) → Consultant prüft das Paket und gibt frei → Versand und Nachhalten → nach Auftrag Ticket an die Entwicklung über den Übergabeweg (Bodo-Ticket bzw. GitLab-Issue, ohne Zuständigen).
+- Umgesetzt auf Folie 5 der Pilot-Vorstellung („Ein Kunde meldet eine Zusatzanforderung“). Im Prototyp noch nicht angelegt.
+
 ## Navigation: Projekte und Prozesse getrennt (Stand 11.10.2026)
 - Entschieden (Boris): „Prozesse & Projekte“ wird getrennt. Linke Leiste: Mein Tag · Cockpit · Projekte · Prozesse · Aufträge.
 - Projekte (Ziel und Ende, verwaltet im CRM): Reiter Projekte · Projektvorlagen · Projekt-Designer (Phasen, Verzweigungen, Meilensteine, Prozesse je Phase).
