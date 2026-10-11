@@ -1,0 +1,574 @@
+<title>AI Head Office Prototyp</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=IBM+Plex+Mono:wght@500&display=swap">
+<style>
+/* Layout: App-Rahmen mit linker Navigation (Unternehmen + Bereiche), Kopfzeile, Arbeitsfläche; Chat als rechtes Panel */
+:root{
+  --bg:#f3f4f7; --surface:#ffffff; --sunk:#eceef3; --fg:#141b2d; --muted:#5d6579; --line:#dde1ea;
+  --ink:#16223f; --ink-soft:#e5e9f3; --accent:#c8641a; --accent-soft:#fbeee2;
+  --ok:#147a5c; --ok-soft:#e1f3ec; --info:#2457c5; --info-soft:#e6edfb; --bad:#b4232a; --bad-soft:#fbe9ea;
+  --bodo:#1f3a5f; --sell:#30ABE2;
+  --f-ui:"Plus Jakarta Sans",system-ui,-apple-system,"Segoe UI",sans-serif; --f-mono:"IBM Plex Mono",ui-monospace,Consolas,monospace;
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  --bg:#0e1322; --surface:#161d30; --sunk:#111829; --fg:#e8ecf5; --muted:#9aa3b9; --line:#283350;
+  --ink:#a9bdf0; --ink-soft:#1f2a47; --accent:#f0a05e; --accent-soft:#3a2614;
+  --ok:#5fd0aa; --ok-soft:#123a30; --info:#8fb0ff; --info-soft:#18284d; --bad:#ff8f8a; --bad-soft:#3d1c1f; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#0e1322; --surface:#161d30; --sunk:#111829; --fg:#e8ecf5; --muted:#9aa3b9; --line:#283350;
+  --ink:#a9bdf0; --ink-soft:#1f2a47; --accent:#f0a05e; --accent-soft:#3a2614;
+  --ok:#5fd0aa; --ok-soft:#123a30; --info:#8fb0ff; --info-soft:#18284d; --bad:#ff8f8a; --bad-soft:#3d1c1f; color-scheme:dark}
+*{box-sizing:border-box}
+[hidden]{display:none!important}
+html,body{height:100%}
+body{background:var(--bg);color:var(--fg);font-family:var(--f-ui);font-size:14px;line-height:1.45}
+button,input,select,textarea{font:inherit;color:inherit}
+button{cursor:pointer}
+:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.app{display:grid;grid-template-columns:204px minmax(0,1fr);grid-template-rows:auto minmax(0,1fr);height:100%}
+.demo{grid-column:1/-1;background:var(--ink);color:var(--surface);font-size:12px;padding:5px 14px;display:flex;gap:10px;flex-wrap:nowrap;align-items:center;white-space:nowrap;overflow:hidden}
+.demo span{overflow:hidden;text-overflow:ellipsis}
+.demo b{font-weight:700}
+aside{background:var(--surface);border-right:1px solid var(--line);display:flex;flex-direction:column;gap:10px;padding:12px 8px;font-size:13.5px;overflow:auto;min-height:0}
+.logo{display:flex;gap:10px;align-items:center;padding:0 6px}
+.mark{width:32px;height:32px;border-radius:9px;background:var(--ink);color:var(--surface);display:grid;place-items:center;font-weight:800;font-size:13px;letter-spacing:-.02em}
+.logo b{font-size:15px;letter-spacing:-.01em}.logo small{display:block;color:var(--muted);font-size:11px}
+.me *{pointer-events:none}
+.me{margin-top:auto;border:1px solid var(--line);background:var(--bg);border-radius:14px;padding:8px 10px;display:flex;gap:10px;align-items:center;text-align:left;width:100%}
+.me:hover,.me[aria-current="true"]{border-color:var(--ink);background:var(--ink-soft)}
+.me b{display:block;font-size:13px}.me small{display:block;font-size:11px;color:var(--muted)}
+.me{padding:6px 8px;gap:8px}.me .chev{margin-left:auto;font-size:18px !important;white-space:nowrap;color:var(--muted);font-size:13px;display:inline-flex;align-items:center;gap:2px}
+.me:hover .chev{color:var(--ink)}
+.ava{border-radius:50%;flex-shrink:0;box-shadow:0 0 0 2px var(--surface),0 0 0 4px var(--accent)}
+.prof{display:flex;gap:20px;align-items:center;flex-wrap:wrap}
+.prof h2{margin:0}
+.lbl{font-family:var(--f-mono);font-size:10.5px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);padding:0 6px}
+.nav{display:flex;flex-direction:column;gap:2px}
+.nav button{border:0;background:none;text-align:left;padding:6px 8px;font-size:13.5px;border-radius:8px;display:flex;gap:10px;align-items:center;color:var(--fg)}
+.nav button:hover{background:var(--sunk)}
+.nav button[aria-current="true"]{background:var(--ink-soft);color:var(--ink);font-weight:700}
+.nav .cnt{margin-left:auto;font-family:var(--f-mono);font-size:11px;background:var(--accent);color:#fff;border-radius:999px;padding:0 7px}
+.co{display:flex;gap:9px;align-items:center}
+.dot{width:10px;height:10px;border-radius:3px;flex:none}
+.ic{width:18px;text-align:center;color:var(--muted);flex:none}
+main{display:flex;flex-direction:column;min-width:0;min-height:0}
+.top{display:flex;gap:12px;align-items:center;padding:14px 22px;border-bottom:1px solid var(--line);background:var(--surface);flex-wrap:wrap}
+.top h1{font-size:19px;margin:0;font-weight:800;letter-spacing:-.01em}
+.top .crumb{color:var(--muted);font-size:12.5px}
+.top .sp{flex:1}
+.btn{border:1px solid var(--line);background:var(--surface);border-radius:9px;padding:7px 13px;font-weight:600}
+.btn.pri{background:var(--ink);border-color:var(--ink);color:var(--surface)}
+.btn.acc{background:var(--accent);border-color:var(--accent);color:#fff}
+.btn.sm{padding:4px 10px;font-size:12.5px}
+.work{display:grid;grid-template-columns:minmax(0,1fr);flex:1;min-height:0}
+
+.view{overflow:auto;padding:20px 22px 96px;min-width:0}
+.stack{display:flex;flex-direction:column;gap:18px}
+.grid{display:grid;gap:14px;grid-template-columns:repeat(auto-fit,minmax(260px,1fr))}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:16px;min-width:0;display:flex;flex-direction:column;gap:10px}
+.card h2{font-size:15px;margin:0;font-weight:700;display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+.card h3{font-size:14px;margin:0;font-weight:700}
+.sub{color:var(--muted);font-size:12.5px}
+.kpis{display:flex;gap:18px;flex-wrap:wrap}
+.kpi b{display:block;font-size:24px;font-weight:800;font-variant-numeric:tabular-nums;letter-spacing:-.02em}
+.kpi span{font-size:12px;color:var(--muted)}
+.kpi.warn b{color:var(--accent)}.kpi.bad b{color:var(--bad)}
+.pill{font-size:11.5px;font-weight:600;padding:2px 8px;border-radius:999px;white-space:nowrap}
+.p-ok{background:var(--ok-soft);color:var(--ok)}.p-run{background:var(--info-soft);color:var(--info)}.p-open{background:var(--sunk);color:var(--muted)}.p-wait{background:var(--accent-soft);color:var(--accent)}.p-bad{background:var(--bad-soft);color:var(--bad)}
+.row{display:flex;gap:10px;align-items:flex-start}
+.list{display:flex;flex-direction:column}
+.item{display:flex;gap:12px;align-items:flex-start;padding:11px 0;border-top:1px solid var(--line)}
+.item:first-child{border-top:0}
+.item .t{flex:1;min-width:0}
+.item .t b{display:block}
+.ava{width:34px;height:34px;border-radius:50%;background:var(--c,#1f3a5f);color:#fff;font-weight:700;font-size:12px;display:grid;place-items:center;flex:none}
+.ava.lead{box-shadow:0 0 0 2px var(--surface),0 0 0 4px var(--accent)}
+.ava.s{width:24px;height:24px;font-size:9.5px}
+.bot{width:24px;height:24px;border-radius:7px;background:var(--sunk);border:1px solid var(--line);display:grid;place-items:center;font-size:12px;color:var(--muted);flex:none}
+.conseq{background:var(--sunk);border-radius:9px;padding:9px 11px;font-size:13px;display:flex;flex-direction:column;gap:3px}
+.conseq .k{color:var(--muted);font-size:11.5px;font-family:var(--f-mono);text-transform:uppercase;letter-spacing:.05em}
+.acts{display:flex;gap:8px;flex-wrap:wrap}
+.gf{border-top:4px solid var(--ink);display:grid;grid-template-columns:minmax(220px,300px) 1fr;gap:18px;align-items:start}
+.gf .who{display:flex;gap:12px;align-items:center}
+.pa{border:1px solid var(--line);border-left:4px solid var(--accent);border-radius:12px;padding:12px 14px;display:flex;flex-direction:column;gap:10px;background:var(--bg)}
+.pa .ttl{display:flex;gap:10px;align-items:center}
+.pa .spark{width:30px;height:30px;border-radius:50%;background:var(--accent);color:#fff;display:inline-flex;align-items:center;justify-content:center;flex-shrink:0}
+.skills{display:flex;flex-wrap:wrap;gap:6px}
+.skills button{border:1px solid var(--line);background:var(--surface);border-radius:999px;padding:4px 11px;font-size:12.5px}
+.skills button[aria-pressed="true"]{background:var(--ink);border-color:var(--ink);color:var(--surface)}
+.skills button.add{border-style:dashed;color:var(--muted)}
+.orgtop{display:grid;grid-template-columns:1fr minmax(260px,320px) 1fr;align-items:center}
+.gfbox{border-top:4px solid var(--ink);text-align:center;align-items:center}
+.gfbox .ava{margin:4px auto}
+.staff{display:flex;align-items:center;gap:0}
+.staff .hl{width:34px;height:2px;background:var(--line);flex-shrink:0}
+.staffcol{display:flex;flex-direction:column;gap:8px}
+.asst{border:1px solid var(--line);border-left:4px solid var(--accent);border-radius:12px;background:var(--surface);padding:9px 12px;display:flex;gap:10px;align-items:center;text-align:left;max-width:270px}
+.asst:hover{border-color:var(--accent)}
+.asst .spark{width:30px;height:30px;border-radius:50%;background:var(--accent);color:#fff;display:inline-flex;align-items:center;justify-content:center;flex-shrink:0}
+.asst.human{border-left-color:var(--muted);border-style:dashed;color:var(--muted)}
+.asst b{display:block;font-size:13px}.asst small{display:block;font-size:11.5px;color:var(--muted)}
+.orgline{width:2px;height:18px;background:var(--line);margin:-4px auto -4px}
+.sklist{display:flex;flex-direction:column;gap:6px;max-height:52vh;overflow:auto}
+.sk{display:flex;gap:10px;align-items:center;border:1px solid var(--line);border-radius:10px;padding:8px 10px;background:var(--surface);text-align:left}
+.sk .bx{width:20px;height:20px;border-radius:6px;border:2px solid var(--line);flex-shrink:0;display:inline-flex;align-items:center;justify-content:center;font-size:13px;color:#fff}
+.sk[aria-pressed="true"] .bx{background:var(--ink);border-color:var(--ink)}
+.sk b{display:block;font-size:13.5px}.sk small{color:var(--muted);font-size:12px}
+@media (max-width:860px){.orgtop{grid-template-columns:1fr}.staff{justify-content:center;margin-top:10px}.staff .hl{display:none}}
+.orgrow{border-top:2px solid var(--line);padding-top:14px}
+@media (max-width:860px){.gf{grid-template-columns:1fr}}
+.org{display:grid;gap:14px;grid-template-columns:repeat(auto-fill,minmax(250px,1fr))}
+.dept .head{display:flex;gap:11px;align-items:center}
+.sec{display:flex;flex-direction:column;gap:6px}
+.sec .m{display:flex;gap:8px;align-items:center;font-size:13px}
+.alert{border-radius:8px;padding:7px 10px;font-size:12.5px;background:var(--accent-soft);color:var(--accent)}
+.alert.ok{background:var(--sunk);color:var(--muted)}
+.tabs{display:flex;gap:4px;border-bottom:1px solid var(--line);flex-wrap:wrap}
+.tabs button{border:0;background:none;padding:8px 12px;border-bottom:3px solid transparent;color:var(--muted);font-weight:600}
+.tabs button[aria-selected="true"]{color:var(--fg);border-bottom-color:var(--ink)}
+.chain{display:flex;gap:6px;align-items:stretch;overflow-x:auto;padding-bottom:4px}
+.step{min-width:150px;flex:1;background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:10px 12px;display:flex;flex-direction:column;gap:5px;font-size:12.5px}
+.step b{font-size:13px}
+.arrow{align-self:center;color:var(--muted)}
+.pkgs{display:grid;gap:12px;grid-template-columns:repeat(auto-fill,minmax(290px,1fr))}
+.pkg{border-left:4px solid var(--c,var(--line))}
+.tl{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:5px;font-size:12.5px}
+.tl li{display:flex;gap:8px;align-items:baseline}
+.tl code{font-family:var(--f-mono);font-size:11px;color:var(--muted)}
+.meta{display:flex;gap:12px;flex-wrap:wrap;font-size:12px;color:var(--muted);align-items:center}
+.eval{border:1px dashed var(--accent);border-radius:9px;padding:9px 11px;font-size:12.5px;display:flex;flex-direction:column;gap:4px}
+.eval .an{font-size:11px;color:var(--accent);font-weight:700}
+.chat{position:fixed;right:20px;bottom:20px;width:400px;height:min(620px,calc(100vh - 110px));z-index:30;background:var(--surface);border:1px solid var(--line);border-radius:16px;box-shadow:0 18px 48px rgba(10,14,28,.22);display:flex;flex-direction:column;min-height:0;overflow:hidden}
+.chat.big{top:48px;bottom:16px;height:auto;width:min(880px,calc(100vw - 48px));left:50%;right:auto;transform:translateX(-50%)}
+.chat header .ib{border:0;background:none;width:30px;height:30px;border-radius:8px;font-size:16px;color:var(--muted)}
+.chat header .ib:hover{background:var(--sunk)}
+.fab{position:fixed;right:20px;bottom:20px;z-index:29;display:inline-flex;align-items:center;gap:10px;border:0;border-radius:999px;padding:12px 20px 12px 14px;background:var(--ink);color:var(--surface);font-weight:700;box-shadow:0 10px 28px rgba(10,14,28,.25)}
+.fab .spark{width:30px;height:30px;border-radius:50%;background:var(--accent);color:#fff;display:inline-flex;align-items:center;justify-content:center}
+.chat .hint{font-size:11px;color:var(--muted);padding:0 16px 10px}
+.chat header{padding:14px 16px;border-bottom:1px solid var(--line);display:flex;align-items:center;gap:10px}
+.chat header b{flex:1}
+.msgs{flex:1;overflow:auto;padding:14px 16px;display:flex;flex-direction:column;gap:10px}
+.msg{max-width:92%;padding:9px 12px;border-radius:12px;font-size:13px}
+.msg.me{align-self:flex-end;background:var(--ink);color:var(--surface);border-bottom-right-radius:4px}
+.msg.ai{align-self:flex-start;background:var(--sunk);border-bottom-left-radius:4px}
+.msg ul{margin:4px 0 0;padding-left:18px}
+.prev{background:var(--surface);border:1px solid var(--line);border-radius:9px;padding:8px 10px;margin-top:6px;display:flex;flex-direction:column;gap:3px}
+.chips{display:flex;gap:6px;flex-wrap:wrap;padding:0 16px 8px}
+.chips button{border:1px solid var(--line);background:var(--surface);border-radius:999px;padding:4px 10px;font-size:12px}
+.composer{display:flex;gap:8px;padding:10px 16px 16px}
+.composer input{flex:1;border:1px solid var(--line);border-radius:9px;padding:8px 10px;background:var(--bg);min-width:0}
+.wiz{display:grid;grid-template-columns:240px minmax(0,1fr);gap:16px}
+.wsteps{display:flex;flex-direction:column;gap:2px}
+.wsteps button{border:0;background:none;text-align:left;padding:7px 10px;border-radius:8px;display:flex;gap:8px;align-items:center;font-size:13px}
+.wsteps button[aria-current="true"]{background:var(--ink-soft);color:var(--ink);font-weight:700}
+.num{font-family:var(--f-mono);font-size:11px;width:20px;height:20px;border-radius:50%;border:1px solid var(--line);display:grid;place-items:center;flex:none}
+.wsteps .done .num{background:var(--ok);border-color:var(--ok);color:#fff}
+.tblw{overflow-x:auto}.tblw table{border-collapse:collapse;width:100%;font-size:13px}.tblw th,.tblw td{text-align:left;padding:8px 10px;border-bottom:1px solid var(--line);vertical-align:top}.tblw th{font-size:12px;color:var(--muted);font-weight:600}
+.ta{width:100%;border:1px solid var(--line);border-radius:9px;padding:8px 10px;background:var(--bg);line-height:1.45;resize:vertical}
+.lock{display:inline-flex;gap:6px;align-items:center;font-size:12px;font-weight:600;color:var(--muted)}
+.assist{border:1px solid var(--line);border-left:4px solid var(--accent);border-radius:9px;padding:10px 12px;display:flex;flex-direction:column;gap:8px;background:var(--surface)}
+.assist .q{display:flex;flex-wrap:wrap;gap:6px;align-items:center}
+.two{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:12px}
+.field{display:flex;flex-direction:column;gap:4px}
+.field label{font-size:12px;font-weight:600;color:var(--muted)}
+.field .val{border:1px solid var(--line);border-radius:9px;padding:8px 10px;background:var(--bg)}
+.conn{display:flex;gap:12px;align-items:center}
+.conn .sym{width:38px;height:38px;border-radius:10px;display:grid;place-items:center;color:#fff;font-weight:800;font-size:13px;flex:none}
+.modal{position:fixed;inset:0;background:rgba(10,14,28,.5);display:flex;align-items:center;justify-content:center;padding:16px;z-index:30}
+.modal .card{width:min(560px,100%);max-height:90%;overflow:auto}
+.modal .card.wide{width:min(820px,100%)}
+.agcard{text-align:left;cursor:pointer;font:inherit;color:inherit}
+.agcard:hover{border-color:var(--ink);box-shadow:0 6px 18px rgba(10,14,28,.08)}
+.agcard .open{font-size:12px;color:var(--info);font-weight:600}
+.lv{display:inline-block;font-family:var(--f-mono);font-size:11px;border-radius:6px;padding:1px 6px;background:var(--sunk);color:var(--muted)}
+.lv.l1{background:var(--info-soft);color:var(--info)}.lv.l2{background:var(--accent-soft);color:var(--accent)}
+.seg{display:inline-flex;border:1px solid var(--line);border-radius:9px;overflow:hidden;flex-wrap:wrap}
+.seg button{border:0;background:var(--surface);padding:6px 11px;font-size:12.5px;border-right:1px solid var(--line)}
+.seg button:last-child{border-right:0}
+.seg button[aria-pressed="true"]{background:var(--ink);color:var(--surface);font-weight:700}
+.perm{display:flex;justify-content:space-between;gap:10px;align-items:center;padding:8px 0;border-bottom:1px solid var(--line);flex-wrap:wrap}
+.perm:last-child{border-bottom:0}
+.sec2{display:flex;flex-direction:column;gap:8px}
+.sec2 h3{margin:0;font-size:14px}
+.opt{border:1px solid var(--line);border-radius:10px;padding:10px 12px;display:flex;gap:10px;align-items:flex-start;cursor:pointer;background:var(--surface);text-align:left}
+.opt[aria-pressed="true"]{border-color:var(--ink);box-shadow:0 0 0 1px var(--ink)}
+.toast{position:fixed;left:50%;bottom:calc(18px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);background:var(--ink);color:var(--surface);padding:9px 15px;border-radius:9px;font-size:13px;z-index:40}
+.menu-btn{display:none}
+@media (max-width:900px){
+  .app{grid-template-columns:1fr}
+  aside{position:fixed;inset:0 auto 0 0;width:260px;z-index:20;transform:translateX(-105%);transition:transform .2s}
+  aside.open{transform:none;box-shadow:0 0 0 100vmax rgba(10,14,28,.4)}
+  .menu-btn{display:inline-flex}
+  .chat,.chat.big{inset:0;width:auto;height:auto;border-radius:0;transform:none}
+  .wiz{grid-template-columns:1fr}
+}
+@media (prefers-reduced-motion:reduce){*{transition:none!important}}
+</style>
+
+<div class="app" id="app">
+  <div class="demo"><b>Prototyp</b><span>Klickbare Vorschau · Beispieldaten · nichts wird gespeichert oder ausgeführt</span></div>
+  <aside id="side">
+    <div class="logo"><div class="mark">AI</div><div><b>AI Head Office</b><small>Arbeitstitel</small></div></div>
+    <div class="lbl">Unternehmen</div>
+    <div class="nav" id="companies"></div>
+    <div class="lbl">Bereiche</div>
+    <div class="nav" id="areas"></div>
+    <button class="me" id="meBtn" aria-label="Profil und Einstellungen"><span id="meAva"></span><span><b>Boris Hose</b><small>Einstellungen</small></span><span class="chev" aria-hidden="true">›</span></button>
+  </aside>
+  <main>
+    <div class="top">
+      <button class="btn sm menu-btn" id="menuBtn" aria-label="Menü">☰ Menü</button>
+      <div><div class="crumb" id="crumb"></div><h1 id="title"></h1></div>
+      <div class="sp"></div>
+      <button class="btn" id="newJob">+ Neuer Auftrag</button>
+    </div>
+    <div class="work" id="work">
+      <section class="view" id="view"></section>
+      <section class="chat" id="chat" hidden>
+        <header><b>✦ KI-Assistent</b><span class="pill p-open" id="chatCo"></span><button class="ib" id="chatBig" aria-label="Größer anzeigen" title="Größer anzeigen">⤢</button><button class="ib" id="chatClose" aria-label="Minimieren" title="Minimieren">–</button></header>
+        <div class="msgs" id="msgs"></div>
+        <div class="chips" id="chips"></div>
+        <form class="composer" id="composer"><input id="chatIn" placeholder="Frage oder Auftrag … (Diktat über die Tastatur möglich)" aria-label="Nachricht"><button class="btn pri">Senden</button></form>
+        <div class="hint">KI kann Fehler machen. Was nach außen wirkt, wird vor dem Ausführen freigegeben.</div>
+      </section>
+    </div>
+    <button class="fab" id="chatBtn"><span class="spark">✦</span>KI-Assistent</button>
+  </main>
+</div>
+<div id="modal"></div>
+<div class="toast" id="toast" hidden></div>
+
+<script>
+const $=s=>document.querySelector(s);
+const esc=s=>String(s).replace(/[&<>"]/g,m=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[m]));
+function toast(t){const e=$("#toast");e.textContent=t;e.hidden=false;clearTimeout(toast.t);toast.t=setTimeout(()=>e.hidden=true,2600)}
+
+const CO={
+ all:{name:"Übersicht",color:"#5d6579",sys:"alle Unternehmen"},
+ bs:{name:"Bodo Solutions",color:"#1f3a5f",sys:"Bodo · Organisation „Bodo Solutions“"},
+ ba:{name:"business//acts",color:"#30ABE2",sys:"sellify · business//acts"}
+};
+const AREAS=[["cockpit","◎","Cockpit"],["org","▦","Organigramm"],["proc","↝","Prozesse & Projekte"],["jobs","☰","Aufträge"]];
+let state={co:"all",area:"cockpit",projTab:"hagen",setTab:"profil"};
+let assistStage=0;
+
+/* ---------- Daten ---------- */
+const WAIT={
+ bs:[
+  {k:"Freigabe",t:"14 recherchierte Leads nach Bodo übertragen",d:"Vertrieb · Recherche-Agent",c:[["Zielsystem","Bodo · Bodo Solutions"],["Aktion","14 Organisationen (Kontakttyp Mieterverein, Interessent) anlegen"],["Prüfung","Dublettenprüfung: 2 bereits vorhanden, werden nicht angelegt"]]},
+  {k:"Change Request",t:"AG-114 Prozessübergabe an Inkasso bewerten",d:"Einführung · Mieterverein Hagen",c:[["Frage","Kostenpflichtig ja/nein? Angebotsbezug? Wertigkeit?"],["Hinweis","In Bodo noch ohne Beschreibung"]]}
+ ],
+ ba:[
+  {k:"Rückfrage",t:"Welche Preisliste gilt für das Angebot Jinsheng Federn?",d:"Vertrieb sellify · Angebots-Agent",c:[["Optionen","Standard 2026 · Projektpreise · Rückfrage an Boris"]]}
+ ]
+};
+const RUN={
+ bs:[["Einführung Mieterverein Hagen","Projekt · 9 Aufgabenpakete","p-run","läuft"],["Kundenwunsch → Ticket → Rückmeldung","Prozess · Schritt 3 von 4","p-run","läuft"],["Bitfarm-Dokumentenmigration (AG-87)","überfällig seit 18.09.","p-bad","Eskalation"]],
+ ba:[["Company OS einführen","Projekt · Setup-Pakete","p-run","läuft"],["Angebot sellify Integration Kit","Prozess · wartet auf Rückfrage","p-wait","wartet"]]
+};
+const ORG={
+ bs:[
+  {n:"Vertrieb",c:"#1f3a5f",lead:["BH","Boris Hose"],dep:"Vertretung: offen",ppl:[["VI","Vertriebsinnendienst"]],ag:["Recherche-Agent","Vertriebsassistent Bodo","Produktinformations-Agent","Angebots-Agent"],al:"2 Freigaben warten"},
+  {n:"Einführung",c:"#147a5c",lead:["BH","Boris Hose"],dep:"Vertretung: Dominik Koppe",ppl:[["DK","Dominik Koppe · unterstützt"],["PL","Projektleitung"]],ag:["Einführungs-Agent","Einrichtungs-Agent","Datenübernahme-Agent","Vorlagen-Agent"],al:"3 Aufgaben überfällig im Pilot"},
+  {n:"Kundenservice",c:"#6a4fb3",lead:["KS","Leitung offen"],dep:"Vertretung: offen",ppl:[["SU","Support"]],ag:["Annahme-Agent","Ticket-Agent"],ok:"Alles im Plan"},
+  {n:"Produktentwicklung",c:"#8a5a12",lead:["DK","Dominik Koppe"],dep:"Vertretung: offen",ppl:[["EN","Entwicklung"]],ag:["Ticket-Agent · unterstützt"],ok:"Nimmt Tickets aus dem Betrieb entgegen"}
+ ],
+ ba:[
+  {n:"Vertrieb sellify",c:"#30ABE2",lead:["BH","Boris Hose"],dep:"Vertretung: offen",ppl:[["VT","Vertrieb"]],ag:["Vertriebsassistent sellify","Angebots-Agent","Video-Agent"],al:"1 Rückfrage offen"},
+  {n:"Beratung & Projekte",c:"#2457c5",lead:["PL","Leitung offen"],dep:"Vertretung: offen",ppl:[["BE","Berater:in"]],ag:["Onboarding-Agent sellify","Einrichtungs-Agent"],ok:"Company OS einführen läuft"}
+ ]
+};
+const GF={bs:{dep:"Vertretung: Dominik Koppe (Beispiel)"},ba:{dep:"Vertretung: offen"}};
+const PSK=[["E-Mails vorbereiten","Entwürfe in deinem Stil, Versand nach Freigabe",1],["Tagesbriefing","Morgens: was wartet, was ist überfällig",1],["Termine & Wiedervorlagen","in Bodo bzw. sellify anlegen und nachhalten",1],["Freigaben bündeln","alle offenen Freigaben auf einen Blick",1],["Angebote erstellen","nach Vorlage aus der Bibliothek",0],["Kontakte anlegen","mit Dublettenprüfung",0],["Tickets anlegen","Feature Requests und Issues ohne Dubletten",0],["Produktinformationen","Produktblätter im Hausstil",0],["Präsentationen","Foliensätze vorbereiten",0]];
+const B="https://bodo-app.com/o/k57bshnkdpahzs3fv4hvq6wz1s8aq2pm/aufgaben/";
+const PKG=[
+ {n:"Datenübernahme",c:"#147a5c",v:"Dominik Koppe",b:"Boris Hose",due:"31.10.",st:["p-run","läuft"],t:[["AG-1","Daten aus Altdatenbank holen","p-ok","erledigt"],["AG-2","Import, als Dev bereitstellen","p-ok","erledigt"],["AG-90","Migration der Hinweise","p-ok","erledigt"],["AG-81","Aktive User klären","p-ok","erledigt"],["AG-87","Bitfarm-Dokumentenmigration","p-bad","überfällig"],["AG-82","Lastschrift Oktober simulieren","p-open","offen"]]},
+ {n:"Setup definieren",c:"#2457c5",v:"Boris Hose",b:"Dominik Koppe",due:"07.11.",st:["p-run","läuft"],t:[["AG-183","Nummernkreis Kontakt vs. Vertrag","p-bad","überfällig"],["AG-85","Suchvorlagen & Listenexport","p-open","offen"],["AG-86","Auswertungen","p-open","offen"],["AG-84","Artikel zu Gewerbetarif bündeln","p-open","offen"],["AG-83","2 Jahre Kündigungsfrist","p-open","offen"]]},
+ {n:"Anforderungen & Change Requests",c:"#c8641a",v:"Boris Hose",b:"Dominik Koppe",due:"14.11.",st:["p-wait","Bewertung offen"],t:[["AG-114","Prozessübergabe an Inkasso","p-bad","überfällig"],["AG-88","Meldungen an den Landesverband","p-open","offen"]],ev:true},
+ {n:"Dokumentvorlagen",c:"#6a4fb3",v:"offen",b:"–",due:"–",st:["p-open","nicht geplant"],t:[]},
+ {n:"Benutzerschulung",c:"#8a5a12",v:"offen",b:"–",due:"–",st:["p-open","nicht geplant"],t:[]},
+ {n:"Übergabe Dev → Produktiv",c:"#14213d",v:"Boris Hose",b:"Dominik Koppe",due:"–",st:["p-wait","blockiert"],t:[],block:"KI-Zugang im Vereinssystem fehlt (Angabe zur Rechtsberatung)"},
+ {n:"Projektsteuerung & Abstimmung",c:"#5d6579",v:"Boris Hose",b:"Dominik Koppe",due:"laufend",st:["p-run","laufend"],t:[["AG-100","Terminaufzeichnungen geteilt","p-ok","erledigt"],["AG-101","Abstimmungstermin 15.09.","p-ok","erledigt"]]}
+];
+const ids={"AG-1":"v17dzd7w2rggdesxn66rgq2jtx8bacj2","AG-2":"v174y97xq72pdxdc362ektx3vh8ba467","AG-90":"v17b95pxpdah39anm9qy3sv4358dvrzn","AG-81":"v17bj8k7h28trdzcwn6yf87wah8dv1je","AG-87":"v175czw98stjcjyt5xndca5md58dttx3","AG-82":"v17dbfm3k52qhqq1v80effp6c98dt9b3","AG-183":"v171x32ex93v601cy043bg4jrh8f5cr5","AG-85":"v17dc3692tjz6sq9vbf2jb64398dvskq","AG-86":"v179gzs5xkhew5z8xg90n9h5118dt9dj","AG-84":"v174q7b50z7h4ew1vy951j1e358dt55h","AG-83":"v178x48779ebjtma439j8xkzmh8dtv52","AG-114":"v17142s34zjy8zfv767y7txvyh8e4h99","AG-88":"v178dd7062hngs4t5x5224yyvn8dvzq7","AG-100":"v1732ppjyxhgtpbh266dym6f7n8e1f7t","AG-101":"v17ehsaezwnsncj11v5mc659ph8e1f5r"};
+const VT=[["Leads recherchieren","Recherche-Agent · Mensch: Vertrieb","→ Bodo: Kontakte"],["Erstkontakt & Bedarf","Vertriebsassistent","→ Bodo: Chance, Termin"],["Demo vorbereiten","Produktinfo-Agent","→ Bodo: Demo-Organisation"],["Angebot","Angebots-Agent","→ Bodo: Dokument, E-Mail"],["Abschluss","Vertriebsassistent","startet Einführung"]];
+const BT=[["Anfrage annehmen","Annahme-Agent","→ Chronik"],["Einordnen","Annahme-Agent","Dublettenprüfung"],["Lösen oder Ticket","Ticket-Agent · Mensch: Support","→ Bodo: Ticket"],["Rückmeldung","Annahme-Agent","→ E-Mail mit Signatur"]];
+const SETUP=[
+ ["Inhaber-System",[["Kunde im eigenen CRM","Bodo · Bodo Solutions → Mietervereine Hagen (K-0037)"],["Bezug","Kunde von Bodo Solutions"]]],
+ ["Projekte",[["Hauptprojekt","Bodo - Einführung bei MIV Hagen"],["Weitere Projekte","MIV Hagen Migration"]]],
+ ["Kundensystem",[["System","Bodo"],["Dev-System","Mieterverein Hagen e.V. (Einrichtung)"],["Produktivsystem","wird später festgelegt"],["KI-Zugang","fehlt – Angabe zur Rechtsberatung nachholen"]]],
+ ["KI-Anbieter & Haupt-KI",[["Haupt-KI (Pflicht)","Claude – nur von uns freigegebene Anbieter wählbar"],["Weitere Anbieter","registrieren, nur mit bestätigter AVV"],["KI-Profile","zunächst alle auf die Haupt-KI, später verfeinern"],["Datenstufe je Anbieter","0 ohne Personendaten · 1 pseudonymisiert · 2 personenbezogen"],["Budget je Anbieter","bei Erreichen: anhalten und benachrichtigen"]]],
+ ["Abteilungen",[["Verwaltet","Vorstand · Verwaltung · Rechtsberatung · Buchhaltung"],["Leitung je Abteilung","genau eine Person, dazu Vertretung"]]],
+ ["Branchenpaket",[["Paket","Mieterverein"],["Übernommen","Organigramm, Prozesse, Projektvorlagen, Agenten"]]],
+ ["Menschen",[["Mitarbeitende","je Abteilung, verknüpft mit Bodo-Benutzer"]]],
+ ["Prozesse & Projekte",[["Aus dem Paket","Mitglied aufnehmen · Beratungstermin · Beitragslauf · Mieteranfrage · Betriebskosten prüfen"],["Je Schritt","Arbeitsanweisung · KI-Profil · Datenstufe"]]],
+ ["Bibliothek & Vorlagenquellen",[["Aus dem Kundensystem","Bodo: E-Mail- und Dokumentvorlagen (über den Anschluss)"],["Cloud-Ordner","OneDrive/SharePoint oder Google Drive – kein lokaler Ordner"]]],
+ ["Agenten & Skills",[["Aktiv","Annahme-Agent · Termin-Agent · Beitrags-Agent · Prüf-Agent"]]],
+ ["Freigaben & Benachrichtigung",[["Außenwirkung","Freigabe nötig, im Auftrag aufhebbar"],["Ruhezeit","20–7 Uhr"],["Kanäle","Push · App · E-Mail je Person"]]],
+ ["Zugriff",[["Rollen","Vorstand · Abteilungsleitung · Mitarbeitende"]]],
+ ["Recht & Datenschutz",[["AVV Kunde ↔ Anbieter von AI Head Office","bestätigt"],["Regeln","je Regel: hart (keine Hintertür) oder übersteuerbar durch eine festgelegte Rolle, protokolliert"],["Agenten dürfen nie","Rechtsberatung erteilen · Geld bewegen"]]],
+ ["KI-Assistent & Übersicht",[["KI-Assistent (Company-Chat)","aktiv, je Unternehmen"],["Kennzahlen","überfällige Pakete · wartende Freigaben · KI-Kosten"]]],
+ ["Abschluss",[["Prüfung","Verbindungstest Kundensystem und KI-Anbieter · Probelauf · Setup-Protokoll in der Kundenakte"]]]
+];
+let setupStep=0;
+
+/* ---------- Rahmen ---------- */
+function nav(){
+  if(!$("#meAva").innerHTML)$("#meAva").innerHTML=avatar(32);
+  $("#companies").innerHTML=Object.entries(CO).map(([k,c])=>`<button data-co="${k}" aria-current="${state.co===k}"><span class="dot" style="background:${c.color}"></span>${esc(c.name)}${k!=="all"&&WAIT[k]?.length?`<span class="cnt">${WAIT[k].length}</span>`:""}</button>`).join("");
+  $("#areas").innerHTML=AREAS.map(([k,i,l])=>`<button data-area="${k}" aria-current="${state.area===k}"><span class="ic">${i}</span>${l}</button>`).join("");
+  $("#chatCo").textContent=state.co==="all"?"alle Unternehmen":CO[state.co].name;
+}
+function go(o){Object.assign(state,o);if(state.co==="all"&&!["cockpit","settings"].includes(state.area))state.co="bs";render();$("#side").classList.remove("open")}
+function render(){
+  nav();
+  const a=AREAS.find(x=>x[0]===state.area)||["settings","","Einstellungen"];
+  $("#meBtn").setAttribute("aria-current",state.area==="settings");
+  $("#crumb").textContent=CO[state.co].name+" · "+CO[state.co].sys;
+  $("#title").textContent=state.area==="cockpit"&&state.co==="all"?"Alle Unternehmen":a[2];
+  const V={cockpit:state.co==="all"?vAll:vCockpit,org:vOrg,proc:vProc,jobs:vJobs,settings:vSettings}[state.area];
+  $("#view").innerHTML=V();$("#view").scrollTop=0;
+}
+
+/* ---------- Ansichten ---------- */
+function waitCard(w,co){return `<div class="item"><span class="pill ${w.k==="Freigabe"?"p-wait":w.k==="Rückfrage"?"p-run":"p-bad"}">${w.k}</span><div class="t"><b>${esc(w.t)}</b><div class="sub">${esc(w.d)}${co?" · "+CO[co].name:""}</div>
+  <div class="conseq" style="margin-top:8px">${w.c.map(([k,v])=>`<span class="k">${k}</span><span>${esc(v)}</span>`).join("")}</div>
+  <div class="acts" style="margin-top:8px">${w.k==="Freigabe"?'<button class="btn sm acc" data-toast="Freigegeben – 12 Leads werden in Bodo angelegt (Prototyp: nichts ausgeführt)">Freigeben</button><button class="btn sm" data-toast="Details geöffnet (Prototyp)">Details</button>':w.k==="Rückfrage"?'<button class="btn sm" data-toast="Antwort gesendet (Prototyp)">Standard 2026</button><button class="btn sm" data-toast="Antwort gesendet (Prototyp)">Projektpreise</button>':'<button class="btn sm acc" data-go="proc">Bewertung öffnen</button>'}</div></div></div>`}
+function vAll(){
+  return `<div class="stack">
+  <div class="grid" style="grid-template-columns:repeat(auto-fit,minmax(280px,1fr))">${["bs","ba"].map(k=>`<div class="card" style="border-top:4px solid ${CO[k].color}"><h2>${CO[k].name}</h2><div class="sub">${CO[k].sys}</div>
+    <div class="kpis"><div class="kpi warn"><b>${WAIT[k].length}</b><span>wartet auf dich</span></div><div class="kpi"><b>${RUN[k].length}</b><span>läuft</span></div><div class="kpi bad"><b>${RUN[k].filter(r=>r[2]==="p-bad").length}</b><span>Eskalationen</span></div></div>
+    <button class="btn" data-co="${k}" data-area="cockpit">Öffnen</button></div>`).join("")}
+  </div>
+  <div class="card"><h2>Wartet auf dich</h2><div class="list">${["bs","ba"].flatMap(k=>WAIT[k].map(w=>waitCard(w,k))).join("")}</div></div>
+  <div class="card"><h2>Projekte über Unternehmen hinweg <span class="pill p-open">vorgesehen</span></h2><div class="sub">„Company OS einführen“ liegt in business//acts und ist verknüpft mit dem Einführungsprojekt beim Kunden in Bodo Solutions.</div></div>
+  </div>`;
+}
+function vCockpit(){
+  const k=state.co;
+  return `<div class="stack"><div class="grid">
+   <div class="card"><h2>Wartet auf dich</h2><div class="list">${WAIT[k].map(w=>waitCard(w)).join("")||'<div class="sub">Nichts offen.</div>'}</div></div>
+   <div class="card"><h2>Läuft</h2><div class="list">${RUN[k].map(r=>`<div class="item"><div class="t"><b>${esc(r[0])}</b><div class="sub">${esc(r[1])}</div></div><span class="pill ${r[2]}">${r[3]}</span></div>`).join("")}</div></div>
+  </div>
+  <div class="card"><h2>Abteilungen</h2><div class="list">${ORG[k].map(d=>`<div class="item"><div class="ava lead" style="--c:${d.c}">${d.lead[0]}</div><div class="t"><b>${d.n}</b><div class="sub">Leitung ${esc(d.lead[1])} · ${d.ag.length} Agenten · ${d.ppl.length} Mitarbeitende</div></div><span class="pill ${d.al?"p-wait":"p-ok"}">${esc(d.al||d.ok)}</span></div>`).join("")}</div></div></div>`;
+}
+function vOrg(){
+  const g=GF[state.co];const on=PSK.filter(x=>x[2]).length;
+  return `<div class="stack"><div class="sub">Oben die Geschäftsführung, daneben als Stabsstelle ihr persönlicher KI-Assistent. Darunter jede Abteilung: eine Leitung, eine Vertretung, Mitarbeitende und Agenten mit einheitlichem Symbol.</div>
+  <div class="orgtop"><div></div>
+   <div class="card gfbox">${avatar(72)}<div><h2 style="margin:0">Geschäftsführung</h2><div class="sub">Boris Hose · du</div><div class="sub">${esc(g.dep)}</div></div></div>
+   <div class="staff"><span class="hl"></span><div class="staffcol">
+    <button class="asst" id="asstBtn"><span class="spark">✦</span><span><b>Persönlicher KI-Assistent</b><small>der Geschäftsführung · ${on} Fähigkeiten</small></span></button>
+    <button class="asst human" data-toast="Persönliche Assistenz (Mensch) hinzufügen (Prototyp)"><span class="spark" style="background:var(--sunk);color:var(--muted)">+</span><span><b>Assistenz (Mensch)</b><small>optional, z. B. Referent:in</small></span></button>
+   </div></div></div>
+  <div class="orgline"></div>
+  <div class="org orgrow">${ORG[state.co].map(d=>`<div class="card dept" style="border-top:4px solid ${d.c}">
+   <div class="head"><div class="ava lead" style="--c:${d.c}">${d.lead[0]}</div><div><h3>${d.n}</h3><div class="sub">Leitung: ${esc(d.lead[1])}</div><div class="sub">${esc(d.dep)}</div></div></div>
+   ${d.ppl.length?`<div class="sec"><div class="lbl" style="padding:0">Mitarbeitende</div>${d.ppl.map(p=>`<div class="m"><span class="ava s" style="--c:#4b6b8a">${p[0]}</span>${esc(p[1])}</div>`).join("")}</div>`:""}
+   <div class="sec"><div class="lbl" style="padding:0">Agenten</div>${d.ag.map(a=>`<div class="m"><span class="bot">◆</span>${esc(a)}</div>`).join("")}</div>
+   <div class="alert ${d.al?"":"ok"}">${esc(d.al||d.ok)}</div></div>`).join("")}
+   <div class="card" style="border-style:dashed;align-items:flex-start"><h3>+ Abteilung</h3><div class="sub">Abteilungen anlegen, ausblenden statt löschen.</div></div></div></div>`;
+}
+function chainHTML(arr){return `<div class="chain">${arr.map((s,i)=>`${i?'<span class="arrow">→</span>':""}<div class="step"><b>${s[0]}</b><span class="sub">${s[1]}</span><span>${s[2]}</span></div>`).join("")}</div>`}
+function vProc(){
+  if(state.co==="ba")return `<div class="stack"><div class="card"><h2>Company OS einführen <span class="pill p-run">Projekt</span></h2><div class="sub">Setup als Projekt in der business//acts-Instanz, weil es Bodo Solutions und sellify betrifft. Verknüpfbar mit den Projekten in den Kundeninstanzen.</div>
+   <div class="pkgs">${["Inhaber-System & Projekte","Kundensystem anbinden","Abteilungen & Menschen","Prozesse aus Branchenpaket","KI-Anbieter & Datenschutz","Abschluss & Probelauf"].map((n,i)=>`<div class="card pkg" style="--c:${["#30ABE2","#2457c5","#147a5c","#6a4fb3","#c8641a","#14213d"][i]}"><h3>${n}</h3><div class="meta"><span>Verantwortlich: Boris Hose</span><span class="pill ${i<2?"p-run":"p-open"}">${i<2?"läuft":"offen"}</span></div></div>`).join("")}</div></div></div>`;
+  const t=state.projTab;
+  return `<div class="stack"><div class="tabs" role="tablist">${[["hagen","Projekt: Einführung Mieterverein Hagen"],["vt","Prozess: Vertrieb"],["bt","Prozess: Betrieb"],["step","Schritt bearbeiten"]].map(([k,l])=>`<button role="tab" aria-selected="${t===k}" data-ptab="${k}">${l}</button>`).join("")}</div>
+  ${t==="step"?vStep():t==="vt"?`<div class="card"><h2>Vertrieb · vom Lead zum Abschluss</h2><div class="sub">Prozess mit fester Reihenfolge. Jeder Schritt: Agent allein oder Agent mit verantwortlichem Menschen.</div>${chainHTML(VT)}</div>`:
+    t==="bt"?`<div class="card"><h2>Betrieb · Anfrage bis Rückmeldung</h2><div class="sub">Prozess mit fester Reihenfolge, Erweiterungswünsche gehen zurück in den Vertrieb.</div>${chainHTML(BT)}</div>`:
+  `<div class="card"><h2>Einführung Mieterverein Hagen <span class="pill p-run">Projekt</span></h2>
+    <div class="sub">Aufgabenpakete ohne feste Reihenfolge. Je Paket genau ein Verantwortlicher, dazu Beteiligte, Frist, Aufgaben und später Abrechnung. Aufgaben und Status aus Bodo (Projekt „MIV Hagen Migration“, 10.10.2026); Verantwortliche und Fristen sind Beispielwerte.</div>
+    <div class="kpis"><div class="kpi"><b>6</b><span>erledigt</span></div><div class="kpi"><b>3</b><span>in Bearbeitung</span></div><div class="kpi"><b>6</b><span>offen</span></div><div class="kpi bad"><b>3</b><span>überfällig</span></div></div></div>
+   <div class="pkgs">${PKG.map(p=>`<div class="card pkg" style="--c:${p.c}"><h3>${p.n}</h3>
+     <div class="meta"><span>Verantwortlich: <b>${esc(p.v)}</b></span><span>Beteiligt: ${esc(p.b)}</span><span>Frist: ${p.due}</span><span class="pill ${p.st[0]}">${p.st[1]}</span></div>
+     ${p.t.length?`<ul class="tl">${p.t.map(x=>`<li><a href="${B+ids[x[0]]}" target="_blank" rel="noopener"><code>${x[0]}</code></a><span style="flex:1">${esc(x[1])}</span><span class="pill ${x[2]}">${x[3]}</span></li>`).join("")}</ul>`:`<div class="sub">${p.block?esc(p.block):"Noch keine Aufgaben – Lücke im Projekt."}</div>`}
+     ${p.ev?`<div class="eval"><b>Anforderungsbewertung AG-114</b><span>Kostenpflichtig? <button class="btn sm" data-toast="Bewertung gespeichert (Prototyp)">ja</button> <button class="btn sm" data-toast="Bewertung gespeichert (Prototyp)">nein</button></span><span class="an">Vorschlag des Agenten, zu prüfen</span><span>Angebotsbezug und Wertigkeit erst möglich, wenn die Anforderung beschrieben ist.</span></div>`:""}
+   </div>`).join("")}</div>`}
+  </div>`;
+}
+function vJobs(){
+  return `<div class="stack"><div class="card"><h2>Eingang</h2><div class="sub">Neue Aufträge landen hier. Der Agent schlägt vor: Einzelaufgabe oder Prozess – du bestätigst.</div>
+   <div class="list">
+    <div class="item"><span class="pill p-wait">Vorschlag</span><div class="t"><b>„Infomaterial Bodo an Mieterverein Musterstadt senden, Text von mir“</b><div class="sub">Einzelaufgabe · Vertrieb · Freigabe im Auftrag enthalten → läuft ohne weitere Freigabe · KI-Profil „Texte“ · Datenstufe 0</div></div><button class="btn sm" data-toast="Auftrag gestartet (Prototyp)">Bestätigen</button></div>
+    <div class="item"><span class="pill p-wait">Vorschlag</span><div class="t"><b>„Kunde meldet: Lastschriftdatei wird abgelehnt“</b><div class="sub">Prozess „Betrieb · Anfrage bis Rückmeldung“ · Kundenservice · Verantwortlich: Support</div></div><button class="btn sm" data-toast="Prozess gestartet (Prototyp)">Prozess starten</button></div>
+   </div></div>
+   <div class="card"><h2>Laufende Aufträge</h2><div class="list">${RUN[state.co].map(r=>`<div class="item"><div class="t"><b>${esc(r[0])}</b><div class="sub">${esc(r[1])}</div></div><span class="pill ${r[2]}">${r[3]}</span></div>`).join("")}</div></div></div>`;
+}
+const SKC={"kontakt-anlegen":["Kontakte anlegen mit Dublettenprüfung",2,1],"bodo-angebot":["Angebot als PDF im Bodo-Stil",1,1],"email-erstellung":["E-Mails im Stil des Absenders",1,1],"bodo-ersteinrichtung":["Bodo-Mandant Bereich für Bereich einrichten",0,1],"bodo-einfuehrung-anlegen":["Einführungsprojekt anlegen",0,1],"bodo-ticket-anlegen":["Feature Requests und Issues ohne Dubletten",0,1],"feature-request-screenshot":["Entwurfs-Screenshots zeichnen",0,0],"bodo-video":["Szenenvideos für Bodo",0,0],"sellify-video":["Szenenvideos für sellify",0,0],"bodo-produktinformation":["Produktblatt im Hausstil",0,0]};
+const AG=[
+ {n:"Recherche-Agent",d:"Vertrieb",t:"Leads recherchieren, Dubletten prüfen",sk:["kontakt-anlegen"],lim:-1,prof:"Schnell & günstig",resp:"Leitung Vertrieb",p:{lesen:1,anlegen:1,mail:0,loeschen:0}},
+ {n:"Angebots-Agent",d:"Vertrieb",t:"Angebote nach Vorlage",sk:["bodo-angebot","email-erstellung"],lim:-1,prof:"Texte",resp:"Leitung Vertrieb",p:{lesen:1,anlegen:1,mail:1,loeschen:0}},
+ {n:"Einrichtungs-Agent",d:"Einführung",t:"Kataloge Bereich für Bereich einrichten",sk:["bodo-ersteinrichtung"],lim:0,prof:"Gründlich prüfen",resp:"Projektleitung",p:{lesen:1,anlegen:1,mail:0,loeschen:0}},
+ {n:"Einführungs-Agent",d:"Einführung",t:"Einführungsprojekt anlegen",sk:["bodo-einfuehrung-anlegen"],lim:-1,prof:"Schnell & günstig",resp:"Projektleitung",p:{lesen:1,anlegen:1,mail:0,loeschen:0}},
+ {n:"Ticket-Agent",d:"Kundenservice / Produktentwicklung",t:"Tickets ohne Dubletten, mit Screenshot",sk:["bodo-ticket-anlegen","feature-request-screenshot"],lim:-1,prof:"Gründlich prüfen",resp:"Support",p:{lesen:1,anlegen:1,mail:0,loeschen:0}},
+ {n:"Video-Agent",d:"Vertrieb",t:"Szenenvideos",sk:["bodo-video","sellify-video"],lim:0,prof:"Bilder",resp:"Leitung Vertrieb",p:{lesen:1,anlegen:0,mail:0,loeschen:0}}
+];
+const LVN=["0 · ohne Personendaten","1 · pseudonymisiert","2 · personenbezogen"];
+const lvTag=l=>`<span class="lv l${l}">Stufe ${l}</span>`;
+const skLv=a=>a.sk.reduce((m,k)=>Math.max(m,SKC[k][1]),0);
+const agLv=a=>a.lim<0?skLv(a):Math.min(a.lim,skLv(a));
+function vAgents(){
+  return `<div class="stack"><div class="sub">Agenten heißen nach ihrer Funktion und arbeiten mit Skills – fein geschnittenen, geprüften Arbeitsanleitungen. Klick auf einen Agenten öffnet Skills und Einstellungen.</div>
+  <div class="grid">${AG.map((a,i)=>`<button class="card agcard" data-agent="${i}"><div class="row"><span class="bot">◆</span><div><h3>${a.n}</h3><div class="sub">${a.d}</div></div></div><div>${a.t}</div><div class="sub">Skills: ${a.sk.join(" · ")}</div><div class="meta"><span class="pill p-wait">Freigabe bei Außenwirkung</span>${lvTag(agLv(a))}</div><span class="open">Skills &amp; Einstellungen →</span></button>`).join("")}
+  <div class="card" style="border-style:dashed"><h3>+ Agent</h3><div class="sub">Neuen Agenten anlegen und Skills zuordnen.</div></div></div></div>`;
+}
+let agI=0;
+function agentModal(i){
+  const old=$("#modal .card.wide");const st=old&&agI===i?old.scrollTop:0;
+  agI=i;const a=AG[i];const sl=skLv(a),el=agLv(a);
+  const allSk=Object.keys(SKC);
+  const P=[["lesen","Daten im Kundensystem lesen",0],["anlegen","Datensätze anlegen und ändern",0],["mail","E-Mails versenden",0],["loeschen","Datensätze löschen",1]];
+  $("#modal").innerHTML=`<div class="modal" data-close><div class="card wide" role="dialog" aria-modal="true" aria-label="${a.n}">
+   <div class="row" style="gap:12px"><span class="bot" style="width:34px;height:34px;font-size:15px">◆</span><div><h2 style="margin:0">${a.n}</h2><div class="sub">${a.d} · ${a.t}</div></div></div>
+   <div class="sec2"><h3>Skills</h3><div class="sub">Was der Agent kann. Jeder Skill bringt seine Datenstufe und ggf. eine Pflicht-Freigabe mit. Datenstufen der Skills sind Beispielwerte.</div>
+    <div class="sklist" style="max-height:none">${allSk.map(k=>{const on=a.sk.includes(k);const c=SKC[k];return `<button class="sk" data-agsk="${k}" aria-pressed="${on}"><span class="bx">${on?"✓":""}</span><span style="flex:1"><b>${k}</b><small>${c[0]}</small></span>${lvTag(c[1])}${c[2]?'<span class="pill p-wait">Pflicht-Freigabe</span>':""}</button>`}).join("")}</div></div>
+   <div class="sec2"><h3>Personenbezogene Daten an die KI</h3>
+    <div class="sub">Standard: Der Agent übernimmt die Datenstufe aus seinen Skills (hier: <b>${LVN[sl]}</b>). Du kannst sie für diesen Agenten nur verschärfen, nie lockern. Harte Regeln aus dem Setup gelten immer.</div>
+    <div class="seg">${[[-1,"aus den Skills"],[0,"0 · keine"],[1,"1 · pseudonymisiert"],[2,"2 · personenbezogen"]].map(([v,l])=>`<button data-aglim="${v}" aria-pressed="${a.lim===v}" ${v>sl?"disabled title=\"höher als die Skills – nicht möglich\" style=\"opacity:.45\"":""}>${l}</button>`).join("")}</div>
+    <div class="alert ok">Wirksam für diesen Agenten: <b>${LVN[el]}</b>${el<sl?" – Skills mit höherer Stufe arbeiten pseudonymisiert oder halten an.":""}</div></div>
+   <div class="sec2"><h3>Was der Agent darf</h3>${P.map(([k,l,hard])=>`<div class="perm"><span>${l}</span>${hard?'<span class="pill p-bad">🔒 nie – harte Regel</span>':`<div class="seg"><button data-agp="${k}:1" aria-pressed="${!!a.p[k]}">erlaubt</button><button data-agp="${k}:0" aria-pressed="${!a.p[k]}">nicht erlaubt</button></div>`}</div>`).join("")}
+    <div class="perm"><span>Außenwirkung (Senden, Schreiben nach außen)</span><span class="pill p-wait">Freigabe nötig · im Auftrag aufhebbar</span></div></div>
+   <div class="two"><div class="field"><label>KI-Profil</label><div class="val">${a.prof} (Beispiel)</div></div><div class="field"><label>Verantwortlicher Mensch</label><div class="val">${a.resp}</div></div></div>
+   <div class="acts"><button class="btn" data-toast="Testlauf im Dev-System gestartet (Prototyp)">Testlauf</button><button class="btn" data-close-btn>Schließen</button><button class="btn pri" data-agsave>Speichern</button></div></div></div>`;
+  const nw=$("#modal .card.wide");if(nw)nw.scrollTop=st;
+}
+function vConn(){
+  const C=[["B","#1f3a5f","Bodo","Kontakte, Projekte, Aufgaben, Termine, Dokumente, E-Mails, Kataloge","p-ok","verbunden"],["s","#30ABE2","sellify","Organisationen, Personen, Chancen, Projekte, Aufgaben, Dokumente","p-ok","verbunden"],["+","#5d6579","Weitere Systeme","jedes System, das per MCP erreichbar ist","p-open","vorgesehen"]];
+  return `<div class="stack"><div class="card"><h2>Anschluss-Schicht</h2><div class="sub">Prozesse nennen nur Grundaufgaben – Kontakt, Aufgabe, Termin, Dokument, E-Mail, Projekt, Katalog. Je System übersetzt ein Anschluss. Ein neues System braucht einen neuen Anschluss, aber keine neuen Prozesse.</div>
+   <div class="list">${C.map(c=>`<div class="item"><div class="conn"><div class="sym" style="background:${c[1]}">${c[0]}</div></div><div class="t"><b>${c[2]}</b><div class="sub">${c[3]}</div></div><span class="pill ${c[4]}">${c[5]}</span></div>`).join("")}</div></div>
+   <div class="card"><h2>KI-Anbieter</h2><div class="sub">Die KI ist ebenfalls angeschlossen, nicht fest eingebaut: Haupt-KI, weitere Anbieter, Profile und Datenstufen stehen unter „KI &amp; Daten“.</div><div class="acts"><button class="btn" data-stab="ki">Zu KI &amp; Daten</button></div></div></div>`;
+}
+function vSetup(){
+  const s=SETUP[setupStep];
+  return `<div class="wiz"><div class="card wsteps">${SETUP.map((x,i)=>`<button data-step="${i}" aria-current="${i===setupStep}" class="${i<setupStep?"done":""}"><span class="num">${i<setupStep?"✓":i+1}</span>${x[0]}</button>`).join("")}</div>
+   <div class="card"><div class="sub">Setup einer Kundeninstanz · Beispiel Mieterverein Hagen · Schritt ${setupStep+1} von ${SETUP.length}</div><h2>${s[0]}</h2>
+    ${s[1].map(([l,v])=>`<div class="field"><label>${l}</label><div class="val">${esc(v)}</div></div>`).join("")}
+    ${setupStep===3?'<div class="alert ok">Ohne Haupt-KI kann AI Head Office nicht arbeiten – dieser Schritt ist Pflicht.</div>':""}
+    ${setupStep===2?'<div class="alert">Blocker erkannt: Ohne KI-Zugang können Agenten im Vereinssystem nicht arbeiten. Die Abteilungsleitung wird informiert.</div>':""}
+    <div class="acts"><button class="btn" data-step="${Math.max(0,setupStep-1)}" ${setupStep?"":"disabled"}>Zurück</button><button class="btn pri" data-step="${Math.min(SETUP.length-1,setupStep+1)}">${setupStep===SETUP.length-1?"Fertig":"Weiter"}</button></div></div></div>`;
+}
+
+const PHOTO="data:image/jpeg;base64,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";
+function avatar(n){return `<span class="ava" role="img" aria-label="Boris Hose" style="display:inline-block;width:${n}px;height:${n}px;min-width:${n}px;background:url(${PHOTO}) center/cover no-repeat;pointer-events:none"></span>`}
+function vSettings(){
+  const t=state.setTab;
+  const tabs=`<div class="tabs" role="tablist">${[["profil","Profil"],["firmen","Unternehmen"],["agents","Agenten & Skills"],["lib","Bibliothek"],["setup","Setup"],["conn","Anschlüsse"],["ki","KI & Daten"]].map(([k,l])=>`<button role="tab" aria-selected="${t===k}" data-stab="${k}">${l}</button>`).join("")}</div>`;
+  if(t==="firmen"){const F=[["bs","Bodo","Organisation „Bodo Solutions“","Dev und Produktiv getrennt"],["ba","sellify","Mandant „business//acts“","Produktiv"]];
+   return `<div class="stack">${tabs}<div class="card"><h2>Angeschlossene Unternehmen</h2><div class="sub">Jedes Unternehmen ist eine eigene Instanz mit eigenem Organigramm, eigenen Prozessen und einem angebundenen System, in dem die Arbeit gespeichert wird.</div>
+   <div class="list">${F.map(f=>`<div class="item"><span class="dot" style="width:12px;height:12px;border-radius:50%;background:${CO[f[0]].color};flex:none"></span><div class="t"><b>${CO[f[0]].name}</b><div class="sub">System: ${f[1]} · ${f[2]} · ${f[3]}</div></div><span class="pill p-ok">verbunden</span><button class="btn sm" data-co="${f[0]}" data-area="cockpit">Öffnen</button></div>`).join("")}
+    <div class="item"><span style="width:22px;height:22px;border-radius:50%;background:var(--sunk);color:var(--muted);display:inline-flex;align-items:center;justify-content:center;font-weight:700;flex:none">+</span><div class="t"><b>Weiteres Unternehmen hinzufügen</b><div class="sub">Eigene Instanz anlegen, System anbinden (Bodo, sellify oder per MCP) – über das geführte Setup.</div></div><button class="btn pri sm" data-stab="setup">Setup starten</button></div>
+   </div></div></div>`;}
+  if(t==="agents")return `<div class="stack">${tabs}${vAgents()}</div>`;
+  if(t==="lib")return `<div class="stack">${tabs}${vLib()}</div>`;
+  if(t==="setup")return `<div class="stack">${tabs}${vSetup()}</div>`;
+  if(t==="conn")return `<div class="stack">${tabs}${vConn()}</div>`;
+  if(t==="ki")return `<div class="stack">${tabs}${vKi()}</div>`;
+  const F=[["Name","Boris Hose"],["Rolle","Geschäftsführung"],["Unternehmen","Bodo Solutions · business//acts"],["Vertretung","Beispiel: Leitung Vertrieb"],["Benachrichtigungen","Push und App sofort · E-Mail als Tageszusammenfassung"],["Ruhezeit","20–7 Uhr, Eskalationen ausgenommen"],["Sprache","Deutsch"],["Erscheinungsbild","automatisch (hell/dunkel)"]];
+  return `<div class="stack">${tabs}<div class="card"><div class="prof">${avatar(96)}<div><h2>Boris Hose</h2><div class="sub">Geschäftsführung · Angaben außer Name und Bild sind Beispiele</div></div><div style="flex:1"></div><button class="btn" data-toast="Profilbild ändern (Prototyp)">Bild ändern</button></div></div>
+   <div class="card"><h2>Profil &amp; persönliche Einstellungen</h2><div class="two">${F.map(([l,v])=>`<div class="field"><label>${l}</label><div class="val">${esc(v)}</div></div>`).join("")}</div>
+   <div class="acts" style="justify-content:flex-start"><button class="btn pri" data-toast="Gespeichert (Prototyp)">Speichern</button><button class="btn" data-toast="Abgemeldet (Prototyp)">Abmelden</button></div></div></div>`;
+}
+
+function skillModal(){
+  $("#modal").innerHTML=`<div class="modal" data-close><div class="card" role="dialog" aria-modal="true" aria-label="Fähigkeiten des persönlichen KI-Assistenten"><h2>✦ Persönlicher KI-Assistent</h2>
+  <div class="sub">Stell dir zusammen, was dein Assistent können soll. <b id="skcnt">${PSK.filter(x=>x[2]).length}</b> Fähigkeiten aktiv. Was nach außen wirkt, gibt er dir weiter zur Freigabe.</div>
+  <div class="sklist">${PSK.map((x,i)=>`<button class="sk" data-sk="${i}" aria-pressed="${!!x[2]}"><span class="bx">${x[2]?"✓":""}</span><span><b>${x[0]}</b><small>${x[1]}</small></span></button>`).join("")}</div>
+  <div class="acts"><button class="btn" data-toast="Weitere Skills aus der Skill-Bibliothek (Prototyp)">+ Weitere Skills</button><button class="btn pri" data-skdone>Fertig</button></div></div></div>`;
+}
+function vKi(){
+  const P=[["Claude","Haupt-KI","Steuerung, KI-Assistent, Gründlich prüfen, Texte","2","ja","180 € / 250 €","p-ok"],["Mistral","Zusatz","Schnell & günstig","1","ja","22 € / 60 €","p-ok"],["Gemini","Zusatz","Bilder","0","ja","9 € / 40 €","p-ok"]];
+  const R=[["Gründlich prüfen","Claude","z. B. Betriebskostenabrechnung prüfen","1"],["Schnell & günstig","Mistral","z. B. Termin dokumentieren","1"],["Texte","Claude","Anschreiben, Zusammenfassungen","1"],["Bilder","Gemini","Porträts, Grafiken","0"]];
+  return `<div class="stack"><div class="alert ok">Anbieter, Modelle und Beträge sind Beispielwerte.</div>
+  <div class="card"><h2>Haupt-KI</h2><div class="sub">Steuert AI Head Office: KI-Assistent (Company-Chat), Einordnung neuer Aufträge, Anforderungsbewertung, Zuweisung, Eskalation. Wählbar sind nur Anbieter, die wir nach Prüfung freigegeben haben.</div>
+   <div class="list"><div class="item"><span class="pill p-ok">freigegeben</span><div class="t"><b>Claude</b><div class="sub">aktive Haupt-KI dieser Instanz</div></div></div>
+   <div class="item"><span class="pill p-open">in Prüfung</span><div class="t"><b>ChatGPT</b><div class="sub">als Haupt-KI erst nach Prüfung wählbar (Anschluss an Bodo/sellify)</div></div></div></div>
+   <div class="sub">Fällt die Haupt-KI aus, pausieren Aufträge und du wirst benachrichtigt – kein automatischer Wechsel.</div></div>
+  <div class="card"><h2>Registrierte Anbieter</h2><div class="sub">Ein Anbieter lässt sich nur hinterlegen, wenn bestätigt ist, dass eine AVV mit ihm besteht. Budget erreicht → Ausführung hält an, kein Ausweichen auf einen anderen Anbieter.</div>
+   <div class="tblw"><table><thead><tr><th>Anbieter</th><th>Rolle</th><th>Profile</th><th>Datenstufe</th><th>AVV bestätigt</th><th>Verbrauch / Budget im Monat</th></tr></thead><tbody>
+   ${P.map(r=>`<tr><td><b>${r[0]}</b></td><td>${r[1]}</td><td>${r[2]}</td><td>${r[3]}</td><td><span class="pill ${r[6]}">${r[4]}</span></td><td>${r[5]}</td></tr>`).join("")}</tbody></table></div>
+   <div class="acts"><button class="btn" data-toast="Anbieter registrieren: zuerst AVV bestätigen (Prototyp)">Anbieter hinzufügen</button></div></div>
+  <div class="card"><h2>KI-Profile</h2><div class="sub">Schritte, Skills und Aufträge nennen ein Profil – das Profil zeigt auf den Anbieter. Wechsel an einer Stelle statt in jedem Prozess. Die genaueste Angabe gewinnt: Auftrag vor Schritt vor Skill vor Haupt-KI.</div>
+   <div class="tblw"><table><thead><tr><th>Profil</th><th>Anbieter</th><th>Wofür</th><th>Höchste Datenstufe</th></tr></thead><tbody>
+   ${R.map(r=>`<tr><td><b>${r[0]}</b></td><td>${r[1]}</td><td>${r[2]}</td><td>${r[3]}</td></tr>`).join("")}</tbody></table></div></div>
+  <div class="card"><h2>Datenstufen &amp; Datenschleuse</h2>
+   <div class="two"><div><b>0 · ohne Personendaten</b><div class="sub">nur Organisation und Prozess</div></div><div><b>1 · pseudonymisiert</b><div class="sub">„das Mitglied“, „der Mandant“ – Name, Anschrift, Kontakt, Geburtsdatum, Nummern und Bankdaten werden vor dem Senden entfernt</div></div><div><b>2 · personenbezogen</b><div class="sub">nur mit AVV und passendem Datenstandort</div></div></div>
+   <div class="tblw"><table><thead><tr><th>Regel</th><th>Art</th><th>Wer darf übersteuern</th></tr></thead><tbody>
+    <tr><td>Besondere Kategorien (z. B. Gesundheit) nie an Stufe 0/1</td><td><span class="pill p-bad">🔒 hart</span></td><td>niemand – auch nicht der Hersteller</td></tr>
+    <tr><td>Mitgliederdaten nur pseudonymisiert an Zusatz-Anbieter</td><td><span class="pill p-bad">🔒 hart</span></td><td>niemand – Lockern nur über erneutes Setup</td></tr>
+    <tr><td>Interne Notizen an Profil „Schnell &amp; günstig“</td><td><span class="pill p-wait">nach Wahl</span></td><td>Abteilungsleitung, mit Begründung (Beispiel)</td></tr>
+   </tbody></table></div><div class="sub">Harte Regeln haben keine Hintertür. Bei Regeln „nach Wahl“ legt der Kunde im Setup fest, ob und von wem sie übersteuert werden dürfen – jede Übersteuerung wird protokolliert. Ein Auftrag kann jede Regel verschärfen.</div></div></div>`;
+}
+function vStep(){
+  const st=["Abrechnungszeitraum und Frist prüfen (§ 556 Abs. 3 BGB).","Jede Kostenart gegen Betriebskostenverordnung und Mietvertrag abgleichen.","Flächenangaben prüfen.",...(assistStage>1?["Umlageschlüssel gegen den Mietvertrag abgleichen."]:[]),"Vorauszahlungen korrekt abgezogen?"];
+  const draft=assistStage?"Ziel: Betriebskostenabrechnung des Mitglieds auf formelle und inhaltliche Fehler prüfen.\nVorgehen:\n"+st.map((x,i)=>(i+1)+". "+x).join("\n")+"\nErgebnis: Prüfbericht mit Ampel je Position und Begründung.\nNicht: keine Rechtsberatung an das Mitglied – Ergebnis geht zur Freigabe an die Rechtsberatung.":"Betriebskostenabrechnung prüfen";
+  return `<div class="card"><h2>Schritt bearbeiten · Betriebskostenabrechnung prüfen</h2><div class="sub">Beispiel aus dem Branchenpaket Mieterverein, Prozess „Beratung“. Anweisungstext ist ein Beispiel und fachlich zu prüfen.</div>
+   <div class="two"><div class="field"><label>Abteilung</label><div class="val">Rechtsberatung</div></div><div class="field"><label>Verantwortlich</label><div class="val">Leitung Rechtsberatung (Beispiel)</div></div><div class="field"><label>Agent</label><div class="val">◆ Prüf-Agent</div></div><div class="field"><label>Skill (Methode)</label><div class="val">betriebskosten-pruefen</div></div></div>
+   <div class="field"><label for="ins">Arbeitsanweisung</label><textarea id="ins" class="ta" rows="${assistStage?10:2}">${esc(draft)}</textarea></div>
+   <div class="acts" style="justify-content:flex-start"><button class="btn pri" data-assist="1">✦ Anweisung per KI erstellen</button><button class="btn" data-toast="Testlauf mit Beispieldaten im Dev-System gestartet (Prototyp)">Testlauf im Dev-System</button><span class="sub">Fassung ${assistStage?2:1} · frühere Fassungen bleiben erhalten</span></div>
+   ${assistStage===1?`<div class="assist"><b>Anweisungs-Assistent (Haupt-KI)</b><div>Ich habe einen Entwurf geschrieben. Eine Rückfrage: Soll der Umlageschlüssel ausdrücklich gegen den Mietvertrag geprüft werden?</div><div class="q"><button class="btn sm" data-assist="2">Ja, aufnehmen</button><button class="btn sm" data-toast="Bleibt wie im Entwurf (Prototyp)">Nein</button></div></div>`:assistStage===2?`<div class="assist"><b>Anweisungs-Assistent</b><div>Übernommen. Möchtest du noch etwas ergänzen, z. B. welche Unterlagen das Mitglied mitliefern muss?</div></div>`:""}
+   <div class="two"><div class="field"><label>KI-Profil</label><div class="val">Gründlich prüfen → Claude (Beispiel)</div></div><div class="field"><label>Datenstufe</label><div class="val"><span class="lock">🔒 1 · pseudonymisiert – im Setup festgelegt</span></div></div><div class="field"><label>Bibliothek</label><div class="val">Vorlage „Prüfbericht Betriebskosten“</div></div><div class="field"><label>Freigabe</label><div class="val">Ergebnis nur nach Freigabe durch die Rechtsberatung</div></div></div></div>`;
+}
+function vLib(){
+  const L=[["Material","Produktübersicht Bodo","OneDrive · Vertrieb/Material","an Interessenten nach dem Erstkontakt","v3 · freigegeben"],["Material","Unternehmenspräsentation","OneDrive · Vertrieb/Material","Erstgespräch, Messen","v5 · freigegeben"],["Material","AVV-Entwurf","OneDrive · Recht","vor Vertragsabschluss mit Kunden","v2 · freigegeben"],["Vorlage","Angebot Bodo","Skill bodo-angebot · Layout Bodo-Navy","Angebote im Vertrieb","v4 · freigegeben"],["Vorlage","Begrüßungs-E-Mail","Bodo · E-Mail-Vorlage (über den Anschluss)","nach Vertragsabschluss","aus Bodo"],["Vorlage","Prüfbericht Betriebskosten","Bodo · Dokumentvorlage","Ergebnis „Betriebskosten prüfen“","Entwurf"]];
+  return `<div class="stack"><div class="card"><h2>Bibliothek</h2><div class="sub">Material wird unverändert versendet, Vorlagen werden befüllt. Quellen: das Kundensystem über den Anschluss oder ein Cloud-Ordner (OneDrive/SharePoint, Google Drive) – kein lokaler Ordner. „Wann verwenden“ hilft der KI, das Richtige zu wählen. Einträge sind Beispiele.</div>
+   <div class="tblw"><table><thead><tr><th>Art</th><th>Name</th><th>Quelle</th><th>Wann verwenden</th><th>Stand</th></tr></thead><tbody>
+   ${L.map(r=>`<tr><td><span class="pill ${r[0]==="Material"?"p-run":"p-wait"}">${r[0]}</span></td><td><b>${r[1]}</b></td><td>${r[2]}</td><td>${r[3]}</td><td>${r[4]}</td></tr>`).join("")}</tbody></table></div>
+   <div class="sub">Was nach außen geht, braucht weiter eine Freigabe. Personendaten setzt das Kundensystem ein, nicht die KI.</div></div></div>`;
+}
+
+/* ---------- Chat ---------- */
+const SCRIPT={
+ "Wie steht die Einführung in Hagen?":`Stand aus Bodo (10.10.2026): <ul><li>15 Aufgaben: 6 erledigt, 3 in Bearbeitung, 6 offen</li><li>Überfällig: AG-87 Dokumentenmigration, AG-114 Inkasso, AG-183 Nummernkreis</li><li>Blocker: KI-Zugang im Vereinssystem fehlt</li><li>Ohne Aufgaben: Dokumentvorlagen, Schulung</li></ul>Soll ich die drei überfälligen Punkte den Verantwortlichen melden?`,
+ "Lege einen Feature Request für Inkasso an":`Ich habe vorher nach vergleichbaren Tickets gesucht: keins gefunden. Entwurf:<div class="prev"><b>Feature Request · Bodo Solutions</b><span><b>Ziel:</b> Übergabe offener Forderungen an ein Inkassobüro</span><span><b>Zuständig:</b> niemand (Entwicklung übernimmt selbst)</span><span><b>Tags:</b> UX</span><span><b>Bewertung:</b> kostenpflichtig? – bitte entscheiden</span></div><div class="acts" style="margin-top:6px"><button class="btn sm acc" data-toast="Ticket angelegt (Prototyp: nichts ausgeführt)">Freigeben & anlegen</button><button class="btn sm">Ändern</button></div>`,
+ "Was wartet heute auf mich?":`Über beide Unternehmen:<ul><li>Bodo Solutions: Freigabe 14 Leads · Bewertung AG-114</li><li>business//acts: Rückfrage Preisliste Jinsheng Federn</li></ul>`
+};
+function chatOpen(v){$("#chat").hidden=!v;$("#chatBtn").hidden=v;if(v&&!$("#msgs").innerHTML)ai("Hallo Boris. Ich kenne Organigramm, Prozesse, Projekte und Aufträge deiner Unternehmen und arbeite über die Anschlüsse in Bodo und sellify – mit deinen Freigaberegeln.");$("#chips").innerHTML=Object.keys(SCRIPT).map(k=>`<button data-ask="${esc(k)}">${esc(k)}</button>`).join("")}
+function me(t){$("#msgs").insertAdjacentHTML("beforeend",`<div class="msg me">${esc(t)}</div>`)}
+function ai(h){$("#msgs").insertAdjacentHTML("beforeend",`<div class="msg ai">${h}</div>`);$("#msgs").scrollTop=1e6}
+function ask(t){me(t);setTimeout(()=>ai(SCRIPT[t]||"Im Prototyp gibt es dafür keine vorbereitete Antwort. Im echten System würde ich die Frage mit den Daten aus Bodo bzw. sellify beantworten."),350)}
+
+/* ---------- Neuer Auftrag ---------- */
+function newJob(){
+  $("#modal").innerHTML=`<div class="modal" data-close><div class="card" role="dialog" aria-modal="true" aria-label="Neuer Auftrag"><h2>Neuer Auftrag</h2>
+  <div class="field"><label for="jt">Was soll passieren?</label><textarea id="jt" rows="3" style="border:1px solid var(--line);border-radius:9px;padding:8px 10px;background:var(--bg)">Angebot für den Mieterverein Musterstadt vorbereiten, 2.400 Mitglieder</textarea></div>
+  <div class="sub">Vorschlag des Agenten</div>
+  <button class="opt" aria-pressed="true" data-opt><div><b>Prozess „Vertrieb“ ab Schritt „Angebot“</b><div class="sub">Abteilung Vertrieb · Verantwortlich: Boris Hose · Angebots-Agent · Freigabe vor Versand</div></div></button>
+  <button class="opt" aria-pressed="false" data-opt><div><b>Einzelaufgabe an den persönlichen Assistenten</b><div class="sub">ohne Prozess, direkt erledigen</div></div></button>
+  <div class="acts"><button class="btn" data-close>Abbrechen</button><button class="btn pri" data-start>Auftrag starten</button></div></div></div>`;
+}
+
+/* ---------- Ereignisse ---------- */
+document.addEventListener("click",e=>{
+  const b=e.target.closest("button,[data-close]");if(!b)return;
+  if(b.dataset.co){go({co:b.dataset.co,area:b.dataset.area||(state.area==="settings"?"cockpit":state.area)});return}
+  if(b.dataset.area){go({area:b.dataset.area});return}
+  if(b.dataset.go){if(["agents","lib","setup"].includes(b.dataset.go)){state.setTab=b.dataset.go;go({area:"settings"})}else go({area:b.dataset.go});return}
+  if(b.dataset.ptab){state.projTab=b.dataset.ptab;render();return}
+  if(b.id==="asstBtn"){skillModal();return}
+  if(b.dataset.agent){agentModal(+b.dataset.agent);return}
+  if(b.dataset.agsk){const a=AG[agI],k=b.dataset.agsk;a.sk=a.sk.includes(k)?a.sk.filter(x=>x!==k):[...a.sk,k];if(a.lim>skLv(a))a.lim=-1;agentModal(agI);return}
+  if(b.dataset.aglim!==undefined){AG[agI].lim=+b.dataset.aglim;agentModal(agI);return}
+  if(b.dataset.agp){const [k,v]=b.dataset.agp.split(":");AG[agI].p[k]=+v;agentModal(agI);return}
+  if(b.hasAttribute("data-agsave")){$("#modal").innerHTML="";render();toast(AG[agI].n+" gespeichert (Prototyp)");return}
+  if(b.hasAttribute("data-close-btn")){$("#modal").innerHTML="";render();return}
+  if(b.hasAttribute("data-sk")){const i=+b.dataset.sk;PSK[i][2]=PSK[i][2]?0:1;b.setAttribute("aria-pressed",!!PSK[i][2]);b.querySelector(".bx").textContent=PSK[i][2]?"✓":"";$("#skcnt").textContent=PSK.filter(x=>x[2]).length;return}
+  if(b.hasAttribute("data-skdone")){$("#modal").innerHTML="";render();toast("Fähigkeiten des Assistenten gespeichert (Prototyp)");return}
+  if(b.dataset.stab){state.setTab=b.dataset.stab;go({area:"settings"});return}
+  if(b.id==="meBtn"){state.setTab="profil";go({area:"settings"});return}
+  if(b.dataset.assist){assistStage=+b.dataset.assist;render();return}
+  if(b.dataset.step!==undefined){setupStep=+b.dataset.step;render();return}
+  if(b.dataset.toast){toast(b.dataset.toast);return}
+  if(b.dataset.ask){ask(b.dataset.ask);return}
+  if(b.hasAttribute("data-opt")){b.parentElement.querySelectorAll("[data-opt]").forEach(x=>x.setAttribute("aria-pressed",x===b));return}
+  if(b.hasAttribute("data-start")){$("#modal").innerHTML="";toast("Auftrag gestartet – Vertrieb ist informiert (Prototyp)");return}
+  if(b.hasAttribute("data-close")&&e.target===b){$("#modal").innerHTML="";return}
+  if(b.id==="newJob")newJob();
+  if(b.id==="chatBtn")chatOpen($("#chat").hidden);
+  if(b.id==="chatClose")chatOpen(false);
+  if(b.id==="chatBig"){const c=$("#chat");c.classList.toggle("big");b.textContent=c.classList.contains("big")?"⤡":"⤢";b.setAttribute("aria-label",c.classList.contains("big")?"Kleiner anzeigen":"Größer anzeigen")}
+  if(b.id==="menuBtn")$("#side").classList.toggle("open");
+});
+$("#composer").addEventListener("submit",e=>{e.preventDefault();const v=$("#chatIn").value.trim();if(!v)return;$("#chatIn").value="";ask(v)});
+document.addEventListener("keydown",e=>{if(e.key==="Escape"){$("#modal").innerHTML="";$("#side").classList.remove("open")}});
+render();
+</script>

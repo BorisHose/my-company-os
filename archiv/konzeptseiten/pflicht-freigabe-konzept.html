@@ -1,0 +1,144 @@
+<!doctype html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Pflicht-Freigabe – Konzept für My Company OS</title>
+<style>
+:root{color-scheme:light;--bg:#f5f6f8;--panel:#fff;--ink:#1b2333;--mut:#667085;--line:#e3e6ec;--navy:#1f3a5f;--acc:#2f6fdf;--accbg:#e8f0fd;--warn:#b54708;--warnbg:#fef0e6;--ok:#067647;--okbg:#e7f6ee;--src:#0e7090;--srcbg:#e6f6fb;--bodo:#1f3a5f;--sell:#30ABE2}
+*{box-sizing:border-box}[hidden]{display:none!important}
+body{margin:0;font:14px/1.5 system-ui,-apple-system,Segoe UI,sans-serif;background:var(--bg);color:var(--ink);min-height:100vh}
+header{background:var(--navy);color:#fff;padding:12px 24px;display:flex;align-items:center;gap:14px;flex-wrap:wrap}
+header h1{font-size:17px;margin:0;font-weight:600}.tag{font-size:11px;background:#ffffff26;padding:2px 8px;border-radius:10px}
+main{padding:20px 24px 32px}
+h2{font-size:20px;margin:0 0 6px}h3{font-size:15px;margin:20px 0 8px}
+.lead{color:var(--mut);margin:0 0 18px}
+.grid>*{min-width:0}.dh{flex-wrap:wrap}.grid{display:grid;grid-template-columns:minmax(0,1.15fr) minmax(0,1fr);gap:18px}@media(max-width:980px){.grid{grid-template-columns:1fr}}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:16px 18px}
+.lbl{display:inline-block;font-size:11px;font-weight:700;letter-spacing:.04em;text-transform:uppercase;padding:2px 8px;border-radius:8px}
+.lbl.src{background:var(--srcbg);color:var(--src)}.lbl.me{background:var(--warnbg);color:var(--warn)}
+/* Dialog-Mock */
+.dlg{background:#fff;border:1px solid var(--line);border-radius:12px;box-shadow:0 8px 30px #1b23331a;overflow:hidden}
+.dh{display:flex;align-items:center;gap:8px;padding:14px 18px;border-bottom:1px solid var(--line)}.dh b{font-size:16px;flex:1}
+.dh code{font-size:11px;color:var(--mut);background:#f3f4f7;padding:1px 5px;border-radius:4px}
+.tabs{display:flex;gap:2px;padding:0 18px;border-bottom:1px solid var(--line);overflow-x:auto}
+.tabs span{padding:9px 12px;font-size:13px;color:var(--mut);border-bottom:3px solid transparent;white-space:nowrap}.tabs span.on{color:var(--ink);font-weight:600;border-bottom-color:var(--navy)}
+.db{padding:16px 18px;display:flex;flex-direction:column;gap:12px}
+.opt{border:1.5px solid var(--line);border-radius:10px;padding:10px 12px;cursor:pointer;display:flex;gap:10px;align-items:flex-start}
+.opt.on{border-color:var(--acc);background:var(--accbg)}.opt input{margin-top:3px}.opt b{display:block}.opt small{color:var(--mut);font-size:12.5px}
+.acts{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:4px 14px;margin:8px 0 0 26px}
+.acts label{display:flex;gap:6px;align-items:center;font-size:13px}
+.warnbox{background:var(--warnbg);color:#7a3a07;border:1px solid #f6d3b8;border-radius:8px;padding:8px 12px;font-size:13px}
+.okbox{background:var(--okbg);color:#05603a;border-radius:8px;padding:8px 12px;font-size:13px}
+.prof{border:1px solid var(--line);border-radius:10px;padding:10px 12px}
+.prof h4{margin:0 0 6px;font-size:13px;display:flex;align-items:center;gap:8px}
+.prof select{padding:5px 8px;border:1px solid var(--line);border-radius:6px;font:inherit;font-size:13px}
+.stripe{width:4px;height:16px;border-radius:2px;display:inline-block}
+.sl{font-size:12px;font-weight:600;color:var(--mut)}
+/* Ablauf / Verlauf */
+.chain{display:flex;flex-direction:column;gap:0}
+.step{display:grid;grid-template-columns:28px minmax(0,1fr);gap:10px;align-items:start;padding:8px 0}
+.dot{width:22px;height:22px;border-radius:50%;background:#e9edf4;color:var(--navy);font-size:12px;font-weight:700;display:flex;align-items:center;justify-content:center}
+.dot.h{background:#fff4d6;color:#8a5a00}.dot.bg{background:var(--okbg);color:var(--ok)}
+.step small{color:var(--mut);display:block}
+table{border-collapse:collapse;width:100%;font-size:13px;background:#fff}th,td{border:1px solid var(--line);padding:7px 10px;text-align:left;vertical-align:top}th{background:#f3f5f9}
+.wrap{overflow-x:auto}
+ol,ul{margin:6px 0;padding-left:20px}li{margin:3px 0}
+.pill{display:inline-block;font-size:11px;font-weight:600;border-radius:9px;padding:1px 8px}
+.pill.f{background:#fff4d6;color:#8a5a00}.pill.n{background:var(--okbg);color:var(--ok)}.pill.t{background:#eef0f4;color:#475467}
+</style>
+</head>
+<body>
+<header><h1>My Company OS</h1><span class="tag">Konzept „Pflicht-Freigabe bei Außenwirkung“ – nicht umgesetzt</span></header>
+<main>
+  <h2>Pflicht-Freigabe bei Außenwirkung – pro Skill einstellbar</h2>
+  <p class="lead">Ein Skill legt selbst fest, ob er vor Aktionen mit Außenwirkung anhält und auf deine Freigabe wartet. So laufen reine Hintergrundarbeiten ohne Unterbrechung, während z. B. Mailversand oder CRM-Anlagen weiter von dir freigegeben werden. Das Mock-up links ist klickbar, nichts wird gespeichert.</p>
+
+  <div class="grid">
+    <!-- Mock -->
+    <div>
+      <div class="dlg">
+        <div class="dh"><b>Skill bearbeiten: Angebot als One-Pager</b><code>angebot-erstellen</code></div>
+        <div class="tabs"><span>Gemeinsam (Kern)</span><span>Bodo-Profil</span><span>sellify-Profil</span><span class="on">Freigaben</span><span>Vergleich</span></div>
+        <div class="db">
+          <div class="sl">Pflicht-Freigabe bei Außenwirkung</div>
+          <label class="opt on" data-o="all"><input type="radio" name="m" value="all" checked><span><b>Immer anhalten</b><small>Vor jeder Aktion mit Außenwirkung wartet der Skill auf deine Freigabe. Standard für neue Skills.</small></span></label>
+          <label class="opt" data-o="sel"><input type="radio" name="m" value="sel"><span><b>Nur bei ausgewählten Aktionen</b><small>Du legst fest, welche Aktionen eine Freigabe brauchen. Alles andere läuft im Hintergrund.</small></span></label>
+          <div class="acts" id="acts" hidden>
+            <label><input type="checkbox" checked> E-Mail versenden</label>
+            <label><input type="checkbox" checked> Datensatz im CRM anlegen</label>
+            <label><input type="checkbox"> Datensatz im CRM ändern</label>
+            <label><input type="checkbox" checked> Ticket anlegen</label>
+            <label><input type="checkbox"> Dokument hochladen / ablegen</label>
+            <label><input type="checkbox" checked> Etwas löschen</label>
+            <label><input type="checkbox"> Termin anlegen</label>
+            <label><input type="checkbox" checked> Kosten auslösen (z. B. Video-Erzeugung)</label>
+          </div>
+          <label class="opt" data-o="none"><input type="radio" name="m" value="none"><span><b>Im Hintergrund ohne Freigabe</b><small>Der Skill führt alles selbst aus. Jede Aktion wird im Verlauf protokolliert; auf Wunsch kommt eine Info-Nachricht.</small></span></label>
+          <div class="warnbox" id="warn" hidden><b>Hinweis:</b> Deine gespeicherten Vorgaben verlangen für CRM-Anlagen und Tickets immer einen Entwurf zur Freigabe. Für Skills, die so etwas tun, wäre „ohne Freigabe“ ein Widerspruch dazu. Bewusst so speichern?</div>
+          <div class="okbox" id="ok">Aktionen mit Außenwirkung dieses Skills warten immer auf deine Freigabe.</div>
+
+          <div class="sl" style="margin-top:4px">Abweichung je Profil (optional)</div>
+          <div class="prof"><h4><span class="stripe" style="background:var(--bodo)"></span>Bodo-Profil <select><option>wie Kern</option><option>Immer anhalten</option><option>Nur bei ausgewählten Aktionen</option><option>Im Hintergrund ohne Freigabe</option></select></h4></div>
+          <div class="prof"><h4><span class="stripe" style="background:var(--sell)"></span>sellify-Profil <select><option>wie Kern</option><option>Immer anhalten</option><option>Nur bei ausgewählten Aktionen</option><option>Im Hintergrund ohne Freigabe</option></select></h4></div>
+
+          <div class="sl" style="margin-top:4px">Ohne Freigabe ausgeführte Aktionen melden</div>
+          <label style="display:flex;gap:6px;align-items:center;font-size:13px"><input type="checkbox" checked> nur im Verlauf des Auftrags</label>
+          <label style="display:flex;gap:6px;align-items:center;font-size:13px"><input type="checkbox"> zusätzlich Info-Nachricht (Kanal laut Ablauf)</label>
+        </div>
+      </div>
+      <p style="font-size:12.5px;color:var(--mut);margin:8px 2px 0">In der Bibliothek zeigt jede Skill-Kachel die Einstellung als kleines Zeichen: <span class="pill f">⏸ Freigabe</span> <span class="pill t">⏸ teilweise</span> <span class="pill n">▶ Hintergrund</span></p>
+    </div>
+
+    <!-- Regeln -->
+    <div style="display:flex;flex-direction:column;gap:14px">
+      <div class="card"><span class="lbl src">Entscheidung Boris</span>
+        <h3 style="margin-top:6px">Was festgelegt ist</h3>
+        <ul>
+          <li>Option heißt <b>„Pflicht-Freigabe bei Außenwirkung“</b> (statt „automatische Freigabe“).</li>
+          <li>Sie wird <b>pro Skill</b> eingestellt, damit Hintergrundarbeiten ohne Unterbrechung laufen können.</li>
+        </ul></div>
+      <div class="card"><span class="lbl me">Vorschlag Claude</span>
+        <h3 style="margin-top:6px">Regeln, wie die Einstellungen zusammenwirken</h3>
+        <ol>
+          <li><b>Drei Stufen je Skill:</b> immer anhalten (Standard) · nur bei ausgewählten Aktionen · im Hintergrund ohne Freigabe.</li>
+          <li><b>Profile dürfen abweichen:</b> z. B. Bodo-Profil im Hintergrund, sellify-Profil mit Freigabe, solange es dort noch neu ist.</li>
+          <li><b>Ablauf schlägt Skill:</b> Eine im Ablauf gezeichnete „Entscheidung (du)“ hält immer an – auch wenn der Skill auf „Hintergrund“ steht.</li>
+          <li><b>Strengste Einstellung gewinnt</b>, wenn ein Schritt mehrere Skills nutzt.</li>
+          <li><b>Nichts verschwindet:</b> Jede ohne Freigabe ausgeführte Aktion steht im Verlauf des Auftrags, auf Wunsch auch als Info-Nachricht.</li>
+          <li><b>Widerspruch zu deinen Vorgaben wird angezeigt:</b> Für CRM-Anlagen und Tickets hast du festgelegt, dass immer ein Entwurf zur Freigabe kommt. Steht ein solcher Skill auf „Hintergrund“, warnt das Cockpit, verhindert es aber nicht.</li>
+        </ol></div>
+      <div class="card"><h3 style="margin-top:0">Beispiel: ein Auftrag mit gemischten Einstellungen <span class="lbl me">Beispiel</span></h3>
+        <div class="chain">
+          <div class="step"><span class="dot bg">▶</span><div><b>Kontakt im CRM prüfen</b><small>Nur lesen – keine Außenwirkung, läuft ohne Halt</small></div></div>
+          <div class="step"><span class="dot bg">▶</span><div><b>Produktblatt erstellen</b><small>Skill auf „Hintergrund“ – PDF wird erzeugt und im Verlauf abgelegt</small></div></div>
+          <div class="step"><span class="dot h">⏸</span><div><b>Angebot erstellen und ablegen</b><small>Skill „nur ausgewählte Aktionen“: Ablegen ist nicht angehakt → läuft; Versand kommt erst im nächsten Schritt</small></div></div>
+          <div class="step"><span class="dot h">⏸</span><div><b>Begleitmail versenden</b><small>E-Mail-Skill „immer anhalten“ → wartet auf deine Freigabe (Push aufs Handy)</small></div></div>
+        </div></div>
+    </div>
+  </div>
+
+  <h3>Was zählt als Außenwirkung? <span class="lbl me">Vorschlag Claude</span></h3>
+  <div class="wrap"><table>
+    <tr><th>Aktion</th><th>Außenwirkung</th><th>Begründung</th></tr>
+    <tr><td>Lesen, suchen, zusammenfassen</td><td>nein</td><td>ändert nichts</td></tr>
+    <tr><td>Entwurf erstellen (Mail, Angebot, Ticket), Datei im Arbeitsbereich erzeugen</td><td>nein</td><td>bleibt intern, bis es verwendet wird</td></tr>
+    <tr><td>E-Mail versenden</td><td>ja</td><td>erreicht Dritte</td></tr>
+    <tr><td>Datensatz im CRM anlegen / ändern, Ticket anlegen, Termin anlegen</td><td>ja</td><td>verändert Systeme, die andere nutzen</td></tr>
+    <tr><td>Dokument hochladen / ablegen</td><td>ja</td><td>für andere sichtbar</td></tr>
+    <tr><td>Löschen</td><td>ja</td><td>nicht umkehrbar</td></tr>
+    <tr><td>Kosten auslösen (z. B. Video-Erzeugung, kostenpflichtige Dienste)</td><td>ja</td><td>Geld</td></tr>
+  </table></div>
+
+  <h3>Was im Datenmodell dazukommt</h3>
+  <p style="margin:0">Skill: <code>freigabe</code> = immer · auswahl · hintergrund, <code>freigabeAktionen</code> = Liste der Aktionen, <code>melden</code> = verlauf · info; je Profil optional dieselben Felder als Abweichung. Die bisherige globale Einstellung entfällt und wird zur Vorgabe für neue Skills.</p>
+</main>
+<script>
+const opts=document.querySelectorAll(".opt");
+function upd(){const v=document.querySelector('[name="m"]:checked').value;opts.forEach(o=>o.classList.toggle("on",o.dataset.o===v));
+  document.getElementById("acts").hidden=v!=="sel";document.getElementById("warn").hidden=v!=="none";
+  const ok=document.getElementById("ok");ok.hidden=v==="none";ok.textContent=v==="all"?"Aktionen mit Außenwirkung dieses Skills warten immer auf deine Freigabe.":"Nur die angehakten Aktionen warten auf deine Freigabe – alles andere läuft im Hintergrund und steht im Verlauf."}
+document.querySelectorAll('[name="m"]').forEach(r=>r.onchange=upd);upd();
+</script>
+</body>
+</html>

@@ -1,0 +1,1133 @@
+<title>Company OS Prototyp</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=IBM+Plex+Mono:wght@500&display=swap">
+<style>
+/* Layout: App-Rahmen mit linker Navigation (Unternehmen + Bereiche), Kopfzeile, Arbeitsfläche; Chat als rechtes Panel */
+:root{
+  --bg:#f3f4f7; --surface:#ffffff; --sunk:#eceef3; --fg:#141b2d; --muted:#5d6579; --line:#dde1ea;
+  --ink:#16223f; --ink-soft:#e5e9f3; --accent:#c8641a; --accent-soft:#fbeee2;
+  --ok:#147a5c; --ok-soft:#e1f3ec; --info:#2457c5; --info-soft:#e6edfb; --bad:#b4232a; --bad-soft:#fbe9ea;
+  --bodo:#1f3a5f; --sell:#30ABE2;
+  --f-ui:"Plus Jakarta Sans",system-ui,-apple-system,"Segoe UI",sans-serif; --f-mono:"IBM Plex Mono",ui-monospace,Consolas,monospace;
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  --bg:#0e1322; --surface:#161d30; --sunk:#111829; --fg:#e8ecf5; --muted:#9aa3b9; --line:#283350;
+  --ink:#a9bdf0; --ink-soft:#1f2a47; --accent:#f0a05e; --accent-soft:#3a2614;
+  --ok:#5fd0aa; --ok-soft:#123a30; --info:#8fb0ff; --info-soft:#18284d; --bad:#ff8f8a; --bad-soft:#3d1c1f; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#0e1322; --surface:#161d30; --sunk:#111829; --fg:#e8ecf5; --muted:#9aa3b9; --line:#283350;
+  --ink:#a9bdf0; --ink-soft:#1f2a47; --accent:#f0a05e; --accent-soft:#3a2614;
+  --ok:#5fd0aa; --ok-soft:#123a30; --info:#8fb0ff; --info-soft:#18284d; --bad:#ff8f8a; --bad-soft:#3d1c1f; color-scheme:dark}
+*{box-sizing:border-box}
+[hidden]{display:none!important}
+html,body{height:100%}
+body{background:var(--bg);color:var(--fg);font-family:var(--f-ui);font-size:14px;line-height:1.45}
+button,input,select,textarea{font:inherit;color:inherit}
+button{cursor:pointer}
+:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+/* Hover nur bei echter Maus – auf Touch-Geräten bleibt :hover sonst nach dem Tippen hängen */
+@media (hover:hover) and (pointer:fine){.me:hover{border-color:var(--ink);background:var(--ink-soft)}.me:hover .chev{color:var(--ink)}.nav button:hover{background:var(--sunk)}.asst:hover{border-color:var(--accent)}.chat header .ib:hover{background:var(--sunk)}.agcard:hover{border-color:var(--ink);box-shadow:0 6px 18px rgba(10,14,28,.08)}}
+button,a{-webkit-tap-highlight-color:transparent}
+
+.app{display:grid;grid-template-columns:204px minmax(0,1fr);grid-template-rows:auto minmax(0,1fr);height:100%}
+.demo{grid-column:1/-1;background:var(--ink);color:var(--surface);font-size:12px;padding:5px 14px;display:flex;gap:10px;flex-wrap:nowrap;align-items:center;white-space:nowrap;overflow:hidden}
+.demo span{overflow:hidden;text-overflow:ellipsis}
+.demo b{font-weight:700}
+aside{background:var(--surface);border-right:1px solid var(--line);display:flex;flex-direction:column;gap:10px;padding:12px 8px;font-size:13.5px;overflow:auto;min-height:0}
+.logo{display:flex;gap:10px;align-items:center;padding:0 6px}
+.mark{width:32px;height:32px;border-radius:9px;background:var(--ink);color:var(--surface);display:grid;place-items:center;font-weight:800;font-size:13px;letter-spacing:-.02em}
+.logo b{font-size:15px;letter-spacing:-.01em}.logo small{display:block;color:var(--muted);font-size:11px}
+.me *{pointer-events:none}
+.me{margin-top:auto;border:1px solid var(--line);background:var(--bg);border-radius:14px;padding:8px 10px;display:flex;gap:10px;align-items:center;text-align:left;width:100%}
+.me[aria-current="true"]{border-color:var(--ink);background:var(--ink-soft)}
+.me b{display:block;font-size:13px}.me small{display:block;font-size:11px;color:var(--muted)}
+.me{padding:6px 8px;gap:8px}.me .chev{margin-left:auto;font-size:18px !important;white-space:nowrap;color:var(--muted);font-size:13px;display:inline-flex;align-items:center;gap:2px}
+
+.ava{border-radius:50%;flex-shrink:0;box-shadow:0 0 0 2px var(--surface),0 0 0 4px var(--accent)}
+.prof{display:flex;gap:20px;align-items:center;flex-wrap:wrap}
+.prof h2{margin:0}
+.lbl{font-family:var(--f-mono);font-size:10.5px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);padding:0 6px}
+.nav{display:flex;flex-direction:column;gap:2px}
+.nav button{border:0;background:none;text-align:left;padding:6px 8px;font-size:13.5px;border-radius:8px;display:flex;gap:10px;align-items:center;color:var(--fg)}
+
+.nav button[aria-current="true"]{background:var(--ink-soft);color:var(--ink);font-weight:700}
+.nav .cnt{margin-left:auto;font-family:var(--f-mono);font-size:11px;background:var(--accent);color:#fff;border-radius:999px;padding:0 7px}
+.co{display:flex;gap:9px;align-items:center}
+.dot{width:10px;height:10px;border-radius:3px;flex:none}
+.ic{width:18px;text-align:center;color:var(--muted);flex:none}
+main{display:flex;flex-direction:column;min-width:0;min-height:0}
+.top{display:flex;gap:12px;align-items:center;padding:14px 22px;border-bottom:1px solid var(--line);background:var(--surface);flex-wrap:wrap}
+.top h1{font-size:19px;margin:0;font-weight:800;letter-spacing:-.01em}
+.top .crumb{color:var(--muted);font-size:12.5px}
+.top .sp{flex:1}
+.btn{border:1px solid var(--line);background:var(--surface);border-radius:9px;padding:7px 13px;font-weight:600}
+.btn.pri{background:var(--ink);border-color:var(--ink);color:var(--surface)}
+.btn.acc{background:var(--accent);border-color:var(--accent);color:#fff}
+.btn.sm{padding:4px 10px;font-size:12.5px}
+.work{display:grid;grid-template-columns:minmax(0,1fr);flex:1;min-height:0}
+
+.view{overflow:auto;padding:20px 22px 96px;min-width:0}
+.stack{display:flex;flex-direction:column;gap:18px}
+.grid{display:grid;gap:14px;grid-template-columns:repeat(auto-fit,minmax(260px,1fr))}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:16px;min-width:0;display:flex;flex-direction:column;gap:10px}
+.card h2{font-size:15px;margin:0;font-weight:700;display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+.card h3{font-size:14px;margin:0;font-weight:700}
+.sub{color:var(--muted);font-size:12.5px}
+.kpis{display:flex;gap:18px;flex-wrap:wrap}
+.kpi b{display:block;font-size:24px;font-weight:800;font-variant-numeric:tabular-nums;letter-spacing:-.02em}
+.kpi span{font-size:12px;color:var(--muted)}
+.kpi.warn b{color:var(--accent)}.kpi.bad b{color:var(--bad)}
+.pill{font-size:11.5px;font-weight:600;padding:2px 8px;border-radius:999px;white-space:nowrap}
+.p-ok{background:var(--ok-soft);color:var(--ok)}.p-run{background:var(--info-soft);color:var(--info)}.p-open{background:var(--sunk);color:var(--muted)}.p-wait{background:var(--accent-soft);color:var(--accent)}.p-bad{background:var(--bad-soft);color:var(--bad)}
+.row{display:flex;gap:10px;align-items:flex-start}
+.list{display:flex;flex-direction:column}
+.item{display:flex;gap:12px;align-items:flex-start;padding:11px 0;border-top:1px solid var(--line)}
+.item:first-child{border-top:0}
+.item .t{flex:1;min-width:0}
+.item .t b{display:block}
+.ava{width:34px;height:34px;border-radius:50%;background:var(--c,#1f3a5f);color:#fff;font-weight:700;font-size:12px;display:grid;place-items:center;flex:none}
+.ava.lead{box-shadow:0 0 0 2px var(--surface),0 0 0 4px var(--accent)}
+.ava.s{width:24px;height:24px;font-size:9.5px}
+.bot{width:24px;height:24px;border-radius:7px;background:var(--sunk);border:1px solid var(--line);display:grid;place-items:center;font-size:12px;color:var(--muted);flex:none}
+.conseq{background:var(--sunk);border-radius:9px;padding:9px 11px;font-size:13px;display:flex;flex-direction:column;gap:3px}
+.conseq .k{color:var(--muted);font-size:11.5px;font-family:var(--f-mono);text-transform:uppercase;letter-spacing:.05em}
+.acts{display:flex;gap:8px;flex-wrap:wrap}
+.gf{border-top:4px solid var(--ink);display:grid;grid-template-columns:minmax(220px,300px) 1fr;gap:18px;align-items:start}
+.gf .who{display:flex;gap:12px;align-items:center}
+.pa{border:1px solid var(--line);border-left:4px solid var(--accent);border-radius:12px;padding:12px 14px;display:flex;flex-direction:column;gap:10px;background:var(--bg)}
+.pa .ttl{display:flex;gap:10px;align-items:center}
+.pa .spark{width:30px;height:30px;border-radius:50%;background:var(--accent);color:#fff;display:inline-flex;align-items:center;justify-content:center;flex-shrink:0}
+.skills{display:flex;flex-wrap:wrap;gap:6px}
+.skills button{border:1px solid var(--line);background:var(--surface);border-radius:999px;padding:4px 11px;font-size:12.5px}
+.skills button[aria-pressed="true"]{background:var(--ink);border-color:var(--ink);color:var(--surface)}
+.skills button.add{border-style:dashed;color:var(--muted)}
+.orgtop{display:grid;grid-template-columns:1fr minmax(260px,320px) 1fr;align-items:center}
+.gfbox{border-top:4px solid var(--ink);text-align:center;align-items:center}
+.gfbox .ava{margin:4px auto}
+.staff{display:flex;align-items:center;gap:0}
+.staff .hl{width:34px;height:2px;background:var(--line);flex-shrink:0}
+.staffcol{display:flex;flex-direction:column;gap:8px}
+.asst{border:1px solid var(--line);border-left:4px solid var(--accent);border-radius:12px;background:var(--surface);padding:9px 12px;display:flex;gap:10px;align-items:center;text-align:left;max-width:270px}
+
+.asst .spark{width:30px;height:30px;border-radius:50%;background:var(--accent);color:#fff;display:inline-flex;align-items:center;justify-content:center;flex-shrink:0}
+.asst.human{border-left-color:var(--muted);border-style:dashed;color:var(--muted)}
+.asst b{display:block;font-size:13px}.asst small{display:block;font-size:11.5px;color:var(--muted)}
+.orgline{width:2px;height:18px;background:var(--line);margin:-4px auto -4px}
+.sklist{display:flex;flex-direction:column;gap:6px;max-height:52vh;overflow:auto}
+.sk{display:flex;gap:10px;align-items:center;border:1px solid var(--line);border-radius:10px;padding:8px 10px;background:var(--surface);text-align:left}
+.sk .bx{width:20px;height:20px;border-radius:6px;border:2px solid var(--line);flex-shrink:0;display:inline-flex;align-items:center;justify-content:center;font-size:13px;color:#fff}
+.sk[aria-pressed="true"] .bx{background:var(--ink);border-color:var(--ink)}
+.sk b{display:block;font-size:13.5px}.sk small{color:var(--muted);font-size:12px}
+@media (max-width:860px){.orgtop{grid-template-columns:1fr}.staff{justify-content:center;margin-top:10px}.staff .hl{display:none}}
+.orgrow{border-top:2px solid var(--line);padding-top:14px}
+@media (max-width:860px){.gf{grid-template-columns:1fr}}
+.org{display:grid;gap:14px;grid-template-columns:repeat(auto-fill,minmax(250px,1fr))}
+.dept .head{display:flex;gap:11px;align-items:center}
+.sec{display:flex;flex-direction:column;gap:6px}
+.sec .m{display:flex;gap:8px;align-items:center;font-size:13px}
+.alert{border-radius:8px;padding:7px 10px;font-size:12.5px;background:var(--accent-soft);color:var(--accent)}
+.alert.ok{background:var(--sunk);color:var(--muted)}
+.tabs{display:flex;gap:4px;border-bottom:1px solid var(--line);flex-wrap:wrap}
+.tabs button{border:0;background:none;padding:8px 12px;border-bottom:3px solid transparent;color:var(--muted);font-weight:600}
+.tabs button[aria-selected="true"]{color:var(--fg);border-bottom-color:var(--ink)}
+.chain{display:flex;gap:6px;align-items:stretch;overflow-x:auto;padding-bottom:4px}
+.step{min-width:150px;flex:1;background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:10px 12px;display:flex;flex-direction:column;gap:5px;font-size:12.5px}
+.step b{font-size:13px}
+.arrow{align-self:center;color:var(--muted)}
+.pkgs{display:grid;gap:12px;grid-template-columns:repeat(auto-fill,minmax(290px,1fr))}
+.pkg{border-left:4px solid var(--c,var(--line))}
+.tl{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:5px;font-size:12.5px}
+.tl li{display:flex;gap:8px;align-items:baseline}
+.tl code{font-family:var(--f-mono);font-size:11px;color:var(--muted)}
+.meta{display:flex;gap:12px;flex-wrap:wrap;font-size:12px;color:var(--muted);align-items:center}
+.eval{border:1px dashed var(--accent);border-radius:9px;padding:9px 11px;font-size:12.5px;display:flex;flex-direction:column;gap:4px}
+.eval .an{font-size:11px;color:var(--accent);font-weight:700}
+.chat{position:fixed;right:20px;bottom:20px;width:400px;height:min(620px,calc(100vh - 110px));z-index:30;background:var(--surface);border:1px solid var(--line);border-radius:16px;box-shadow:0 18px 48px rgba(10,14,28,.22);display:flex;flex-direction:column;min-height:0;overflow:hidden}
+.chat.big{top:48px;bottom:16px;height:auto;width:min(880px,calc(100vw - 48px));left:50%;right:auto;transform:translateX(-50%)}
+.chat header .ib{border:0;background:none;width:30px;height:30px;border-radius:8px;font-size:16px;color:var(--muted)}
+
+.fab{position:fixed;right:20px;bottom:20px;z-index:29;display:inline-flex;align-items:center;gap:10px;border:0;border-radius:999px;padding:12px 20px 12px 14px;background:var(--ink);color:var(--surface);font-weight:700;box-shadow:0 10px 28px rgba(10,14,28,.25)}
+.fab .spark{width:30px;height:30px;border-radius:50%;background:var(--accent);color:#fff;display:inline-flex;align-items:center;justify-content:center}
+.chat .hint{font-size:11px;color:var(--muted);padding:0 16px 10px}
+.chat header{padding:14px 16px;border-bottom:1px solid var(--line);display:flex;align-items:center;gap:10px}
+.chat header b{flex:1}
+.msgs{flex:1;overflow:auto;padding:14px 16px;display:flex;flex-direction:column;gap:10px}
+.msg{max-width:92%;padding:9px 12px;border-radius:12px;font-size:13px}
+.msg.me{align-self:flex-end;background:var(--ink);color:var(--surface);border-bottom-right-radius:4px}
+.msg.ai{align-self:flex-start;background:var(--sunk);border-bottom-left-radius:4px}
+.msg ul{margin:4px 0 0;padding-left:18px}
+.prev{background:var(--surface);border:1px solid var(--line);border-radius:9px;padding:8px 10px;margin-top:6px;display:flex;flex-direction:column;gap:3px}
+.chips{display:flex;gap:6px;flex-wrap:wrap;padding:0 16px 8px}
+.chips button{border:1px solid var(--line);background:var(--surface);border-radius:999px;padding:4px 10px;font-size:12px}
+.composer{display:flex;gap:8px;padding:10px 16px 16px}
+.composer input{flex:1;border:1px solid var(--line);border-radius:9px;padding:8px 10px;background:var(--bg);min-width:0}
+.wiz{display:grid;grid-template-columns:240px minmax(0,1fr);gap:16px}
+.wsteps{display:flex;flex-direction:column;gap:2px}
+.wsteps button{border:0;background:none;text-align:left;padding:7px 10px;border-radius:8px;display:flex;gap:8px;align-items:center;font-size:13px}
+.wsteps button[aria-current="true"]{background:var(--ink-soft);color:var(--ink);font-weight:700}
+.num{font-family:var(--f-mono);font-size:11px;width:20px;height:20px;border-radius:50%;border:1px solid var(--line);display:grid;place-items:center;flex:none}
+.wsteps .done .num{background:var(--ok);border-color:var(--ok);color:#fff}
+.tblw{overflow-x:auto}.tblw table{border-collapse:collapse;width:100%;font-size:13px}.tblw th,.tblw td{text-align:left;padding:8px 10px;border-bottom:1px solid var(--line);vertical-align:top}.tblw th{font-size:12px;color:var(--muted);font-weight:600}
+.ta{width:100%;border:1px solid var(--line);border-radius:9px;padding:8px 10px;background:var(--bg);line-height:1.45;resize:vertical}
+.lock{display:inline-flex;gap:6px;align-items:center;font-size:12px;font-weight:600;color:var(--muted)}
+.assist{border:1px solid var(--line);border-left:4px solid var(--accent);border-radius:9px;padding:10px 12px;display:flex;flex-direction:column;gap:8px;background:var(--surface)}
+.assist .q{display:flex;flex-wrap:wrap;gap:6px;align-items:center}
+.two{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:12px}
+.field{display:flex;flex-direction:column;gap:4px}
+.field label{font-size:12px;font-weight:600;color:var(--muted)}
+.field .val{border:1px solid var(--line);border-radius:9px;padding:8px 10px;background:var(--bg)}
+.conn{display:flex;gap:12px;align-items:center}
+.conn .sym{width:38px;height:38px;border-radius:10px;display:grid;place-items:center;color:#fff;font-weight:800;font-size:13px;flex:none}
+.modal{position:fixed;inset:0;background:rgba(10,14,28,.5);display:flex;align-items:center;justify-content:center;padding:16px;z-index:30}
+.modal .card{width:min(560px,100%);max-height:90%;overflow:auto}
+.modal .card.wide{width:min(820px,100%)}
+.agcard{text-align:left;cursor:pointer;font:inherit;color:inherit}
+
+.agcard .open{font-size:12px;color:var(--info);font-weight:600}
+.lv{display:inline-block;font-family:var(--f-mono);font-size:11px;border-radius:6px;padding:1px 6px;background:var(--sunk);color:var(--muted)}
+.lv.l1{background:var(--info-soft);color:var(--info)}.lv.l2{background:var(--accent-soft);color:var(--accent)}
+.seg{display:inline-flex;border:1px solid var(--line);border-radius:9px;overflow:hidden;flex-wrap:wrap}
+.seg button{border:0;background:var(--surface);padding:6px 11px;font-size:12.5px;border-right:1px solid var(--line)}
+.seg button:last-child{border-right:0}
+.seg button[aria-pressed="true"]{background:var(--ink);color:var(--surface);font-weight:700}
+.perm{display:flex;justify-content:space-between;gap:10px;align-items:center;padding:8px 0;border-bottom:1px solid var(--line);flex-wrap:wrap}
+.perm:last-child{border-bottom:0}
+.sec2{display:flex;flex-direction:column;gap:8px}
+.sec2 h3{margin:0;font-size:14px}
+.opt{border:1px solid var(--line);border-radius:10px;padding:10px 12px;display:flex;gap:10px;align-items:flex-start;cursor:pointer;background:var(--surface);text-align:left}
+.opt[aria-pressed="true"]{border-color:var(--ink);box-shadow:0 0 0 1px var(--ink)}
+.toast{position:fixed;left:50%;bottom:calc(18px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);background:var(--ink);color:var(--surface);padding:9px 15px;border-radius:9px;font-size:13px;z-index:40}
+.menu-btn{display:none}
+@media (max-width:900px){
+  .app{grid-template-columns:1fr}
+  aside{position:fixed;inset:0 auto 0 0;width:260px;z-index:20;transform:translateX(-105%);transition:transform .2s}
+  aside.open{transform:none;box-shadow:0 0 0 100vmax rgba(10,14,28,.4)}
+  .menu-btn{display:inline-flex}
+  .chat,.chat.big{inset:0;width:auto;height:auto;border-radius:0;transform:none}
+  .wiz{grid-template-columns:1fr}
+}
+.bot.lead{background:var(--ink);color:var(--surface);border-color:var(--ink)}
+.three{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:10px}
+.canvas{background-color:var(--bg);background-image:radial-gradient(var(--line) 1px,transparent 1px);background-size:16px 16px;border:1px solid var(--line);border-radius:12px;padding:20px;overflow-x:auto}
+.flow{display:flex;align-items:center;min-width:max-content}
+.node{border:1px solid var(--line);background:var(--surface);border-radius:10px;padding:8px 10px;width:170px;font-size:12.5px;display:flex;flex-direction:column;gap:3px}
+.node.gap{border:2px dashed var(--accent)}
+.ev{width:28px;height:28px;border-radius:50%;border:2px solid var(--ink);background:var(--surface);flex:none}
+.ev.end{border-width:5px}
+.gwrap{display:flex;flex-direction:column;align-items:center;gap:8px;font-size:11px;color:var(--muted);text-align:center;min-width:70px}
+.gw{width:30px;height:30px;transform:rotate(45deg);border:2px solid var(--ink);background:var(--surface);flex:none;display:grid;place-items:center}
+.gw span{transform:rotate(-45deg);font-weight:800;font-size:13px}
+.gw.sm{width:22px;height:22px}
+.ln{width:26px;height:2px;background:var(--muted);flex:none;position:relative}
+.ln::after{content:"";position:absolute;right:-1px;top:-4px;border-left:7px solid var(--muted);border-top:5px solid transparent;border-bottom:5px solid transparent}
+.parcol{display:flex;flex-direction:column;gap:10px;padding:8px;border:1px dashed var(--muted);border-radius:12px}
+.msn{display:flex;flex-direction:column;align-items:center;gap:8px;font-size:11px;color:var(--muted);text-align:center;width:104px}
+.dia{width:16px;height:16px;transform:rotate(45deg);background:var(--accent);border-radius:3px;display:inline-block;flex:none}
+.dia.done{background:var(--ok)}
+.phases{display:flex;align-items:center;gap:8px;overflow-x:auto;padding:6px 2px}
+.ph{width:190px;flex:none;border:1px solid var(--line);border-radius:12px;padding:10px 12px;background:var(--surface);text-align:left;display:flex;flex-direction:column;gap:4px}
+.ph[aria-current="true"]{border-color:var(--ink);box-shadow:0 0 0 1px var(--ink)}
+.ph.st-done{border-left:4px solid var(--ok)}.ph.st-run{border-left:4px solid var(--info)}.ph.st-open{border-left:4px solid var(--line)}
+.ms{display:flex;flex-direction:column;align-items:center;gap:8px;width:110px;flex:none;font-size:11px;color:var(--muted);text-align:center}
+.par{display:flex;flex-direction:column;gap:8px;padding:8px;border:1px dashed var(--muted);border-radius:12px;flex:none}
+.cobadges{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+.cobadge{border:1px solid var(--line);background:var(--surface);border-radius:999px;padding:6px 14px;font-weight:600;display:inline-flex;gap:8px;align-items:center}
+.cobadge[aria-pressed="true"]{background:var(--ink);border-color:var(--ink);color:var(--surface)}
+.cobadge.add{border-style:dashed;color:var(--muted);font-weight:600}
+.bell{position:relative;padding:6px 10px}.bell .cnt{position:absolute;top:-6px;right:-6px;font-family:var(--f-mono);font-size:10.5px;background:var(--accent);color:#fff;border-radius:999px;padding:0 6px}
+.pop{position:fixed;top:16px;right:20px;z-index:45;background:var(--surface);border:1px solid var(--line);border-left:4px solid var(--accent);border-radius:12px;box-shadow:0 14px 36px rgba(10,14,28,.22);padding:12px 14px;display:flex;gap:12px;align-items:center;max-width:min(460px,calc(100vw - 32px))}
+.pop .spark{width:30px;height:30px;border-radius:50%;background:var(--accent);color:#fff;display:inline-flex;align-items:center;justify-content:center;flex-shrink:0}
+.pop b{display:block;font-size:13px}.pop small{color:var(--muted);font-size:12px}
+.pop .ib{border:0;background:none;font-size:18px;color:var(--muted)}
+.modal.top{align-items:flex-start;justify-content:flex-end;padding-top:64px}
+.srct{font-size:11.5px;font-weight:600;color:var(--muted);font-family:var(--f-mono)}
+.sess h3{font-size:14.5px}
+.sess.big{border-left:4px solid var(--accent)}.sess.big h3{font-size:17px}
+.kv{display:grid;grid-template-columns:86px 1fr;gap:4px 10px;font-size:13px}
+.kv .k{font-family:var(--f-mono);font-size:10.5px;text-transform:uppercase;letter-spacing:.05em;color:var(--muted);padding-top:2px}
+.askbox{border:1px dashed var(--accent);border-radius:9px;padding:8px 10px;font-size:12.5px;display:flex;flex-direction:column;gap:6px;background:var(--accent-soft)}
+.lanes{display:grid;gap:14px;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));align-items:start}
+.lane{background:var(--sunk);border-radius:12px;padding:10px;display:flex;flex-direction:column;gap:10px}
+.lane-h{display:flex;justify-content:space-between;align-items:center;padding:2px 4px}
+.daycard{border-top:4px solid var(--ink)}
+.lnk{border:0;background:none;padding:0;color:var(--info);text-align:left;font:inherit;text-decoration:underline;cursor:pointer}
+.tline{display:flex;flex-direction:column;gap:8px}
+.tl-row{display:grid;grid-template-columns:50px 1fr;gap:10px;align-items:start}
+.tm{font-family:var(--f-mono);font-size:12px;color:var(--muted);padding-top:8px}
+.slot{border-radius:9px;padding:8px 11px;display:flex;flex-direction:column;gap:2px;font-size:12.5px}
+.slot.cal{background:var(--ink-soft);border-left:4px solid var(--ink)}
+.slot.free{border:1px dashed var(--line);color:var(--muted)}.slot.free b{color:var(--fg)}
+a.btn{text-decoration:none;color:var(--ink);display:inline-flex;align-items:center}
+.bodolink{color:inherit;text-decoration:underline;text-decoration-color:#C8641A;text-underline-offset:2px;font-weight:600}
+.modebtn{margin-left:auto;border:1px solid rgba(255,255,255,.35);background:none;color:inherit;border-radius:999px;padding:1px 10px;font-size:11.5px;font-weight:600;flex:none}
+@media (prefers-reduced-motion:reduce){*{transition:none!important}}
+</style>
+
+<div class="app" id="app">
+  <div class="demo"><b>Prototyp</b><span id="modeTxt">Vorführung „Musterfirma“ · erfundene Daten</span><button class="modebtn" id="modeBtn">Pilotdaten zeigen</button></div>
+  <aside id="side">
+    <div class="logo"><div class="mark">OS</div><div><b>Company OS</b><small>Arbeitstitel</small></div></div>
+    <div class="lbl">Unternehmen</div>
+    <div class="nav" id="companies"></div>
+    <div class="lbl">Bereiche</div>
+    <div class="nav" id="areas"></div>
+    <button class="me" id="meBtn" aria-label="Profil und Einstellungen"><span id="meAva"></span><span><b id="meName">Boris Hose</b><small>Einstellungen</small></span><span class="chev" aria-hidden="true">›</span></button>
+  </aside>
+  <main>
+    <div class="top">
+      <button class="btn sm menu-btn" id="menuBtn" aria-label="Menü">☰ Menü</button>
+      <div><div class="crumb" id="crumb"></div><h1 id="title"></h1></div>
+      <div class="sp"></div>
+      <button class="btn bell" id="bell" aria-label="Benachrichtigungen">🔔<span class="cnt">5</span></button><button class="btn" id="newJob">+ Neuer Auftrag</button>
+    </div>
+    <div class="work" id="work">
+      <section class="view" id="view"></section>
+      <section class="chat" id="chat" hidden>
+        <header><b>✦ KI-Assistent</b><span class="pill p-open" id="chatCo"></span><button class="ib" id="chatBig" aria-label="Größer anzeigen" title="Größer anzeigen">⤢</button><button class="ib" id="chatClose" aria-label="Minimieren" title="Minimieren">–</button></header>
+        <div class="msgs" id="msgs"></div>
+        <div class="chips" id="chips"></div>
+        <form class="composer" id="composer"><input id="chatIn" placeholder="Frage oder Auftrag … (Diktat über die Tastatur möglich)" aria-label="Nachricht"><button class="btn pri">Senden</button></form>
+        <div class="hint">KI kann Fehler machen. Was nach außen wirkt, wird vor dem Ausführen freigegeben.</div>
+      </section>
+    </div>
+    <button class="fab" id="chatBtn"><span class="spark">✦</span>KI-Assistent</button>
+  </main>
+</div>
+<div id="modal"></div>
+<div class="toast" id="toast" hidden></div>
+<div class="pop" id="pop" hidden role="status"><span class="spark">✦</span><div><b>Sitzung „Elevator Pitch – Kostenfolie“ ist fertig</b><small>Ergebnis prüfen und freigeben</small></div><button class="btn sm" data-gotag="sess">Ansehen</button><button class="ib" data-popx aria-label="Schließen">×</button></div>
+
+<script>
+const $=s=>document.querySelector(s);
+const esc=s=>String(s).replace(/[&<>"]/g,m=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[m]));
+function toast(t){const e=$("#toast");e.textContent=typeof demoTxt==="function"?demoTxt(t):t;e.hidden=false;clearTimeout(toast.t);toast.t=setTimeout(()=>e.hidden=true,2600)}
+
+const CO={
+ all:{name:"Übersicht",color:"#5d6579",sys:"alle Unternehmen"},
+ bs:{name:"Bodo Solutions",color:"#1f3a5f",sys:"Bodo · Organisation „Bodo Solutions“"},
+ ba:{name:"business//acts",color:"#30ABE2",sys:"sellify · business//acts"}
+};
+const AREAS=[["tag","☀","Mein Tag"],["cockpit","◎","Cockpit"],["proj","▦","Projekte"],["proc","↝","Prozesse"],["jobs","☰","Aufträge"]];
+let state={co:"all",area:"tag",dayTab:"heute",showRest:false,projTab:"mine",pjTab:"list",setTab:"profil",procSel:null,procView:"list",tplF:"Branchenpaket Mieterverein",projSel:null,phaseSel:"p2",desMode:"proc",desStage:0,desPrompt:"",showNo:false,orgCo:null};
+let assistStage=0;
+
+/* ---------- Daten ---------- */
+const WAIT={
+ bs:[
+  {k:"Freigabe",t:"14 recherchierte Leads nach Bodo übertragen",d:"Prozess Lead-Gewinnung · Schritt 4 · Recherche-Agent",c:[["Zielsystem","Bodo · Bodo Solutions"],["Aktion","14 Organisationen (Kontakttyp Mieterverein, Interessent) anlegen"],["Prüfung","Dublettenprüfung: 2 bereits vorhanden, werden nicht angelegt"]]},
+  {k:"Change Request",t:"AG-114 Prozessübergabe an Inkasso bewerten",d:"Einführung · Mieterverein Hagen",c:[["Frage","Kostenpflichtig ja/nein? Angebotsbezug? Wertigkeit?"],["Hinweis","In Bodo noch ohne Beschreibung"]]}
+ ],
+ ba:[
+  {k:"Rückfrage",t:"Welche Preisliste gilt für das Angebot Jinsheng Federn?",d:"Vertrieb sellify · Angebots-Agent",c:[["Optionen","Standard 2026 · Projektpreise · Rückfrage an Boris"]]}
+ ]
+};
+const RUN={
+ bs:[["50 Leads Mietervereine NRW","Prozess Lead-Gewinnung · ◆ Lead-Prozessagent · Schritt 2 von 4","p-run","läuft"],["Entwicklungsprojekt Inkasso-Schnittstelle","Projekt · Phase 2 Konzept & Mockup · Meilenstein 29.10.","p-run","läuft"],["Einführung Mieterverein Hagen","Projekt · Aufgabenpakete aus Bodo","p-run","läuft"],["Bitfarm-Dokumentenmigration (AG-87)","überfällig seit 18.09.","p-bad","Eskalation"]],
+ ba:[["Company OS einführen","Projekt · Setup-Pakete","p-run","läuft"],["Angebot sellify Integration Kit","Prozess Angebot erstellen · wartet auf Rückfrage","p-wait","wartet"]]
+};
+const ORG={
+ bs:[
+  {n:"Vertrieb",c:"#1f3a5f",lead:["BH","Boris Hose"],dep:"Vertretung: offen",ppl:[["VI","Vertriebsinnendienst"]],pa:[["Lead-Prozessagent","führt: Lead-Gewinnung"],["Vertriebs-Prozessagent","führt: Vertrieb · Lead bis Abschluss"]],ag:["Recherche-Agent","Aufbereitungs-Agent","Vertriebsassistent Bodo","Produktinformations-Agent","Angebots-Agent"],al:"2 Freigaben warten"},
+  {n:"Einführung",c:"#147a5c",lead:["BH","Boris Hose"],dep:"Vertretung: Dominik Koppe",ppl:[["DK","Dominik Koppe · unterstützt"],["PL","Projektleitung"]],pa:[["Anforderungs-Prozessagent","führt: Anforderung aufnehmen und bewerten"]],ag:["Einführungs-Agent","Einrichtungs-Agent","Datenübernahme-Agent","Vorlagen-Agent"],al:"3 Aufgaben überfällig im Pilot"},
+  {n:"Kundenservice",c:"#6a4fb3",lead:["KS","Leitung offen"],dep:"Vertretung: offen",ppl:[["SU","Support"]],pa:[["Service-Prozessagent","führt: Betrieb · Anfrage bis Rückmeldung"]],ag:["Annahme-Agent","Ticket-Agent"],ok:"Alles im Plan"},
+  {n:"Produktentwicklung",c:"#8a5a12",lead:["DK","Dominik Koppe"],dep:"Vertretung: offen",ppl:[["EN","Entwicklung"]],pa:[["Projekt-Agent Entwicklung","projektverantwortlich: Entwicklungsprojekt Inkasso-Schnittstelle"]],ag:["Ticket-Agent · unterstützt"],ok:"Nimmt Tickets aus dem Betrieb entgegen"}
+ ],
+ ba:[
+  {n:"Vertrieb sellify",c:"#30ABE2",lead:["BH","Boris Hose"],dep:"Vertretung: offen",ppl:[["VT","Vertrieb"]],pa:[["Angebots-Prozessagent","führt: Angebot erstellen"]],ag:["Vertriebsassistent sellify","Angebots-Agent","Video-Agent"],al:"1 Rückfrage offen"},
+  {n:"Beratung & Projekte",c:"#2457c5",lead:["PL","Leitung offen"],dep:"Vertretung: offen",ppl:[["BE","Berater:in"]],pa:[["Onboarding-Prozessagent","führt: Onboarding sellify-Kunde (Entwurf)"]],ag:["Onboarding-Agent sellify","Einrichtungs-Agent"],ok:"Company OS einführen läuft"}
+ ]
+};
+const GF={bs:{dep:"Vertretung: Dominik Koppe (Beispiel)"},ba:{dep:"Vertretung: offen"}};
+const PSK=[["E-Mails vorbereiten","Entwürfe in deinem Stil, Versand nach Freigabe",1],["Tagesbriefing","Morgens: was wartet, was ist überfällig",1],["Termine & Wiedervorlagen","in Bodo bzw. sellify anlegen und nachhalten",1],["Freigaben bündeln","alle offenen Freigaben auf einen Blick",1],["Angebote erstellen","nach Vorlage aus der Bibliothek",0],["Kontakte anlegen","mit Dublettenprüfung",0],["Tickets anlegen","Feature Requests und Issues ohne Dubletten",0],["Produktinformationen","Produktblätter im Hausstil",0],["Präsentationen","Foliensätze vorbereiten",0]];
+const B="https://bodo-app.com/o/k57bshnkdpahzs3fv4hvq6wz1s8aq2pm/aufgaben/";
+const PKG=[
+ {n:"Datenübernahme",c:"#147a5c",v:"Dominik Koppe",b:"Boris Hose",due:"31.10.",ag:"Datenübernahme-Agent",st:["p-bad","1 überfällig"],t:[["AG-1","Aktuelle Daten aus MIV Hagen Datenbank holen","p-ok","erledigt","",""],["AG-2","MIV Hagen Datenbank in Bodo importieren und als Dev Convex zur Verfügung stellen","p-ok","erledigt","02.08.","Dominik Koppe"],["AG-90","Migration von „Hinweisen“ am Kontakt","p-ok","erledigt","","Dominik Koppe"],["AG-81","Sachbearbeiter Klärung – welche User sind aktiv","p-ok","erledigt","",""],["AG-87","Bitfarm Dokumenten Migration","p-bad","in Bearbeitung · überfällig","18.09.","Dominik Koppe"],["AG-82","Lastschrift Oktober simulieren","p-open","offen","",""]]},
+ {n:"Setup definieren",c:"#2457c5",v:"Boris Hose",b:"Dominik Koppe",due:"07.11.",ag:"Einrichtungs-Agent",st:["p-bad","1 überfällig"],t:[["AG-183","Nummernkreis-Übergabe MIV Hagen – Kontakt vs. Vertrag","p-bad","in Bearbeitung · überfällig","01.10.","Dominik Koppe"],["AG-85","Suchvorlagen & Listenexport (pdf / xlsx)","p-open","offen","",""],["AG-86","Auswertungen","p-open","offen","",""],["AG-84","Artikel zu Gewerbetarif bündeln","p-open","offen","","Dominik Koppe"],["AG-83","2 Jahre Kündigungsfrist an Verträgen festhalten","p-open","offen","",""]]},
+ {n:"Anforderungen & Change Requests",c:"#c8641a",v:"Boris Hose",b:"Dominik Koppe",due:"14.11.",ag:"◆ Anforderungs-Prozessagent",st:["p-wait","Bewertung offen"],t:[["AG-114","Prozessübergabe an Inkasso durchdenken und definieren","p-bad","in Bearbeitung · überfällig","17.09.","Boris Hose"],["AG-88","Meldungen an den Landesverband","p-open","offen","",""]],ev:true},
+ {n:"Dokumentvorlagen",c:"#6a4fb3",v:"offen",b:"–",due:"–",ag:"Vorlagen-Agent",st:["p-open","nicht geplant"],t:[]},
+ {n:"Benutzerschulung",c:"#8a5a12",v:"offen",b:"–",due:"–",ag:"Einführungs-Agent",st:["p-open","nicht geplant"],t:[]},
+ {n:"Übergabe Dev → Produktiv",c:"#14213d",v:"Boris Hose",b:"Dominik Koppe",due:"–",ag:"Einrichtungs-Agent",st:["p-wait","blockiert"],t:[],block:"KI-Zugang im Vereinssystem fehlt (Angabe zur Rechtsberatung)"},
+ {n:"Projektsteuerung & Abstimmung",c:"#5d6579",v:"Boris Hose",b:"Dominik Koppe",due:"laufend",ag:"Persönlicher KI-Assistent",st:["p-run","laufend"],t:[["AG-100","Terminaufzeichnungen 8.9.26 mit Dominik teilen","p-ok","erledigt","08.09.","Boris Hose"],["AG-101","Neue Teams Termin Einladung für 15.09. rausschicken","p-ok","erledigt","25.09.","Boris Hose"]]}
+];
+const BO="https://bodo-app.com/o/k57bshnkdpahzs3fv4hvq6wz1s8aq2pm/";
+const BLINK=[["MIV Hagen Migration",BO+"projekte/js7jm4cbk99fwprsngazz7a0ad8bbzjk"],["Bodo - Einführung bei MIV Hagen",BO+"projekte/js7yhx046fsx5nnmnvt8y4vbgs8fvj9g"],["K-0037",BO+"parties/kh7ayp3a941n1ft1fewvgkfq0d8ewt1x"]];
+const HAGEN={stand:"11.10.2026",kunde:["Mietervereine Hagen","K-0037",BO+"parties/kh7ayp3a941n1ft1fewvgkfq0d8ewt1x"],kontakte:[["Kirsten Horn","Verwaltungsleitung",BO+"parties/kh7e8yxee73en3rf3tqt23bw0x8fdyna"],["Stefan Wintersohle","Rechtsanwalt",BO+"parties/kh74gnthgmgb2t8aafbnk6nbb18fg2tt"]],
+ proj:[["MIV Hagen Migration","15 Aufgaben",BO+"projekte/js7jm4cbk99fwprsngazz7a0ad8bbzjk"],["Bodo - Einführung bei MIV Hagen","Projekttyp Bodo-Einführung, noch ohne Aufgaben",BO+"projekte/js7yhx046fsx5nnmnvt8y4vbgs8fvj9g"]],
+ hot:[["AG-114","Prozessübergabe an Inkasso durchdenken und definieren","Boris Hose","17.09.","Feature Request · Priorität hoch · noch ohne Beschreibung","◆ Anforderungs-Prozessagent: Beschreibung als Entwurf schreiben, Kosten und Angebotsbezug bewerten, dir zur Freigabe vorlegen"],
+      ["AG-87","Bitfarm Dokumenten Migration","Dominik Koppe","18.09.","Priorität hoch","Persönlicher KI-Assistent: Stand bei Dominik Koppe erfragen, neue Frist vorschlagen und in Bodo eintragen"],
+      ["AG-183","Nummernkreis-Übergabe MIV Hagen – Kontakt vs. Vertrag","Dominik Koppe","01.10.","Priorität normal","Einrichtungs-Agent: Entscheidungsvorlage Kontaktnummer vs. Vertragsnummer vorbereiten"]]};
+
+const ids={"AG-1":"v17dzd7w2rggdesxn66rgq2jtx8bacj2","AG-2":"v174y97xq72pdxdc362ektx3vh8ba467","AG-90":"v17b95pxpdah39anm9qy3sv4358dvrzn","AG-81":"v17bj8k7h28trdzcwn6yf87wah8dv1je","AG-87":"v175czw98stjcjyt5xndca5md58dttx3","AG-82":"v17dbfm3k52qhqq1v80effp6c98dt9b3","AG-183":"v171x32ex93v601cy043bg4jrh8f5cr5","AG-85":"v17dc3692tjz6sq9vbf2jb64398dvskq","AG-86":"v179gzs5xkhew5z8xg90n9h5118dt9dj","AG-84":"v174q7b50z7h4ew1vy951j1e358dt55h","AG-83":"v178x48779ebjtma439j8xkzmh8dtv52","AG-114":"v17142s34zjy8zfv767y7txvyh8e4h99","AG-88":"v178dd7062hngs4t5x5224yyvn8dvzq7","AG-100":"v1732ppjyxhgtpbh266dym6f7n8e1f7t","AG-101":"v17ehsaezwnsncj11v5mc659ph8e1f5r"};
+const VT=[["Leads recherchieren","Recherche-Agent · Mensch: Vertrieb","→ Bodo: Kontakte"],["Erstkontakt & Bedarf","Vertriebsassistent","→ Bodo: Chance, Termin"],["Demo vorbereiten","Produktinfo-Agent","→ Bodo: Demo-Organisation"],["Angebot","Angebots-Agent","→ Bodo: Dokument, E-Mail"],["Abschluss","Vertriebsassistent","startet Einführung"]];
+const BT=[["Anfrage annehmen","Annahme-Agent","→ Chronik"],["Einordnen","Annahme-Agent","Dublettenprüfung"],["Lösen oder Ticket","Ticket-Agent · Mensch: Support","→ Bodo: Ticket"],["Rückmeldung","Annahme-Agent","→ E-Mail mit Signatur"]];
+const SETUP=[
+ ["Inhaber-System",[["Kunde im eigenen CRM","Bodo · Bodo Solutions → Mietervereine Hagen (K-0037)"],["Bezug","Kunde von Bodo Solutions"]]],
+ ["Projekte",[["Hauptprojekt","Bodo - Einführung bei MIV Hagen (Name in Bodo)"],["Weitere Projekte","MIV Hagen Migration"],["Verwaltung","Projekte, Meilensteine und Aufgaben bleiben in Bodo – Company OS zeigt sie an und steuert die Arbeit"]]],
+ ["Anschlüsse & Rollen",[["CRM","Bodo · Dev-System Mieterverein Hagen e.V. (Einrichtung), Produktivsystem wird später festgelegt"],["Entwicklung","Bodo (Feature Request / Issue)"],["Bibliothek","Cloud-Ordner (OneDrive/SharePoint oder Google Drive)"],["ERP · weitere Systeme","nicht angeschlossen – bei Bedarf per MCP"],["KI-Zugang im Kundensystem","fehlt – Angabe zur Rechtsberatung nachholen"]]],
+ ["KI-Anbieter & Haupt-KI",[["Haupt-KI (Pflicht)","Claude – nur von uns freigegebene Anbieter wählbar"],["Weitere Anbieter","registrieren, nur mit bestätigter AVV"],["KI-Profile","zunächst alle auf die Haupt-KI, später verfeinern"],["Datenstufe je Anbieter","0 ohne Personendaten · 1 pseudonymisiert · 2 personenbezogen"],["Budget je Anbieter","bei Erreichen: anhalten und benachrichtigen"]]],
+ ["Abteilungen & Organigramm",[["Verwaltet","Vorstand · Verwaltung · Rechtsberatung · Buchhaltung"],["Je Abteilung","eine Leitung, eine Vertretung, Mitarbeitende, Agenten"]]],
+ ["Branchenpaket",[["Paket","Mieterverein"],["Liefert","Organigramm-Vorlage, Vorschlagsliste mit Prozessen und Projektvorlagen, Standard-Agenten und Skills"]]],
+ ["Menschen",[["Mitarbeitende","je Abteilung, verknüpft mit Bodo-Benutzer"]]],
+ ["Prozesse & Projekte",[["Vorschlagsliste","aus dem Branchenpaket: Prozesse und Projektvorlagen – direkt übernehmen, anpassen, ablehnen oder später"],["Je Schritt","Arbeitsanweisung · Agent und Ersatz-Agent · KI-Profil · Datenstufe"],["Je Prozess","Prozessverantwortlicher Agent · ergebnisverantwortlicher Mensch"],["Übernommenes","startet als Entwurf, aktiv erst nach Testlauf"]]],
+ ["Übergabewege",[["Entwicklungsaufträge","→ Bodo, Methode: Skill bodo-ticket-anlegen"],["Auftrag nach Abschluss an ERP","kein ERP angeschlossen"],["Abweichung je Projekt","möglich"]]],
+ ["Bibliothek & Vorlagenquellen",[["Aus dem Kundensystem","Bodo: E-Mail- und Dokumentvorlagen (über den Anschluss)"],["Cloud-Ordner","OneDrive/SharePoint oder Google Drive – kein lokaler Ordner"]]],
+ ["Agenten & Skills",[["Agentenpool","Annahme-Agent · Termin-Agent · Beitrags-Agent · Prüf-Agent"],["Prozessführung","je Prozess ein Prozessverantwortlicher Agent (Standard-Skill „Prozess führen“)"],["Regel","Agenten werden beim Entwerfen fest eingesetzt – keine Ausleihe zur Laufzeit"]]],
+ ["Freigaben & Benachrichtigung",[["Außenwirkung","Freigabe nötig, im Auftrag aufhebbar"],["Ruhezeit","20–7 Uhr"],["Kanäle","App · E-Mail je Person · Handy (Mobil-Projekt)"]]],
+ ["Zugriff",[["Rollen","Vorstand · Abteilungsleitung · Mitarbeitende"]]],
+ ["Recht & Datenschutz",[["AVV Kunde ↔ Anbieter von Company OS","bestätigt"],["Regeln","je Regel: hart (keine Hintertür) oder übersteuerbar durch eine festgelegte Rolle, protokolliert"],["Agenten dürfen nie","Rechtsberatung erteilen · Geld bewegen"]]],
+ ["KI-Assistent & Übersicht",[["KI-Assistent (Company-Chat)","aktiv, je Unternehmen"],["Mein Tag","Morgenübersicht und Tagesabschluss je Person einstellbar"],["Kennzahlen","überfällige Pakete · wartende Freigaben · Prozesse aktiv/im Test · KI-Kosten"]]],
+ ["Abschluss",[["Prüfung","Verbindungstest Anschlüsse und KI-Anbieter · Probelauf · Setup-Protokoll in der Kundenakte"]]]
+];
+let setupStep=0;
+
+/* ---------- Rahmen ---------- */
+function nav(){
+  if(!$("#meAva").innerHTML)$("#meAva").innerHTML=avatar(32);
+  $("#companies").innerHTML=Object.entries(CO).map(([k,c])=>`<button data-co="${k}" aria-current="${state.co===k}"><span class="dot" style="background:${c.color}"></span>${esc(c.name)}${k!=="all"&&WAIT[k]?.length?`<span class="cnt">${WAIT[k].length}</span>`:""}</button>`).join("");
+  $("#areas").innerHTML=AREAS.map(([k,i,l])=>`<button data-area="${k}" aria-current="${state.area===k}"><span class="ic">${i}</span>${l}</button>`).join("");
+  $("#chatCo").textContent=state.co==="all"?"alle Unternehmen":CO[state.co].name;
+}
+function go(o){Object.assign(state,o);if(state.co==="all"&&!["tag","cockpit","settings"].includes(state.area))state.co="bs";render();$("#side").classList.remove("open")}
+function render(){
+  nav();
+  const a=AREAS.find(x=>x[0]===state.area)||["settings","","Einstellungen"];
+  $("#meBtn").setAttribute("aria-current",state.area==="settings");
+  $("#crumb").textContent=demoTxt(CO[state.co].name+" · "+CO[state.co].sys);
+  $("#title").textContent=state.area==="cockpit"&&state.co==="all"?"Alle Unternehmen":a[2];
+  const V={tag:vTag,cockpit:state.co==="all"?vAll:vCockpit,proj:vProjArea,proc:vProc,jobs:vJobs,settings:vSettings}[state.area];
+  $("#view").innerHTML=demoTxt(V());$("#view").scrollTop=0;
+}
+
+/* ---------- Ansichten ---------- */
+function waitCard(w,co){return `<div class="item"><span class="pill ${w.k==="Freigabe"?"p-wait":w.k==="Rückfrage"?"p-run":"p-bad"}">${w.k}</span><div class="t"><b>${esc(w.t)}</b><div class="sub">${esc(w.d)}${co?" · "+CO[co].name:""}</div>
+  <div class="conseq" style="margin-top:8px">${w.c.map(([k,v])=>`<span class="k">${k}</span><span>${esc(v)}</span>`).join("")}</div>
+  <div class="acts" style="margin-top:8px">${w.k==="Freigabe"?'<button class="btn sm acc" data-toast="Freigegeben – 12 Leads werden in Bodo angelegt (Prototyp: nichts ausgeführt)">Freigeben</button><button class="btn sm" data-toast="Details geöffnet (Prototyp)">Details</button>':w.k==="Rückfrage"?'<button class="btn sm" data-toast="Antwort gesendet (Prototyp)">Standard 2026</button><button class="btn sm" data-toast="Antwort gesendet (Prototyp)">Projektpreise</button>':'<button class="btn sm acc" data-ptabgo="proj" data-projgo="hagen">Bewertung öffnen</button>'}</div></div></div>`}
+function vAll(){
+  const W=SESS.filter(x=>x.l==="wait");
+  return `<div class="stack"><div class="card" style="border-left:4px solid var(--accent)"><div class="row" style="justify-content:space-between;flex-wrap:wrap"><div><h2>☀ Mein Tag</h2><div class="sub">${W.length} KI-Sitzungen warten auf dich${W[0]?` · jetzt dran: „${esc(W[0].t)}“`:""}</div></div><button class="btn pri" data-gotag>Öffnen</button></div></div>
+  <div class="grid" style="grid-template-columns:repeat(auto-fit,minmax(280px,1fr))">${["bs","ba"].map(k=>`<div class="card" style="border-top:4px solid ${CO[k].color}"><h2>${CO[k].name}</h2><div class="sub">${CO[k].sys}</div>
+    <div class="kpis"><div class="kpi warn"><b>${WAIT[k].length}</b><span>wartet auf dich</span></div><div class="kpi"><b>${RUN[k].length}</b><span>läuft</span></div><div class="kpi bad"><b>${RUN[k].filter(r=>r[2]==="p-bad").length}</b><span>Eskalationen</span></div></div>
+    <button class="btn" data-co="${k}" data-area="cockpit">Öffnen</button></div>`).join("")}
+  </div>
+  <div class="card"><h2>Wartet auf dich</h2><div class="list">${["bs","ba"].flatMap(k=>WAIT[k].map(w=>waitCard(w,k))).join("")}</div></div>
+  <div class="card"><h2>Projekte über Unternehmen hinweg <span class="pill p-open">vorgesehen</span></h2><div class="sub">„Company OS einführen“ liegt in business//acts und ist verknüpft mit dem Einführungsprojekt beim Kunden in Bodo Solutions.</div></div>
+  </div>`;
+}
+function vCockpit(){
+  const k=state.co;
+  return `<div class="stack"><div class="grid">
+   <div class="card"><h2>Wartet auf dich</h2><div class="list">${WAIT[k].map(w=>waitCard(w)).join("")||'<div class="sub">Nichts offen.</div>'}</div></div>
+   <div class="card"><h2>Läuft</h2><div class="list">${RUN[k].map(r=>`<div class="item"><div class="t"><b>${esc(r[0])}</b><div class="sub">${esc(r[1])}</div></div><span class="pill ${r[2]}">${r[3]}</span></div>`).join("")}</div></div>
+  </div>
+  <div class="card"><h2>Projekte</h2><div class="kpis"><div class="kpi"><b>${(PROJ[k]||[]).length}</b><span>laufend</span></div><div class="kpi"><b>${(PROJ[k]||[]).filter(x=>x.kind==="Phasen").length}</b><span>mit Phasen</span></div><div class="kpi"><b>${(PROJ[k]||[]).filter(x=>x.kind!=="Phasen").length}</b><span>mit Aufgabenpaketen</span></div></div><div class="acts" style="justify-content:flex-start"><button class="btn sm" data-ptabgo="proj">Projekte</button></div></div>
+  <div class="card"><h2>Prozesse</h2><div class="kpis"><div class="kpi"><b>${PROC[k].filter(p=>p.st==="aktiv").length}</b><span>aktiv</span></div><div class="kpi"><b>${PROC[k].filter(p=>p.st==="im Test").length}</b><span>im Test</span></div><div class="kpi"><b>${PROC[k].filter(p=>p.st==="Entwurf").length}</b><span>Entwürfe</span></div><div class="kpi warn"><b>${SUG.filter(s=>s.s==="offen").length}</b><span>Vorschläge offen</span></div></div><div class="acts" style="justify-content:flex-start"><button class="btn sm" data-ptabgo="mine">Prozesse</button><button class="btn sm" data-ptabgo="sug">Vorschläge ansehen</button></div></div>
+  <div class="card"><h2>Abteilungen <button class="btn sm" data-stab="firmen" style="margin-left:auto">Organigramm</button></h2><div class="list">${ORG[k].map(d=>`<div class="item"><div class="ava lead" style="--c:${d.c}">${d.lead[0]}</div><div class="t"><b>${d.n}</b><div class="sub">Leitung ${esc(d.lead[1])} · ${d.ag.length} Agenten · ${d.ppl.length} Mitarbeitende</div></div><span class="pill ${d.al?"p-wait":"p-ok"}">${esc(d.al||d.ok)}</span></div>`).join("")}</div></div></div>`;
+}
+function vOrg(co){
+  co=co||state.co;const g=GF[co];const on=PSK.filter(x=>x[2]).length;
+  return `<div class="stack"><div class="sub">Oben die Geschäftsführung, daneben als Stabsstelle ihr persönlicher KI-Assistent. Darunter jede Abteilung: eine Leitung, eine Vertretung, Mitarbeitende, Prozessverantwortliche Agenten (führen je einen Prozess) und Agenten mit einheitlichem Symbol.</div>
+  <div class="orgtop"><div></div>
+   <div class="card gfbox">${avatar(72)}<div><h2 style="margin:0">Geschäftsführung</h2><div class="sub">Boris Hose · du</div><div class="sub">${esc(g.dep)}</div></div></div>
+   <div class="staff"><span class="hl"></span><div class="staffcol">
+    <button class="asst" id="asstBtn"><span class="spark">✦</span><span><b>Persönlicher KI-Assistent</b><small>der Geschäftsführung · ${on} Fähigkeiten</small></span></button>
+    <button class="asst human" data-toast="Persönliche Assistenz (Mensch) hinzufügen (Prototyp)"><span class="spark" style="background:var(--sunk);color:var(--muted)">+</span><span><b>Assistenz (Mensch)</b><small>optional, z. B. Referent:in</small></span></button>
+   </div></div></div>
+  <div class="orgline"></div>
+  <div class="org orgrow">${ORG[co].map(d=>`<div class="card dept" style="border-top:4px solid ${d.c}">
+   <div class="head"><div class="ava lead" style="--c:${d.c}">${d.lead[0]}</div><div><h3>${d.n}</h3><div class="sub">Leitung: ${esc(d.lead[1])}</div><div class="sub">${esc(d.dep)}</div></div></div>
+   ${d.ppl.length?`<div class="sec"><div class="lbl" style="padding:0">Mitarbeitende</div>${d.ppl.map(p=>`<div class="m"><span class="ava s" style="--c:#4b6b8a">${p[0]}</span>${esc(p[1])}</div>`).join("")}</div>`:""}
+   ${d.pa&&d.pa.length?`<div class="sec"><div class="lbl" style="padding:0">Prozessführung</div>${d.pa.map(p=>`<div class="m"><span class="bot lead">◆</span><span><b>${esc(p[0])}</b><small class="sub" style="display:block">${esc(p[1])}</small></span></div>`).join("")}</div>`:""}
+   <div class="sec"><div class="lbl" style="padding:0">Agenten</div>${d.ag.map(a=>`<div class="m"><span class="bot">◆</span>${esc(a)}</div>`).join("")}</div>
+   <div class="alert ${d.al?"":"ok"}">${esc(d.al||d.ok)}</div></div>`).join("")}
+   <div class="card" style="border-style:dashed;align-items:flex-start"><h3>+ Abteilung</h3><div class="sub">Abteilungen anlegen, ausblenden statt löschen.</div></div></div></div>`;
+}
+function chainHTML(arr){return `<div class="chain">${arr.map((s,i)=>`${i?'<span class="arrow">→</span>':""}<div class="step"><b>${s[0]}</b><span class="sub">${s[1]}</span><span>${s[2]}</span></div>`).join("")}</div>`}
+
+/* ---------- Prozesse, Vorlagen, Vorschläge, Designer, Projekte ---------- */
+const S=(n,dep,ag,ers,fr)=>({n,dep,ag,ers,fr});
+const STC={"aktiv":"p-ok","im Test":"p-run","Entwurf":"p-open"};
+const PROC={
+ bs:[
+  {id:"lead",n:"Lead-Gewinnung",dep:"Vertrieb",st:"aktiv",v:"v3",pa:"Lead-Prozessagent",er:"Boris Hose",run:"1 Auftrag läuft",note:"Der Aufbereitungs-Agent wurde in seiner Heimat-Abteilung geändert (v2 → v3). Testlauf nötig, bevor dieser Prozess die neue Version übernimmt – bis dahin arbeitet er mit v2.",steps:[S("Leads ermitteln","Vertrieb","Recherche-Agent","Vertriebsassistent Bodo",""),S("Leads aufbereiten","Vertrieb","Aufbereitungs-Agent","Recherche-Agent",""),S("Dubletten prüfen","Vertrieb","Recherche-Agent","–",""),S("Ins CRM übergeben","Vertrieb","Recherche-Agent","Vertriebsassistent Bodo","Freigabe: Leitung Vertrieb")]},
+  {id:"vt",n:"Vertrieb · vom Lead zum Abschluss",dep:"Vertrieb",st:"aktiv",v:"v2",pa:"Vertriebs-Prozessagent",er:"Boris Hose",run:"kein Auftrag aktiv",steps:[S("Leads recherchieren","Vertrieb","Recherche-Agent","Vertriebsassistent Bodo","Mensch: Vertriebsinnendienst"),S("Erstkontakt & Bedarf","Vertrieb","Vertriebsassistent Bodo","–",""),S("Demo vorbereiten","Vertrieb","Produktinformations-Agent","–",""),S("Angebot","Vertrieb","Angebots-Agent","–","Freigabe vor Versand"),S("Abschluss","Vertrieb","Vertriebsassistent Bodo","–","startet Projekt „Einführung“")]},
+  {id:"bt",n:"Betrieb · Anfrage bis Rückmeldung",dep:"Kundenservice",st:"aktiv",v:"v2",pa:"Service-Prozessagent",er:"Support",run:"1 Auftrag läuft",steps:[S("Anfrage annehmen","Kundenservice","Annahme-Agent","–",""),S("Einordnen","Kundenservice","Annahme-Agent","–","Dublettenprüfung"),S("Lösen oder Ticket","Kundenservice","Ticket-Agent","–","Mensch: Support"),S("Rückmeldung","Kundenservice","Annahme-Agent","–","E-Mail mit Signatur")]},
+  {id:"anf",n:"Anforderung aufnehmen und bewerten",dep:"Einführung",st:"im Test",v:"v1",pa:"Anforderungs-Prozessagent",er:"Boris Hose",run:"Testlauf im Dev-System",steps:[S("Anforderung aufnehmen","Einführung","Einführungs-Agent","–",""),S("Bewertung vorschlagen: kostenpflichtig, Angebotsbezug, Wertigkeit","Einführung","Einführungs-Agent","–","Bestätigung: ergebnisverantwortlich"),S("Ticket ohne Dublette anlegen","Produktentwicklung","Ticket-Agent","–","Entwurf zur Freigabe")]}
+ ],
+ ba:[
+  {id:"ang",n:"Angebot erstellen",dep:"Vertrieb sellify",st:"aktiv",v:"v2",pa:"Angebots-Prozessagent",er:"Boris Hose",run:"1 Auftrag wartet",steps:[S("Bedarf aufnehmen","Vertrieb sellify","Vertriebsassistent sellify","–",""),S("Angebot aus Vorlage entwerfen","Vertrieb sellify","Angebots-Agent","–",""),S("Freigabe","Vertrieb sellify","–","–","Boris Hose"),S("Versand & Wiedervorlage","Vertrieb sellify","Angebots-Agent","Vertriebsassistent sellify","")]},
+  {id:"onb",n:"Onboarding sellify-Kunde",dep:"Beratung & Projekte",st:"Entwurf",v:"v1",pa:"Onboarding-Prozessagent",er:"Leitung offen",run:"–",steps:[S("Kickoff vorbereiten","Beratung & Projekte","Onboarding-Agent sellify","–",""),S("Mandant einrichten","Beratung & Projekte","Einrichtungs-Agent","–","Freigabe: Berater:in")]}
+ ]
+};
+const TPLF=["Branchenpaket Mieterverein","Vertrieb","Marketing","Kundenservice","Buchhaltung & Finanzen","Personal","Geschäftsführung"];
+const TPL=[
+ {f:"Branchenpaket Mieterverein",n:"Neuaufnahme Mitglied",d:"Antrag prüfen → Mitglied anlegen → Begrüßung senden",sk:["antrag-pruefen","kontakt-anlegen","email-erstellung"]},
+ {f:"Branchenpaket Mieterverein",n:"Betriebskostenabrechnung vorprüfen",d:"Unterlagen anfordern → prüfen → Prüfbericht zur Freigabe",sk:["betriebskosten-pruefen","email-erstellung"]},
+ {f:"Branchenpaket Mieterverein",n:"Beratungstermin",d:"Anliegen aufnehmen → Termin vereinbaren → erinnern",sk:["termin-vereinbaren","email-erstellung"]},
+ {f:"Branchenpaket Mieterverein",n:"Kündigung und Rückgewinnung",d:"Kündigungsgrund erkennen → Rückgewinnung anbieten → Wiedervorlage",sk:["kuendigung-auswerten","email-erstellung"]},
+ {f:"Vertrieb",n:"Lead-Gewinnung",d:"ermitteln → aufbereiten → Dubletten prüfen → ins CRM übergeben",sk:["lead-recherche","lead-aufbereiten","kontakt-anlegen"]},
+ {f:"Vertrieb",n:"Angebot erstellen",d:"Bedarf → Entwurf aus Vorlage → Freigabe → Versand → Wiedervorlage",sk:["bodo-angebot","email-erstellung"]},
+ {f:"Vertrieb",n:"Angebote nachfassen",d:"offene Angebote finden → Erinnerung entwerfen → Wiedervorlage",sk:["wiedervorlage","email-erstellung"]},
+ {f:"Marketing",n:"Newsletter / Kampagne",d:"Thema → Text → Freigabe → Versand → Auswertung",sk:["texte-schreiben","email-erstellung"]},
+ {f:"Marketing",n:"Infomaterial auf Anfrage",d:"Anfrage erkennen → Material aus der Bibliothek → Versand",sk:["bibliothek-versand","email-erstellung"]},
+ {f:"Marketing",n:"Social-Media-Beitrag",d:"Thema → Text und Bild → Freigabe",sk:["texte-schreiben","bild-erstellen"]},
+ {f:"Kundenservice",n:"Anfrage einordnen und beantworten",d:"Eingang → einordnen → Antwortentwurf → Freigabe → senden → dokumentieren",sk:["anfrage-einordnen","email-erstellung"]},
+ {f:"Kundenservice",n:"Beschwerde bearbeiten",d:"aufnehmen → Ursache klären → Antwort → nachfassen",sk:["anfrage-einordnen","email-erstellung"]},
+ {f:"Kundenservice",n:"Termin vereinbaren und erinnern",d:"Wunschtermin → Kalender → Erinnerung",sk:["termin-vereinbaren"]},
+ {f:"Buchhaltung & Finanzen",n:"Eingangsrechnung prüfen",d:"Eingang → prüfen → vorkontieren → Freigabe",sk:["rechnung-pruefen"]},
+ {f:"Buchhaltung & Finanzen",n:"Mahnwesen",d:"offene Posten → Erinnerung → Mahnstufe → Inkasso-Übergabe",sk:["mahnung-erstellen","email-erstellung"]},
+ {f:"Buchhaltung & Finanzen",n:"Rechnung stellen",d:"Leistung erfassen → Rechnung → Versand",sk:["rechnung-erstellen"]},
+ {f:"Personal",n:"Bewerbungen vorsortieren",d:"Eingang → Kriterien prüfen → Vorschlag an die Leitung (Datenstufe beachten)",sk:["bewerbung-sichten"]},
+ {f:"Personal",n:"Onboarding",d:"Zugänge → Unterlagen → Einarbeitungsplan",sk:["onboarding-planen","email-erstellung"]},
+ {f:"Personal",n:"Abwesenheiten",d:"Antrag → Vertretung prüfen → Freigabe",sk:["termin-vereinbaren"]},
+ {f:"Geschäftsführung",n:"Wochenbericht",d:"Kennzahlen sammeln → Bericht → Versand",sk:["bericht-erstellen"]},
+ {f:"Geschäftsführung",n:"Besprechung vorbereiten und protokollieren",d:"Agenda → Unterlagen → Protokoll → Aufgaben",sk:["protokoll-schreiben","email-erstellung"]},
+ {f:"Projektvorlagen",n:"Entwicklungsprojekt",d:"Phasen: Anforderungsanalyse & Spezifikation → Konzept & Mockup → Umsetzung (parallel: Testfälle vorbereiten) → Qualitätssicherung · Abnahme je Phase = Meilenstein",sk:["prozess-fuehren"],proj:true},
+ {f:"Projektvorlagen",n:"Einführung Bodo beim Mieterverein",d:"Aufgabenpakete ohne feste Reihenfolge: Datenübernahme, Setup, Vorlagen, Schulung, Übergabe Dev → Produktiv",sk:["bodo-einfuehrung-anlegen","bodo-ersteinrichtung"],proj:true}
+];
+const tplSk=n=>(TPL.find(t=>t.n===n)||{sk:[]}).sk;
+const SUG=[
+ {n:"Neuaufnahme Mitglied",src:"Branchenpaket Mieterverein",why:"häufigster Vorgang im Verein",s:"offen"},
+ {n:"Betriebskostenabrechnung vorprüfen",src:"Branchenpaket Mieterverein",why:"hoher Zeitaufwand je Fall",s:"offen"},
+ {n:"Beratungstermin",src:"Branchenpaket Mieterverein",why:"viele Rückfragen per Telefon",s:"offen"},
+ {n:"Kündigung und Rückgewinnung",src:"Branchenpaket Mieterverein",why:"Kündigungsgründe werden heute nicht ausgewertet",s:"offen"},
+ {n:"Angebote nachfassen",src:"Gespräch mit dem KI-Assistenten",why:"„Wir vergessen oft nachzufassen.“",s:"offen"},
+ {n:"Infomaterial auf Anfrage",src:"Gespräch mit dem KI-Assistenten",why:"Material liegt in der Bibliothek bereit",s:"offen"},
+ {n:"Wochenbericht",src:"eigener Prompt",why:"„Jeden Freitag ein Überblick für die Geschäftsführung“",s:"offen"}
+];
+let sugSel=new Set();
+const PROJ={
+ bs:[{id:"hagen",n:"Einführung Mieterverein Hagen",kind:"Aufgabenpakete",sys:"Bodo",pv:["Mensch","Boris Hose"],tpl:"Einführung Bodo beim Mieterverein",flow:"manuell"},
+     {id:"dev",n:"Entwicklungsprojekt Inkasso-Schnittstelle",kind:"Phasen",sys:"Bodo",pv:["KI-Agent","Projekt-Agent Entwicklung"],tpl:"Entwicklungsprojekt",flow:"automatisch",ex:true}],
+ ba:[{id:"cos",n:"Company OS einführen",kind:"Aufgabenpakete",sys:"sellify",pv:["Mensch","Boris Hose"],tpl:"–",flow:"manuell"}]
+};
+const PH=[
+ {id:"p1",n:"Anforderungsanalyse & Spezifikation",st:"done",from:"01.10.",to:"15.10.",er:"Boris Hose",pr:[["Anforderung aufnehmen und bewerten","12 von 12 Läufen"],["Spezifikation erstellen","1 von 1"]],ms:["Spezifikation abgenommen","15.10.",true]},
+ {id:"p2",n:"Konzept & Mockup",st:"run",from:"16.10.",to:"29.10.",er:"Boris Hose",pr:[["Umsetzungskonzept erstellen","1 von 1"],["Klickbares Mockup erstellen und abstimmen","1 von 2 · Feedbackrunde 2 läuft"]],ms:["Konzept und Mockup vom Kunden freigegeben","29.10.",false]},
+ {id:"p3",n:"Umsetzung",st:"open",par:1,from:"30.10.",to:"10.12.",er:"Leitung Produktentwicklung",pr:[["Entwicklungsticket umsetzen","0 von 22 Tickets"]],ms:["Alle Tickets erledigt, Stand im Testsystem","10.12.",false]},
+ {id:"p3b",n:"Testfälle vorbereiten",st:"open",par:1,from:"30.10.",to:"03.12.",er:"Boris Hose",pr:[["Testfall aus echtem Prozess ableiten","0 von 15 Testfällen"]],ms:["Testfälle mit dem Kunden abgestimmt","03.12.",false]},
+ {id:"p4",n:"Qualitätssicherung",st:"open",from:"11.12.",to:"19.12.",er:"Boris Hose",pr:[["Echten Prozess gegen die Entwicklung verproben","0 von 15"],["Fehler melden → Ticket in der Umsetzung","bei Bedarf"]],ms:["Kundenabnahme – danach Übergabe Dev → Produktiv","19.12.",false]}
+];
+const PHS={done:["p-ok","abgenommen"],run:["p-run","läuft"],open:["p-open","geplant"]};
+function agentFor(sk){const a=AG.find(x=>x.sk.includes(sk));return a?a.n:null}
+function covHTML(sk){const gaps=sk.filter(k=>!agentFor(k));return gaps.length?`<span class="pill p-wait">Lücke: ${gaps.join(", ")}</span>`:`<span class="pill p-ok">Agenten vorhanden</span>`}
+function escChain(){return chainHTML([["Ausführender Agent","arbeitet den Schritt ab",""],["Prozessverantwortlicher Agent","wiederholt, nimmt den Ersatz-Agenten, stellt Rückfrage",""],["Ergebnisverantwortlich (Mensch)","entscheidet und nimmt ab",""],["Abteilungsleitung","wenn keine Reaktion",""],["Vertretung","bei Abwesenheit oder Frist",""]])}
+
+function vProc(){
+  const t=state.projTab;const nOpen=SUG.filter(s=>s.s==="offen").length;
+  const T=[["mine","Meine Prozesse"],["tpl","Prozessvorlagen"],["sug","Vorschläge"],["des","Prozess-Designer"]];
+  if(state.desMode!=="proc"){state.desMode="proc";state.desPrompt="";state.desStage=0}
+  const body=t==="tpl"?vTpl():t==="sug"?vSug():t==="des"?vDes():vMine();
+  return `<div class="stack"><div class="tabs" role="tablist">${T.map(([k,l])=>`<button role="tab" aria-selected="${t===k}" data-ptab="${k}">${l}${k==="sug"&&nOpen?` <span class="pill p-wait">${nOpen}</span>`:""}</button>`).join("")}</div>${body}</div>`;
+}
+function vProjArea(){
+  const t=state.pjTab;const T=[["list","Projekte"],["tpl","Projektvorlagen"],["des","Projekt-Designer"]];
+  if(t==="des"&&state.desMode!=="proj"){state.desMode="proj";state.desPrompt="";state.desStage=0}
+  const body=t==="tpl"?vProjTpl():t==="des"?vDes():vProj();
+  return `<div class="stack"><div class="tabs" role="tablist">${T.map(([k,l])=>`<button role="tab" aria-selected="${t===k}" data-pjtab="${k}">${l}</button>`).join("")}</div>${body}</div>`;
+}
+function vProjTpl(){
+  const L=TPL.map((t,i)=>[t,i]).filter(([t])=>t.proj);
+  return `<div class="card"><h2>Projektvorlagen</h2><div class="sub">Ein Projekt hat ein Ziel und ein Ende. Vorlagen legen fest, ob es in Phasen mit Meilensteinen läuft oder in Aufgabenpaketen ohne feste Reihenfolge, und welche Prozesse in den Phasen genutzt werden. Beim Start wird das Projekt im angeschlossenen System (Bodo bzw. sellify) angelegt. Inhalte sind Beispiele.</div></div>
+  <div class="grid">${L.map(([t,i])=>`<div class="card"><div class="row" style="justify-content:space-between"><h3>${esc(t.n)}</h3><span class="pill p-run">Projektvorlage</span></div><div class="sub">${esc(t.d)}</div><div class="acts"><button class="btn sm pri" data-tpl="${i}">Projekt aus Vorlage starten</button><button class="btn sm" data-pjtab="des" data-desfill="1">Im Designer öffnen</button></div></div>`).join("")}
+   <div class="card" style="border-style:dashed"><h3>+ Projektvorlage</h3><div class="sub">im Projekt-Designer mit KI entwerfen</div><div class="acts"><button class="btn sm" data-pjtab="des">Projekt-Designer</button></div></div></div>`;
+}
+function vMine(){
+  const L=PROC[state.co]||[];
+  if(state.procView==="step")return `<div class="stack"><div><button class="btn sm" data-procback>← Zurück zum Prozess</button></div>${vStep()}</div>`;
+  const p=state.procView==="detail"&&L.find(x=>x.id===state.procSel);
+  if(p)return vProcDetail(p);
+  return `<div class="card"><h2>Meine Prozesse</h2><div class="sub">Ein Prozess besteht aus Schritten; an jedem Schritt arbeitet ein fest eingesetzter Agent, dazu optional ein Ersatz-Agent. Je Prozess führt ein Prozessverantwortlicher Agent, ein Mensch ist ergebnisverantwortlich. Inhalte sind Beispiele.</div>
+   <div class="list">${L.map(x=>`<div class="item"><span class="pill ${STC[x.st]}">${x.st}</span><div class="t"><b>${esc(x.n)}</b><div class="sub">${esc(x.dep)} · ${x.v} · ${x.steps.length} Schritte · ◆ ${esc(x.pa)} · Ergebnisverantwortlich: ${esc(x.er)}${x.note?' · <span style="color:var(--accent)">Testlauf nötig</span>':""}</div></div><button class="btn sm" data-proc="${x.id}">Öffnen</button></div>`).join("")}</div>
+   <div class="acts" style="justify-content:flex-start"><button class="btn" data-ptab="tpl">+ Aus Vorlage</button><button class="btn pri" data-ptab="des">✦ Neu mit KI-Designer</button></div></div>`;
+}
+function vProcDetail(p){
+  return `<div class="stack"><div><button class="btn sm" data-procback>← Alle Prozesse</button></div>
+  <div class="card"><h2>${esc(p.n)} <span class="pill ${STC[p.st]}">${p.st}</span><span class="lv">${p.v}</span></h2>
+   <div class="two"><div class="field"><label>Abteilung</label><div class="val">${esc(p.dep)}</div></div><div class="field"><label>Prozessverantwortlicher Agent</label><div class="val">◆ ${esc(p.pa)}</div></div><div class="field"><label>Ergebnisverantwortlich (Mensch)</label><div class="val">${esc(p.er)}</div></div><div class="field"><label>Aufträge</label><div class="val">${esc(p.run||"–")}</div></div></div>
+   ${p.note?`<div class="alert">${esc(p.note)}</div>`:""}
+   <div class="chain">${p.steps.length?p.steps.map((s,i)=>`${i?'<span class="arrow">→</span>':""}<div class="step"><span class="sub">Schritt ${i+1} · ${esc(s.dep)}</span><b>${esc(s.n)}</b><span>◆ ${esc(s.ag)}</span><span class="sub">Ersatz: ${esc(s.ers)}</span>${s.fr?`<span class="pill p-wait" style="align-self:flex-start;white-space:normal">${esc(s.fr)}</span>`:""}</div>`).join(""):'<div class="sub">Schritte aus der Vorlage übernommen – im Designer Agenten zuordnen und prüfen.</div>'}</div>
+   <div class="acts" style="justify-content:flex-start"><button class="btn pri" data-pjob="">Auftrag starten</button><button class="btn" data-ptab="des">Im Designer öffnen</button><button class="btn" data-stepedit>Schritt bearbeiten (Beispiel)</button><button class="btn" data-toast="Testlauf im Dev-System mit Beispieldaten gestartet (Prototyp)">Testlauf</button></div></div>
+  <div class="card"><h2>Eskalation</h2><div class="sub">Wer reagiert, wenn ein Schritt hängt. Bei erreichtem Budget oder Ausfall des KI-Anbieters wird nicht ausgewichen – der Auftrag hält an und du wirst benachrichtigt.</div>${escChain()}</div>
+  <div class="card"><h2>Agenten in diesem Prozess</h2><div class="sub">Agenten werden beim Entwerfen aus dem Agentenpool gewählt und fest eingesetzt – keine Ausleihe zur Laufzeit. Eine andere Besetzung ist eine Prozessänderung mit neuer Version und Freigabe.</div></div></div>`;
+}
+function vTpl(){
+  const f=state.tplF;const L=TPL.map((t,i)=>[t,i]).filter(([t])=>t.f===f);
+  return `<div class="card"><h2>Prozessvorlagen</h2><div class="sub">Ein Prozess ist ein wiederkehrender Ablauf aus Schritten, der immer wieder läuft. Standards statt jedes Mal neu bauen. Vorlagen beschreiben je Schritt die benötigten Fähigkeiten (Skills); beim Übernehmen ordnet Company OS passende Agenten aus dem Pool zu und zeigt Lücken. Inhalte sind Beispiele.</div>
+   <div class="skills">${TPLF.map(x=>`<button data-tplf="${x}" aria-pressed="${x===f}">${x}</button>`).join("")}<button class="add" data-toast="Branchenpaket Immobilien- und Gewerbeimmobilienverwaltung ist in Vorbereitung">Immobilienverwaltung · in Vorbereitung</button></div></div>
+  <div class="grid">${L.map(([t,i])=>`<div class="card"><div class="row" style="justify-content:space-between"><h3>${esc(t.n)}</h3><span class="pill p-open">Prozess</span></div><div class="sub">${esc(t.d)}</div><div class="sub">Skills: ${t.sk.join(" · ")}</div>${covHTML(t.sk)}<div class="acts"><button class="btn sm pri" data-tpl="${i}">Übernehmen</button></div></div>`).join("")}</div>`;
+}
+function tplModal(i){
+  const t=TPL[i];
+  $("#modal").innerHTML=`<div class="modal" data-close><div class="card" role="dialog" aria-modal="true" aria-label="Vorlage übernehmen"><h2>${esc(t.n)} übernehmen</h2>
+   <div class="sub">${t.proj?"Projektvorlage – beim Start wird das Projekt im angeschlossenen System (Bodo bzw. sellify) angelegt.":"Für jeden benötigten Skill wird ein Agent aus dem Pool eingesetzt."}</div>
+   <div class="list">${t.sk.map(k=>{const a=agentFor(k);return `<div class="item"><code style="font-family:var(--f-mono);font-size:12px">${k}</code><div class="t"></div>${a?`<span class="pill p-ok">◆ ${esc(a)}</span>`:`<span class="pill p-wait">Lücke – Agent zusammenstellen?</span>`}</div>`}).join("")}</div>
+   <div class="alert ok">Übernommenes startet als Entwurf und wird erst nach Testlauf und Aktivierung wirksam.</div>
+   <div class="acts"><button class="btn" data-close-btn>Abbrechen</button><button class="btn pri" data-adopt="${i}">Als Entwurf übernehmen</button></div></div></div>`;
+}
+function adopt(n){
+  const t=TPL.find(x=>x.n===n);const L=PROC[state.co];
+  if(t&&!t.proj&&!L.some(x=>x.n===n))L.push({id:"x"+L.length+Date.now(),n,dep:t.f,st:"Entwurf",v:"v1",pa:"wird im Designer vorgeschlagen",er:"offen",run:"–",steps:t.d.split(" → ").map(x=>S(x,"–","im Designer zuordnen","–",""))});
+  render();toast(`„${n}“ als Entwurf übernommen – aktiv erst nach Testlauf (Prototyp)`);
+}
+function vSug(){
+  const vis=SUG.map((s,i)=>[s,i]).filter(([s])=>state.showNo||s.s!=="abgelehnt");const nNo=SUG.filter(s=>s.s==="abgelehnt").length;
+  const SP={"übernommen":"p-ok","angepasst":"p-run","abgelehnt":"p-bad","später":"p-open"};
+  return `<div class="card"><h2>Vorschläge</h2><div class="sub">Vorschläge aus dem Branchenpaket, aus Gesprächen mit dem KI-Assistenten oder aus einem eigenen Prompt. Je Vorschlag: direkt übernehmen, anpassen, ablehnen oder später. Übernommenes startet als Entwurf. Abgelehnte werden nicht erneut vorgeschlagen. Inhalte sind Beispiele.</div>
+   <div class="acts" style="justify-content:flex-start"><button class="btn pri" data-sugall ${sugSel.size?"":"disabled"}>Ausgewählte übernehmen (${sugSel.size})</button><button class="btn" data-sugno>${state.showNo?"Abgelehnte ausblenden":`Abgelehnte anzeigen (${nNo})`}</button><button class="btn" data-ask="Schlag mir weitere Prozesse vor">✦ Weitere vorschlagen lassen</button></div>
+   <div class="list">${vis.map(([s,i])=>{const open=s.s==="offen"||s.s==="später";return `<div class="item">${open?`<button class="sk" style="padding:4px;border:0;background:none" data-sugchk="${i}" aria-pressed="${sugSel.has(i)}" aria-label="auswählen"><span class="bx">${sugSel.has(i)?"✓":""}</span></button>`:'<span style="width:28px"></span>'}<div class="t"><b>${esc(s.n)}</b><div class="sub">${esc(s.src)} · ${esc(s.why)}</div><div class="meta" style="margin-top:4px">${covHTML(tplSk(s.n))}${s.s!=="offen"?`<span class="pill ${SP[s.s]}">${s.s}</span>`:""}</div></div>${open?`<div class="acts"><button class="btn sm acc" data-suga="${i}:ok">Direkt übernehmen</button><button class="btn sm" data-suga="${i}:edit">Anpassen</button><button class="btn sm" data-suga="${i}:no">Ablehnen</button>${s.s==="offen"?`<button class="btn sm" data-suga="${i}:later">Später</button>`:""}</div>`:""}</div>`}).join("")}</div></div>`;
+}
+function sugAct(i,a){
+  const s=SUG[i];sugSel.delete(i);
+  if(a==="ok"){s.s="übernommen";adopt(s.n);return}
+  if(a==="edit"){s.s="angepasst";state.desMode="proc";state.desStage=0;state.desPrompt=`Passe die Vorlage „${s.n}“ an unser Unternehmen an: `;state.projTab="des";render();toast("Vorlage im Designer geöffnet (Prototyp)");return}
+  if(a==="no"){s.s="abgelehnt";render();toast("Abgelehnt – wird nicht erneut vorgeschlagen (Prototyp)");return}
+  if(a==="later"){s.s="später";render();return}
+}
+const DSTL=["Entwurf","geprüft","Testlauf erfolgreich","aktiv"];
+function vDes(){
+  const m=state.desMode,st=state.desStage;
+  const def=m==="proc"?"Erstelle einen Prozess für die Lead-Gewinnung von Mietervereinen: recherchieren, aufbereiten, Dubletten prüfen, ins CRM übergeben.":"Lege eine Projektvorlage für Entwicklungsprojekte an: Anforderungsanalyse und Spezifikation, Konzept mit klickbarem Mockup, Umsetzung, Qualitätssicherung. Testfälle parallel zur Umsetzung vorbereiten.";
+  const pal=m==="proc"?["Schritt","Entscheidung","Freigabe","Parallel","Ende"]:["Phase","Meilenstein","Parallel","Prozess zuordnen","Aufgabenpaket"];
+  const next=st<2?`<button class="btn pri" data-desstage="2">Prüfen</button>`:st<3?`<button class="btn pri" data-desstage="3">Testlauf im Dev-System</button>`:st<4?`<button class="btn acc" data-desstage="4">Aktivieren</button>`:`<span class="pill p-ok">aktiv · Version 1</span>`;
+  return `<div class="card"><div class="row" style="justify-content:space-between;flex-wrap:wrap"><div style="flex:1;min-width:240px"><h2>${m==="proc"?"Prozess-Designer":"Projekt-Designer"}</h2><div class="sub">${m==="proc"?"Prozesse aus Schritten mit fest eingesetzten Agenten, Entscheidungen und Freigaben.":"Projektvorlagen mit Phasen, Verzweigungen und Meilensteinen; je Phase werden Prozesse zugeordnet."} Derselbe BPM-Designer für Projekte und Prozesse; der KI-Entwurf ist der Einstieg, danach passt du an.</div></div></div>
+   <div class="field"><label for="dp">✦ Mit KI entwerfen</label><textarea id="dp" class="ta" rows="2">${esc(state.desPrompt||def)}</textarea></div>
+   <div class="acts" style="justify-content:flex-start"><button class="btn pri" data-desstage="1">✦ Entwurf erzeugen</button><button class="btn" ${m==="proc"?'data-ptab="tpl"':'data-pjtab="tpl"'}>Mit Vorlage beginnen</button><span class="sub">Simulation mit Beispieldaten – speichert nichts, legt nichts in Bodo an</span></div></div>
+  ${st?`<div class="card"><h2>${m==="proc"?"Lead-Gewinnung Mietervereine":"Projektvorlage Entwicklungsprojekt"} <span class="pill ${st>=4?"p-ok":"p-run"}">${DSTL[st-1]}</span></h2>
+   <div class="skills">${pal.map(x=>`<button class="add" data-toast="Element „${x}“ auf die Fläche ziehen (Prototyp)">+ ${x}</button>`).join("")}</div>
+   <div class="canvas">${m==="proc"?flowProc():flowProj()}</div>
+   <div class="two">${m==="proc"?desInfoProc():desInfoProj()}</div>
+   <div class="acts" style="justify-content:flex-start">${next}</div></div>`:`<div class="card"><div class="sub">Beschreibe oben den Ablauf und lass einen Entwurf erzeugen – oder beginne mit einer Vorlage.</div></div>`}`;
+}
+const N=(t,a,c="")=>`<div class="node ${c}"><b>${t}</b><span class="sub">${a}</span></div>`;
+const LN='<span class="ln" aria-hidden="true"></span>';
+const MS=(t,d,done)=>`<div class="msn"><span class="dia ${done?"done":""}"></span><small>${t}<br>${d}</small></div>`;
+function flowProc(){return `<div class="flow"><span class="ev" title="Start"></span>${LN}${N("Leads ermitteln","◆ Recherche-Agent<br>Ersatz: Vertriebsassistent Bodo")}${LN}${N("Leads aufbereiten","◆ Aufbereitungs-Agent")}${LN}<div class="gwrap"><span class="gw"><span>?</span></span><small>Dublette?<br>ja → verwerfen</small></div>${LN}${N("Lead bewerten","⚠ Lücke: Skill lead-bewertung","gap")}${LN}${N("Ins CRM übergeben","◆ Recherche-Agent<br>Freigabe: Leitung Vertrieb")}${LN}<span class="ev end" title="Ende"></span></div>`}
+function flowProj(){return `<div class="flow"><span class="ev" title="Start"></span>${LN}${N("1 · Anforderungsanalyse & Spezifikation","Prozesse: Anforderung aufnehmen und bewerten · Spezifikation erstellen")}${LN}${MS("Spezifikation abgenommen","Meilenstein")}${LN}${N("2 · Konzept & Mockup","Prozesse: Umsetzungskonzept · Mockup abstimmen")}${LN}${MS("Konzept freigegeben","Meilenstein")}${LN}<div class="gwrap"><span class="gw"><span>+</span></span><small>parallel</small></div>${LN}<div class="parcol">${N("3 · Umsetzung","Prozess: Entwicklungsticket umsetzen")}${N("3b · Testfälle vorbereiten","Prozess: Testfall aus echtem Prozess ableiten")}</div>${LN}<div class="gwrap"><span class="gw"><span>+</span></span><small>alle fertig</small></div>${LN}${N("4 · Qualitätssicherung","Prozesse: Verproben · Fehler → Ticket in 3")}${LN}${MS("Kundenabnahme","→ Übergabe Dev → Produktiv")}${LN}<span class="ev end" title="Ende"></span></div>`}
+function desInfoProc(){return `<div class="sec2"><h3>Warum diese Agenten</h3><div class="list">
+  <div class="item"><span class="bot">◆</span><div class="t"><b>Recherche-Agent</b><div class="sub">hat die Skills lead-recherche und kontakt-anlegen · Datenstufe 0 · darf anlegen</div></div></div>
+  <div class="item"><span class="bot">◆</span><div class="t"><b>Aufbereitungs-Agent</b><div class="sub">Skill lead-aufbereiten · Datenstufe 1 (pseudonymisiert)</div></div></div>
+  <div class="item"><span class="bot lead">◆</span><div class="t"><b>Lead-Prozessagent · prozessverantwortlich</b><div class="sub">Standard-Skill prozess-fuehren · Ergebnisverantwortlich: Boris Hose (Vorschlag)</div></div></div></div></div>
+  <div class="sec2"><h3>Lücke</h3><div class="alert">Kein Agent im Pool hat den Skill „lead-bewertung“.</div><div class="acts" style="justify-content:flex-start"><button class="btn sm" data-toast="Vorschlag: „Bewertungs-Agent“ aus lead-aufbereiten + lead-bewertung – wird nur mit deiner Freigabe angelegt (Prototyp)">Agent aus Skills zusammenstellen</button><button class="btn sm" data-toast="Schritt entfernt (Prototyp)">Schritt weglassen</button></div><div class="sub">Agenten werden hier fest eingesetzt, dazu je Schritt optional ein Ersatz-Agent. Zur Laufzeit wird nicht ausgeliehen.</div></div>`}
+function desInfoProj(){return `<div class="sec2"><h3>Ablauf</h3><div class="sub">Phasen laufen standardmäßig nacheinander. Die Verzweigung nach Phase 2 ist bewusst gesetzt: Umsetzung und Testfälle laufen parallel. Phase 4 startet erst, wenn beide abgeschlossen sind.</div><h3>Projektverantwortlich</h3><div class="sub">Mensch oder KI-Agent. Ist ein Agent verantwortlich, nimmt je Phase weiterhin ein ergebnisverantwortlicher Mensch ab.</div></div>
+  <div class="sec2"><h3>Meilensteine</h3><div class="sub">Die Abnahme jeder Phase ist ein Meilenstein mit Datum. Meilensteine werden an Bodo bzw. sellify übergeben und erscheinen dort unter Fristen und Fälligkeiten. Verwaltet wird das Projekt im CRM, Company OS steuert die Arbeit.</div><h3>Prozesse je Phase</h3><div class="sub">Phasen nutzen Prozesse aus „Meine Prozesse“ – oft mehrfach, z. B. je Ticket oder Testfall.</div></div>`}
+function vProj(){
+  const L=PROJ[state.co]||[];const p=L.find(x=>x.id===state.projSel)||L[0];
+  return `<div class="stack"><div class="grid">${L.map(x=>`<button class="card agcard" data-proj="${x.id}" style="${x===p?"border-color:var(--ink);box-shadow:0 0 0 1px var(--ink)":""}"><div class="row" style="justify-content:space-between"><h3>${esc(x.n)}</h3><span class="pill p-open">${x.kind}</span></div><div class="sub">verwaltet in ${x.sys} · Projektverantwortlich: ${x.pv[0]==="KI-Agent"?"◆ ":""}${esc(x.pv[1])}${x.ex?" · Beispiel":""}</div></button>`).join("")}
+   <div class="card" style="border-style:dashed"><h3>+ Projekt</h3><div class="sub">aus einer Projektvorlage oder im Designer – wird in ${state.co==="ba"?"sellify":"Bodo"} angelegt.</div></div></div>
+   ${p?projDetail(p):""}</div>`;
+}
+function projDetail(p){
+  const head=`<div class="card"><h2>${esc(p.n)} <span class="pill p-open">${p.kind}</span><span class="pill p-run">verwaltet in ${p.sys}</span></h2>
+   <div class="two"><div class="field"><label>Projektverantwortlich</label><div class="val">${p.pv[0]==="KI-Agent"?"◆ ":""}${esc(p.pv[1])} <span class="sub">(${p.pv[0]})</span></div></div><div class="field"><label>Vorlage</label><div class="val">${esc(p.tpl)}</div></div>
+    <div class="field"><label>Ablauf</label><div class="seg"><button data-opt aria-pressed="${p.flow==="automatisch"}">automatisch aus Vorlage</button><button data-opt aria-pressed="${p.flow==="manuell"}">manuell</button></div></div>
+    <div class="field"><label>Aufträge im Projekt</label><div class="val">${p.flow==="automatisch"?"entstehen aus dem Ablauf; du greifst ein, wenn ein Mensch nötig ist":"werden im Projekt von Hand ausgelöst"}</div></div></div>
+   ${p.pv[0]==="KI-Agent"?'<div class="alert ok">Ein KI-Agent ist projektverantwortlich. Abnahmen je Phase erteilen weiterhin ergebnisverantwortliche Menschen. In Bodo wird später hinterlegt, welcher Agent verantwortlich ist.</div>':""}
+   <div class="acts" style="justify-content:flex-start"><button class="btn pri" data-pjob="${esc(p.n)}">Auftrag im Projekt starten</button>${p.kind==="Phasen"?'<button class="btn" data-pjtab="des" data-desfill="1">Im Designer öffnen</button>':""}${p.id==="hagen"&&!DEMO?`<a class="btn" href="${HAGEN.proj[0][2]}" target="_blank" rel="noopener">In Bodo öffnen</a>`:`<button class="btn" data-toast="Öffnet das Projekt in ${p.sys} (Prototyp)">In ${p.sys} öffnen</button>`}</div></div>`;
+  if(p.id==="hagen")return head+(DEMO?"":hagenBodo())+pkgView();
+  if(p.id==="cos")return head+cosView();
+  const ph=PH.find(x=>x.id===state.phaseSel)||PH[1];
+  const tile=x=>`<button class="ph st-${x.st}" data-phase="${x.id}" aria-current="${x===ph}"><span class="sub">${x.from}–${x.to}</span><b>${esc(x.n)}</b><span class="pill ${PHS[x.st][0]}" style="align-self:flex-start">${PHS[x.st][1]}</span>${x.par?`<small class="sub">◆ Meilenstein ${x.ms[1]}</small>`:""}</button>`;
+  const ms=x=>`<div class="ms"><span class="dia ${x.ms[2]?"done":""}"></span><small>${esc(x.ms[0])}<br><b>${x.ms[1]}</b></small></div>`;
+  const bar=`<div class="phases">${tile(PH[0])}${ms(PH[0])}${tile(PH[1])}${ms(PH[1])}<div class="par">${tile(PH[2])}${tile(PH[3])}</div><div class="ms"><span class="gw sm"><span>+</span></span><small>beide fertig</small></div>${tile(PH[4])}${ms(PH[4])}</div>`;
+  return head+`<div class="card"><h2>Phasen &amp; Meilensteine</h2><div class="sub">Phasen laufen nacheinander; nach „Konzept &amp; Mockup“ ist eine Verzweigung gesetzt. Die Abnahme einer Phase ist ein Meilenstein mit Datum – er wird an Bodo übergeben und erscheint dort unter Fristen und Fälligkeiten. Daten und Läufe sind Beispielwerte.</div>${bar}</div>
+   <div class="card"><h2>${esc(ph.n)} <span class="pill ${PHS[ph.st][0]}">${PHS[ph.st][1]}</span></h2>
+    <div class="two"><div class="field"><label>Zeitraum</label><div class="val">${ph.from}–${ph.to}</div></div><div class="field"><label>Ergebnisverantwortlich (nimmt ab)</label><div class="val">${esc(ph.er)}</div></div></div>
+    <div class="sec2"><h3>Prozesse in dieser Phase</h3><div class="list">${ph.pr.map(r=>`<div class="item"><span class="bot">↝</span><div class="t"><b>${esc(r[0])}</b><div class="sub">${esc(r[1])}</div></div><button class="btn sm" data-pjob="${esc(p.n)}">Auftrag starten</button></div>`).join("")}</div></div>
+    <div class="eval"><b>◆ Meilenstein: ${esc(ph.ms[0])}</b><span>Datum: ${ph.ms[1]} · in Bodo unter Fristen und Fälligkeiten</span>${ph.ms[2]?'<span class="pill p-ok" style="align-self:flex-start">erreicht und abgenommen</span>':`<div class="acts" style="justify-content:flex-start"><button class="btn sm acc" data-toast="Abnahme erteilt – Meilenstein als erreicht an Bodo übergeben (Prototyp: nichts ausgeführt)">Abnahme erteilen</button><button class="btn sm" data-toast="Datum geändert und an Bodo übergeben (Prototyp)">Datum ändern</button></div>`}</div></div>`;
+}
+function hagenBodo(){
+  const H=HAGEN,lk=(t,u)=>`<a href="${u}" target="_blank" rel="noopener">${esc(t)}</a>`;
+  return `<div class="card"><h2>Verbunden mit Bodo <span class="pill p-ok">echte Daten · Stand ${H.stand}</span></h2>
+   <div class="sub">Company OS steuert die Arbeit, Bodo verwaltet Projekt, Aufgaben und Kontakte. Jede Aufgabennummer, jedes Projekt und jeder Kontakt öffnet den echten Datensatz in Bodo Solutions (Anmeldung in Bodo nötig).</div>
+   <div class="two"><div class="field"><label>Projekte in Bodo</label><div class="val">${H.proj.map(x=>lk(x[0],x[2])+` <span class="sub">· ${esc(x[1])}</span>`).join("<br>")}</div></div>
+    <div class="field"><label>Kunde</label><div class="val">${lk(H.kunde[0]+" ("+H.kunde[1]+")",H.kunde[2])}</div></div>
+    <div class="field"><label>Ansprechpartner beim Kunden</label><div class="val">${H.kontakte.map(x=>lk(x[0],x[2])+` <span class="sub">· ${esc(x[1])}</span>`).join("<br>")}</div></div>
+    <div class="field"><label>Kundensystem</label><div class="val">Bodo-Organisation „Mieterverein Hagen e.V.“ · <span class="pill p-bad">KI-Zugang deaktiviert</span> <span class="sub">Angabe zur Rechtsberatung fehlt</span></div></div></div></div>
+  <div class="card"><h2>So arbeitet Company OS in diesem Projekt</h2><div class="three" style="grid-template-columns:repeat(4,1fr)">
+    <div class="conseq"><span class="k">Bodo verwaltet</span><span>Projekt „MIV Hagen Migration“ mit 15 Aufgaben, Bearbeitern und Fälligkeiten – die einzige Stelle, an der gepflegt wird</span></div>
+    <div class="conseq"><span class="k">Company OS steuert</span><span>ordnet die Aufgaben in 7 Pakete, zeigt Überfälliges und Lücken, startet Aufträge und eskaliert</span></div>
+    <div class="conseq"><span class="k">KI-Agenten erledigen</span><span>Datenübernahme-, Einrichtungs- und Vorlagen-Agent, ◆ Anforderungs-Prozessagent, persönlicher KI-Assistent</span></div>
+    <div class="conseq"><span class="k">Menschen entscheiden</span><span>Boris Hose verantwortet das Projekt, Dominik Koppe die Technik; Freigaben und Abnahmen bleiben beim Menschen</span></div></div>
+   <div class="sub">Agenten und Paketzuschnitt sind Vorschläge von Company OS; im Pilot wird noch nichts ausgeführt.</div></div>
+  <div class="card"><h2>Jetzt wichtig – überfällig laut Bodo <span class="pill p-bad">${H.hot.length}</span></h2><div class="list">${H.hot.map(x=>`<div class="item"><span class="bot">!</span><div class="t"><b><a href="${B+ids[x[0]]}" target="_blank" rel="noopener"><code>${x[0]}</code></a> ${esc(x[1])}</b><div class="sub">Bearbeitung: ${esc(x[2])} · fällig ${x[3]} · ${esc(x[4])}</div><div class="sub">Vorschlag: ${esc(x[5])}</div></div><button class="btn sm" data-toast="Auftrag zu ${x[0]} gestartet – Ergebnis kommt zur Freigabe (Prototyp: nichts ausgeführt)">Auftrag starten</button></div>`).join("")}</div></div>`;
+}
+function pkgView(){
+  return `<div class="card"><h2>Aufgabenpakete</h2>
+    <div class="sub">Projekt ohne Phasen: Aufgabenpakete ohne feste Reihenfolge. Je Paket genau ein Verantwortlicher, dazu Beteiligte, Frist und Aufgaben. ${DEMO?"Aufgaben und Status sind Beispieldaten.":"Aufgaben, Status, Bearbeitung und Fälligkeiten aus Bodo (Projekt „MIV Hagen Migration“, Stand "+HAGEN.stand+"); Paketzuschnitt, Paketverantwortliche, Paketfristen und Agenten sind Vorschläge von Company OS."}</div>
+    <div class="kpis"><div class="kpi"><b>6</b><span>erledigt</span></div><div class="kpi"><b>3</b><span>in Bearbeitung</span></div><div class="kpi"><b>6</b><span>offen</span></div><div class="kpi bad"><b>3</b><span>überfällig</span></div></div></div>
+   <div class="pkgs">${PKG.map(p=>`<div class="card pkg" style="--c:${p.c}"><h3>${p.n}</h3>
+     <div class="meta"><span>Verantwortlich: <b>${esc(p.v)}</b></span><span>Beteiligt: ${esc(p.b)}</span><span>Frist: ${p.due}</span><span class="pill ${p.st[0]}">${p.st[1]}</span></div>${p.ag?`<div class="sub">Agent im Paket: ${esc(p.ag)}</div>`:""}
+     ${p.t.length?`<ul class="tl">${p.t.map(x=>`<li>${ids[x[0]]?`<a href="${B+ids[x[0]]}" target="_blank" rel="noopener"><code>${x[0]}</code></a>`:`<code>${x[0]}</code>`}<span style="flex:1">${esc(x[1])}${(x[4]||x[5])?`<br><small class="sub">${[x[5]?"Bearbeitung: "+esc(x[5]):"",x[4]?"fällig "+x[4]:""].filter(Boolean).join(" · ")}</small>`:""}</span><span class="pill ${x[2]}">${x[3]}</span></li>`).join("")}</ul>`:`<div class="sub">${p.block?esc(p.block):"Noch keine Aufgaben – Lücke im Projekt."}</div>`}
+     ${p.ev?`<div class="eval"><b>Anforderungsbewertung AG-114</b><span>Kostenpflichtig? <button class="btn sm" data-toast="Bewertung gespeichert (Prototyp)">ja</button> <button class="btn sm" data-toast="Bewertung gespeichert (Prototyp)">nein</button></span><span class="an">Vorschlag des Agenten, zu prüfen</span><span>Angebotsbezug und Wertigkeit erst möglich, wenn die Anforderung beschrieben ist.</span></div>`:""}
+   </div>`).join("")}</div>`;
+}
+function cosView(){
+  return `<div class="card"><h2>Aufgabenpakete</h2><div class="sub">Setup als Projekt in der business//acts-Instanz, weil es Bodo Solutions und sellify betrifft. Verknüpfbar mit den Projekten in den Kundeninstanzen.</div></div>
+   <div class="pkgs">${["Inhaber-System & Projekte","Kundensystem anbinden","Abteilungen & Menschen","Prozesse aus Vorschlagsliste","KI-Anbieter & Datenschutz","Abschluss & Probelauf"].map((n,i)=>`<div class="card pkg" style="--c:${["#30ABE2","#2457c5","#147a5c","#6a4fb3","#c8641a","#14213d"][i]}"><h3>${n}</h3><div class="meta"><span>Verantwortlich: Boris Hose</span><span class="pill ${i<2?"p-run":"p-open"}">${i<2?"läuft":"offen"}</span></div></div>`).join("")}</div>`;
+}
+const JOBS={
+ bs:[["50 Leads Mietervereine NRW bis 31.10.","Prozess Lead-Gewinnung · ◆ Lead-Prozessagent · Schritt 2 von 4","intern · ohne Projekt","p-run","läuft"],
+     ["Mockup – Feedbackrunde 2","Prozess Klickbares Mockup abstimmen · Phase 2","im Projekt: Entwicklungsprojekt Inkasso-Schnittstelle","p-wait","wartet auf Kunde"],
+     ["Anforderung AG-114 bewerten","Prozess Anforderung aufnehmen und bewerten · ◆ Anforderungs-Prozessagent","im Projekt: Einführung Mieterverein Hagen","p-bad","Eskalation"],
+     ["AG-87 nachhalten: neue Frist mit Dominik Koppe klären","Einzelaufgabe · Persönlicher KI-Assistent","im Projekt: Einführung Mieterverein Hagen","p-wait","wartet auf Antwort"],
+     ["Entscheidungsvorlage AG-183 Nummernkreis","Einzelaufgabe · Einrichtungs-Agent","im Projekt: Einführung Mieterverein Hagen","p-run","läuft"],
+     ["Kundenwunsch → Ticket → Rückmeldung","Prozess Betrieb · Schritt 3 von 4","intern · ohne Projekt","p-run","läuft"]],
+ ba:[["Angebot sellify Integration Kit","Prozess Angebot erstellen · ◆ Angebots-Prozessagent · wartet auf Rückfrage","intern · ohne Projekt","p-wait","wartet"],
+     ["Setup-Paket „Kundensystem anbinden“","manuell im Projekt ausgelöst","im Projekt: Company OS einführen","p-run","läuft"]]
+};
+function vJobs(){
+  return `<div class="stack"><div class="card"><h2>Wie Aufträge entstehen</h2><div class="three">
+    <div class="conseq"><span class="k">intern</span><span>projektübergreifend oder ohne Projekt, z. B. „50 Leads bis Monatsende“</span></div>
+    <div class="conseq"><span class="k">im Projekt</span><span>von Hand im Projekt ausgelöst, optional mit einem Prozess</span></div>
+    <div class="conseq"><span class="k">automatisch</span><span>aus einer Projektvorlage mit Ablauf – du greifst ein, wo ein Mensch nötig ist</span></div></div></div>
+   <div class="card"><h2>Eingang</h2><div class="sub">Neue Aufträge landen hier. Der Agent schlägt vor: Einzelaufgabe oder Prozess – du bestätigst.</div>
+   <div class="list">
+    <div class="item"><span class="pill p-wait">Vorschlag</span><div class="t"><b>„Infomaterial Bodo an Mieterverein Musterstadt senden, Text von mir“</b><div class="sub">intern · Einzelaufgabe · Vertrieb · Freigabe im Auftrag enthalten → läuft ohne weitere Freigabe · KI-Profil „Texte“ · Datenstufe 0</div></div><button class="btn sm" data-toast="Auftrag gestartet (Prototyp)">Bestätigen</button></div>
+    <div class="item"><span class="pill p-wait">Vorschlag</span><div class="t"><b>„Kunde meldet: Lastschriftdatei wird abgelehnt“</b><div class="sub">intern · Prozess „Betrieb · Anfrage bis Rückmeldung“ · ◆ Service-Prozessagent · Ergebnisverantwortlich: Support</div></div><button class="btn sm" data-toast="Prozess gestartet (Prototyp)">Prozess starten</button></div>
+   </div></div>
+   <div class="card"><h2>Laufende Aufträge</h2><div class="list">${(JOBS[state.co]||[]).map(r=>`<div class="item"><div class="t"><b>${esc(r[0])}</b><div class="sub">${esc(r[1])}</div><div class="meta" style="margin-top:4px"><span class="pill p-open">${esc(r[2])}</span></div></div><span class="pill ${r[3]}">${r[4]}</span></div>`).join("")}</div></div>
+   <div class="card"><h2>Eskalation</h2><div class="sub">Gilt für jeden Auftrag, der in einem Prozess läuft.</div>${escChain()}</div></div>`;
+}
+
+const SKC={"kontakt-anlegen":["Kontakte anlegen mit Dublettenprüfung",2,1],"bodo-angebot":["Angebot als PDF im Bodo-Stil",1,1],"email-erstellung":["E-Mails im Stil des Absenders",1,1],"bodo-ersteinrichtung":["Bodo-Mandant Bereich für Bereich einrichten",0,1],"bodo-einfuehrung-anlegen":["Einführungsprojekt anlegen",0,1],"bodo-ticket-anlegen":["Feature Requests und Issues ohne Dubletten",0,1],"feature-request-screenshot":["Entwurfs-Screenshots zeichnen",0,0],"bodo-video":["Szenenvideos für Bodo",0,0],"sellify-video":["Szenenvideos für sellify",0,0],"bodo-produktinformation":["Produktblatt im Hausstil",0,0],"lead-recherche":["Leads recherchieren",0,0],"lead-aufbereiten":["Leads aufbereiten und bewerten",1,0],"anfrage-einordnen":["Anfragen einordnen",1,0],"termin-vereinbaren":["Termine vereinbaren und erinnern",1,0],"prozess-fuehren":["Prozess führen: Schritte vergeben, prüfen, eskalieren",0,0]};
+const AG=[
+ {n:"Recherche-Agent",d:"Vertrieb",t:"Leads recherchieren, Dubletten prüfen",sk:["kontakt-anlegen","lead-recherche"],lim:-1,prof:"Schnell & günstig",resp:"Leitung Vertrieb",r:"Mitarbeiter",inn:["Lead-Gewinnung","Vertrieb · Lead bis Abschluss"],ver:"v4",p:{lesen:1,anlegen:1,mail:0,loeschen:0}},
+ {n:"Aufbereitungs-Agent",d:"Vertrieb",t:"Leads aufbereiten und bewerten",sk:["lead-aufbereiten"],lim:-1,prof:"Texte",resp:"Leitung Vertrieb",r:"Mitarbeiter",inn:["Lead-Gewinnung"],ver:"v3 · geändert",p:{lesen:1,anlegen:0,mail:0,loeschen:0}},
+ {n:"Lead-Prozessagent",d:"Vertrieb",t:"führt den Prozess Lead-Gewinnung",sk:["prozess-fuehren"],lim:-1,prof:"Gründlich prüfen",resp:"Boris Hose (ergebnisverantwortlich)",r:"Prozessverantwortlich",inn:["Lead-Gewinnung"],ver:"v1",p:{lesen:1,anlegen:0,mail:0,loeschen:0}},
+ {n:"Angebots-Agent",d:"Vertrieb",t:"Angebote nach Vorlage",sk:["bodo-angebot","email-erstellung"],lim:-1,prof:"Texte",resp:"Leitung Vertrieb",r:"Mitarbeiter",inn:["Vertrieb · Lead bis Abschluss","Angebot erstellen"],ver:"v2",p:{lesen:1,anlegen:1,mail:1,loeschen:0}},
+ {n:"Annahme-Agent",d:"Kundenservice",t:"Anfragen annehmen und einordnen",sk:["anfrage-einordnen","email-erstellung"],lim:-1,prof:"Schnell & günstig",resp:"Support",r:"Mitarbeiter",inn:["Betrieb · Anfrage bis Rückmeldung"],ver:"v2",p:{lesen:1,anlegen:1,mail:1,loeschen:0}},
+ {n:"Einrichtungs-Agent",d:"Einführung",t:"Kataloge Bereich für Bereich einrichten",sk:["bodo-ersteinrichtung"],lim:0,prof:"Gründlich prüfen",resp:"Projektleitung",r:"Mitarbeiter",inn:["Onboarding sellify-Kunde"],ver:"v1",p:{lesen:1,anlegen:1,mail:0,loeschen:0}},
+ {n:"Einführungs-Agent",d:"Einführung",t:"Einführungsprojekt anlegen, Anforderungen aufnehmen",sk:["bodo-einfuehrung-anlegen","termin-vereinbaren"],lim:-1,prof:"Schnell & günstig",resp:"Projektleitung",r:"Mitarbeiter",inn:["Anforderung aufnehmen und bewerten"],ver:"v2",p:{lesen:1,anlegen:1,mail:0,loeschen:0}},
+ {n:"Ticket-Agent",d:"Kundenservice / Produktentwicklung",t:"Tickets ohne Dubletten, mit Screenshot",sk:["bodo-ticket-anlegen","feature-request-screenshot"],lim:-1,prof:"Gründlich prüfen",resp:"Support",r:"Mitarbeiter",inn:["Betrieb · Anfrage bis Rückmeldung","Anforderung aufnehmen und bewerten"],ver:"v3",p:{lesen:1,anlegen:1,mail:0,loeschen:0}},
+ {n:"Projekt-Agent Entwicklung",d:"Produktentwicklung",t:"projektverantwortlich für das Entwicklungsprojekt Inkasso-Schnittstelle",sk:["prozess-fuehren"],lim:-1,prof:"Gründlich prüfen",resp:"Abnahmen: ergebnisverantwortliche Menschen je Phase",r:"Projektverantwortlich",inn:["Entwicklungsprojekt Inkasso-Schnittstelle"],ver:"v1",p:{lesen:1,anlegen:1,mail:0,loeschen:0}},
+ {n:"Video-Agent",d:"Vertrieb",t:"Szenenvideos",sk:["bodo-video","sellify-video"],lim:0,prof:"Bilder",resp:"Leitung Vertrieb",r:"Mitarbeiter",inn:[],ver:"v1",p:{lesen:1,anlegen:0,mail:0,loeschen:0}}
+];
+const LVN=["0 · ohne Personendaten","1 · pseudonymisiert","2 · personenbezogen"];
+const lvTag=l=>`<span class="lv l${l}">Stufe ${l}</span>`;
+const skLv=a=>a.sk.reduce((m,k)=>Math.max(m,SKC[k][1]),0);
+const agLv=a=>a.lim<0?skLv(a):Math.min(a.lim,skLv(a));
+function vAgents(){
+  return `<div class="stack"><div class="card"><h2>Agentenpool</h2><div class="sub">Alle Agenten des Unternehmens. Sie heißen nach ihrer Funktion und arbeiten mit Skills. Beim Entwerfen eines Prozesses werden sie fest eingesetzt (dazu je Schritt optional ein Ersatz-Agent) – keine Ausleihe zur Laufzeit. Ändert die Heimat-Abteilung einen Agenten, bekommen die betroffenen Prozesse einen Hinweis und einen Testlauf, bevor sie die neue Version übernehmen.</div></div>
+  <div class="grid">${AG.map((a,i)=>`<button class="card agcard" data-agent="${i}"><div class="row"><span class="bot ${a.r==="Mitarbeiter"?"":"lead"}">◆</span><div><h3>${a.n}</h3><div class="sub">${a.d}</div></div></div><div>${a.t}</div><div class="sub">Skills: ${a.sk.join(" · ")}</div><div class="sub">Eingesetzt in: ${a.inn.length?esc(a.inn.join(" · ")):"noch in keinem Prozess"}</div><div class="meta"><span class="pill ${a.r==="Mitarbeiter"?"p-open":"p-run"}">${a.r}</span><span class="lv">${a.ver}</span>${lvTag(agLv(a))}</div><span class="open">Skills &amp; Einstellungen →</span></button>`).join("")}
+  <div class="card" style="border-style:dashed"><h3>+ Agent</h3><div class="sub">Neuen Agenten anlegen und Skills zuordnen.</div></div></div></div>`;
+}
+let agI=0;
+function agentModal(i){
+  const old=$("#modal .card.wide");const st=old&&agI===i?old.scrollTop:0;
+  agI=i;const a=AG[i];const sl=skLv(a),el=agLv(a);
+  const allSk=Object.keys(SKC);
+  const P=[["lesen","Daten im Kundensystem lesen",0],["anlegen","Datensätze anlegen und ändern",0],["mail","E-Mails versenden",0],["loeschen","Datensätze löschen",1]];
+  $("#modal").innerHTML=`<div class="modal" data-close><div class="card wide" role="dialog" aria-modal="true" aria-label="${a.n}">
+   <div class="row" style="gap:12px"><span class="bot" style="width:34px;height:34px;font-size:15px">◆</span><div><h2 style="margin:0">${a.n}</h2><div class="sub">${a.d} · ${a.t}</div></div></div>
+   <div class="sec2"><h3>Skills</h3><div class="sub">Was der Agent kann. Jeder Skill bringt seine Datenstufe und ggf. eine Pflicht-Freigabe mit. Datenstufen der Skills sind Beispielwerte.</div>
+    <div class="sklist" style="max-height:none">${allSk.map(k=>{const on=a.sk.includes(k);const c=SKC[k];return `<button class="sk" data-agsk="${k}" aria-pressed="${on}"><span class="bx">${on?"✓":""}</span><span style="flex:1"><b>${k}</b><small>${c[0]}</small></span>${lvTag(c[1])}${c[2]?'<span class="pill p-wait">Pflicht-Freigabe</span>':""}</button>`}).join("")}</div></div>
+   <div class="sec2"><h3>Personenbezogene Daten an die KI</h3>
+    <div class="sub">Standard: Der Agent übernimmt die Datenstufe aus seinen Skills (hier: <b>${LVN[sl]}</b>). Du kannst sie für diesen Agenten nur verschärfen, nie lockern. Harte Regeln aus dem Setup gelten immer.</div>
+    <div class="seg">${[[-1,"aus den Skills"],[0,"0 · keine"],[1,"1 · pseudonymisiert"],[2,"2 · personenbezogen"]].map(([v,l])=>`<button data-aglim="${v}" aria-pressed="${a.lim===v}" ${v>sl?"disabled title=\"höher als die Skills – nicht möglich\" style=\"opacity:.45\"":""}>${l}</button>`).join("")}</div>
+    <div class="alert ok">Wirksam für diesen Agenten: <b>${LVN[el]}</b>${el<sl?" – Skills mit höherer Stufe arbeiten pseudonymisiert oder halten an.":""}</div></div>
+   <div class="sec2"><h3>Was der Agent darf</h3>${P.map(([k,l,hard])=>`<div class="perm"><span>${l}</span>${hard?'<span class="pill p-bad">🔒 nie – harte Regel</span>':`<div class="seg"><button data-agp="${k}:1" aria-pressed="${!!a.p[k]}">erlaubt</button><button data-agp="${k}:0" aria-pressed="${!a.p[k]}">nicht erlaubt</button></div>`}</div>`).join("")}
+    <div class="perm"><span>Außenwirkung (Senden, Schreiben nach außen)</span><span class="pill p-wait">Freigabe nötig · im Auftrag aufhebbar</span></div></div>
+   <div class="two"><div class="field"><label>Rolle</label><div class="val">${a.r}</div></div><div class="field"><label>Eingesetzt in</label><div class="val">${a.inn.length?esc(a.inn.join(" · ")):"noch in keinem Prozess"}</div></div><div class="field"><label>Version</label><div class="val">${a.ver}</div></div><div class="field"><label>KI-Profil</label><div class="val">${a.prof} (Beispiel)</div></div><div class="field"><label>Zuständiger Mensch</label><div class="val">${esc(a.resp)}</div></div></div>
+   <div class="acts"><button class="btn" data-toast="Testlauf im Dev-System gestartet (Prototyp)">Testlauf</button><button class="btn" data-close-btn>Schließen</button><button class="btn pri" data-agsave>Speichern</button></div></div></div>`;
+  const nw=$("#modal .card.wide");if(nw)nw.scrollTop=st;
+}
+const CONN={
+ bs:[["CRM","B","#1f3a5f","Bodo","Organisation „Bodo Solutions“","Kontakt, Aufgabe, Termin, Dokument, E-Mail, Projekt, Meilenstein, Katalog","p-ok","verbunden"],["Entwicklung","B","#1f3a5f","Bodo","Aufgabentyp Feature Request / Issue","Entwicklungsauftrag","p-ok","verbunden"],["Bibliothek","☁","#2457c5","OneDrive","Ordner Vertrieb/Material","Material, Vorlage","p-ok","verbunden"]],
+ ba:[["CRM","s","#30ABE2","sellify","Mandant „business//acts“","Kontakt, Aufgabe, Termin, Dokument, E-Mail, Projekt","p-ok","verbunden"],["Entwicklung","G","#c8641a","GitLab","Projekt noch festzulegen (Vorschlag Florian)","Entwicklungsauftrag","p-wait","einzurichten"],["Bibliothek","☁","#2457c5","OneDrive","Ordner Vertrieb/Material","Material, Vorlage","p-ok","verbunden"]]
+};
+const ROUTES={
+ bs:[["Entwicklungsaufträge","Bodo · Feature Request / Issue","Skill bodo-ticket-anlegen","p-ok","aktiv"],["Auftrag nach Abschluss an ERP","kein ERP angeschlossen","–","p-open","vorgesehen"],["Daten an weiteres Prozess- und Datensystem","noch kein System angeschlossen","–","p-open","vorgesehen"]],
+ ba:[["Entwicklungsaufträge","GitLab · Issue","Skill gitlab-issue-anlegen (neu)","p-wait","einzurichten"],["Auftrag nach Abschluss an ERP","kein ERP angeschlossen","–","p-open","vorgesehen"],["Daten an weiteres Prozess- und Datensystem","noch kein System angeschlossen","–","p-open","vorgesehen"]]
+};
+function vConn(){
+  const oc=state.orgCo||(state.co==="all"?"bs":state.co);
+  return `<div class="stack"><div class="card"><h2>Anschlüsse</h2><div class="sub">Prozesse nennen nur Grundaufgaben – Kontakt, Aufgabe, Termin, Dokument, E-Mail, Projekt, Entwicklungsauftrag, Übergabe. Je Unternehmen legst du fest, welches System welche Rolle übernimmt. Hier meldest du dich an den Systemen an; wie übergeben wird (Format, Dublettenprüfung, Tags), regelt der Skill. Einträge sind Beispiele.</div>
+   <div class="cobadges">${["bs","ba"].map(k=>`<button class="cobadge" data-orgco="${k}" aria-pressed="${k===oc}"><span class="dot" style="background:${CO[k].color}"></span>${CO[k].name}</button>`).join("")}</div>
+   <div class="list">${CONN[oc].map(c=>`<div class="item"><div class="conn"><div class="sym" style="background:${c[2]}">${c[1]}</div></div><div class="t"><b>${c[3]} <span class="pill p-open">${c[0]}</span></b><div class="sub">${esc(c[4])}</div><div class="sub">Grundaufgaben: ${esc(c[5])}</div></div><span class="pill ${c[6]}">${c[7]}</span>${c[7]==="einzurichten"?'<button class="btn sm pri" data-toast="Anmeldung an GitLab starten (Prototyp)">Anmelden</button>':""}</div>`).join("")}</div>
+   <div class="acts" style="justify-content:flex-start"><button class="btn" data-toast="Anschluss hinzufügen: Rolle wählen – CRM, Entwicklung, ERP, weiteres Prozess- und Datensystem, Bibliothek (Prototyp)">+ Anschluss hinzufügen</button></div>
+   <div class="three">${[["ERP","Aufträge, Rechnungen, Artikel übergeben"],["Weiteres Prozess- und Datensystem","Daten aus dem Workflow weitergeben"],["Jedes System per MCP","neuer Anschluss statt neuer Prozesse"]].map(r=>`<div class="conseq" style="border:1px dashed var(--line);background:none"><span class="k">vorgesehen</span><span><b>${r[0]}</b> – ${r[1]}</span></div>`).join("")}</div></div>
+  <div class="card"><h2>Übergabewege</h2><div class="sub">Wohin Übergaben aus Prozessen gehen. Ein Prozessschritt sagt nur „Entwicklungsauftrag anlegen“ oder „Übergabe an ERP“ – das Ziel steht hier, je Unternehmen (optional je Projekt abweichend).</div>
+   <div class="tblw"><table><thead><tr><th>Übergabe</th><th>geht an</th><th>Methode</th><th>Status</th></tr></thead><tbody>${ROUTES[oc].map(r=>`<tr><td><b>${r[0]}</b></td><td>${esc(r[1])}</td><td>${esc(r[2])}</td><td><span class="pill ${r[3]}">${r[4]}</span></td></tr>`).join("")}</tbody></table></div>
+   <div class="sub">In der Pilotphase liegt der Zugang noch als Connector in Claude; mit eigener Software wandert die Anmeldung hierher.</div></div>
+  <div class="card"><h2>KI-Anbieter</h2><div class="sub">Die KI ist ebenfalls angeschlossen, nicht fest eingebaut: Haupt-KI, weitere Anbieter, Profile und Datenstufen stehen unter „KI &amp; Daten“.</div><div class="acts"><button class="btn" data-stab="ki">Zu KI &amp; Daten</button></div></div></div>`;
+}
+function vSetup(){
+  const s=SETUP[setupStep];
+  return `<div class="wiz"><div class="card wsteps">${SETUP.map((x,i)=>`<button data-step="${i}" aria-current="${i===setupStep}" class="${i<setupStep?"done":""}"><span class="num">${i<setupStep?"✓":i+1}</span>${x[0]}</button>`).join("")}</div>
+   <div class="card"><div class="sub">Setup einer Kundeninstanz · Beispiel Mieterverein Hagen · Schritt ${setupStep+1} von ${SETUP.length}</div><h2>${s[0]}</h2>
+    ${s[1].map(([l,v])=>`<div class="field"><label>${l}</label><div class="val">${esc(v)}</div></div>`).join("")}
+    ${setupStep===3?'<div class="alert ok">Ohne Haupt-KI kann Company OS nicht arbeiten – dieser Schritt ist Pflicht.</div>':""}
+    ${SETUP[setupStep][0]==="Prozesse & Projekte"?'<div class="acts" style="justify-content:flex-start"><button class="btn" data-ptabgo="sug">Vorschlagsliste öffnen</button></div>':""}
+    ${setupStep===2?'<div class="alert">Blocker erkannt: Ohne KI-Zugang können Agenten im Vereinssystem nicht arbeiten. Die Abteilungsleitung wird informiert.</div>':""}
+    <div class="acts"><button class="btn" data-step="${Math.max(0,setupStep-1)}" ${setupStep?"":"disabled"}>Zurück</button><button class="btn pri" data-step="${Math.min(SETUP.length-1,setupStep+1)}">${setupStep===SETUP.length-1?"Fertig":"Weiter"}</button></div></div></div>`;
+}
+
+const PHOTO="data:image/jpeg;base64,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";
+function avatar(n){if(typeof DEMO!=="undefined"&&DEMO)return `<span class="ava" role="img" aria-label="Alex Beispiel" style="display:inline-grid;place-items:center;width:${n}px;height:${n}px;min-width:${n}px;border-radius:50%;background:#C8641A;color:#fff;font-weight:700;font-size:${Math.round(n*.38)}px;pointer-events:none">AB</span>`;return `<span class="ava" role="img" aria-label="Boris Hose" style="display:inline-block;width:${n}px;height:${n}px;min-width:${n}px;background:url(${PHOTO}) center/cover no-repeat;pointer-events:none"></span>`}
+function vSettings(){
+  const t=state.setTab;
+  const tabs=`<div class="tabs" role="tablist">${[["profil","Profil"],["tag","Mein Tag"],["firmen","Unternehmen"],["agents","Agenten & Skills"],["lib","Bibliothek"],["setup","Setup"],["conn","Anschlüsse"],["ki","KI & Daten"]].map(([k,l])=>`<button role="tab" aria-selected="${t===k}" data-stab="${k}">${l}</button>`).join("")}</div>`;
+  if(t==="firmen"){const oc=state.orgCo||(state.co==="all"?"bs":state.co);const SYS={bs:"Bodo · Organisation „Bodo Solutions“ · Dev und Produktiv getrennt",ba:"sellify · Mandant „business//acts“ · Produktiv"};
+   return `<div class="stack">${tabs}<div class="card"><h2>Unternehmen &amp; Organigramm</h2><div class="sub">Jedes Unternehmen ist eine eigene Instanz mit eigenem Organigramm, eigenen Prozessen und einem angebundenen System, in dem die Arbeit gespeichert wird. Unternehmen wählen, um sein Organigramm zu sehen.</div>
+    <div class="cobadges">${["bs","ba"].map(k=>`<button class="cobadge" data-orgco="${k}" aria-pressed="${k===oc}"><span class="dot" style="background:${CO[k].color}"></span>${CO[k].name}</button>`).join("")}<button class="cobadge add" data-stab="setup">+ Weiteres Unternehmen hinzufügen</button></div>
+    <div class="meta"><span>System: ${SYS[oc]}</span><span class="pill p-ok">verbunden</span><button class="btn sm" data-co="${oc}" data-area="cockpit">Cockpit öffnen</button></div></div>
+    ${vOrg(oc)}</div>`;}
+  if(t==="tag")return `<div class="stack">${tabs}<div class="card"><h2>Mein Tag</h2><div class="sub">Persönliche Einstellungen für Übersichten, Benachrichtigungen und Sitzungen. Werte sind Beispiele.</div>
+   <div class="perm"><span><b>Morgenübersicht</b><br><span class="sub">Uhrzeit 7:30</span></span><div class="seg"><button data-opt aria-pressed="true">nur in der App</button><button data-opt aria-pressed="false">E-Mail über Bodo/sellify</button><button data-opt aria-pressed="false" disabled style="opacity:.45" title="kommt mit dem Mobil-Projekt">Handy (später)</button></div></div>
+   <div class="perm"><span><b>Tagesabschluss</b><br><span class="sub">Uhrzeit 17:30</span></span><div class="seg"><button data-opt aria-pressed="true">nur in der App</button><button data-opt aria-pressed="false">E-Mail über Bodo/sellify</button><button data-opt aria-pressed="false" disabled style="opacity:.45" title="kommt mit dem Mobil-Projekt">Handy (später)</button></div></div>
+   <div class="perm"><span><b>Benachrichtigungen</b><br><span class="sub">aufpoppen und gebündelt unter der Glocke</span></span><div class="seg"><button data-opt aria-pressed="true">sofort</button><button data-opt aria-pressed="false">gebündelt stündlich</button></div></div>
+   <div class="perm"><span><b>Ruhend nach</b></span><span class="lv">3 Tagen ohne Aktivität</span></div>
+   <div class="perm"><span><b>Hinweis „zu viel parallel“</b></span><span class="lv">ab 10 aktiven Sitzungen</span></div>
+   <div class="perm"><span><b>Sitzungsquellen</b></span><span class="sub">Cowork / Claude-App ✓ · Claude Code ✓ · Handy-Chats ✓ · geplante Aufgaben ✓</span></div>
+   <div class="perm"><span><b>Zuordnung zu Unternehmen und Projekt</b></span><span class="sub">automatisch durch die KI, sonst nachfragen</span></div>
+   <div class="perm"><span><b>Wartende Sitzungen als Aufgabe im CRM</b><br><span class="sub">Bodo „Meine Arbeit“ bzw. Gegenstück in sellify – offen, mit Dominik zu entscheiden; nur möglich, wenn der MCP-Server es kann</span></span><span class="pill p-open">noch nicht verfügbar</span></div></div>
+   <div class="card"><h2>Wie Company OS den Stand der Sitzungen erfährt</h2><div class="sub">Technisch noch zu prüfen. Vorgesehen: A – Sitzungen aus Company OS starten · B – Sitzungen melden sich per Standard-Skill selbst (Stand, nächster Schritt, Ergebnis, Link) · C – von Hand erfassen.</div></div></div>`;
+  if(t==="agents")return `<div class="stack">${tabs}${vAgents()}</div>`;
+  if(t==="lib")return `<div class="stack">${tabs}${vLib()}</div>`;
+  if(t==="setup")return `<div class="stack">${tabs}${vSetup()}</div>`;
+  if(t==="conn")return `<div class="stack">${tabs}${vConn()}</div>`;
+  if(t==="ki")return `<div class="stack">${tabs}${vKi()}</div>`;
+  const F=[["Name","Boris Hose"],["Rolle","Geschäftsführung"],["Unternehmen","Bodo Solutions · business//acts"],["Vertretung","Beispiel: Leitung Vertrieb"],["Benachrichtigungen","Push und App sofort · E-Mail als Tageszusammenfassung"],["Ruhezeit","20–7 Uhr, Eskalationen ausgenommen"],["Sprache","Deutsch"],["Erscheinungsbild","automatisch (hell/dunkel)"]];
+  return `<div class="stack">${tabs}<div class="card"><div class="prof">${avatar(96)}<div><h2>Boris Hose</h2><div class="sub">Geschäftsführung · Angaben außer Name und Bild sind Beispiele</div></div><div style="flex:1"></div><button class="btn" data-toast="Profilbild ändern (Prototyp)">Bild ändern</button></div></div>
+   <div class="card"><h2>Profil &amp; persönliche Einstellungen</h2><div class="two">${F.map(([l,v])=>`<div class="field"><label>${l}</label><div class="val">${esc(v)}</div></div>`).join("")}</div>
+   <div class="acts" style="justify-content:flex-start"><button class="btn pri" data-toast="Gespeichert (Prototyp)">Speichern</button><button class="btn" data-toast="Abgemeldet (Prototyp)">Abmelden</button></div></div></div>`;
+}
+
+function skillModal(){
+  $("#modal").innerHTML=`<div class="modal" data-close><div class="card" role="dialog" aria-modal="true" aria-label="Fähigkeiten des persönlichen KI-Assistenten"><h2>✦ Persönlicher KI-Assistent</h2>
+  <div class="sub">Stell dir zusammen, was dein Assistent können soll. <b id="skcnt">${PSK.filter(x=>x[2]).length}</b> Fähigkeiten aktiv. Was nach außen wirkt, gibt er dir weiter zur Freigabe.</div>
+  <div class="sklist">${PSK.map((x,i)=>`<button class="sk" data-sk="${i}" aria-pressed="${!!x[2]}"><span class="bx">${x[2]?"✓":""}</span><span><b>${x[0]}</b><small>${x[1]}</small></span></button>`).join("")}</div>
+  <div class="acts"><button class="btn" data-toast="Weitere Skills aus der Skill-Bibliothek (Prototyp)">+ Weitere Skills</button><button class="btn pri" data-skdone>Fertig</button></div></div></div>`;
+}
+function vKi(){
+  const P=[["Claude","Haupt-KI","Steuerung, KI-Assistent, Gründlich prüfen, Texte","2","ja","180 € / 250 €","p-ok"],["Mistral","Zusatz","Schnell & günstig","1","ja","22 € / 60 €","p-ok"],["Gemini","Zusatz","Bilder","0","ja","9 € / 40 €","p-ok"]];
+  const R=[["Gründlich prüfen","Claude","z. B. Betriebskostenabrechnung prüfen","1"],["Schnell & günstig","Mistral","z. B. Termin dokumentieren","1"],["Texte","Claude","Anschreiben, Zusammenfassungen","1"],["Bilder","Gemini","Porträts, Grafiken","0"]];
+  return `<div class="stack"><div class="alert ok">Anbieter, Modelle und Beträge sind Beispielwerte.</div>
+  <div class="card"><h2>Haupt-KI</h2><div class="sub">Steuert Company OS: KI-Assistent (Company-Chat), Einordnung neuer Aufträge, Anforderungsbewertung, Zuweisung, Eskalation. Wählbar sind nur Anbieter, die wir nach Prüfung freigegeben haben.</div>
+   <div class="list"><div class="item"><span class="pill p-ok">freigegeben</span><div class="t"><b>Claude</b><div class="sub">aktive Haupt-KI dieser Instanz</div></div></div>
+   <div class="item"><span class="pill p-open">in Prüfung</span><div class="t"><b>ChatGPT</b><div class="sub">als Haupt-KI erst nach Prüfung wählbar (Anschluss an Bodo/sellify)</div></div></div></div>
+   <div class="sub">Fällt die Haupt-KI aus, pausieren Aufträge und du wirst benachrichtigt – kein automatischer Wechsel.</div></div>
+  <div class="card"><h2>Registrierte Anbieter</h2><div class="sub">Ein Anbieter lässt sich nur hinterlegen, wenn bestätigt ist, dass eine AVV mit ihm besteht. Budget erreicht → Ausführung hält an, kein Ausweichen auf einen anderen Anbieter.</div>
+   <div class="tblw"><table><thead><tr><th>Anbieter</th><th>Rolle</th><th>Profile</th><th>Datenstufe</th><th>AVV bestätigt</th><th>Verbrauch / Budget im Monat</th></tr></thead><tbody>
+   ${P.map(r=>`<tr><td><b>${r[0]}</b></td><td>${r[1]}</td><td>${r[2]}</td><td>${r[3]}</td><td><span class="pill ${r[6]}">${r[4]}</span></td><td>${r[5]}</td></tr>`).join("")}</tbody></table></div>
+   <div class="acts"><button class="btn" data-toast="Anbieter registrieren: zuerst AVV bestätigen (Prototyp)">Anbieter hinzufügen</button></div></div>
+  <div class="card"><h2>KI-Profile</h2><div class="sub">Schritte, Skills und Aufträge nennen ein Profil – das Profil zeigt auf den Anbieter. Wechsel an einer Stelle statt in jedem Prozess. Die genaueste Angabe gewinnt: Auftrag vor Schritt vor Skill vor Haupt-KI.</div>
+   <div class="tblw"><table><thead><tr><th>Profil</th><th>Anbieter</th><th>Wofür</th><th>Höchste Datenstufe</th></tr></thead><tbody>
+   ${R.map(r=>`<tr><td><b>${r[0]}</b></td><td>${r[1]}</td><td>${r[2]}</td><td>${r[3]}</td></tr>`).join("")}</tbody></table></div></div>
+  <div class="card"><h2>Datenstufen &amp; Datenschleuse</h2>
+   <div class="two"><div><b>0 · ohne Personendaten</b><div class="sub">nur Organisation und Prozess</div></div><div><b>1 · pseudonymisiert</b><div class="sub">„das Mitglied“, „der Mandant“ – Name, Anschrift, Kontakt, Geburtsdatum, Nummern und Bankdaten werden vor dem Senden entfernt</div></div><div><b>2 · personenbezogen</b><div class="sub">nur mit AVV und passendem Datenstandort</div></div></div>
+   <div class="tblw"><table><thead><tr><th>Regel</th><th>Art</th><th>Wer darf übersteuern</th></tr></thead><tbody>
+    <tr><td>Besondere Kategorien (z. B. Gesundheit) nie an Stufe 0/1</td><td><span class="pill p-bad">🔒 hart</span></td><td>niemand – auch nicht der Hersteller</td></tr>
+    <tr><td>Mitgliederdaten nur pseudonymisiert an Zusatz-Anbieter</td><td><span class="pill p-bad">🔒 hart</span></td><td>niemand – Lockern nur über erneutes Setup</td></tr>
+    <tr><td>Interne Notizen an Profil „Schnell &amp; günstig“</td><td><span class="pill p-wait">nach Wahl</span></td><td>Abteilungsleitung, mit Begründung (Beispiel)</td></tr>
+   </tbody></table></div><div class="sub">Harte Regeln haben keine Hintertür. Bei Regeln „nach Wahl“ legt der Kunde im Setup fest, ob und von wem sie übersteuert werden dürfen – jede Übersteuerung wird protokolliert. Ein Auftrag kann jede Regel verschärfen.</div></div></div>`;
+}
+function vStepDemo(){
+  const st=["Anliegen erkennen und dem Kunden zuordnen.","Passende Information oder Vorlage aus der Bibliothek wählen.","Antwort im Hausstil formulieren, Zusagen nur im Rahmen der Freigaben.",...(assistStage>1?["Bei Beschwerden die Leitung Kundenservice informieren."]:[]),"Vorgang im CRM dokumentieren."];
+  const draft=assistStage?"Ziel: Kundenanfrage vollständig und freundlich beantworten.\nVorgehen:\n"+st.map((x,i)=>(i+1)+". "+x).join("\n")+"\nErgebnis: Antwortentwurf zur Freigabe.\nNicht: keine Preis- oder Terminzusagen ohne Freigabe.":"Kundenanfrage beantworten";
+  return `<div class="card"><h2>Schritt bearbeiten · Kundenanfrage beantworten</h2><div class="sub">Beispiel aus den Vorlagen Kundenservice. Anweisungstext ist ein Beispiel.</div>
+   <div class="two"><div class="field"><label>Abteilung</label><div class="val">Kundenservice</div></div><div class="field"><label>Ergebnisverantwortlich</label><div class="val">Leitung Kundenservice (Beispiel)</div></div><div class="field"><label>Agent</label><div class="val">◆ Annahme-Agent</div></div><div class="field"><label>Ersatz-Agent</label><div class="val">◆ Ticket-Agent (Beispiel)</div></div><div class="field"><label>Skill (Methode)</label><div class="val">anfrage-einordnen</div></div></div>
+   <div class="field"><label for="ins">Arbeitsanweisung</label><textarea id="ins" class="ta" rows="${assistStage?10:2}">${esc(draft)}</textarea></div>
+   <div class="acts" style="justify-content:flex-start"><button class="btn pri" data-assist="1">✦ Anweisung per KI erstellen</button><button class="btn" data-toast="Testlauf mit Beispieldaten im Dev-System gestartet (Prototyp)">Testlauf im Dev-System</button><span class="sub">Fassung ${assistStage?2:1} · frühere Fassungen bleiben erhalten</span></div>
+   ${assistStage===1?`<div class="assist"><b>Anweisungs-Assistent (Haupt-KI)</b><div>Ich habe einen Entwurf geschrieben. Eine Rückfrage: Soll bei Beschwerden immer die Leitung Kundenservice informiert werden?</div><div class="q"><button class="btn sm" data-assist="2">Ja, aufnehmen</button><button class="btn sm" data-toast="Bleibt wie im Entwurf (Prototyp)">Nein</button></div></div>`:assistStage===2?`<div class="assist"><b>Anweisungs-Assistent</b><div>Übernommen. Möchtest du noch etwas ergänzen, z. B. Antwortzeiten?</div></div>`:""}
+   <div class="two"><div class="field"><label>KI-Profil</label><div class="val">Texte → Claude (Beispiel)</div></div><div class="field"><label>Datenstufe</label><div class="val"><span class="lock">🔒 1 · pseudonymisiert – im Setup festgelegt</span></div></div><div class="field"><label>Bibliothek</label><div class="val">Vorlage „Antwort-E-Mail Kundenservice“</div></div><div class="field"><label>Freigabe</label><div class="val">Antwort nach Freigabe durch den Kundenservice</div></div></div></div>`;
+}
+function vStep(){if(DEMO)return vStepDemo();
+  const st=["Abrechnungszeitraum und Frist prüfen (§ 556 Abs. 3 BGB).","Jede Kostenart gegen Betriebskostenverordnung und Mietvertrag abgleichen.","Flächenangaben prüfen.",...(assistStage>1?["Umlageschlüssel gegen den Mietvertrag abgleichen."]:[]),"Vorauszahlungen korrekt abgezogen?"];
+  const draft=assistStage?"Ziel: Betriebskostenabrechnung des Mitglieds auf formelle und inhaltliche Fehler prüfen.\nVorgehen:\n"+st.map((x,i)=>(i+1)+". "+x).join("\n")+"\nErgebnis: Prüfbericht mit Ampel je Position und Begründung.\nNicht: keine Rechtsberatung an das Mitglied – Ergebnis geht zur Freigabe an die Rechtsberatung.":"Betriebskostenabrechnung prüfen";
+  return `<div class="card"><h2>Schritt bearbeiten · Betriebskostenabrechnung prüfen</h2><div class="sub">Beispiel aus dem Branchenpaket Mieterverein, Prozess „Beratung“. Anweisungstext ist ein Beispiel und fachlich zu prüfen.</div>
+   <div class="two"><div class="field"><label>Abteilung</label><div class="val">Rechtsberatung</div></div><div class="field"><label>Ergebnisverantwortlich</label><div class="val">Leitung Rechtsberatung (Beispiel)</div></div><div class="field"><label>Agent</label><div class="val">◆ Prüf-Agent</div></div><div class="field"><label>Ersatz-Agent</label><div class="val">◆ Rechtsprüf-Agent (Beispiel)</div></div><div class="field"><label>Skill (Methode)</label><div class="val">betriebskosten-pruefen</div></div></div>
+   <div class="field"><label for="ins">Arbeitsanweisung</label><textarea id="ins" class="ta" rows="${assistStage?10:2}">${esc(draft)}</textarea></div>
+   <div class="acts" style="justify-content:flex-start"><button class="btn pri" data-assist="1">✦ Anweisung per KI erstellen</button><button class="btn" data-toast="Testlauf mit Beispieldaten im Dev-System gestartet (Prototyp)">Testlauf im Dev-System</button><span class="sub">Fassung ${assistStage?2:1} · frühere Fassungen bleiben erhalten</span></div>
+   ${assistStage===1?`<div class="assist"><b>Anweisungs-Assistent (Haupt-KI)</b><div>Ich habe einen Entwurf geschrieben. Eine Rückfrage: Soll der Umlageschlüssel ausdrücklich gegen den Mietvertrag geprüft werden?</div><div class="q"><button class="btn sm" data-assist="2">Ja, aufnehmen</button><button class="btn sm" data-toast="Bleibt wie im Entwurf (Prototyp)">Nein</button></div></div>`:assistStage===2?`<div class="assist"><b>Anweisungs-Assistent</b><div>Übernommen. Möchtest du noch etwas ergänzen, z. B. welche Unterlagen das Mitglied mitliefern muss?</div></div>`:""}
+   <div class="two"><div class="field"><label>KI-Profil</label><div class="val">Gründlich prüfen → Claude (Beispiel)</div></div><div class="field"><label>Datenstufe</label><div class="val"><span class="lock">🔒 1 · pseudonymisiert – im Setup festgelegt</span></div></div><div class="field"><label>Bibliothek</label><div class="val">Vorlage „Prüfbericht Betriebskosten“</div></div><div class="field"><label>Freigabe</label><div class="val">Ergebnis nur nach Freigabe durch die Rechtsberatung</div></div></div></div>`;
+}
+function vLib(){
+  const L=[["Material","Produktübersicht Bodo","OneDrive · Vertrieb/Material","an Interessenten nach dem Erstkontakt","v3 · freigegeben"],["Material","Unternehmenspräsentation","OneDrive · Vertrieb/Material","Erstgespräch, Messen","v5 · freigegeben"],["Material","AVV-Entwurf","OneDrive · Recht","vor Vertragsabschluss mit Kunden","v2 · freigegeben"],["Vorlage","Angebot Bodo","Skill bodo-angebot · Layout Bodo-Navy","Angebote im Vertrieb","v4 · freigegeben"],["Vorlage","Begrüßungs-E-Mail","Bodo · E-Mail-Vorlage (über den Anschluss)","nach Vertragsabschluss","aus Bodo"],["Vorlage","Prüfbericht Betriebskosten","Bodo · Dokumentvorlage","Ergebnis „Betriebskosten prüfen“","Entwurf"]];
+  return `<div class="stack"><div class="card"><h2>Bibliothek</h2><div class="sub">Material wird unverändert versendet, Vorlagen werden befüllt. Quellen: das Kundensystem über den Anschluss oder ein Cloud-Ordner (OneDrive/SharePoint, Google Drive) – kein lokaler Ordner. „Wann verwenden“ hilft der KI, das Richtige zu wählen. Einträge sind Beispiele.</div>
+   <div class="tblw"><table><thead><tr><th>Art</th><th>Name</th><th>Quelle</th><th>Wann verwenden</th><th>Stand</th></tr></thead><tbody>
+   ${L.map(r=>`<tr><td><span class="pill ${r[0]==="Material"?"p-run":"p-wait"}">${r[0]}</span></td><td><b>${r[1]}</b></td><td>${r[2]}</td><td>${r[3]}</td><td>${r[4]}</td></tr>`).join("")}</tbody></table></div>
+   <div class="sub">Was nach außen geht, braucht weiter eine Freigabe. Personendaten setzt das Kundensystem ein, nicht die KI.</div></div></div>`;
+}
+
+/* ---------- Mein Tag: Heute und Meine KI-Sitzungen ---------- */
+const SRC={cw:["◧","Cowork"],cc:["⌘","Claude Code"],mob:["▯","Handy-Chat"],plan:["◷","Geplante Aufgabe"]};
+const SESS=[
+ {t:"Namensfindung & Arbeitstitel",src:"cw",l:"wait",as:"Produkt Company OS · business//acts",st:"Vorschläge für Methode und Arbeitstitel liegen vor.",nx:"Kombination auswählen, z. B. „Steuern statt Machen“ + „Projekt 2T“",res:"Antwort im Chat",ago:"vor 12 Min."},
+ {t:"Bodo-Ticket AG-114 beschreiben",src:"mob",l:"wait",as:null,ask:["Einführung Mieterverein Hagen","projektübergreifend"],st:"Ticket-Entwurf fertig, Dublettenprüfung ohne Treffer.",nx:"Entwurf lesen und freigeben",res:"Ticket-Entwurf (noch nicht angelegt)",ago:"vor 40 Min."},
+ {t:"Elevator Pitch – Kostenfolie",src:"cw",l:"check",as:"Produkt Company OS · business//acts",st:"Folie 5 neu: Delegation an die KI, 9.660 € Ersparnis als Highlight.",nx:"Folie ansehen und freigeben",res:"Präsentation „Elevator Pitch“ · 7 Folien",ago:"vor 25 Min."},
+ {t:"Umsetzungskonzept",src:"cw",l:"check",as:"Produkt Company OS · business//acts",st:"Alle 9 Abschnitte gefüllt, Architektur und Referenzen ergänzt.",nx:"Lesen, direkt bearbeiten oder kommentieren",res:"Dokument „Company OS – Umsetzungskonzept“",ago:"gestern"},
+ {t:"Tagesbriefing",src:"plan",l:"check",as:"projektübergreifend",st:"Morgenübersicht um 7:30 erstellt.",nx:"Lesen",res:"Morgenübersicht",ago:"7:30"},
+ {t:"Prototyp – Mein Tag",src:"cw",l:"run",as:"Produkt Company OS · business//acts",st:"Bereich „Mein Tag“ wird gebaut.",nx:"nichts – läuft",res:"–",ago:"gerade eben"},
+ {t:"Repository my-company-os aufsetzen",src:"cc",l:"run",as:"Produkt Company OS · business//acts",st:"Grundgerüst angelegt, Tests laufen.",nx:"nichts – läuft",res:"–",ago:"vor 8 Min."},
+ {t:"Homepage Bodo – Konzept",src:"cw",l:"rest",as:"Bodo Solutions",st:"Konzept zur Freigabe vorgelegt, keine Rückmeldung.",nx:"weitermachen oder archivieren",res:"Konzeptseite",ago:"vor 9 Tagen"},
+ {t:"Jinsheng Federn – Prozessaufnahme",src:"cw",l:"rest",as:"business//acts · Kundenprojekt",st:"Handlungsfelder notiert.",nx:"weitermachen oder archivieren",res:"Notizen",ago:"vor 5 Tagen"},
+ {t:"sellify-Video Storyboard",src:"cw",l:"rest",as:"business//acts",st:"Storyboard-Entwurf mit 6 Szenen.",nx:"weitermachen oder archivieren",res:"Storyboard",ago:"vor 12 Tagen"}
+];
+const LANES=[["wait","Wartet auf mich","p-wait"],["check","Fertig – zu prüfen","p-run"],["run","Läuft","p-open"]];
+const CAL=[["09:00","09:30","Jour fixe Entwicklung","Bodo"],["11:00","12:00","Abstimmung Mieterverein Hagen","Bodo"],["14:00","15:00","Demo Company OS für Interessent","sellify"]];
+const activeN=()=>SESS.filter(s=>["wait","check","run"].includes(s.l)).length;
+function srcTag(s){const x=SRC[s.src];return `<span class="srct" title="${x[1]}">${x[0]} ${x[1]}</span>`}
+function asHTML(s,i){return s.as?`<span class="pill p-open">${esc(s.as)}</span>`:`<div class="askbox"><span>Gehört das zu <b>${esc(s.ask[0])}</b> oder ist es ${esc(s.ask[1])}?</span><div class="acts" style="justify-content:flex-start"><button class="btn sm" data-sassign="${i}:0">${esc(s.ask[0])}</button><button class="btn sm" data-sassign="${i}:1">${esc(s.ask[1])}</button></div></div>`}
+function sessCard(s,i,big){
+  const acts=s.l==="rest"?`<button class="btn sm" data-sact="${i}:open">Weitermachen</button><button class="btn sm" data-sact="${i}:arch">Archivieren</button><button class="btn sm" data-sact="${i}:del">Löschen</button>`:
+   `<button class="btn sm ${big?"pri":""}" data-sact="${i}:open">Sitzung öffnen</button>${s.l!=="run"?`<button class="btn sm" data-sact="${i}:done">Erledigt</button>`:""}<button class="btn sm" data-sact="${i}:park">Parken</button>`;
+  return `<div class="card sess ${big?"big":""}"><div class="row" style="justify-content:space-between;gap:8px">${srcTag(s)}<span class="sub">${s.ago}</span></div>
+   <h3>${esc(s.t)}</h3>${asHTML(s,i)}
+   <div class="kv"><span class="k">Stand</span><span>${esc(s.st)}</span><span class="k">Jetzt tun</span><span><b>${esc(s.nx)}</b></span><span class="k">Ergebnis</span><span>${s.res!=="–"?`<button class="lnk" data-toast="Öffnet: ${esc(s.res)} (Prototyp)">${esc(s.res)}</button>`:"–"}</span></div>
+   <div class="acts" style="justify-content:flex-start">${acts}</div></div>`;
+}
+function vTag(){
+  const t=state.dayTab;
+  return `<div class="stack"><div class="tabs" role="tablist">${[["heute","Heute"],["sess","Meine KI-Sitzungen"]].map(([k,l])=>`<button role="tab" aria-selected="${t===k}" data-daytab="${k}">${l}${k==="sess"?` <span class="pill p-wait">${SESS.filter(s=>s.l==="wait").length}</span>`:""}</button>`).join("")}</div>${t==="sess"?vSess():vHeute()}</div>`;
+}
+function vHeute(){
+  const W=SESS.map((s,i)=>[s,i]).filter(([s])=>s.l==="wait");const C=SESS.map((s,i)=>[s,i]).filter(([s])=>s.l==="check");
+  const q=[...W,...C];const now=q[0];const rest=q.slice(1);const done=SESS.filter(s=>s.l==="done");const n=activeN();
+  return `<div class="alert ok">Beispieldaten aus den Themen der heutigen Arbeit; Status, Termine und Zeitschätzungen sind simuliert.</div>
+  <div class="card daycard"><div class="row" style="justify-content:space-between;flex-wrap:wrap"><h2>☀ Morgenübersicht · Sonntag, 11. Oktober</h2><span class="sub">erstellt 7:30 · Kanal: App</span></div>
+   <div class="kpis"><div class="kpi"><b>2</b><span>über Nacht fertig</span></div><div class="kpi warn"><b>${W.length}</b><span>wartet auf dich</span></div><div class="kpi"><b>${C.length}</b><span>zu prüfen</span></div><div class="kpi bad"><b>3</b><span>überfällig in Bodo</span></div><div class="kpi"><b>${n}</b><span>aktive Sitzungen</span></div></div>
+   ${n>=10?'<div class="alert">Zu viel parallel – etwas parken?</div>':`<div class="sub">${n} aktive Sitzungen – unter der Grenze von 10 (einstellbar).</div>`}</div>
+  ${now?`<div class="stack" style="gap:8px"><div class="lbl">Jetzt dran</div>${sessCard(now[0],now[1],true)}</div>`:'<div class="card"><h2>Jetzt dran</h2><div class="sub">Nichts wartet auf dich.</div></div>'}
+  <div class="grid" style="grid-template-columns:repeat(auto-fit,minmax(320px,1fr))">
+   <div class="card"><h2>Danach</h2><div class="sub">Empfohlene Reihenfolge: erst was auf dich wartet, dann Ergebnisse prüfen.</div><div class="list">${rest.map(([s,i],k)=>`<div class="item"><span class="num">${k+2}</span><div class="t"><b>${esc(s.t)}</b><div class="sub">${esc(s.nx)}</div></div><button class="btn sm" data-sact="${i}:open">Öffnen</button></div>`).join("")||'<div class="sub">Nichts weiter.</div>'}</div></div>
+   <div class="card"><h2>Tagesplan</h2><div class="sub">Termine aus Bodo und sellify, dazwischen Vorschläge für die freien Zeiten (Zeitbedarf geschätzt).</div><div class="tline">
+    <div class="tl-row"><span class="tm">08:00</span><div class="slot free"><b>frei bis 09:00</b><span>Vorschlag: „${esc(now?now[0].t:"–")}“ erledigen (ca. 10 Min.)</span></div></div>
+    ${CAL.map((c,k)=>`<div class="tl-row"><span class="tm">${c[0]}</span><div class="slot cal"><b>${esc(c[2])}</b><span>${c[0]}–${c[1]} · aus ${c[3]}</span></div></div>${k===0?`<div class="tl-row"><span class="tm">09:30</span><div class="slot free"><b>frei bis 11:00</b><span>Vorschlag: ${C.length} Ergebnisse prüfen (ca. 30 Min.)</span></div></div>`:k===1?`<div class="tl-row"><span class="tm">12:00</span><div class="slot free"><b>frei bis 14:00</b><span>Vorschlag: ruhende Sitzungen aufräumen, Demo vorbereiten</span></div></div>`:""}`).join("")}
+   </div></div></div>
+  <div class="card daycard"><div class="row" style="justify-content:space-between;flex-wrap:wrap"><h2>☾ Tagesabschluss</h2><span class="sub">geplant 17:30 · Kanal: App</span></div>
+   <div class="three"><div class="conseq"><span class="k">erledigt heute</span><span>${done.length?done.map(s=>esc(s.t)).join(" · "):"noch nichts als erledigt markiert"}</span></div><div class="conseq"><span class="k">bleibt offen</span><span>${q.length} Sitzungen warten oder sind zu prüfen</span></div><div class="conseq"><span class="k">morgen zuerst</span><span>${now?esc(now[0].t):"–"}</span></div></div>
+   <div class="acts" style="justify-content:flex-start"><button class="btn" data-toast="Übergabenotizen je Sitzung werden geschrieben (Prototyp)">Übergabenotizen schreiben lassen</button><button class="btn pri" data-toast="Tagesabschluss erstellt – erscheint morgen in der Morgenübersicht (Prototyp)">Tagesabschluss jetzt erstellen</button></div></div>`;
+}
+function vSess(){
+  const R=SESS.map((s,i)=>[s,i]).filter(([s])=>s.l==="rest");
+  return `<div class="card"><div class="row" style="justify-content:space-between;flex-wrap:wrap;gap:10px"><div style="flex:1;min-width:240px"><h2>Meine KI-Sitzungen</h2><div class="sub">Sitzungen aus Cowork, Claude Code, Handy-Chats und geplanten Aufgaben. Je Karte: Stand, was du jetzt tun musst, Ergebnis. Die KI ordnet Unternehmen und Projekt zu – oder fragt nach. Beispieldaten.</div></div>
+   <div class="acts"><button class="btn" data-toast="Sitzung von Hand erfassen (Prototyp)">+ Erfassen</button><button class="btn pri" data-toast="Neue Sitzung aus Company OS gestartet (Prototyp)">✦ Neue Sitzung</button></div></div></div>
+  <div class="lanes">${LANES.map(([k,l,c])=>{const L=SESS.map((s,i)=>[s,i]).filter(([s])=>s.l===k);return `<div class="lane"><div class="lane-h"><span class="pill ${c}">${l}</span><span class="sub">${L.length}</span></div>${L.map(([s,i])=>sessCard(s,i)).join("")||'<div class="sub" style="padding:8px">leer</div>'}</div>`}).join("")}</div>
+  <div class="card"><button class="btn" data-resttoggle aria-expanded="${state.showRest}">${state.showRest?"▾":"▸"} Ruhend (${R.length}) – länger als 3 Tage keine Aktivität</button>
+   ${state.showRest?`<div class="sub">Vor dem Archivieren schreibt die KI eine Übergabenotiz, damit du später nahtlos weitermachen kannst.</div><div class="lanes">${R.map(([s,i])=>sessCard(s,i)).join("")}</div>`:""}</div>`;
+}
+const NOTE=[["Elevator Pitch – Kostenfolie","fertig – zu prüfen"],["Bodo-Ticket AG-114 beschreiben","wartet auf deine Freigabe"],["Namensfindung & Arbeitstitel","wartet auf deine Entscheidung"],["Prozess Lead-Gewinnung","Testlauf nötig (Agent geändert)"],["Tagesbriefing","Morgenübersicht erstellt"]];
+function bellModal(){
+  $("#modal").innerHTML=`<div class="modal top" data-close><div class="card" role="dialog" aria-modal="true" aria-label="Benachrichtigungen"><h2>🔔 Benachrichtigungen</h2><div class="sub">Gebündelt an einer Stelle; Neues poppt zusätzlich kurz auf.</div>
+   <div class="list">${NOTE.map(n=>`<div class="item"><span class="dot" style="background:var(--accent);margin-top:6px"></span><div class="t"><b>${esc(n[0])}</b><div class="sub">${esc(n[1])}</div></div></div>`).join("")}</div>
+   <div class="acts"><button class="btn" data-close-btn>Schließen</button><button class="btn pri" data-gotag>Zu „Mein Tag“</button></div></div></div>`;
+}
+function popNote(){const p=$("#pop");if(!p)return;p.hidden=false;clearTimeout(popNote.t);popNote.t=setTimeout(()=>p.hidden=true,9000)}
+
+/* ---------- Chat ---------- */
+const SCRIPT={
+ "Wie steht die Einführung in Hagen?":`Stand aus Bodo (11.10.2026), Projekt MIV Hagen Migration: <ul><li>15 Aufgaben: 6 erledigt, 3 in Bearbeitung, 6 offen</li><li>Überfällig: AG-114 Inkasso (fällig 17.09., Boris Hose), AG-87 Dokumentenmigration (18.09., Dominik Koppe), AG-183 Nummernkreis (01.10., Dominik Koppe)</li><li>Blocker: KI-Zugang im Vereinssystem fehlt</li><li>Ohne Aufgaben: Dokumentvorlagen, Schulung</li></ul>Soll ich die drei überfälligen Punkte den Verantwortlichen melden?`,
+ "Lege einen Feature Request für Inkasso an":`Ich habe vorher nach vergleichbaren Tickets gesucht: keins gefunden. Entwurf:<div class="prev"><b>Feature Request · Bodo Solutions</b><span><b>Ziel:</b> Übergabe offener Forderungen an ein Inkassobüro</span><span><b>Zuständig:</b> niemand (Entwicklung übernimmt selbst)</span><span><b>Tags:</b> UX</span><span><b>Bewertung:</b> kostenpflichtig? – bitte entscheiden</span></div><div class="acts" style="margin-top:6px"><button class="btn sm acc" data-toast="Ticket angelegt (Prototyp: nichts ausgeführt)">Freigeben & anlegen</button><button class="btn sm">Ändern</button></div>`,
+ "Entwirf einen Prozess für die Lead-Gewinnung":`Ich habe einen Entwurf im Designer vorbereitet: 5 Schritte, Agenten aus dem Pool mit Begründung, eine Lücke (kein Agent mit Skill „lead-bewertung“). Prozessverantwortlich: Lead-Prozessagent, ergebnisverantwortlich: du (Vorschlag).<div class="acts" style="margin-top:6px"><button class="btn sm acc" data-ptabgo="des" data-desgo="1">Im Designer öffnen</button></div>`,
+ "Schlag mir weitere Prozesse vor":`Aus deinem Organigramm und dem Branchenpaket kämen dazu infrage:<ul><li>Mahnwesen bis Inkasso-Übergabe (Buchhaltung)</li><li>Beschwerde bearbeiten (Kundenservice)</li></ul>Soll ich beide auf die Vorschlagsliste setzen?`,
+ "Was wartet heute auf mich?":`Über beide Unternehmen und deine KI-Sitzungen:<ul><li>Sitzungen: „Namensfindung“ wartet auf deine Entscheidung, Bodo-Ticket AG-114 auf Freigabe</li><li>Bodo Solutions: Freigabe 14 Leads · Bewertung AG-114</li><li>business//acts: Rückfrage Preisliste Jinsheng Federn</li></ul><div class="acts" style="margin-top:6px"><button class="btn sm acc" data-gotag>Zu „Mein Tag“</button></div>`
+};
+function chatOpen(v){$("#chat").hidden=!v;$("#chatBtn").hidden=v;if(v&&!$("#msgs").innerHTML)ai("Hallo Boris. Ich kenne Organigramm, Prozesse, Projekte und Aufträge deiner Unternehmen und arbeite über die Anschlüsse in Bodo und sellify – mit deinen Freigaberegeln.");$("#chips").innerHTML=Object.keys(SCRIPT).map(k=>`<button data-ask="${esc(k)}">${esc(k)}</button>`).join("")}
+function me(t){$("#msgs").insertAdjacentHTML("beforeend",`<div class="msg me">${esc(t)}</div>`)}
+function ai(h){h=demoTxt(h);$("#msgs").insertAdjacentHTML("beforeend",`<div class="msg ai">${h}</div>`);$("#msgs").scrollTop=1e6}
+function ask(t){me(t);setTimeout(()=>ai(SCRIPT[t]||"Im Prototyp gibt es dafür keine vorbereitete Antwort. Im echten System würde ich die Frage mit den Daten aus Bodo bzw. sellify beantworten."),350)}
+
+/* ---------- Neuer Auftrag ---------- */
+function newJob(ctx){
+  const inP=!!ctx;
+  $("#modal").innerHTML=`<div class="modal" data-close><div class="card" role="dialog" aria-modal="true" aria-label="Neuer Auftrag"><h2>Neuer Auftrag</h2>
+  <div class="field"><label for="jt">Was soll passieren?</label><textarea id="jt" rows="3" style="border:1px solid var(--line);border-radius:9px;padding:8px 10px;background:var(--bg)">${inP?"Feedbackrunde 3 zum Mockup mit dem Kunden abstimmen":"Angebot für den Mieterverein Musterstadt vorbereiten, 2.400 Mitglieder"}</textarea></div>
+  <div class="field"><label>Wo?</label><div class="seg"><button data-opt aria-pressed="${!inP}">intern · ohne Projekt</button><button data-opt aria-pressed="${inP}">im Projekt${inP?": "+esc(ctx):" …"}</button></div></div>
+  <div class="sub">Vorschlag des Agenten</div>
+  <div class="stack" style="gap:8px">
+  <button class="opt" aria-pressed="true" data-opt><div><b>${inP?"Prozess „Klickbares Mockup erstellen und abstimmen“":"Prozess „Vertrieb“ ab Schritt „Angebot“"}</b><div class="sub">${inP?"Phase 2 · ◆ Projekt-Agent Entwicklung führt · Ergebnisverantwortlich: Boris Hose":"◆ Vertriebs-Prozessagent führt · Angebots-Agent · Ergebnisverantwortlich: Boris Hose · Freigabe vor Versand"}</div></div></button>
+  <button class="opt" aria-pressed="false" data-opt><div><b>Einzelaufgabe an den persönlichen Assistenten</b><div class="sub">ohne Prozess, direkt erledigen</div></div></button></div>
+  <div class="acts"><button class="btn" data-close>Abbrechen</button><button class="btn pri" data-start>Auftrag starten</button></div></div></div>`;
+}
+
+/* ---------- Ereignisse ---------- */
+document.addEventListener("click",e=>{
+  const b=e.target.closest("button,[data-close]");if(!b)return;
+  if(b.dataset.co){go({co:b.dataset.co,area:b.dataset.area||(state.area==="settings"||state.area==="tag"?"cockpit":state.area)});return}
+  if(b.dataset.area){go({area:b.dataset.area});return}
+  if(b.dataset.go){if(["agents","lib","setup"].includes(b.dataset.go)){state.setTab=b.dataset.go;go({area:"settings"})}else go({area:b.dataset.go});return}
+  if(b.dataset.daytab){state.dayTab=b.dataset.daytab;render();return}
+  if(b.dataset.sact){const [i,a]=b.dataset.sact.split(":");const x=SESS[+i];
+    if(a==="open"){if(x.l==="rest"){x.l="run";render()}toast("Öffnet die Sitzung „"+x.t+"“ in Claude (Prototyp)");return}
+    if(a==="done"){x.l="done";render();toast("„"+x.t+"“ erledigt – erscheint im Tagesabschluss (Prototyp)");return}
+    if(a==="park"){x.l="rest";render();toast("Geparkt – unter „Ruhend“ (Prototyp)");return}
+    if(a==="arch"){x.l="arch";render();toast("Übergabenotiz geschrieben, Sitzung archiviert (Prototyp)");return}
+    if(a==="del"){x.l="del";render();toast("Sitzung gelöscht (Prototyp)");return}}
+  if(b.dataset.sassign){const [i,v]=b.dataset.sassign.split(":");const x=SESS[+i];x.as=x.ask[+v];render();toast("Zugeordnet: "+x.as+" (Prototyp)");return}
+  if(b.hasAttribute("data-resttoggle")){state.showRest=!state.showRest;render();return}
+  if(b.id==="bell"){bellModal();return}
+  if(b.hasAttribute("data-popx")){$("#pop").hidden=true;return}
+  if(b.dataset.gotag!==undefined){$("#modal").innerHTML="";$("#pop").hidden=true;state.dayTab=b.dataset.gotag||"heute";go({area:"tag"});return}
+  if(b.dataset.ptabgo){if(b.dataset.projgo)state.projSel=b.dataset.projgo;state.projTab=b.dataset.ptabgo;state.procView="list";if(b.dataset.desgo){state.desMode="proc";state.desStage=1;state.desPrompt=""}$("#modal").innerHTML="";if($("#chat").classList.contains("big")||innerWidth<900)chatOpen(false);go({area:b.dataset.ptabgo==="proj"?"proj":"proc",pjTab:"list"});return}
+  if(b.dataset.pjtab){state.pjTab=b.dataset.pjtab;if(state.pjTab==="des"){if(state.desMode!=="proj"||b.hasAttribute("data-desfill")){state.desPrompt=""}state.desMode="proj";state.desStage=b.hasAttribute("data-desfill")?1:(state.desStage||0)}if(state.area!=="proj")go({area:"proj"});else render();return}
+  if(b.dataset.ptab){state.projTab=b.dataset.ptab;state.procView="list";if(b.dataset.desmode){state.desMode=b.dataset.desmode;state.desStage=1}render();return}
+  if(b.dataset.proc){state.procSel=b.dataset.proc;state.procView="detail";render();return}
+  if(b.hasAttribute("data-procback")){state.procView=state.procView==="step"?"detail":"list";render();return}
+  if(b.hasAttribute("data-stepedit")){state.procView="step";render();return}
+  if(b.dataset.tplf){state.tplF=b.dataset.tplf;render();return}
+  if(b.dataset.tpl!==undefined){tplModal(+b.dataset.tpl);return}
+  if(b.dataset.adopt!==undefined){const n=TPL[+b.dataset.adopt].n;$("#modal").innerHTML="";const sg=SUG.find(x=>x.n===n);if(sg)sg.s="übernommen";adopt(n);return}
+  if(b.dataset.sugchk!==undefined){const i=+b.dataset.sugchk;sugSel.has(i)?sugSel.delete(i):sugSel.add(i);render();return}
+  if(b.dataset.suga){const [i,a]=b.dataset.suga.split(":");sugAct(+i,a);return}
+  if(b.hasAttribute("data-sugall")){const L=[...sugSel];sugSel.clear();L.forEach(i=>{SUG[i].s="übernommen";const t=TPL.find(x=>x.n===SUG[i].n);if(t&&!PROC[state.co].some(x=>x.n===t.n))PROC[state.co].push({id:"x"+i+Date.now(),n:t.n,dep:t.f,st:"Entwurf",v:"v1",pa:"wird im Designer vorgeschlagen",er:"offen",run:"–",steps:t.d.split(" → ").map(x=>S(x,"–","im Designer zuordnen","–",""))})});render();toast(L.length+" Vorschläge als Entwurf übernommen (Prototyp)");return}
+  if(b.hasAttribute("data-sugno")){state.showNo=!state.showNo;render();return}
+  if(b.dataset.desmode){state.desMode=b.dataset.desmode;state.desStage=0;state.desPrompt="";render();return}
+  if(b.dataset.desstage){const v=+b.dataset.desstage;const ta=$("#dp");if(ta)state.desPrompt=ta.value;state.desStage=v;render();const M={1:"Entwurf erzeugt – bitte prüfen (Prototyp)",2:"Geprüft: keine Regelverstöße, 1 Hinweis offen (Prototyp)",3:"Testlauf im Dev-System mit Beispieldaten erfolgreich (Prototyp)",4:"Aktiviert als Version 1 (Prototyp)"};toast(M[v]);return}
+  if(b.dataset.proj){state.projSel=b.dataset.proj;render();return}
+  if(b.dataset.phase){state.phaseSel=b.dataset.phase;render();return}
+  if(b.dataset.pjob!==undefined){newJob(b.dataset.pjob);return}
+  if(b.id==="asstBtn"){skillModal();return}
+  if(b.dataset.agent){agentModal(+b.dataset.agent);return}
+  if(b.dataset.agsk){const a=AG[agI],k=b.dataset.agsk;a.sk=a.sk.includes(k)?a.sk.filter(x=>x!==k):[...a.sk,k];if(a.lim>skLv(a))a.lim=-1;agentModal(agI);return}
+  if(b.dataset.aglim!==undefined){AG[agI].lim=+b.dataset.aglim;agentModal(agI);return}
+  if(b.dataset.agp){const [k,v]=b.dataset.agp.split(":");AG[agI].p[k]=+v;agentModal(agI);return}
+  if(b.hasAttribute("data-agsave")){$("#modal").innerHTML="";render();toast(AG[agI].n+" gespeichert (Prototyp)");return}
+  if(b.hasAttribute("data-close-btn")){$("#modal").innerHTML="";render();return}
+  if(b.hasAttribute("data-sk")){const i=+b.dataset.sk;PSK[i][2]=PSK[i][2]?0:1;b.setAttribute("aria-pressed",!!PSK[i][2]);b.querySelector(".bx").textContent=PSK[i][2]?"✓":"";$("#skcnt").textContent=PSK.filter(x=>x[2]).length;return}
+  if(b.hasAttribute("data-skdone")){$("#modal").innerHTML="";render();toast("Fähigkeiten des Assistenten gespeichert (Prototyp)");return}
+  if(b.dataset.orgco){state.orgCo=b.dataset.orgco;render();return}
+  if(b.dataset.stab){if(b.dataset.stab==="firmen"&&state.area!=="settings"&&state.co!=="all")state.orgCo=state.co;state.setTab=b.dataset.stab;go({area:"settings"});return}
+  if(b.id==="meBtn"){state.setTab="profil";go({area:"settings"});return}
+  if(b.dataset.assist){assistStage=+b.dataset.assist;render();return}
+  if(b.dataset.step!==undefined){setupStep=+b.dataset.step;render();return}
+  if(b.dataset.toast){toast(b.dataset.toast);return}
+  if(b.dataset.ask){ask(b.dataset.ask);return}
+  if(b.hasAttribute("data-opt")){b.parentElement.querySelectorAll("[data-opt]").forEach(x=>x.setAttribute("aria-pressed",x===b));return}
+  if(b.hasAttribute("data-start")){$("#modal").innerHTML="";toast("Auftrag gestartet – der Prozessverantwortliche Agent übernimmt (Prototyp)");return}
+  if(b.hasAttribute("data-close")&&e.target===b){$("#modal").innerHTML="";return}
+  if(b.id==="newJob")newJob("");
+  if(b.id==="chatBtn")chatOpen($("#chat").hidden);
+  if(b.id==="chatClose")chatOpen(false);
+  if(b.id==="chatBig"){const c=$("#chat");c.classList.toggle("big");b.textContent=c.classList.contains("big")?"⤡":"⤢";b.setAttribute("aria-label",c.classList.contains("big")?"Kleiner anzeigen":"Größer anzeigen")}
+  if(b.id==="menuBtn")$("#side").classList.toggle("open");
+});
+$("#composer").addEventListener("submit",e=>{e.preventDefault();const v=$("#chatIn").value.trim();if(!v)return;$("#chatIn").value="";ask(v)});
+document.addEventListener("keydown",e=>{if(e.key==="Escape"){$("#modal").innerHTML="";$("#side").classList.remove("open")}});
+/* ---------- Vorführmodus „Musterfirma“ (erfundene Daten) ---------- */
+let DEMO=true;
+const ORIG=structuredClone({CO,WAIT,RUN,ORG,GF,PKG,SESS,SUG,SETUP,SCRIPT,NOTE,JOBS,CAL});
+const setArr=(a,b)=>a.splice(0,a.length,...structuredClone(b));
+const setObj=(o,b)=>{Object.keys(o).forEach(k=>delete o[k]);Object.assign(o,structuredClone(b))};
+const DMAP=[
+ ["AG-183","T-6"],["AG-82","T-5"],
+ ["Angebot für den Mieterverein Musterstadt vorbereiten, 2.400 Mitglieder","Angebot für Musterkunde Süd vorbereiten, 120 Arbeitsplätze"],
+ ["Einführung Bodo beim Mieterverein","Einführung CRM bei Kunde Beispiel GmbH"],
+ ["offen, mit Dominik zu entscheiden","offen, mit der Entwicklung zu entscheiden"],
+ ["„das Mitglied“, „der Mandant“","„der Kunde“, „der Ansprechpartner“"],
+ ["Mitgliederdaten","Kundendaten"],["Mitgliedsnummer","Kundennummer"],["Mitglieder","Kunden"],["Mitglied","Kunde"],
+ ["Inkasso-Übergabe","Übergabe an Dienstleister"],
+ ["Boris Hose","Alex Beispiel"],["Hallo Boris","Hallo Alex"],["an Boris","an Alex"],
+ ["Setup als Projekt in der business//acts-Instanz, weil es Bodo Solutions und sellify betrifft. Verknüpfbar mit den Projekten in den Kundeninstanzen.","Einführung von Company OS als Projekt mit Aufgabenpaketen."],
+ ["„Company OS einführen“ liegt in business//acts und ist verknüpft mit dem Einführungsprojekt beim Kunden in Bodo Solutions.","Projekte verschiedener Unternehmen lassen sich miteinander verknüpfen."],
+ ["Projekt „MIV Hagen Migration“, 10.10.2026","Beispieldaten"],
+ ["Kontakttyp Mieterverein, Interessent","Interessent, Branche Handwerk"],
+ ["Lead-Gewinnung von Mietervereinen","Lead-Gewinnung von Handwerksbetrieben"],
+ ["Lead-Gewinnung Mietervereine","Lead-Gewinnung Handwerk"],
+ ["Mietervereine NRW","Handwerksbetriebe Region Nord"],
+ ["Einführung Mieterverein Hagen","Einführung bei Kunde Beispiel GmbH"],
+ ["Beispiel Mieterverein Hagen","Beispiel Muster GmbH"],
+ ["Mieterverein Hagen","Kunde Beispiel GmbH"],
+ ["Mieterverein Musterstadt, 2.400 Mitglieder","Musterkunde Süd, 120 Mitarbeitende"],
+ ["Mieterverein Musterstadt","Musterkunde Süd"],
+ ["Infomaterial Bodo","Infomaterial"],
+ ["Inkasso-Schnittstelle","Kundenportal"],
+ ["Prozessübergabe an Inkasso","Schnittstelle zum ERP"],
+ ["Bitfarm-Dokumentenmigration (AG-87)","Dokumente aus dem Archiv (T-12)"],
+ ["AG-114","T-14"],["AG-87","T-12"],
+ ["Dominik Koppe","Leitung Entwicklung"],
+ ["Vorschlag Florian","Beispiel"],
+ ["Jinsheng Federn","Musterkunde Nord"],
+ ["sellify Integration Kit","Servicepaket Plus"],
+ ["Company OS einführen","Company OS einführen"],
+ ["Onboarding sellify-Kunde","Onboarding Neukunde"],
+ ["Onboarding-Agent sellify","Onboarding-Agent"],
+ ["Vertriebsassistent sellify","Vertriebsassistent Handel"],
+ ["Vertriebsassistent Bodo","Vertriebsassistent"],
+ ["Vertrieb sellify","Vertrieb"],
+ ["Produktübersicht Bodo","Produktübersicht"],["Angebot Bodo","Angebot"],["Layout Bodo-Navy","Layout im Hausstil"],
+ ["Prüfbericht Betriebskosten","Antwortvorlage Kundenservice"],["Ergebnis „Betriebskosten prüfen“","Antworten im Kundenservice"],
+ ["Vereinssystem","Kundensystem"],
+ ["Organisation „Bodo Solutions“","Mandant „Muster GmbH“"],["Mandant „business//acts“","Mandant „Muster Handel“"],
+ ["Bodo Solutions","Muster GmbH"],["business//acts","Muster Handel GmbH"]
+];
+function demoTxt(s){if(!DEMO||typeof s!=="string")return s;for(const [a,b] of DMAP)s=s.split(a).join(b);return s}
+const D_PKG=[
+ {n:"Datenübernahme",c:"#147a5c",v:"Projektleitung",b:"Boris Hose",due:"31.10.",st:["p-run","läuft"],t:[["T-1","Daten aus dem Altsystem exportieren","p-ok","erledigt"],["T-2","Import ins Testsystem","p-ok","erledigt"],["T-3","Dubletten bereinigen","p-ok","erledigt"],["T-4","Aktive Benutzer klären","p-ok","erledigt"],["T-12","Dokumente aus dem Archiv übernehmen","p-bad","überfällig"],["T-5","Rechnungslauf simulieren","p-open","offen"]]},
+ {n:"Setup definieren",c:"#2457c5",v:"Boris Hose",b:"Projektleitung",due:"07.11.",st:["p-run","läuft"],t:[["T-6","Nummernkreise festlegen","p-bad","überfällig"],["T-7","Suchvorlagen & Listenexport","p-open","offen"],["T-8","Auswertungen","p-open","offen"],["T-9","Artikel und Preise bündeln","p-open","offen"],["T-10","Kündigungsfristen hinterlegen","p-open","offen"]]},
+ {n:"Anforderungen & Change Requests",c:"#c8641a",v:"Boris Hose",b:"Leitung Entwicklung",due:"14.11.",st:["p-wait","Bewertung offen"],t:[["T-14","Schnittstelle zum ERP","p-bad","überfällig"],["T-11","Export an den Steuerberater","p-open","offen"]],ev:true},
+ {n:"Dokumentvorlagen",c:"#6a4fb3",v:"offen",b:"–",due:"–",st:["p-open","nicht geplant"],t:[]},
+ {n:"Benutzerschulung",c:"#8a5a12",v:"offen",b:"–",due:"–",st:["p-open","nicht geplant"],t:[]},
+ {n:"Übergabe Dev → Produktiv",c:"#14213d",v:"Boris Hose",b:"Leitung Entwicklung",due:"–",st:["p-wait","blockiert"],t:[],block:"KI-Zugang im Kundensystem fehlt"},
+ {n:"Projektsteuerung & Abstimmung",c:"#5d6579",v:"Boris Hose",b:"Projektleitung",due:"laufend",st:["p-run","laufend"],t:[["T-15","Kickoff-Protokoll geteilt","p-ok","erledigt"],["T-16","Abstimmungstermin 15.09.","p-ok","erledigt"]]}
+];
+const D_SESS=[
+ {t:"Preisliste für Angebot klären",src:"cw",l:"wait",as:"Muster Handel GmbH · Vertrieb",st:"Angebot an Musterkunde Nord vorbereitet, Preisliste unklar.",nx:"Entscheiden: Standardpreise oder Projektpreise",res:"Angebotsentwurf",ago:"vor 12 Min."},
+ {t:"Ticket-Entwurf: Export-Funktion",src:"mob",l:"wait",as:null,ask:["Entwicklungsprojekt Kundenportal","projektübergreifend"],st:"Ticket-Entwurf fertig, Dublettenprüfung ohne Treffer.",nx:"Entwurf lesen und freigeben",res:"Ticket-Entwurf (noch nicht angelegt)",ago:"vor 40 Min."},
+ {t:"Newsletter Oktober",src:"cw",l:"check",as:"Muster GmbH · Marketing",st:"Text und Betreffzeilen entworfen.",nx:"Lesen und freigeben",res:"Entwurf Newsletter",ago:"vor 25 Min."},
+ {t:"Quartalsbericht Q3",src:"cw",l:"check",as:"Muster GmbH · Geschäftsführung",st:"Kennzahlen zusammengestellt, Kommentar entworfen.",nx:"Prüfen, ergänzen oder kommentieren",res:"Dokument „Quartalsbericht Q3“",ago:"gestern"},
+ {t:"Tagesbriefing",src:"plan",l:"check",as:"projektübergreifend",st:"Morgenübersicht um 7:30 erstellt.",nx:"Lesen",res:"Morgenübersicht",ago:"7:30"},
+ {t:"Lead-Recherche Handwerk",src:"cw",l:"run",as:"Muster GmbH · Vertrieb",st:"32 von 50 Leads recherchiert.",nx:"nichts – läuft",res:"–",ago:"gerade eben"},
+ {t:"Repository Kundenportal aufsetzen",src:"cc",l:"run",as:"Muster GmbH · Entwicklung",st:"Grundgerüst angelegt, Tests laufen.",nx:"nichts – läuft",res:"–",ago:"vor 8 Min."},
+ {t:"Messeplanung 2027",src:"cw",l:"rest",as:"Muster GmbH · Marketing",st:"Messeliste mit Kosten erstellt.",nx:"weitermachen oder archivieren",res:"Messeliste",ago:"vor 9 Tagen"},
+ {t:"Lieferantenvergleich Drucker",src:"cw",l:"rest",as:"Muster GmbH · Einkauf",st:"Drei Angebote verglichen.",nx:"weitermachen oder archivieren",res:"Vergleichstabelle",ago:"vor 5 Tagen"},
+ {t:"Imagevideo Storyboard",src:"cw",l:"rest",as:"Muster Handel GmbH · Marketing",st:"Storyboard-Entwurf mit 6 Szenen.",nx:"weitermachen oder archivieren",res:"Storyboard",ago:"vor 12 Tagen"}
+];
+const D_SUG=[
+ {n:"Angebote nachfassen",src:"Vorlagen Vertrieb",why:"offene Angebote ohne Rückmeldung",s:"offen"},
+ {n:"Anfrage einordnen und beantworten",src:"Vorlagen Kundenservice",why:"viele gleichartige Anfragen",s:"offen"},
+ {n:"Eingangsrechnung prüfen",src:"Vorlagen Buchhaltung",why:"hoher Zeitaufwand je Beleg",s:"offen"},
+ {n:"Mahnwesen",src:"Vorlagen Buchhaltung",why:"Erinnerungen gehen heute unter",s:"offen"},
+ {n:"Infomaterial auf Anfrage",src:"Gespräch mit dem KI-Assistenten",why:"Material liegt in der Bibliothek bereit",s:"offen"},
+ {n:"Onboarding",src:"Gespräch mit dem KI-Assistenten",why:"„Neue Kolleginnen und Kollegen brauchen zu lange.“",s:"offen"},
+ {n:"Wochenbericht",src:"eigener Prompt",why:"„Jeden Freitag ein Überblick für die Geschäftsführung“",s:"offen"}
+];
+const D_NOTE=[["Newsletter Oktober","fertig – zu prüfen"],["Ticket-Entwurf: Export-Funktion","wartet auf deine Freigabe"],["Preisliste für Angebot klären","wartet auf deine Entscheidung"],["Prozess Lead-Gewinnung","Testlauf nötig (Agent geändert)"],["Tagesbriefing","Morgenübersicht erstellt"]];
+const D_SCRIPT={
+ "Wie steht die Einführung bei Kunde Beispiel GmbH?":`Stand aus dem CRM (Beispieldaten): <ul><li>15 Aufgaben: 6 erledigt, 3 in Bearbeitung, 6 offen</li><li>Überfällig: T-12 Dokumente aus dem Archiv, T-14 Schnittstelle zum ERP, T-6 Nummernkreise</li><li>Blocker: KI-Zugang im Kundensystem fehlt</li><li>Ohne Aufgaben: Dokumentvorlagen, Schulung</li></ul>Soll ich die drei überfälligen Punkte den Verantwortlichen melden?`,
+ "Lege einen Feature Request für die ERP-Schnittstelle an":`Ich habe vorher nach vergleichbaren Tickets gesucht: keins gefunden. Entwurf:<div class="prev"><b>Entwicklungsauftrag · GitLab</b><span><b>Ziel:</b> Aufträge nach Abschluss an das ERP übergeben</span><span><b>Zuständig:</b> niemand (Entwicklung übernimmt selbst)</span><span><b>Bewertung:</b> kostenpflichtig? – bitte entscheiden</span></div><div class="acts" style="margin-top:6px"><button class="btn sm acc" data-toast="Ticket angelegt (Prototyp: nichts ausgeführt)">Freigeben & anlegen</button><button class="btn sm">Ändern</button></div>`,
+ "Entwirf einen Prozess für die Lead-Gewinnung":ORIG.SCRIPT["Entwirf einen Prozess für die Lead-Gewinnung"],
+ "Schlag mir weitere Prozesse vor":ORIG.SCRIPT["Schlag mir weitere Prozesse vor"],
+ "Was wartet heute auf mich?":`Über beide Unternehmen und deine KI-Sitzungen:<ul><li>Sitzungen: „Preisliste für Angebot klären“ wartet auf deine Entscheidung, Ticket-Entwurf Export-Funktion auf Freigabe</li><li>Muster GmbH: Freigabe 14 Leads · Bewertung T-14</li><li>Muster Handel GmbH: Rückfrage Preisliste Musterkunde Nord</li></ul><div class="acts" style="margin-top:6px"><button class="btn sm acc" data-gotag>Zu „Mein Tag“</button></div>`
+};
+function demoSetup(){
+  const S=structuredClone(ORIG.SETUP);const set=(name,rows)=>{const e=S.find(x=>x[0]===name);if(e)e[1]=rows};
+  set("Inhaber-System",[["Kunde im eigenen CRM","Bodo · Ihr Anbieter → Muster GmbH (K-0001)"],["Bezug","Kunde des Anbieters"]]);
+  set("Projekte",[["Hauptprojekt","Einführung Company OS"],["Weitere Projekte","Datenübernahme Altsystem"],["Verwaltung","Projekte, Meilensteine und Aufgaben bleiben im CRM – Company OS zeigt sie an und steuert die Arbeit"]]);
+  set("Anschlüsse & Rollen",[["CRM","Bodo · Testsystem Muster GmbH (Einrichtung), Produktivsystem folgt"],["Entwicklung","GitLab (Issue)"],["Bibliothek","Cloud-Ordner (OneDrive/SharePoint oder Google Drive)"],["ERP · weitere Systeme","nicht angeschlossen – bei Bedarf per MCP"],["KI-Zugang im Kundensystem","fehlt – Freigabe im CRM nachholen"]]);
+  set("Abteilungen & Organigramm",[["Verwaltet","Vertrieb · Kundenservice · Projekte · Buchhaltung"],["Je Abteilung","eine Leitung, eine Vertretung, Mitarbeitende, Agenten"]]);
+  set("Branchenpaket",[["Paket","Standardvorlagen – Branchenpakete z. B. Mieterverein, Immobilienverwaltung in Vorbereitung"],["Liefert","Organigramm-Vorlage, Vorschlagsliste mit Prozessen und Projektvorlagen, Standard-Agenten und Skills"]]);
+  set("Menschen",[["Mitarbeitende","je Abteilung, verknüpft mit dem CRM-Benutzer"]]);
+  set("Übergabewege",[["Entwicklungsaufträge","→ GitLab, Methode: Skill gitlab-issue-anlegen"],["Auftrag nach Abschluss an ERP","kein ERP angeschlossen"],["Abweichung je Projekt","möglich"]]);
+  set("Bibliothek & Vorlagenquellen",[["Aus dem Kundensystem","E-Mail- und Dokumentvorlagen aus dem CRM (über den Anschluss)"],["Cloud-Ordner","OneDrive/SharePoint oder Google Drive – kein lokaler Ordner"]]);
+  set("Agenten & Skills",[["Agentenpool","Recherche-Agent · Angebots-Agent · Annahme-Agent · Ticket-Agent"],["Prozessführung","je Prozess ein Prozessverantwortlicher Agent (Standard-Skill „Prozess führen“)"],["Regel","Agenten werden beim Entwerfen fest eingesetzt – keine Ausleihe zur Laufzeit"]]);
+  set("Recht & Datenschutz",[["AVV Kunde ↔ Anbieter von Company OS","bestätigt"],["Regeln","je Regel: hart (keine Hintertür) oder übersteuerbar durch eine festgelegte Rolle, protokolliert"],["Agenten dürfen nie","Verträge unterschreiben · Geld bewegen"]]);
+  return S;
+}
+function applyMode(){
+  setObj(CO,ORIG.CO);setObj(WAIT,ORIG.WAIT);setObj(RUN,ORIG.RUN);setObj(ORG,ORIG.ORG);setObj(GF,ORIG.GF);setArr(PKG,ORIG.PKG);setArr(SESS,ORIG.SESS);setArr(SUG,ORIG.SUG);setArr(SETUP,ORIG.SETUP);setObj(SCRIPT,ORIG.SCRIPT);setArr(NOTE,ORIG.NOTE);setObj(JOBS,ORIG.JOBS);setArr(CAL,ORIG.CAL);
+  if(DEMO){
+    CO.bs.name="Muster GmbH";CO.bs.sys="Bodo · Mandant „Muster GmbH“";CO.ba.name="Muster Handel GmbH";CO.ba.sys="sellify · Mandant „Muster Handel“";
+    setArr(PKG,D_PKG);setArr(SESS,D_SESS);setArr(SUG,D_SUG);setArr(NOTE,D_NOTE);setObj(SCRIPT,D_SCRIPT);setArr(SETUP,demoSetup());
+    Object.values(ORG).forEach(L=>L.forEach(d=>{if(d.lead[0]==="DK")d.lead[0]="LE";if(d.lead[0]==="BH")d.lead[0]="AB";d.ppl.forEach(p=>{if(p[0]==="DK")p[0]="LE"})}));
+    state.tplF="Vertrieb";
+  }else state.tplF="Branchenpaket Mieterverein";
+  sugSel.clear();state.projSel=null;state.procView="list";
+  $("#msgs").innerHTML="";$("#chips").innerHTML="";
+  $("#pop b").textContent=DEMO?"Sitzung „Newsletter Oktober“ ist fertig":"Sitzung „Elevator Pitch – Kostenfolie“ ist fertig";
+  $("#modeTxt").textContent=DEMO?"Vorführung „Musterfirma“ · erfundene Daten · nichts wird gespeichert oder ausgeführt":"Pilotdaten (intern) · teils echte Daten aus Bodo · nichts wird gespeichert oder ausgeführt";
+  $("#meName").textContent=DEMO?"Alex Beispiel":"Boris Hose";$("#meAva").innerHTML=avatar(32);
+  $("#modeBtn").textContent=DEMO?"Pilotdaten zeigen":"Musterfirma zeigen";
+}
+document.addEventListener("click",e=>{
+  const b=e.target.closest("button");if(b&&b.id==="modeBtn"){DEMO=!DEMO;applyMode();render();toast(DEMO?"Vorführmodus „Musterfirma“":"Pilotdaten (intern)");return}
+  const m=$("#modal");if(DEMO&&m.innerHTML){const t=demoTxt(m.innerHTML);if(t!==m.innerHTML)m.innerHTML=t}
+});
+applyMode();
+
+function linkBodo(root){if(DEMO||!root)return;const re=/\b(AG-\d+|MIV Hagen Migration|Bodo - Einführung bei MIV Hagen|K-0037)\b/;const W=document.createTreeWalker(root,NodeFilter.SHOW_TEXT,{acceptNode:n=>{if(!re.test(n.nodeValue))return NodeFilter.FILTER_REJECT;let e=n.parentElement;while(e){if(/^(A|BUTTON|TEXTAREA|INPUT|SELECT|OPTION|SCRIPT|STYLE|LABEL)$/.test(e.tagName))return NodeFilter.FILTER_REJECT;e=e.parentElement}return NodeFilter.FILTER_ACCEPT}});const L=[];while(W.nextNode())L.push(W.currentNode);
+  const url=t=>{if(/^AG-/.test(t))return ids[t]?B+ids[t]:null;const f=BLINK.find(x=>x[0]===t);return f?f[1]:null};
+  L.forEach(n=>{const parts=n.nodeValue.split(new RegExp(re.source,"g"));if(parts.length<2)return;const fr=document.createDocumentFragment();parts.forEach((t,i)=>{const u=i%2?url(t):null;if(u){const a=document.createElement("a");a.href=u;a.target="_blank";a.rel="noopener";a.textContent=t;a.className="bodolink";a.title="In Bodo öffnen";fr.appendChild(a)}else if(t)fr.appendChild(document.createTextNode(t))});n.parentNode.replaceChild(fr,n)})}
+new MutationObserver(ms=>{if(DEMO)return;ms.forEach(m=>m.addedNodes.forEach(n=>{if(n.nodeType===1)linkBodo(n);else if(n.nodeType===3&&n.parentElement)linkBodo(n.parentElement)}))}).observe(document.body,{childList:true,subtree:true});
+render();
+setTimeout(popNote,3500);
+</script>

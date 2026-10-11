@@ -1,0 +1,392 @@
+<!doctype html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Organigramm – Konzept für My Company OS</title>
+<style>
+:root{color-scheme:light;--bg:#f5f6f8;--panel:#fff;--ink:#1b2333;--mut:#667085;--line:#e3e6ec;--navy:#1f3a5f;--acc:#2f6fdf;--accbg:#e8f0fd;--warn:#b54708;--warnbg:#fef0e6;--ok:#067647;--okbg:#e7f6ee;--bodo:#1f3a5f;--bodobg:#e3eaf4;--sell:#30ABE2;--sellbg:#e3f4fb;--selltxt:#1576a3;--src:#0e7090;--srcbg:#e6f6fb}
+*{box-sizing:border-box}[hidden]{display:none!important}body{margin:0;font:14px/1.5 system-ui,-apple-system,Segoe UI,sans-serif;background:var(--bg);color:var(--ink)}
+header{background:var(--navy);color:#fff;padding:12px 20px;display:flex;align-items:center;gap:14px;flex-wrap:wrap}
+header h1{font-size:17px;margin:0;font-weight:600}.tag{font-size:11px;background:#ffffff26;padding:2px 8px;border-radius:10px}
+nav.app{margin-left:auto;display:flex;gap:4px;flex-wrap:wrap}nav.app span{border:1px solid #ffffff40;color:#fff;padding:6px 12px;border-radius:6px;font-size:13.5px;opacity:.75}
+nav.app span.new{background:#fff;color:var(--navy);opacity:1;position:relative}nav.app span.new::after{content:"neu";position:absolute;top:-8px;right:-6px;background:#e5a50a;color:#fff;font-size:10px;padding:0 5px;border-radius:8px}
+.tabs{display:flex;gap:2px;background:#fff;border-bottom:1px solid var(--line);padding:0 16px;overflow-x:auto}
+.tabs button{border:0;background:none;padding:12px 14px;font:inherit;font-size:14px;color:var(--mut);border-bottom:3px solid transparent;cursor:pointer;white-space:nowrap}
+.tabs button.on{color:var(--ink);font-weight:600;border-bottom-color:var(--navy)}
+main{padding:20px 24px 24px;flex:1;display:flex;flex-direction:column;min-height:0}
+section.pane{display:none}section.pane.on{display:flex;flex-direction:column;flex:1}
+h2{font-size:20px;margin:0 0 6px;text-wrap:balance}h3{font-size:15px;margin:18px 0 8px}
+.lead{color:var(--mut);margin:0 0 18px}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:16px 18px}
+.grid2{display:grid;grid-template-columns:repeat(auto-fit,minmax(320px,1fr));gap:14px}
+.verdict{border-left:5px solid var(--ok);background:var(--okbg);border-radius:10px;padding:14px 18px;margin-bottom:16px}
+.verdict b{font-size:16px}
+.lbl{display:inline-block;font-size:11px;font-weight:700;letter-spacing:.04em;text-transform:uppercase;padding:2px 8px;border-radius:8px;margin-bottom:6px}
+.lbl.src{background:var(--srcbg);color:var(--src)}.lbl.me{background:var(--warnbg);color:var(--warn)}
+ul{margin:6px 0;padding-left:20px}li{margin:3px 0}
+.risk{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:0;border:1px solid var(--line);border-radius:10px;overflow:hidden;background:#fff}
+.risk>div{padding:10px 14px;border-top:1px solid var(--line)}.risk>div:nth-child(-n+2){border-top:0;background:#f3f5f9;font-weight:600;font-size:13px}
+.risk>div:nth-child(odd){border-right:1px solid var(--line)}
+@media(max-width:700px){.risk{grid-template-columns:1fr}.risk>div:nth-child(odd){border-right:0}}
+a{color:var(--acc)}
+.src-list{font-size:13px;color:var(--mut)}
+/* Mockup */
+.mock{border:1px solid var(--line);border-radius:12px;background:var(--bg);overflow:hidden}
+.mhead{background:#fff;border-bottom:1px solid var(--line);padding:12px 16px;display:flex;gap:10px;align-items:center;flex-wrap:wrap}
+.mhead h4{margin:0;font-size:15px}.seg{display:flex;border:1px solid var(--line);border-radius:8px;overflow:hidden}.seg button{border:0;background:#fff;padding:6px 12px;font:inherit;font-size:13px;cursor:pointer;border-left:1px solid var(--line)}.seg button:first-child{border-left:0}.seg button.on{background:var(--navy);color:#fff}
+.btn{border:1px solid var(--line);background:#fff;border-radius:6px;padding:6px 12px;cursor:pointer;font:inherit;font-size:13px;color:var(--ink)}.btn.p{background:var(--acc);color:#fff;border-color:var(--acc)}
+.mbody{display:grid;grid-template-columns:minmax(0,1fr) 260px;gap:14px;padding:14px}
+@media(max-width:860px){.mbody{grid-template-columns:1fr}}
+.depts{display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:12px;align-content:start}
+.dept{background:#fff;border:1px solid var(--line);border-radius:10px;padding:12px;border-top:4px solid var(--c,#98a2b3);min-height:150px;display:flex;flex-direction:column;gap:8px}
+.dept.over{outline:2px dashed var(--acc);background:var(--accbg)}
+.dhead{display:flex;align-items:flex-start;gap:4px 8px;flex-wrap:wrap}.dhead b{font-size:14.5px;flex:1}.cnt{font-size:11px;color:var(--mut);background:#eef0f4;border-radius:8px;padding:1px 7px;white-space:nowrap}
+.lead-h{font-size:12px;color:var(--mut)}.lead-h span{display:inline-flex;align-items:center;gap:4px;background:#f3f5f9;border-radius:10px;padding:1px 8px;color:var(--ink)}
+.purpose{font-size:12.5px;color:var(--mut)}
+.chips{display:flex;flex-wrap:wrap;gap:6px;flex:1;align-content:flex-start}
+.ag{display:inline-flex;align-items:center;gap:5px;background:#fff;border:1px solid #cfd5df;border-left:4px solid #98a2b3;border-radius:7px;padding:3px 8px;font-size:12.5px;cursor:grab;user-select:none}
+.ag.bodo{border-left-color:var(--bodo)}.ag.sellify{border-left-color:var(--sell)}.ag.ph{border-style:dashed;color:var(--mut)}
+.ag small{font-size:10.5px;color:var(--mut)}
+.empty{font-size:12px;color:var(--mut);border:1.5px dashed var(--line);border-radius:7px;padding:8px;text-align:center;width:100%}
+.pool{background:#fff;border:1px solid var(--line);border-radius:10px;padding:12px;align-self:start}
+.pool h5{margin:0 0 4px;font-size:13px}.pool .hint{font-size:12px;color:var(--mut);margin:0 0 8px}
+.adddept{border:1.5px dashed #b8c0cc;border-radius:10px;background:transparent;min-height:150px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;color:var(--mut);cursor:pointer;font:inherit}
+.adddept:hover{border-color:var(--acc);color:var(--acc)}
+.form{background:#fff;border:1px solid var(--acc);border-radius:10px;padding:12px;display:flex;flex-direction:column;gap:8px}
+.form input,.form select,.form textarea,textarea.in,select.in{width:100%;padding:7px 9px;border:1px solid var(--line);border-radius:6px;font:inherit;font-size:13px}
+.sugg{display:flex;flex-wrap:wrap;gap:5px}.sugg button{font-size:12px;border:1px solid var(--line);background:#f7f8fa;border-radius:12px;padding:2px 9px;cursor:pointer}
+/* Organigramm */
+.org{padding:18px 14px;overflow-x:auto}
+.orgin{width:max-content;margin:0 auto}.org .top{display:flex;justify-content:center}
+.node{background:#fff;border:1px solid var(--line);border-radius:10px;padding:8px 12px;text-align:center;min-width:150px;border-top:4px solid var(--c,#98a2b3)}
+.node b{display:block;font-size:13.5px}.node small{color:var(--mut);font-size:11.5px}
+.org .lvl{display:flex;gap:12px;justify-content:center;flex-wrap:nowrap;position:relative;padding-top:26px;margin-top:0}
+.org .lvl::before{content:"";position:absolute;top:0;left:8%;right:8%;height:13px;border:1.5px solid #c4cad4;border-bottom:0;border-radius:8px 8px 0 0}
+.org .col{display:flex;flex-direction:column;align-items:center;gap:6px;position:relative}
+.org .col .ag{cursor:default;font-size:11.5px}
+.vline{width:1.5px;height:13px;background:#c4cad4;margin:0 auto}
+/* Besprechung */
+.meet{display:grid;grid-template-columns:minmax(0,340px) minmax(0,1fr);gap:14px}@media(max-width:860px){.meet{grid-template-columns:1fr}}
+.cast{display:flex;flex-direction:column;gap:8px}
+.castrow{display:grid;grid-template-columns:120px minmax(0,1fr);gap:10px;align-items:start;background:#fff;border:1px solid var(--line);border-radius:10px;padding:10px 12px}
+.role{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.04em;color:var(--navy)}
+.why{font-size:12.5px;color:var(--mut);margin-top:2px}
+.gap{background:var(--warnbg);border:1px solid #f6d3b8;border-radius:10px;padding:10px 12px;font-size:13px;color:#7a3a07}
+.sim{font-size:11px;background:#fff4d6;color:#8a5a00;border-radius:8px;padding:1px 8px;font-weight:600}
+.flow{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+.flow .st{background:#fff;border:1px solid var(--line);border-radius:8px;padding:8px 10px;font-size:13px;max-width:210px}
+.flow .st b{display:block;font-size:11px;text-transform:uppercase;color:var(--mut);letter-spacing:.04em}
+.flow .arr{color:#98a2b3}
+table.dm{border-collapse:collapse;width:100%;background:#fff;font-size:13px}table.dm th,table.dm td{border:1px solid var(--line);padding:7px 10px;text-align:left;vertical-align:top}table.dm th{background:#f3f5f9}
+.wrap{overflow-x:auto}
+.names{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:10px}
+.name{background:#fff;border:1px solid var(--line);border-radius:10px;padding:12px}.name.rec{border:2px solid var(--ok)}.name b{font-size:15px}.name p{margin:4px 0 0;font-size:12.5px;color:var(--mut)}
+.ag.sup{border-style:dashed;background:#fafbfc}.ag.sup .s{font-size:10px;color:var(--mut)}
+.ag .x{border:0;background:none;color:var(--mut);cursor:pointer;font-size:13px;padding:0 0 0 2px;line-height:1}.ag .x:hover{color:#b42318}
+.addag{border:1.5px dashed #b8c0cc;background:#fff;border-radius:7px;padding:3px 10px;font:inherit;font-size:12.5px;color:var(--acc);cursor:pointer}
+.addag:hover{border-color:var(--acc);background:var(--accbg)}
+.ovl{position:fixed;inset:0;background:#0f172a80;display:flex;align-items:flex-start;justify-content:center;padding:40px 16px;overflow:auto;z-index:30}
+.dlg{background:#fff;border-radius:12px;max-width:560px;width:100%;padding:18px;display:flex;flex-direction:column;gap:10px}
+.dlg h3{margin:0;font-size:16px}
+.plist{border:1px solid var(--line);border-radius:8px;max-height:46vh;overflow:auto}
+.pgrp{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.04em;color:var(--mut);background:#f3f5f9;padding:5px 12px;position:sticky;top:0}
+.prow{display:flex;gap:10px;align-items:center;padding:8px 12px;border-top:1px solid var(--line);cursor:pointer}.prow:hover{background:#f7f9fc}
+.prow.dis{opacity:.55;cursor:default}.prow .nm{flex:1;min-width:0}.prow .nm small{display:block;color:var(--mut);font-size:11.5px}
+.pb{font-size:10.5px;padding:1px 7px;border-radius:8px;font-weight:600}.pb.bodo{background:var(--bodobg);color:var(--bodo)}.pb.sellify{background:var(--sellbg);color:var(--selltxt)}.pb.all{background:#eef0f4;color:#475467}
+.opt{background:#f7f8fa;border-radius:8px;padding:8px 12px;font-size:13px}.opt label{display:flex;gap:6px;align-items:flex-start;margin:3px 0}
+html,body{min-height:100%}body{display:flex;flex-direction:column;min-height:100vh}
+#mock .mock{flex:1;display:flex;flex-direction:column;min-height:420px}#cardsView,#orgView{flex:1}
+#meet .meet{flex:1}#meet .meet>.card{align-self:stretch}
+.dhide{border:0;background:none;color:var(--mut);cursor:pointer;font-size:15px;line-height:1;padding:2px 5px;border-radius:5px}.dhide:hover{background:#eef0f4;color:var(--ink)}
+.dept.off{opacity:.55;border-top-color:#c4cad4;background:#f7f8fa}.dept.off .chips{display:none}
+.hidbar{grid-column:1/-1;display:flex;align-items:center;gap:10px;flex-wrap:wrap;background:#fff;border:1px dashed #b8c0cc;border-radius:10px;padding:8px 12px;font-size:13px;color:var(--mut)}
+.toast{position:fixed;bottom:18px;left:50%;transform:translateX(-50%);background:var(--navy);color:#fff;padding:8px 14px;border-radius:8px;font-size:13px;z-index:20}
+</style>
+</head>
+<body>
+<header>
+  <h1>My Company OS</h1><span class="tag">Konzept „Organigramm“ – nicht umgesetzt</span>
+  <nav class="app"><span class="new">Organigramm</span><span>Aufträge</span><span>Abläufe</span><span>Agenten bauen</span><span>Matrix</span></nav>
+</header>
+<div class="tabs" id="tabs">
+  <button data-t="bew" class="on">1 · Bewertung</button>
+  <button data-t="mock">2 · Organigramm</button>
+  <button data-t="meet">3 · Besprechung</button>
+  <button data-t="regeln">4 · Konzept &amp; Regeln</button>
+  <button data-t="name">5 · Name</button>
+</div>
+<main>
+
+<!-- 1 BEWERTUNG -->
+<section class="pane on" id="bew">
+  <h2>Trägt die Idee? Ja – mit drei Leitplanken</h2>
+  <p class="lead">Die Abteilungs-Sicht macht My Company OS für Interessenten sofort verständlich, weil jeder Unternehmer in Abteilungen denkt. Andere haben das schon versucht. Aus ihren Fehlern ergeben sich drei Regeln, die wir von Anfang an einbauen sollten.</p>
+  <div class="verdict"><b>Kurzfazit</b><br>Als <b>Ordnungs- und Vorführschicht</b> über den bestehenden Agenten ist die Idee sinnvoll und marktüblich. Riskant wird sie erst, wenn Agenten wie Menschen dargestellt werden oder wenn eine „Besprechung“ frei und unkontrolliert Agenten-Gruppen bildet. <span class="lbl me" style="margin:0 0 0 6px">Einschätzung Claude</span></div>
+
+  <div class="grid2">
+    <div class="card"><span class="lbl src">Aus den Quellen</span><h3 style="margin-top:4px">Das machen andere schon</h3>
+      <ul>
+        <li><b>Microsoft</b> beschreibt die „Frontier Firm“: Jeder Mitarbeiter wird zum „Agent Boss“, der Agenten führt. Aus dem Organigramm wird ein „Work Chart“ – flexibel nach Ergebnis statt starr nach Hierarchie. Neue Kennzahl: Verhältnis Mensch zu Agent.</li>
+        <li><b>Salesforce Agentforce</b> sortiert seine Agenten nach Arbeitsbereichen: Service, Vertrieb, Marketing, Handel, Personal.</li>
+        <li><b>Relevance AI</b> baut ganze „AI Workforces“: Spezialisten-Agenten im Team, ein Manager-Agent koordiniert, dazu Freigaben und Eskalation.</li>
+        <li><b>Sintra</b> verkauft 12 „AI-Mitarbeiter“ mit Namen und Rolle (z. B. Vertrieb, SEO, Support) für kleine Firmen.</li>
+        <li><b>CrewAI, MetaGPT, ChatDev</b> simulieren ganze Firmen mit Rollen und Arbeitsanweisungen.</li>
+      </ul></div>
+    <div class="card"><span class="lbl src">Aus den Quellen</span><h3 style="margin-top:4px">Diese Fehler haben andere gemacht</h3>
+      <ul>
+        <li><b>Agenten als Mitarbeiter vermenschlicht:</b> Das HR-Softwarehaus Lattice wollte 2024 KI-Agenten als „digitale Mitarbeiter“ ins Organigramm aufnehmen – nach heftiger Kritik nach wenigen Tagen zurückgenommen. Salesforce rät, Agenten nach <i>Funktion</i> zu benennen, nicht mit Personas und Titeln.</li>
+        <li><b>Manager-Agent wählt Team selbst:</b> Praktiker berichten bei CrewAI, dass das „zufällig“ und unzuverlässig läuft; bei klaren Abläufen ist ein fester Ablauf verlässlicher.</li>
+        <li><b>Mehr Agenten ≠ besser:</b> Eine Studie über 7 Multi-Agenten-Systeme fand 14 Fehlerarten: 42 % unklare Rollen/Vorgaben, 37 % Abstimmungsfehler zwischen Agenten, 21 % fehlende Prüfung. Bessere Rollenbeschreibungen und eine Prüfinstanz verbesserten die Ergebnisse deutlich.</li>
+        <li><b>Hype statt Nutzen:</b> Gartner erwartet, dass über 40 % der Agenten-Projekte bis Ende 2027 eingestellt werden – wegen Kosten, unklarem Nutzen und fehlender Kontrolle.</li>
+      </ul></div>
+  </div>
+
+  <h3>Drei Leitplanken für unser Konzept <span class="lbl me">Einschätzung Claude</span></h3>
+  <div class="risk">
+    <div>Risiko</div><div>So lösen wir es</div>
+    <div>Kunden mit echten Mitarbeitern fühlen sich bedroht („Die KI ersetzt mein Team“).</div>
+    <div>Agenten heißen <b>Agenten</b>, nicht Mitarbeiter, und tragen Funktionsnamen. Jede Abteilung hat einen <b>verantwortlichen Menschen</b>. Botschaft: „Ihr Team bekommt Unterstützung“, nicht „Ersatz“.</div>
+    <div>Arbeit läuft quer durch Abteilungen (Anfrage → Angebot → Rechnung), starre Abteilungen bremsen.</div>
+    <div>Abteilung ist die <b>Heimat</b> eines Agenten. Abläufe und Aufträge dürfen Agenten aus mehreren Abteilungen kombinieren.</div>
+    <div>„Stell mir ein Team zusammen“ liefert unzuverlässige Ergebnisse.</div>
+    <div>Die Besprechung macht einen <b>Besetzungsvorschlag mit Begründung</b>, immer mit Prüfer-Rolle. Du bestätigst, erst dann wird ein Auftrag daraus. Fehlende Fähigkeiten werden offen benannt.</div>
+  </div>
+
+  <h3>Wichtig für die Kundenvorführung <span class="lbl me">Einschätzung Claude</span></h3>
+  <div class="card">Beim Vorführen sollten Interessenten <b>nicht deine echten Skills, Agenten und Aufträge</b> sehen. Vorschlag: ein zweiter Arbeitsbereich „Musterfirma“ mit erfundenen Beispieldaten, umschaltbar oben in der Leiste. Damit kannst du gefahrlos zeigen und später für jeden Kunden einen eigenen Bereich anlegen.</div>
+
+  <h3>Quellen</h3>
+  <ul class="src-list">
+    <li><a href="https://blogs.microsoft.com/blog/2025/04/23/the-2025-annual-work-trend-index-the-frontier-firm-is-born/" target="_blank" rel="noopener">Microsoft: Work Trend Index 2025 – The Frontier Firm is born</a></li>
+    <li><a href="https://www.salesforce.com/news/stories/how-salesforce-built-better-ai-agents/" target="_blank" rel="noopener">Salesforce: How Salesforce built better AI agents</a></li>
+    <li><a href="https://shrm.org/topics-tools/news/technology/lattice-scraps-plans-to-treat-ai-bots-as-employees-after-backlash" target="_blank" rel="noopener">SHRM: Lattice scraps plans to treat AI bots as employees after backlash</a></li>
+    <li><a href="https://www.saastr.com/saastr-ai-app-of-the-week-relevance-ai-the-platform-where-ops-teams-build-entire-ai-workforces-without-writing-a-line-of-code" target="_blank" rel="noopener">SaaStr: Relevance AI – AI workforces</a> (Werbebeitrag)</li>
+    <li><a href="https://www.salesforge.ai/blog/sintra-ai-review" target="_blank" rel="noopener">Salesforge: Sintra AI Review</a> (Wettbewerber-Blog)</li>
+    <li><a href="https://community.crewai.com/t/does-hierarchical-process-even-work-your-experience-is-highly-appreciated/2690/8" target="_blank" rel="noopener">CrewAI Community: Does hierarchical process even work?</a></li>
+    <li><a href="https://arxiv.org/html/2503.13657v2" target="_blank" rel="noopener">Cemri u. a.: Why Do Multi-Agent LLM Systems Fail? (2025)</a></li>
+    <li><a href="https://w.media/over-40-percent-of-agentic-ai-projects-could-face-the-axe-by-end-of-2027-gartner/" target="_blank" rel="noopener">W.Media: Gartner – über 40 % der Agenten-Projekte vor dem Aus</a></li>
+    <li><a href="https://claude.com/resources/articles/building-multi-agent-systems-when-and-how-to-use-them" target="_blank" rel="noopener">Anthropic: Multi-Agent-Systeme – wann und wie</a></li>
+  </ul>
+</section>
+
+<!-- 2 MOCKUP -->
+<section class="pane" id="mock">
+  <h2>Organigramm</h2>
+  <p class="lead">Klickbares Mock-up: Über <b>„+ Agenten“</b> in jeder Abteilung öffnet sich die Liste aller Agenten zur Mehrfachauswahl. Jeder Agent hat eine <b>Heimat-Abteilung</b> und kann zusätzlich in weiteren Abteilungen <b>unterstützen</b> (gestrichelt umrandet). Per Drag &amp; Drop lässt sich die Heimat zwischen Abteilungen verschieben, × entfernt einen Agenten aus der Abteilung. Nicht genutzte Abteilungen blendest du mit <b>„⊘ ausblenden“</b> aus – sie verschwinden aus Karten, Baum und Besprechung und lassen sich unten wieder einblenden. Agenten mit gestricheltem linkem Rand sind Platzhalter, die es noch nicht gibt. Nichts wird gespeichert.</p>
+  <div class="mock">
+    <div class="mhead"><h4>Organigramm</h4><span class="cnt" id="sum"></span><button class="btn" id="orphBtn" hidden></button>
+      <div class="seg" id="viewseg" style="margin-left:auto"><button data-v="cards" class="on">Karten</button><button data-v="org">Baum</button></div>
+      <div class="seg"><button class="on" title="Arbeitsbereich">Meine Firma</button><button title="Vorführdaten für Interessenten">Musterfirma</button></div>
+    </div>
+    <div id="cardsView" class="mbody" style="grid-template-columns:1fr"><div class="depts" id="depts"></div></div>
+    <div id="orgView" class="org" hidden></div>
+  </div>
+</section>
+
+<!-- 3 MEETING -->
+<section class="pane" id="meet">
+  <h2>Besprechung <span class="sim">Ausblick – spätere Stufe</span></h2>
+  <p class="lead">So könnte „Ich brauche ein Meeting mit dem Marketing zu Thema X“ aussehen. Die Besprechung plant nur: Sie schlägt eine Besetzung vor, begründet sie und macht daraus nach deiner Bestätigung einen Auftrag. Unten ist eine Simulation mit festen Regeln, keine echte KI.</p>
+  <div class="meet">
+    <div class="card">
+      <label style="font-size:12px;font-weight:600;color:var(--mut)">Abteilung(en)</label>
+      <select class="in" id="mDept" style="margin:4px 0 10px"></select>
+      <label style="font-size:12px;font-weight:600;color:var(--mut)">Thema / Aufgabe</label>
+      <textarea class="in" id="mTopic" rows="4" style="margin-top:4px">Für die Messe im November ein Vorstellungsvideo für Bodo und eine Landingpage, die auf dem Handy gut aussieht.</textarea>
+      <div style="display:flex;gap:8px;margin-top:10px"><button class="btn p" id="mGo">Besetzung vorschlagen</button></div>
+      <p style="font-size:12px;color:var(--mut);margin:10px 0 0">Ablauf: Thema verstehen → passende Agenten über ihre Zuständigkeiten finden → Rollen verteilen (Leitung, Ausführung, Prüfung) → Lücken benennen → du bestätigst → Auftrag.</p>
+    </div>
+    <div id="mOut" class="cast"></div>
+  </div>
+</section>
+
+<!-- 4 KONZEPT -->
+<section class="pane" id="regeln">
+  <h2>Konzept &amp; Regeln</h2>
+  <p class="lead">Was neu dazukommt und wie es mit Skills, Agenten, Abläufen und Aufträgen zusammenhängt.</p>
+  <div class="flow" style="margin-bottom:16px">
+    <div class="st"><b>Abteilung</b>Wer gehört wohin, wer ist verantwortlich</div><span class="arr">→</span>
+    <div class="st"><b>Agent</b>Hat eine Heimat-Abteilung und Zuständigkeiten</div><span class="arr">→</span>
+    <div class="st"><b>Skills</b>Was der Agent kann</div><span class="arr">·</span>
+    <div class="st"><b>Ablauf</b>Darf Agenten aus mehreren Abteilungen kombinieren</div><span class="arr">→</span>
+    <div class="st"><b>Auftrag</b>Konkreter Durchlauf, auch aus einer Besprechung</div>
+  </div>
+  <h3>Datenmodell (neu bzw. erweitert)</h3>
+  <div class="wrap"><table class="dm">
+    <tr><th>Objekt</th><th>Felder</th><th>Hinweis</th></tr>
+    <tr><td><b>Abteilung</b> (neu)</td><td>Name, Farbe, Zweck (1–2 Sätze), verantwortlicher Mensch, Reihenfolge, „übergeordnet“ (für Organigramm), Standard-Abläufe</td><td>9 Abteilungen vorbelegt, eigene über „+ Abteilung“</td></tr>
+    <tr><td><b>Agent</b> (erweitert)</td><td>+ Heimat-Abteilung, + Zuständigkeiten (Stichworte), + „unterstützt auch“ (weitere Abteilungen)</td><td>Zuständigkeiten sind die Grundlage für Besetzungsvorschläge</td></tr>
+    <tr><td><b>Besprechung</b> (später)</td><td>Thema, Abteilungen, Besetzungsvorschlag mit Rollen und Begründung, Lücken, Entscheidung</td><td>Wird nach Bestätigung zum Auftrag; bleibt im Verlauf nachvollziehbar</td></tr>
+    <tr><td><b>Arbeitsbereich</b> (Vorschlag)</td><td>„Meine Firma“, „Musterfirma“, später je Kunde</td><td>Trennt echte Daten von Vorführdaten</td></tr>
+  </table></div>
+  <h3>Vorbelegte Abteilungen <span class="lbl me">Vorschlag Claude</span></h3>
+  <p style="margin:0">Geschäftsführung · Vertrieb · Marketing · Kundenservice · Buchhaltung &amp; Finanzen · Personal · Einkauf · IT · Produktentwicklung. Schnellvorschläge beim Hinzufügen: Projektmanagement, Qualitätsmanagement, Recht &amp; Datenschutz, Logistik, Einführung &amp; Schulung.</p>
+  <h3>Regeln <span class="lbl me">Vorschlag Claude</span></h3>
+  <ul>
+    <li>Ein Agent hat genau <b>eine Heimat-Abteilung</b> (dort wird er gepflegt, deren Verantwortlicher gibt frei) und kann zusätzlich in <b>beliebig vielen weiteren Abteilungen unterstützen</b>. <span class="lbl src" style="margin:0">Entscheidung Boris</span></li>
+    <li>Nicht genutzte Abteilungen werden <b>ausgeblendet</b>, nicht gelöscht: Sie verschwinden aus Karten, Baum und Besprechung, ihre Zuordnungen bleiben erhalten und sie lassen sich jederzeit wieder einblenden. <span class="lbl src" style="margin:0">Entscheidung Boris</span></li>
+    <li>Agenten werden über <b>„+ Agenten“</b> mit Mehrfachauswahl hinzugefügt; Drag &amp; Drop verschiebt nur die Heimat.</li>
+    <li>Jede Abteilung hat einen <b>verantwortlichen Menschen</b>. Freigaben aus Abläufen gehen an diese Person.</li>
+    <li>Abläufe und Aufträge kennen keine Abteilungsgrenzen.</li>
+    <li>Die Abteilungsansicht zeigt pro Abteilung: Agenten, laufende Aufträge, offene Rückfragen.</li>
+    <li>Agenten werden mit Funktionsnamen benannt, ohne Personas oder Fotos.</li>
+    <li>Besetzungsvorschläge enthalten immer eine Prüfer-Rolle und nennen fehlende Fähigkeiten, statt sie zu überspielen.</li>
+  </ul>
+  <h3>Vorschlag für die Umsetzung in Stufen</h3>
+  <ol>
+    <li><b>Organigramm-Seite</b> mit Abteilungen, Drag &amp; Drop und Organigramm (dieses Mock-up).</li>
+    <li><b>Arbeitsbereich „Musterfirma“</b> für Vorführungen.</li>
+    <li><b>Zuständigkeiten</b> an den Agenten pflegen.</li>
+    <li><b>Besprechung</b> mit echtem Besetzungsvorschlag durch Claude – zusammen mit der Auftragsausführung (Stufe 2).</li>
+  </ol>
+</section>
+
+<!-- 5 NAME -->
+<section class="pane" id="name">
+  <div class="verdict" style="margin-bottom:22px"><b>Produktname: My Company OS</b> <span class="lbl src" style="margin:0 0 0 6px">entschieden von Boris</span><br>Ersetzt „My AI Factory“ – das Betriebssystem für die Arbeitsorganisation des Unternehmens. Wird bei der nächsten Umsetzung auch in der Live-Anwendung umbenannt.</div>
+  <h2>Name des Menüpunkts: Organigramm</h2>
+  <p class="lead">Kriterien: kurz, auch für Kunden verständlich, und es klingt nicht nach „KI ersetzt Mitarbeiter“.</p>
+  <div class="names">
+    <div class="name rec"><b>Organigramm</b> <span class="lbl src">Entscheidung Boris</span><p>Jeder Unternehmer kennt den Begriff und weiß sofort, was ihn dort erwartet: Abteilungen, Verantwortliche und wer wo arbeitet. Die Darstellung darin heißt „Karten“ oder „Baum“.</p></div>
+    <div class="name"><b>Organisation</b> <span class="lbl me">ersetzt</span><p>War die erste Wahl, etwas allgemeiner; jetzt durch „Organigramm“ ersetzt.</p></div>
+    <div class="name"><b>Aufbau</b><p>Betriebswirtschaftlich das Gegenstück zu „Abläufe“ (Aufbau- und Ablauforganisation). Braucht aber eine kurze Erklärung.</p></div>
+    <div class="name"><b>Abteilungen</b><p>Sehr wörtlich, aber eng, falls später Projektgruppen quer zu Abteilungen dazukommen.</p></div>
+    <div class="name"><b>Teams</b> <span class="lbl me">verworfen</span><p>Wird leicht mit Microsoft Teams verwechselt.</p></div>
+    <div class="name"><b>Meine Mitarbeiter</b> <span class="lbl me">abgeraten</span><p>Vermenschlicht die Agenten – genau das hat bei Lattice zur Gegenreaktion geführt.</p></div>
+  </div>
+</section>
+</main>
+
+<script>
+const $=s=>document.querySelector(s),esc=t=>String(t).replace(/&/g,"&amp;").replace(/</g,"&lt;");
+function toast(t){document.querySelectorAll(".toast").forEach(x=>x.remove());const d=document.createElement("div");d.className="toast";d.textContent=t;document.body.appendChild(d);setTimeout(()=>d.remove(),2200)}
+document.querySelectorAll("#tabs button").forEach(b=>b.onclick=()=>{document.querySelectorAll("#tabs button").forEach(x=>x.classList.toggle("on",x===b));document.querySelectorAll(".pane").forEach(p=>p.classList.toggle("on",p.id===b.dataset.t));scrollTo(0,0)});
+
+// Daten: echte Agenten aus My Company OS + Platzhalter (ph)
+let AG=[
+ {id:"vb",n:"Vertriebsassistent Bodo",p:"bodo",d:"vertrieb",k:"angebot produktblatt kontakt mail interessent"},
+ {id:"vs",n:"Vertriebsassistent sellify",p:"sellify",d:"vertrieb",k:"angebot produktblatt kontakt mail interessent"},
+ {id:"ob",n:"Onboarding Mieterverein",p:"bodo",d:"service",k:"einführung einrichtung mandant kunde schulung"},
+ {id:"os",n:"Onboarding sellify-Kunde",p:"sellify",d:"service",k:"einführung einrichtung mandant kunde schulung"},
+ {id:"tb",n:"Bodo Produkt & Tickets",p:"bodo",d:"prod",k:"ticket feature wunsch fehler entwicklung screenshot"},
+ {id:"ts",n:"sellify Produkt & Tickets",p:"sellify",d:"prod",k:"ticket feature wunsch fehler entwicklung screenshot"},
+ {id:"vib",n:"Bodo Video-Studio",p:"bodo",d:"marketing",k:"video storyboard film messe werbung"},
+ {id:"vis",n:"sellify Video-Studio",p:"sellify",d:"marketing",k:"video storyboard film messe werbung"},
+ {id:"wq",n:"Web-QA",p:"all",d:"marketing",sup:["prod"],k:"webseite landingpage handy mobil iphone homepage"},
+ {id:"x1",n:"Rechnungsprüfung",p:"all",d:"fibu",ph:1,k:"rechnung beleg prüfung"},
+ {id:"x2",n:"Mahnwesen",p:"all",d:"fibu",ph:1,k:"mahnung zahlung offene posten"},
+ {id:"x3",n:"Social-Media-Redaktion",p:"all",d:null,ph:1,k:"social linkedin post beitrag messe"},
+ {id:"x4",n:"Texter Landingpage",p:"all",d:null,ph:1,k:"landingpage text webseite messe"}
+];
+let DP=[
+ {id:"gf",n:"Geschäftsführung",c:"#1f3a5f",lead:"Boris",z:"Ziele, Freigaben, Prioritäten"},
+ {id:"vertrieb",n:"Vertrieb",c:"#2f6fdf",lead:"Boris",z:"Interessenten bis zum Auftrag"},
+ {id:"marketing",n:"Marketing",c:"#c4320a",lead:"Boris",z:"Sichtbarkeit, Inhalte, Webseiten, Videos"},
+ {id:"service",n:"Kundenservice",c:"#067647",lead:"Boris",z:"Einführung und Betreuung bestehender Kunden"},
+ {id:"fibu",n:"Buchhaltung & Finanzen",c:"#6941c6",lead:"– offen –",z:"Rechnungen, Zahlungen, Auswertungen"},
+ {id:"hr",n:"Personal",c:"#b54708",lead:"– offen –",z:"Bewerbungen, Einarbeitung"},
+ {id:"eink",n:"Einkauf",c:"#0e7090",lead:"– offen –",z:"Lieferanten, Bestellungen"},
+ {id:"it",n:"IT",c:"#475467",lead:"– offen –",z:"Systeme, Zugänge, Datenschutz"},
+ {id:"prod",n:"Produktentwicklung",c:"#30ABE2",lead:"Boris",z:"Wünsche und Fehler bis zum Ticket"}
+];
+const SUGG=["Projektmanagement","Qualitätsmanagement","Recht & Datenschutz","Logistik","Einführung & Schulung"];
+const COLORS=["#8a5a00","#3e4784","#a15c07","#155b75","#7a2e0e"];
+let adding=false,view="cards",showHidden=false;
+const dn=id=>DP.find(d=>d.id===id)?.n||"";
+const chip=(a,ctx)=>{const sup=ctx&&a.d!==ctx;return `<span class="ag ${a.p} ${a.ph?'ph':''} ${sup?'sup':''}" ${sup?'':'draggable="true"'} data-ag="${a.id}" title="${a.ph?'Platzhalter – gibt es noch nicht. ':''}${sup?'Heimat: '+esc(dn(a.d)||'keine'):(a.sup||[]).length?'Unterstützt auch: '+esc(a.sup.map(dn).join(', ')):''}">${esc(a.n)}${a.p!=="all"?` <small>${a.p==="bodo"?"Bodo":"sellify"}</small>`:""}${sup?' <span class="s">unterstützt</span>':''}${ctx?`<button class="x" data-rm="${a.id}" data-from="${ctx}" title="aus ${esc(dn(ctx))} entfernen">×</button>`:''}</span>`};
+function render(){
+  AG.forEach(a=>a.sup=a.sup||[]);
+  const real=AG.filter(a=>!a.ph).length,orph=AG.filter(a=>!a.d);
+  $("#sum").textContent=`${DP.filter(d=>!d.off).length} Abteilungen · ${real} Agenten · ${AG.length-real} Platzhalter`;
+  const ob=$("#orphBtn");ob.hidden=!orph.length;ob.textContent=`${orph.length} ohne Heimat-Abteilung`;
+  const HID=DP.filter(d=>d.off),SHOW=DP.filter(d=>!d.off||showHidden);
+  $("#depts").innerHTML=SHOW.map(d=>{const L=AG.filter(a=>a.d===d.id),S=AG.filter(a=>a.d!==d.id&&a.sup.includes(d.id));return `<div class="dept ${d.off?'off':''}" data-d="${d.id}" style="--c:${d.c}">
+    <div class="dhead"><b>${esc(d.n)}</b><span class="cnt">${L.length} Agent${L.length==1?"":"en"}${S.length?" + "+S.length+" unterst.":""}</span>${d.off?`<button class="btn" data-show="${d.id}" style="padding:2px 8px;font-size:12px">Einblenden</button>`:`<button class="dhide" data-hide="${d.id}" title="Abteilung ausblenden (wird nicht genutzt)" aria-label="Abteilung ausblenden">⊘</button>`}</div>
+    <div class="lead-h">Verantwortlich: <span>👤 ${esc(d.lead)}</span></div><div class="purpose">${esc(d.z)}</div>
+    <div class="chips">${L.map(a=>chip(a,d.id)).join("")}${S.map(a=>chip(a,d.id)).join("")}<button class="addag" data-add="${d.id}">+ Agenten</button></div></div>`}).join("")+
+    (adding?`<div class="form" id="addForm"><b style="font-size:14px">Neue Abteilung</b><input id="nName" placeholder="Name, z. B. Projektmanagement"><div class="sugg">${SUGG.filter(s=>!DP.some(d=>d.n===s)).map(s=>`<button data-s="${esc(s)}">${esc(s)}</button>`).join("")}</div><input id="nLead" placeholder="Verantwortlich (Mensch)"><input id="nZ" placeholder="Zweck in einem Satz"><div style="display:flex;gap:6px;justify-content:flex-end"><button class="btn" id="nNo">Abbrechen</button><button class="btn p" id="nYes">Anlegen und Agenten wählen</button></div></div>`
+    :`<button class="adddept" id="addBtn"><span style="font-size:22px">+</span>Abteilung hinzufügen</button>`)+
+    (HID.length?`<div class="hidbar">⊘ ${HID.length} ausgeblendet: ${HID.map(d=>esc(d.n)).join(", ")} <button class="btn" id="togHid" style="margin-left:auto">${showHidden?"Ausgeblendete verbergen":"Ausgeblendete anzeigen"}</button></div>`:"");
+  bind();if(view==="org")org();
+}
+function bind(){
+  document.querySelectorAll(".ag[draggable]").forEach(c=>c.ondragstart=e=>e.dataTransfer.setData("t",c.dataset.ag));
+  document.querySelectorAll(".dept").forEach(el=>{const target=el.dataset.d;el.ondragover=e=>{e.preventDefault();el.classList.add("over")};el.ondragleave=()=>el.classList.remove("over");
+    el.ondrop=e=>{e.preventDefault();el.classList.remove("over");const a=AG.find(x=>x.id===e.dataTransfer.getData("t"));if(a&&a.d!==target){a.d=target;a.sup=a.sup.filter(x=>x!==target);render();toast(`Heimat von „${a.n}“ → ${dn(target)}`)}}});
+  document.querySelectorAll("[data-rm]").forEach(b=>b.onclick=e=>{e.stopPropagation();const a=AG.find(x=>x.id===b.dataset.rm),f=b.dataset.from;
+    if(a.d===f){a.d=a.sup.shift()||null;toast(a.d?`„${a.n}“: neue Heimat ${dn(a.d)}`:`„${a.n}“ hat keine Heimat-Abteilung mehr`)}else{a.sup=a.sup.filter(x=>x!==f);toast(`„${a.n}“ unterstützt ${dn(f)} nicht mehr`)}render()});
+  document.querySelectorAll("[data-add]").forEach(b=>b.onclick=()=>picker(b.dataset.add));
+  document.querySelectorAll("[data-hide]").forEach(b=>b.onclick=()=>{const d=DP.find(x=>x.id===b.dataset.hide),n=AG.filter(a=>a.d===d.id||a.sup.includes(d.id)).length;d.off=true;render();fillDept();toast(`„${d.n}“ ausgeblendet`+(n?` – ${n} Agent${n==1?" bleibt":"en bleiben"} zugeordnet`:""))});
+  document.querySelectorAll("[data-show]").forEach(b=>b.onclick=()=>{const d=DP.find(x=>x.id===b.dataset.show);d.off=false;render();fillDept();toast(`„${d.n}“ wieder eingeblendet`)});
+  const th=$("#togHid");if(th)th.onclick=()=>{showHidden=!showHidden;render()};
+  $("#orphBtn").onclick=()=>toast("Diese Agenten über „+ Agenten“ einer Abteilung zuordnen – sie stehen in der Liste ganz oben");
+  const ab=$("#addBtn");if(ab)ab.onclick=()=>{adding=true;render();$("#nName").focus()};
+  const f=$("#addForm");if(f){document.querySelectorAll("[data-s]").forEach(b=>b.onclick=()=>{$("#nName").value=b.dataset.s;$("#nZ").focus()});
+    $("#nNo").onclick=()=>{adding=false;render()};
+    $("#nYes").onclick=()=>{const n=$("#nName").value.trim();if(!n){$("#nName").focus();return}
+      const id="d"+Date.now();DP.push({id,n,c:COLORS[DP.length%COLORS.length],lead:$("#nLead").value.trim()||"– offen –",z:$("#nZ").value.trim()||"Zweck noch offen"});adding=false;render();toast("Abteilung „"+n+"“ angelegt");picker(id)}}
+}
+function picker(did){
+  const d=DP.find(x=>x.id===did);let q="",pf="all";const sel=new Set();
+  const o=document.createElement("div");o.className="ovl";document.body.appendChild(o);
+  const close=()=>o.remove();
+  const rows=()=>{const vis=AG.filter(a=>(pf==="all"||a.p===pf)&&a.n.toLowerCase().includes(q));
+    const grp=[["Ohne Heimat-Abteilung",vis.filter(a=>!a.d)],["In anderen Abteilungen",vis.filter(a=>a.d&&a.d!==did&&!a.sup.includes(did))],["Bereits in "+d.n,vis.filter(a=>a.d===did||a.sup.includes(did))]];
+    return grp.filter(g=>g[1].length).map(([t,L])=>`<div class="pgrp">${t}</div>`+L.map(a=>{const here=a.d===did||a.sup.includes(did);
+      return `<label class="prow ${here?'dis':''}"><input type="checkbox" data-pk="${a.id}" ${here||sel.has(a.id)?'checked':''} ${here?'disabled':''}><span class="nm">${esc(a.n)}${a.ph?' <span class="cnt">Platzhalter</span>':''}<small>${here?(a.d===did?'Heimat hier':'unterstützt hier'):a.d?'Heimat: '+esc(dn(a.d)):'noch keiner Abteilung zugeordnet'}</small></span><span class="pb ${a.p}">${a.p==="all"?"Andere":a.p==="bodo"?"Bodo":"sellify"}</span></label>`}).join("")).join("")||'<div style="padding:14px;color:var(--mut)">Keine Agenten gefunden.</div>'};
+  const draw=()=>{const other=[...sel].some(id=>AG.find(a=>a.id===id).d);
+    o.innerHTML=`<div class="dlg"><div style="display:flex;align-items:center;gap:8px"><h3 style="flex:1">Agenten hinzufügen – ${esc(d.n)}</h3><button class="btn" id="pX">✕</button></div>
+     <div style="display:flex;gap:8px;flex-wrap:wrap"><input id="pQ" placeholder="Agent suchen …" value="${esc(q)}" style="flex:1;min-width:160px;padding:7px 9px;border:1px solid var(--line);border-radius:6px;font:inherit"><div class="seg" id="pSeg">${[["all","Alle"],["bodo","Bodo"],["sellify","sellify"]].map(([k,l])=>`<button data-pf="${k}" class="${pf===k?'on':''}">${l}</button>`).join("")}</div></div>
+     <div class="plist">${rows()}</div>
+     ${other?`<div class="opt"><b>Agenten aus anderen Abteilungen:</b><label><input type="radio" name="pm" value="sup" checked> zusätzlich hier unterstützen lassen (Heimat bleibt)</label><label><input type="radio" name="pm" value="move"> Heimat hierher verschieben</label></div>`:""}
+     <div style="display:flex;gap:8px;align-items:center"><button class="btn" id="pNew">+ Neuen Agenten anlegen</button><span style="flex:1"></span><button class="btn" id="pNo">Abbrechen</button><button class="btn p" id="pOk" ${sel.size?'':'disabled'}>${sel.size||""} hinzufügen</button></div></div>`;
+    $("#pX").onclick=close;$("#pNo").onclick=close;o.onclick=e=>{if(e.target===o)close()};
+    $("#pNew").onclick=()=>toast("Öffnet „Agenten bauen“ mit Heimat-Abteilung "+d.n);
+    const qi=$("#pQ");qi.oninput=()=>{q=qi.value.toLowerCase();const pos=qi.selectionStart;draw();const n=$("#pQ");n.focus();n.setSelectionRange(pos,pos)};
+    o.querySelectorAll("[data-pf]").forEach(b=>b.onclick=()=>{pf=b.dataset.pf;draw()});
+    o.querySelectorAll("[data-pk]").forEach(c=>c.onchange=()=>{c.checked?sel.add(c.dataset.pk):sel.delete(c.dataset.pk);draw()});
+    $("#pOk").onclick=()=>{const mode=(o.querySelector('[name="pm"]:checked')||{}).value||"sup";let n=0;
+      sel.forEach(id=>{const a=AG.find(x=>x.id===id);if(!a.d)a.d=did;else if(mode==="move"){a.sup=a.sup.filter(x=>x!==did);a.d=did}else if(!a.sup.includes(did))a.sup.push(did);n++});
+      close();render();toast(`${n} Agent${n==1?"":"en"} zu ${d.n} hinzugefügt`)};
+  };
+  draw();
+}
+function org(){
+  const V=DP.filter(d=>!d.off),gf=V[0]||DP[0],rest=V.slice(1);
+  $("#orgView").innerHTML=`<div class="orgin"><div class="top"><div class="node" style="--c:${gf.c}"><b>${esc(gf.n)}</b><small>👤 ${esc(gf.lead)}</small></div></div>
+   <div class="vline"></div>
+   <div class="lvl">${rest.map(d=>{const L=AG.filter(a=>a.d===d.id);return `<div class="col"><div class="node" style="--c:${d.c}"><b>${esc(d.n)}</b><small>👤 ${esc(d.lead)}</small></div>${L.map(a=>chip(a)).join("")}${AG.filter(a=>a.d!==d.id&&(a.sup||[]).includes(d.id)).map(a=>chip(a,"_")).join("").replace(/<button class="x"[^>]*>×<\/button>/g,"")}</div>`}).join("")}</div></div>`;
+}
+document.querySelectorAll("#viewseg button").forEach(b=>b.onclick=()=>{view=b.dataset.v;document.querySelectorAll("#viewseg button").forEach(x=>x.classList.toggle("on",x===b));$("#cardsView").hidden=view!=="cards";$("#orgView").hidden=view!=="org";if(view==="org")org()});
+render();
+
+// Besprechung (Simulation mit Stichwortregeln)
+function fillDept(){$("#mDept").innerHTML=`<option value="">Alle Abteilungen</option>`+DP.filter(d=>!d.off).map(d=>`<option value="${d.id}" ${d.id==="marketing"?"selected":""}>${esc(d.n)}</option>`).join("")}
+fillDept();document.querySelector('[data-t="meet"]').addEventListener("click",fillDept);
+$("#mGo").onclick=()=>{
+  const t=$("#mTopic").value.toLowerCase(),dep=$("#mDept").value;
+  const words=t.split(/[^a-zäöüß]+/).filter(w=>w.length>3);
+  const prod=/sellify/.test(t)?"sellify":/bodo/.test(t)?"bodo":null;
+  const score=a=>{const s=a.k.split(" ").filter(k=>words.some(w=>w.startsWith(k.slice(0,5))||k.startsWith(w.slice(0,5)))).length;return s?s+(prod&&a.p===prod?1:0):0};
+  let cand=AG.map(a=>({a,s:score(a)})).filter(x=>x.s>0&&(!prod||x.a.p===prod||x.a.p==="all")).sort((x,y)=>y.s-x.s);
+  const inDep=cand.filter(x=>!dep||x.a.d===dep),outDep=cand.filter(x=>dep&&x.a.d!==dep);
+  const real=inDep.filter(x=>!x.a.ph),gaps=cand.filter(x=>x.a.ph);
+  const lead=real[0],workers=real.slice(1),qa=AG.find(a=>a.id==="wq");
+  const row=(r,a,why)=>`<div class="castrow"><div class="role">${r}</div><div><b>${esc(a.n)}</b>${a.d?` <span class="cnt">${esc(DP.find(d=>d.id===a.d)?.n||"")}</span>`:""}<div class="why">${why}</div></div></div>`;
+  let h=`<div style="display:flex;align-items:center;gap:8px"><b>Besetzungsvorschlag</b><span class="sim">Simulation</span></div>`;
+  if(!lead){h+=`<div class="gap">In dieser Abteilung passt kein Agent zum Thema. Vorschlag: andere Abteilung wählen oder einen Agenten anlegen.</div>`}
+  else{
+    h+=row("Leitung",lead.a,"Zuständigkeiten passen am besten zum Thema; plant die Schritte und hält Rücksprache mit dir.");
+    workers.forEach(w=>h+=row("Ausführung",w.a,"Übernimmt den passenden Teil der Aufgabe."));
+    outDep.filter(x=>!x.a.ph).slice(0,2).forEach(x=>h+=row("Aus anderer Abteilung",x.a,"Wird gebraucht, gehört aber nicht zur gewählten Abteilung – Abläufe dürfen Abteilungen kombinieren."));
+    h+=row("Prüfung",qa&&!real.some(x=>x.a===qa)&&!outDep.some(x=>x.a===qa)?qa:{n:"Prüfschritt durch dich",d:null},"Prüft das Ergebnis gegen das Ziel, bevor etwas nach außen geht.");
+    if(gaps.length)h+=`<div class="gap"><b>Lücke:</b> Für ${gaps.map(g=>"„"+esc(g.a.n)+"“").join(", ")} gibt es noch keinen echten Agenten. Anlegen oder ohne diesen Teil starten?</div>`;
+    h+=`<div class="castrow" style="grid-template-columns:1fr"><div><b>Nächster Schritt</b><div class="why">Du bestätigst oder änderst die Besetzung → daraus wird ein Auftrag mit Ablauf, Haltepunkten und Benachrichtigung.</div>
+      <div style="display:flex;gap:8px;margin-top:8px"><button class="btn p" onclick="toast('Im Konzept ohne Funktion')">Als Auftrag anlegen</button><button class="btn" onclick="toast('Im Konzept ohne Funktion')">Besetzung ändern</button></div></div></div>`}
+  $("#mOut").innerHTML=h;
+};
+$("#mGo").click();
+</script>
+</body>
+</html>

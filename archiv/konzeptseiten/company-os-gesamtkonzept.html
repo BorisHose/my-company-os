@@ -1,0 +1,495 @@
+<title>Company OS Gesamtkonzept</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Sans+Condensed:wght@600;700&family=IBM+Plex+Mono:wght@500&display=swap">
+<style>
+/* Layout: Kopf mit Reitern, darunter je Reiter eine Arbeitsfläche; Prozessphasen als Kartenraster, Kundenakte als durchlaufendes Band */
+:root{
+  --bg:#f2f4f8; --surface:#ffffff; --sunk:#e9edf4; --fg:#15213b; --muted:#5a6680; --line:#d6dce8;
+  --navy:#1f3a5f; --navy-soft:#e3eaf4; --sell:#30ABE2; --sell-soft:#e1f3fb; --sell-ink:#1572a0;
+  --human:#a8620a; --human-soft:#fdf1df; --write:#0d7a6a; --write-soft:#e1f4f0;
+  --gate:#b4232a; --gate-soft:#fbe9ea;
+  --f-head:"IBM Plex Sans Condensed","IBM Plex Sans",system-ui,sans-serif;
+  --f-body:"IBM Plex Sans",system-ui,-apple-system,"Segoe UI",sans-serif;
+  --f-mono:"IBM Plex Mono",ui-monospace,Consolas,monospace;
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  --bg:#0f1525; --surface:#172036; --sunk:#111a2d; --fg:#e6ebf5; --muted:#9ba7c0; --line:#2a3652;
+  --navy:#9db4e8; --navy-soft:#22304f; --sell:#5cc5ef; --sell-soft:#123a4b; --sell-ink:#7fd2f3;
+  --human:#f0b25e; --human-soft:#3a2a12; --write:#5fd1bd; --write-soft:#123a35; --gate:#ff8f8a; --gate-soft:#3d1c1f; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#0f1525; --surface:#172036; --sunk:#111a2d; --fg:#e6ebf5; --muted:#9ba7c0; --line:#2a3652;
+  --navy:#9db4e8; --navy-soft:#22304f; --sell:#5cc5ef; --sell-soft:#123a4b; --sell-ink:#7fd2f3;
+  --human:#f0b25e; --human-soft:#3a2a12; --write:#5fd1bd; --write-soft:#123a35; --gate:#ff8f8a; --gate-soft:#3d1c1f; color-scheme:dark}
+*{box-sizing:border-box}
+body{background:var(--bg);color:var(--fg);font-family:var(--font-body,var(--f-body));font-size:14.5px;line-height:1.5}
+button{font:inherit;color:inherit;cursor:pointer}
+:focus-visible{outline:2px solid var(--sell);outline-offset:2px}
+.top{background:var(--surface);border-bottom:1px solid var(--line);padding-inline:16px;position:sticky;top:env(safe-area-inset-top,0px);z-index:5}
+.top .in{max-width:1280px;margin:0 auto;padding-block:14px 0}
+.eyebrow{font-family:var(--f-mono);font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
+h1{font-family:var(--f-head);font-size:24px;margin:2px 0 4px;font-weight:700;text-wrap:balance}
+.sub{color:var(--muted);margin:0 0 10px}
+.tabs{display:flex;gap:2px;overflow-x:auto;scrollbar-width:thin}
+.tabs button{border:0;background:none;padding:9px 12px;border-bottom:3px solid transparent;color:var(--muted);white-space:nowrap;font-weight:500}
+.tabs button[aria-selected="true"]{color:var(--fg);border-bottom-color:var(--navy)}
+main{padding-inline:16px;padding-block:20px 48px}
+.wrap{max-width:1280px;margin:0 auto;display:flex;flex-direction:column;gap:20px}
+section[role="tabpanel"]{display:flex;flex-direction:column;gap:20px}
+h2{font-family:var(--f-head);font-size:19px;margin:0;font-weight:700;text-wrap:balance}
+h3{font-family:var(--f-head);font-size:16px;margin:0;font-weight:600}
+p{margin:0}
+.prose{display:flex;flex-direction:column;gap:10px}
+.legend{display:flex;flex-wrap:wrap;gap:6px 14px;font-size:12.5px;color:var(--muted);align-items:center}
+.src{font-family:var(--f-mono);font-size:10.5px;padding:1px 6px;border-radius:4px;white-space:nowrap;vertical-align:1px}
+.s-boris{background:var(--navy-soft);color:var(--navy)}
+.s-bodo{background:var(--write-soft);color:var(--write)}
+.s-vor{background:var(--sunk);color:var(--muted);border:1px dashed var(--line)}
+.s-ann{background:var(--human-soft);color:var(--human)}
+.panel{background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:16px;min-width:0}
+.cols{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:16px}
+ul.plain{margin:0;padding-left:18px;display:flex;flex-direction:column;gap:4px}
+/* Architekturbild */
+.arch{display:grid;grid-template-columns:1fr;gap:10px}
+.layer{border-radius:10px;padding:14px 16px;border:1px solid var(--line);background:var(--surface);display:flex;flex-direction:column;gap:8px}
+.layer.os{border:2px solid var(--navy)}
+.layer h3{display:flex;gap:8px;align-items:baseline;flex-wrap:wrap}
+.layer .what{color:var(--muted);font-size:13px}
+.boxes{display:flex;flex-wrap:wrap;gap:6px}
+.box{background:var(--sunk);border-radius:6px;padding:4px 10px;font-size:13px}
+.flow{display:flex;justify-content:center;gap:20px;color:var(--muted);font-size:12.5px;flex-wrap:wrap;text-align:center}
+.sys{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:10px}
+.layer.bodo{border-top:4px solid var(--navy)}.layer.sellify{border-top:4px solid var(--sell)}
+/* Organigramm */
+.org{display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:14px}
+.dept{background:var(--surface);border:1px solid var(--line);border-radius:10px;display:flex;flex-direction:column;min-width:0}
+.dhead{display:flex;gap:12px;align-items:center;padding:14px 14px 10px;border-bottom:1px solid var(--line)}
+.ava{width:46px;height:46px;border-radius:50%;flex:none;display:flex;align-items:center;justify-content:center;font-family:var(--f-head);font-weight:700;font-size:16px;color:#fff;background:var(--c);box-shadow:0 0 0 3px var(--surface),0 0 0 5px var(--human)}
+.dhead .t{min-width:0}
+.dhead .role{font-size:12px;color:var(--muted)}
+.agents{list-style:none;margin:0;padding:10px 14px;display:flex;flex-direction:column;gap:6px}
+.agents li{display:flex;gap:8px;align-items:center;font-size:13px}
+.bot{width:22px;height:22px;border-radius:5px;background:var(--sunk);border:1px solid var(--line);display:flex;align-items:center;justify-content:center;font-family:var(--f-mono);font-size:10px;color:var(--muted);flex:none}
+.grp{padding:8px 14px 0}.grp .agents{padding:4px 0}
+.pp{width:22px;height:22px;border-radius:50%;background:var(--c);color:#fff;font-size:9px;font-weight:700;display:flex;align-items:center;justify-content:center;flex:none}
+.alert{margin:6px 14px 14px;padding:8px 10px;border-radius:7px;background:var(--human-soft);color:var(--human);font-size:12.5px;display:flex;gap:8px;align-items:flex-start}
+.alert.ok{background:var(--sunk);color:var(--muted)}
+.dot{width:8px;height:8px;border-radius:50%;background:currentColor;margin-top:6px;flex:none}
+/* Prozesskette */
+.chain{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+.chain button{border:1px solid var(--line);background:var(--surface);border-radius:999px;padding:6px 14px;font-weight:500}
+.chain button[aria-pressed="true"]{background:var(--navy);border-color:var(--navy);color:var(--surface)}
+.chain .arr{color:var(--muted)}
+.phead{display:flex;flex-wrap:wrap;gap:8px 18px;align-items:baseline}
+.phead .res{font-size:13px;color:var(--muted)}
+.phases{display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:12px;counter-reset:ph}
+.ph{background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:12px 14px;display:flex;flex-direction:column;gap:9px;min-width:0;counter-increment:ph}
+.ph h3{display:flex;gap:8px;align-items:baseline}
+.ph h3::before{content:counter(ph);font-family:var(--f-mono);font-size:11px;color:var(--muted);border:1px solid var(--line);border-radius:4px;padding:0 5px}
+.who{display:flex;gap:8px;align-items:center;font-size:12.5px;color:var(--muted)}
+.mini{width:24px;height:24px;border-radius:50%;background:var(--c);color:#fff;font-size:10px;font-weight:700;display:flex;align-items:center;justify-content:center;flex:none;box-shadow:0 0 0 2px var(--human-soft)}
+.team{display:flex;flex-wrap:wrap;gap:4px}
+.chip{font-size:12px;background:var(--sunk);border-radius:5px;padding:1px 7px}
+.lbl{font-family:var(--f-mono);font-size:10.5px;letter-spacing:.06em;text-transform:uppercase;color:var(--muted)}
+.ph ul{margin:0;padding-left:16px;font-size:13px;display:flex;flex-direction:column;gap:2px}
+.w{font-size:12.5px;background:var(--write-soft);color:var(--write);border-radius:6px;padding:6px 8px;display:flex;flex-direction:column;gap:2px}
+.w b{font-weight:600}
+.gate{font-size:12px;color:var(--gate);background:var(--gate-soft);border-radius:5px;padding:2px 7px;align-self:flex-start}
+.tl{margin:0;padding-left:16px;font-size:12.5px;display:flex;flex-direction:column;gap:3px}.tl a{color:var(--navy);font-family:var(--f-mono);font-size:11px}
+.st{font-size:11px;padding:0 5px;border-radius:4px}.st-e{background:var(--write-soft);color:var(--write)}.st-b{background:var(--navy-soft);color:var(--navy)}.st-o{background:var(--sunk);color:var(--muted)}
+.gapbox{font-size:12.5px;background:var(--human-soft);color:var(--human);border-radius:6px;padding:6px 8px}
+.handoff{border:2px dashed var(--line);border-radius:10px;padding:10px 14px;font-size:13px;color:var(--muted)}
+/* Kundenakte */
+.akte{display:flex;gap:0;overflow-x:auto;padding-bottom:4px}
+.akte .it{flex:0 0 auto;min-width:150px;padding:10px 12px;border-top:4px solid var(--c);background:var(--surface);border-right:1px solid var(--line);font-size:12.5px;display:flex;flex-direction:column;gap:2px}
+.akte .it:first-child{border-radius:8px 0 0 8px}.akte .it:last-child{border-radius:0 8px 8px 0;border-right:0}
+.akte .it small{color:var(--muted)}
+/* Tabellen */
+.tbl{overflow-x:auto}
+table{border-collapse:collapse;width:100%;font-size:13px}
+th,td{border-bottom:1px solid var(--line);padding:8px 10px;text-align:left;vertical-align:top}
+th{font-family:var(--f-mono);font-size:11px;letter-spacing:.05em;text-transform:uppercase;color:var(--muted);font-weight:500}
+.risk{display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:12px}
+.risk .panel{display:flex;flex-direction:column;gap:6px}
+.risk .panel h3{font-size:15px}
+.fix{font-size:13px;color:var(--write)}
+ol.dec{margin:0;padding-left:22px;display:flex;flex-direction:column;gap:8px}
+.names{display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:12px}
+.name{display:flex;flex-direction:column;gap:4px}
+.name .n{font-family:var(--f-head);font-size:20px;font-weight:700}
+.note{background:var(--human-soft);color:var(--human);border-radius:8px;padding:10px 12px;font-size:13px}
+@media (prefers-reduced-motion:reduce){*{transition:none!important}}
+</style>
+
+<header class="top"><div class="in">
+  <div class="eyebrow">My Company OS · Konzept · Stand 10.10.2026 · nicht umgesetzt</div>
+  <h1>Company OS Gesamtkonzept</h1>
+  <p class="sub">Wie Company OS als vorgelagerte Arbeitsumgebung Organigramm, Prozesse und Agenten zusammenführt und mit Bodo bzw. sellify arbeitet. Als erstes Beispiel durchgespielt an der Bodo-Kette für Mietervereine: Vertrieb → Einführung → Betrieb.</p>
+  <div class="tabs" role="tablist" aria-label="Bereiche">
+    <button role="tab" id="t-bild" aria-controls="bild" aria-selected="true">Produktbild</button>
+    <button role="tab" id="t-org" aria-controls="org" aria-selected="false">Organigramm &amp; Leitung</button>
+    <button role="tab" id="t-kette" aria-controls="kette" aria-selected="false">Beispiel: Kette Mieterverein</button>
+    <button role="tab" id="t-pilot" aria-controls="pilot" aria-selected="false">Pilot: Mieterverein Hagen</button>
+    <button role="tab" id="t-inst" aria-controls="inst" aria-selected="false">Kundeninstanzen</button>
+    <button role="tab" id="t-ki" aria-controls="ki" aria-selected="false">KI, Daten &amp; Bibliothek</button>
+    <button role="tab" id="t-bew" aria-controls="bew" aria-selected="false">Bewertung</button>
+    <button role="tab" id="t-name" aria-controls="name" aria-selected="false">Produktname</button>
+    <button role="tab" id="t-offen" aria-controls="offen" aria-selected="false">Offene Entscheidungen</button>
+  </div>
+</div></header>
+
+<main><div class="wrap">
+  <div class="legend"><span>Herkunft:</span>
+    <span><span class="src s-boris">Boris</span> deine Vorgabe</span>
+    <span><span class="src s-bodo">Bodo</span> aus Bodo oder vorhandenen Skills gelesen</span>
+    <span><span class="src s-vor">Vorschlag</span> Gestaltungsvorschlag von Claude</span>
+    <span><span class="src s-ann">Annahme</span> Einschätzung von Claude, nicht belegt</span>
+  </div>
+
+  <!-- 1 Produktbild -->
+  <section role="tabpanel" id="bild" aria-labelledby="t-bild">
+    <div class="prose">
+      <h2>Company OS denkt und steuert, Bodo und sellify halten die Daten</h2>
+      <p>Der Geschäftsführer organisiert sein Unternehmen in Company OS: Abteilungen, Prozesse, Agenten und Aufträge. Alles, was dabei an Kontakten, Aufgaben, Terminen, Dokumenten und E-Mails entsteht, landet in Bodo oder sellify und bleibt dort zusammen. <span class="src s-boris">Boris</span></p>
+    </div>
+    <div class="panel prose" style="border-left:4px solid var(--navy)"><h3>Leitgedanke <span class="src s-boris">Boris</span></h3>
+      <p>Company OS ist das Zusammenspiel von Menschen und agentischen KI-Prozessen. Unternehmen werden auch künftig nicht von einer Person allein geführt; in den Abteilungen arbeiten noch lange viele Menschen an der Wertschöpfung mit. Company OS unterstützt und entlastet genau diese Menschen, sodass sie nach und nach für andere Aufgaben frei werden oder Kosten sinken.</p></div>
+    <div class="panel prose" style="border-left:4px solid var(--sell)"><h3>Company-Chat <span class="src s-boris">Boris, entschieden: wichtiger Baustein</span></h3>
+      <p>Ein Chatfenster in Company OS, vergleichbar mit dem Claude-Chat: je Unternehmen und optional je Auftrag oder Abteilung.</p>
+      <ul class="plain">
+        <li><b>Kennt die Firma:</b> Organigramm, Prozesse, Skills und Aufträge aus Company OS stehen dem Chat als Wissen zur Verfügung. <span class="src s-vor">Vorschlag</span></li>
+        <li><b>Handelt über die Anschluss-Schicht:</b> liest und schreibt in Bodo bzw. sellify mit den Rechten des Nutzers; es gelten Pflicht-Freigabe, Freigabe im Auftrag und deine Bodo-Regeln. <span class="src s-vor">Vorschlag</span></li>
+        <li><b>Merkt sich Verläufe:</b> Gespräche werden in Company OS gespeichert, je Unternehmen, Auftrag oder Abteilung. <span class="src s-vor">Vorschlag</span></li>
+        <li><b>Aus dem Chat wird Arbeit:</b> Ein Gespräch kann einen Auftrag anlegen oder einen Prozess starten. <span class="src s-vor">Vorschlag</span></li>
+        <li><b>Schwere Arbeit</b> (Dateien bauen, Seiten veröffentlichen, lange Abläufe) bleibt vorerst in Cowork. Später kann der Chat eine Cowork-Sitzung anstoßen (über „Claude Code Remote“, noch nicht getestet). <span class="src s-ann">Annahme</span></li>
+      </ul>
+      <p><b>Technisch möglich</b> laut Fähigkeitenliste des Kontos: Claude aus der Seite fragen (mit Werkzeugen), Connectoren aufrufen, Verläufe in der Seiten-Datenbank speichern. <span class="src s-bodo">Fähigkeitenliste</span> <b>Nicht möglich:</b> Zugriff auf Claude-Projekte und bisherige Chats aus der Claude-App; kein eigener Arbeitsbereich mit Dateien und Shell.</p></div>
+    <div class="arch">
+      <div class="layer"><h3>Kunde · Geschäftsführung</h3><div class="what">sieht sein Unternehmen als Organigramm und Prozesslandkarte, gibt Aufträge, entscheidet an Freigabepunkten</div></div>
+      <div class="flow"><span>↓ Auftrag, Freigabe</span><span>↑ Stand, Rückfrage, Eskalation</span></div>
+      <div class="layer os"><h3>Company OS <span class="src s-boris">Boris</span></h3>
+        <div class="what">vorgelagerte zentrale Arbeitsumgebung, je Kunde eine eigene Instanz</div>
+        <div class="boxes"><span class="box">Organigramm mit menschlicher Abteilungsleitung</span><span class="box">Prozesse mit Phasen</span><span class="box">Agententeams je Phase</span><span class="box">Aufträge: Einzelaufgabe oder Prozess</span><span class="box">Kundenakte je Vorgang</span><span class="box">Freigaben und Eskalation</span><span class="box"><b>Company-Chat</b></span></div>
+      </div>
+      <div class="flow"><span>↓ anlegen, ändern, Prozess anstoßen (über die KI-Schnittstelle, mit Pflicht-Freigabe)</span><span>↑ Daten lesen</span></div>
+      <div class="sys">
+        <div class="layer bodo"><h3>Bodo</h3><div class="what">für Vereine, z. B. Mietervereine</div><div class="boxes"><span class="box">Kontakte</span><span class="box">Projekte</span><span class="box">Aufgaben</span><span class="box">Termine</span><span class="box">Dokumente</span><span class="box">E-Mails</span><span class="box">Kataloge</span></div></div>
+        <div class="layer sellify"><h3>sellify</h3><div class="what">für Unternehmen im Vertrieb</div><div class="boxes"><span class="box">Organisationen</span><span class="box">Personen</span><span class="box">Chancen</span><span class="box">Projekte</span><span class="box">Aufgaben</span><span class="box">Dokumente</span></div></div>
+        <div class="layer" style="border-style:dashed"><h3>Weitere Systeme <span class="src s-boris">Boris</span></h3><div class="what">später möglich: jedes System, das per MCP erreichbar ist und die operative Dokumentation übernimmt</div><div class="boxes"><span class="box">z. B. anderes CRM</span><span class="box">Ticketsystem</span><span class="box">Dokumentablage</span></div></div>
+      </div>
+      <div class="panel prose"><h3>Anschluss-Schicht <span class="src s-boris">Boris, entschieden</span></h3>
+        <p>Company OS spricht die Systeme dahinter nur über eine Anschluss-Schicht an. Jeder Anschluss beschreibt, welche Grundaufgaben das System übernimmt: Kontakt, Aufgabe, Termin, Dokument, E-Mail, Projekt, Katalog. Prozesse und Phasen nennen nur diese Grundaufgaben, nicht Bodo oder sellify direkt. Ein neues System per MCP braucht dann einen neuen Anschluss, aber keine neuen Prozesse.</p>
+        <p>Je Kundeninstanz ist festgelegt, welches System angeschlossen ist. Hat ein System eine Grundaufgabe nicht, zeigt Company OS das beim Einrichten als Lücke.</p></div>
+    </div>
+    <div class="panel prose"><h3>Übersicht über mehrere Unternehmen <span class="src s-boris">Boris</span></h3>
+      <p>Wer mehrere Unternehmen führt, hat je Unternehmen eine eigene Instanz mit eigenem Organigramm, eigenen Prozessen und eigenem angeschlossenen System. Darüber liegt eine Übersichtsschicht, die zeigt, was in den einzelnen Unternehmen los ist, und von der aus man in jedes Unternehmen springt, um Prozesse anzustoßen und zu überwachen.</p>
+      <p class="eyebrow">Beispiel mit Platzhalterzahlen</p>
+      <div class="cols" style="gap:10px">
+        <div class="layer bodo"><h3>Bodo Solutions</h3><div class="what">angeschlossen: Bodo</div><div class="boxes"><span class="box">wartet auf dich: 2</span><span class="box">läuft: 5</span><span class="box">Eskalationen: 1</span></div></div>
+        <div class="layer sellify"><h3>sellify (business//acts)</h3><div class="what">angeschlossen: sellify</div><div class="boxes"><span class="box">wartet auf dich: 0</span><span class="box">läuft: 3</span><span class="box">Eskalationen: 0</span></div></div>
+      </div>
+      <p>Aufgaben für Menschen landen im System des jeweiligen Unternehmens: bei Bodo Solutions in Bodo, bei business//acts in sellify. <span class="src s-boris">Boris</span></p></div>
+    <div class="cols">
+      <div class="panel prose"><h3>Was Company OS selbst speichert <span class="src s-vor">Vorschlag</span></h3>
+        <ul class="plain"><li>Organigramm, Abteilungsleitung, Agenten und ihre Skills</li><li>Prozessvorlagen mit Phasen, Aufgaben und Ergebnissen</li><li>Auftrags- und Prozessstand, Verlauf, Freigaben</li><li>Kundenakte als Verweisliste auf die Datensätze in Bodo/sellify</li></ul></div>
+      <div class="panel prose"><h3>Was nur in Bodo/sellify liegt <span class="src s-vor">Vorschlag</span></h3>
+        <ul class="plain"><li>Kontakte, Chancen, Projekte, Aufgaben, Termine</li><li>Dokumente und E-Mails</li><li>Kataloge wie Aktivitäts-, Aufgaben- und Dokumenttypen</li></ul>
+        <p>Grund: keine doppelte Datenhaltung. Company OS verweist, das System speichert.</p></div>
+      <div class="panel prose"><h3>Schon vorhanden in Bodo <span class="src s-bodo">Bodo</span></h3>
+        <ul class="plain"><li>Projekte haben die Felder Projekttyp, Workflow und Standard-Vorlage. Eine Prozessphase könnte später eine Bodo-Projektvorlage auslösen.</li><li>Bodo-Organisationen haben eine Instanzart „demo“ oder „test“. Das passt zum Demosystem im Vertrieb.</li></ul></div>
+    </div>
+  </section>
+
+  <!-- 2 Organigramm -->
+  <section role="tabpanel" id="org" aria-labelledby="t-org" hidden>
+    <div class="prose">
+      <h2>Abteilungen mit Menschen und Agenten</h2>
+      <p>Jede Abteilung hat eine menschliche Leitung mit eigenem Avatar und eine Vertretung, die übernimmt, wenn die Leitung verhindert ist. Dazu kommen die Mitarbeitenden der Abteilung: In einem echten Unternehmen arbeiten vor allem Menschen, und Company OS unterstützt ihre Arbeit. Agenten stehen daneben, alle mit demselben Agentensymbol. <span class="src s-boris">Boris, entschieden</span></p>
+      <p class="eyebrow">Beispiel: Instanz „Bodo Solutions intern“ · Personen außer Boris sind Platzhalter</p>
+    </div>
+    <div class="org">
+      <div class="dept"><div class="dhead"><div class="ava" style="--c:#1f3a5f">BH</div><div class="t"><h3>Vertrieb</h3><div class="role">Leitung: Boris Hose</div><div class="role">Vertretung: Platzhalter</div></div></div>
+        <div class="grp"><div class="lbl">Mitarbeitende</div><ul class="agents"><li><span class="pp" style="--c:#4b6b8a">MA</span>Vertriebsinnendienst (Platzhalter)</li></ul></div>
+        <div class="grp"><div class="lbl">Agenten</div><ul class="agents"><li><span class="bot">◆</span>Recherche-Agent</li><li><span class="bot">◆</span>Vertriebsassistent Bodo</li><li><span class="bot">◆</span>Produktinformations-Agent</li><li><span class="bot">◆</span>Angebots-Agent</li></ul></div>
+        <div class="alert"><span class="dot"></span><span>2 Freigaben warten: 14 neue Leads nach Bodo übertragen · Angebot an Musterverein</span></div></div>
+      <div class="dept"><div class="dhead"><div class="ava" style="--c:#0d7a6a">BH</div><div class="t"><h3>Einführung</h3><div class="role">Leitung: Boris Hose · abwesend bis Mo.</div><div class="role"><b>Vertretung aktiv:</b> Platzhalter</div></div></div>
+        <div class="grp"><div class="lbl">Mitarbeitende</div><ul class="agents"><li><span class="pp" style="--c:#2e8b6e">PL</span>Projektleitung Einführung (Platzhalter)</li><li><span class="pp" style="--c:#7a6a9c">SC</span>Schulung (Platzhalter)</li></ul></div>
+        <div class="grp"><div class="lbl">Agenten</div><ul class="agents"><li><span class="bot">◆</span>Einführungs-Agent</li><li><span class="bot">◆</span>Einrichtungs-Agent</li><li><span class="bot">◆</span>Vorlagen-Agent</li><li><span class="bot">◆</span>Datenübernahme-Agent</li><li><span class="bot">◆</span>Schulungs-Agent</li></ul></div>
+        <div class="alert"><span class="dot"></span><span>Eskalation an die Vertretung: Datenübernahme Probelauf mit 37 Abweichungen, Agent hält an</span></div></div>
+      <div class="dept"><div class="dhead"><div class="ava" style="--c:#6a4fb3">KS</div><div class="t"><h3>Kundenservice</h3><div class="role">Leitung: Platzhalter</div><div class="role">Vertretung: Platzhalter</div></div></div>
+        <div class="grp"><div class="lbl">Mitarbeitende</div><ul class="agents"><li><span class="pp" style="--c:#8a5a12">SV</span>Support (Platzhalter)</li></ul></div>
+        <div class="grp"><div class="lbl">Agenten</div><ul class="agents"><li><span class="bot">◆</span>Annahme-Agent</li><li><span class="bot">◆</span>Ticket-Agent</li></ul></div>
+        <div class="alert ok"><span class="dot"></span><span>Alles im Plan · 3 Anfragen heute erledigt</span></div></div>
+      <div class="dept"><div class="dhead"><div class="ava" style="--c:#8a5a12">PE</div><div class="t"><h3>Produktentwicklung</h3><div class="role">Leitung: Platzhalter</div><div class="role">Vertretung: Platzhalter</div></div></div>
+        <div class="grp"><div class="lbl">Mitarbeitende</div><ul class="agents"><li><span class="pp" style="--c:#1f3a5f">EW</span>Entwicklung (Platzhalter)</li></ul></div>
+        <div class="grp"><div class="lbl">Agenten</div><ul class="agents"><li><span class="bot">◆</span>Ticket-Agent (unterstützt)</li></ul></div>
+        <div class="alert ok"><span class="dot"></span><span>Nimmt Tickets aus dem Betrieb entgegen</span></div></div>
+    </div>
+    <div class="cols">
+      <div class="panel prose"><h3>Vertretung <span class="src s-boris">Boris, Vorschläge übernommen</span></h3>
+        <ul class="plain"><li>Je Abteilung eine Vertretung neben der Leitung.</li><li>Die Leitung trägt eine Abwesenheit mit Zeitraum ein. In dieser Zeit gehen Freigaben, Rückfragen und Eskalationen an die Vertretung. <span class="src s-vor">Vorschlag</span></li><li>Reagiert die Leitung nicht innerhalb einer Frist, geht eine Eskalation zusätzlich an die Vertretung. Die Frist ist je Abteilung einstellbar. <span class="src s-vor">Vorschlag</span></li><li>Im Verlauf steht, wer entschieden hat: Leitung oder Vertretung.</li></ul></div>
+      <div class="panel prose"><h3>Menschen in der Abteilung <span class="src s-boris">Boris</span></h3>
+        <ul class="plain"><li>Mitarbeitende werden je Abteilung aufgenommen, mit eigenem Avatar wie die Leitung.</li><li>Das Team einer Phase besteht aus Menschen und Agenten. Ein Schritt wird von einem Agenten allein oder von einem Agenten mit verantwortlichem Menschen bearbeitet. <span class="src s-boris">Boris</span></li><li>Aufgaben für Menschen landen als Aufgabe im angeschlossenen System, z. B. als Bodo-Aufgabe beim Benutzer. Dort arbeitet der Mensch wie gewohnt. <span class="src s-vor">Vorschlag</span></li><li>Menschen können wie Agenten in mehreren Abteilungen mitarbeiten und an verschiedenen Stellen unterstützen: Heimat plus „unterstützt auch“. <span class="src s-boris">Boris</span></li></ul></div>
+      <div class="panel prose"><h3>Bearbeitung eines Schritts <span class="src s-boris">Boris</span></h3>
+        <ul class="plain"><li><b>Agent allein</b> oder <b>Agent mit verantwortlichem Menschen</b> – je Prozessschritt wählbar.</li><li><b>Ein Verantwortlicher, mehrere Beteiligte:</b> Je Aufgabenpaket bzw. Schritt gibt es genau <b>einen</b> Verantwortlichen – bei zweien gibt es keine Verantwortung mehr. Dazu beliebig viele Beteiligte. Der Verantwortliche bekommt Eskalationen und nimmt das Ergebnis ab; Beteiligte arbeiten mit und werden informiert. <span class="src s-boris">Boris</span></li><li>Ist ein Mensch zugeordnet, ist er für diesen Schritt verantwortlich und überwacht den Agenten. Eskalationen aus dem Schritt gehen zuerst an ihn, nicht direkt an die Abteilungsleitung.</li><li>Eskalationskette: verantwortlicher Mensch → Abteilungsleitung → Vertretung. Weiter nach oben geht es erst, wenn die Stufe darunter nicht reagiert oder selbst eskaliert. <span class="src s-vor">Vorschlag</span></li></ul></div>
+      <div class="panel prose"><h3>Wann informiert wird <span class="src s-boris">Boris</span></h3>
+        <ul class="plain"><li><b>Freigabe:</b> bei Aktionen mit Außenwirkung standardmäßig nötig, aber flexibel. Der Auftrag kann die Freigabe schon enthalten, z. B. „Infomaterial X mit diesem Text an Kunde Y senden“ – dann läuft es ohne weitere Freigabe.</li><li>Dazu je Skill die Pflicht-Freigabe (immer / bei ausgewählten Aktionen / im Hintergrund) aus dem eigenen Konzept. Was ohne Freigabe läuft, steht immer im Verlauf. <span class="src s-vor">Vorschlag</span></li><li><b>Rückfrage:</b> Agent kommt ohne Entscheidung nicht weiter</li><li><b>Eskalation:</b> Fehler, Frist überschritten, Ergebnis unter der Prüfschwelle</li><li><b>Tagesbild:</b> optional eine Zusammenfassung pro Abteilung, ohne Push</li></ul>
+        <p class="note">Hinweis: Für Tickets und CRM-Anlagen hast du heute festgelegt, dass immer erst ein Entwurf gezeigt wird. Ob eine Freigabe im Auftrag das ersetzen darf, entscheidest du je Fall; ohne deine Entscheidung bleibt die bestehende Regel. <span class="src s-ann">Annahme</span></p></div>
+      <div class="panel prose"><h3>Warum ein Mensch je Abteilung <span class="src s-vor">Vorschlag</span></h3>
+        <p>Aus der Recherche: Eingriffe von Menschen sichern die Qualität bei sachlichen Problemen, und frühes Eingreifen ist entscheidend (Feldversuch Alibaba). Praktiker empfehlen, Zuständigkeiten zwischen Mensch und Agent ausdrücklich aufzuteilen. Leitung, Vertretung und Mitarbeitende machen das sichtbar.</p></div>
+    </div>
+  </section>
+
+  <!-- 3 Prozesskette -->
+  <section role="tabpanel" id="kette" aria-labelledby="t-kette" hidden>
+    <div class="prose">
+      <h2>Bodo-Kette für Mietervereine</h2>
+      <p>Drei Prozesse, die aufeinander aufbauen. Das Ergebnis eines Prozesses startet den nächsten, und die Kundenakte nimmt alles mit. <span class="src s-boris">Boris</span> Phasen, Teams und Ergebnisse sind ein erster Entwurf. <span class="src s-vor">Vorschlag</span></p>
+    </div>
+    <div class="chain" role="group" aria-label="Prozess wählen">
+      <button data-p="vt" aria-pressed="true">1 · Vertrieb</button><span class="arr">→</span>
+      <button data-p="ef" aria-pressed="false">2 · Einführung</button><span class="arr">→</span>
+      <button data-p="bt" aria-pressed="false">3 · Betrieb</button><span class="arr">↺ zurück zum Vertrieb</span>
+    </div>
+    <div id="proc"></div>
+    <div class="panel" style="display:flex;flex-direction:column;gap:10px">
+      <div class="phead"><h3>Kundenakte · Musterverein (Beispiel)</h3><span class="res">= Akte des Vereins in Bodo; jede Phase legt ihr Ergebnis dort ab, Company OS zeigt sie an <span class="src s-boris">Boris, entschieden</span></span></div>
+      <div class="akte" id="akte"></div>
+    </div>
+  </section>
+
+  <section role="tabpanel" id="pilot" aria-labelledby="t-pilot" hidden>
+    <div class="prose">
+      <h2>Pilot: Mieterverein Hagen</h2>
+      <p>Die Aufgabenpakete der Einführung, gefüllt mit dem, was heute tatsächlich in Bodo steht. <span class="src s-bodo">Bodo</span> Stand der Daten: 10.10.2026, gelesen aus der Organisation „Bodo Solutions“. Die Zuordnung der Aufgaben zu den Phasen ist mein Vorschlag. <span class="src s-vor">Vorschlag</span></p>
+    </div>
+        <div class="panel prose" style="border-left:4px solid var(--navy)"><h3>Projekte bestehen aus Aufgabenpaketen <span class="src s-boris">Boris</span></h3>
+      <p>Die Einführung läuft nicht 1 bis N ab. Die Teilthemen sind <b>Aufgabenpakete</b>, die im Ganzen erledigt sein müssen. Ein Paket kann selbst wieder ein Projekt sein.</p>
+      <ul class="plain"><li><b>Ein Verantwortlicher</b> je Paket, dazu <b>Beteiligte</b></li><li><b>Aufgaben</b>, die dem Paket zugeordnet sind</li><li><b>Abrechnung:</b> später auch Rechnungsstellung und Rechnungslegung je Paket</li><li><b>Fertigstellungsdatum</b> je Paket bzw. Schritt</li><li><b>Abhängigkeiten</b> zwischen Paketen sind möglich</li></ul>
+      <p><b>Weitere Merkmale</b> <span class="src s-vor">Vorschlag</span>: Status; Ergebnis bzw. Abnahmekriterium; Bewertung aus der Anforderungsbewertung (kostenpflichtig, Angebotsbezug, Wertigkeit); Aufwand geplant/tatsächlich; Ansprechpartner beim Kunden als externe Beteiligte; Blocker.</p>
+      <p><b>Folge fürs Gesamtkonzept</b> <span class="src s-vor">Vorschlag</span>: Es gibt zwei Arten von Abläufen. <b>Prozesse</b> laufen in fester Reihenfolge (z. B. Ticket annehmen → prüfen → anlegen → Rückmeldung). <b>Projekte</b> bestehen aus Aufgabenpaketen ohne feste Reihenfolge (z. B. Einführung). Eine Projektvorlage im Branchenpaket liefert die üblichen Pakete; im Kundenprojekt werden sie angepasst.</p>
+      <p><b>Anbindung Bodo</b> <span class="src s-ann">Annahme, zu prüfen</span>: Bodo-Aufgaben haben ein Feld für Projekt-Meilensteine, und Bodo kennt Aufträge mit Meilensteinen und Leistungsnachweisen. Aufgabenpakete könnten darauf abgebildet werden, die Abrechnung über Aufträge.</p></div>
+<div class="cols">
+      <div class="panel prose"><h3>Auf einen Blick <span class="src s-bodo">Bodo</span></h3>
+        <ul class="plain"><li>15 Aufgaben im Projekt „MIV Hagen Migration“: 6 erledigt, 3 in Bearbeitung, 6 offen (Stand nach Erledigung von AG-101 am 10.10.). Beteiligt: Boris Hose, Dominik Koppe.</li><li>3 Aufgaben sind überfällig (AG-114, AG-87, AG-183).</li><li>Das Einführungsprojekt selbst hat noch keine Aufgaben.</li><li>Ansprechpartner beim Verein: Kirsten Horn (Verwaltungsleitung), Mirjam Michaelis (stellv. Verwaltungsleitung), Vorstand Klaus-P. Dietrich, Thomas Wessner, Stefan Wintersohle.</li></ul></div>
+      <div class="panel prose"><h3>Was der Pilot zeigt <span class="src s-ann">Annahme</span></h3>
+        <ul class="plain"><li>Datenübernahme ist am weitesten. Setup, Change Requests und Schulung laufen parallel dazu, nicht nacheinander. Die Teilthemen sind deshalb Aufgabenpakete, keine Phasen in fester Reihenfolge (von Boris bestätigt).</li><li>Dokumentvorlagen und Go-live sind noch nicht geplant.</li><li>Für Agenten fehlt der KI-Zugang zum Bodo des Vereins.</li></ul></div>
+    </div>
+          <div class="panel prose"><h3>Anforderungsbewertung in Kundenprojekten <span class="src s-boris">Boris</span></h3>
+        <p>Für jede Anforderung, die in einem Kundenprojekt aufgenommen wird, gilt:</p>
+        <ul class="plain"><li><b>Kostenpflichtig ja/nein?</b> Das ist die eigentliche Frage, nicht „Change Request oder Setup“.</li><li><b>Wenn kostenpflichtig:</b> direkt eine Einschätzung für einen denkbaren Angebotsbezug (Aufwand, Preisrahmen). Die Umsetzbarkeit wird danach validiert.</li><li><b>Wertigkeit:</b> zu jeder Anforderung eine Einschätzung, wie wertvoll sie ist. <span class="src s-ann">Annahme: gemeint ist der Nutzen für den Kunden und für den Bodo-Standard</span></li><li>Die Abfrage muss automatisch beim Aufnehmen passieren, nicht als umständlicher Extraschritt. Heute fehlt sie bei der Anlage in Bodo-Projekten.</li></ul>
+        <p><b>Umsetzung</b> <span class="src s-vor">Vorschlag</span>: Der Agent stellt die Fragen beim Aufnehmen, schlägt Einschätzungen vor (als Annahme gekennzeichnet), der Verantwortliche bestätigt. In Bodo könnten die Werte als Felder am vorhandenen Aufgabentyp „Feature Request“ liegen – das wäre eine Katalogänderung und braucht deine Freigabe.</p></div>
+<div class="phases"><article class="ph"><h3>Einführungsprojekt anlegen</h3><p style="font-size:13px">Projekt „Bodo - Einführung bei MIV Hagen“ existiert, aber ohne Aufgaben. Die laufende Arbeit steckt im Projekt „MIV Hagen Migration“ (15 Aufgaben).</p><div class="gapbox">Der Verein ist in Bodo als „Mietervereine Hagen“ (K-0037) angelegt, aber ohne Kontaktrolle (Kunde/Mieterverein).</div></article><article class="ph"><h3>Setup definieren</h3><div><div class="lbl">Aufgaben in Bodo</div><ul class="tl"><li><a href="https://bodo-app.com/o/k57bshnkdpahzs3fv4hvq6wz1s8aq2pm/aufgaben/v17dc3692tjz6sq9vbf2jb64398dvskq" target="_blank" rel="noopener">AG-85</a> Suchvorlagen & Listenexport (pdf/xlsx) · <span class="st st-o">Offen</span></li><li><a href="https://bodo-app.com/o/k57bshnkdpahzs3fv4hvq6wz1s8aq2pm/aufgaben/v179gzs5xkhew5z8xg90n9h5118dt9dj" target="_blank" rel="noopener">AG-86</a> Auswertungen · <span class="st st-o">Offen</span></li><li><a href="https://bodo-app.com/o/k57bshnkdpahzs3fv4hvq6wz1s8aq2pm/aufgaben/v174q7b50z7h4ew1vy951j1e358dt55h" target="_blank" rel="noopener">AG-84</a> Artikel zu Gewerbetarif bündeln · <span class="st st-o">Offen</span></li><li><a href="https://bodo-app.com/o/k57bshnkdpahzs3fv4hvq6wz1s8aq2pm/aufgaben/v178x48779ebjtma439j8xkzmh8dtv52" target="_blank" rel="noopener">AG-83</a> 2 Jahre Kündigungsfrist an Verträgen festhalten · <span class="st st-o">Offen</span></li><li><a href="https://bodo-app.com/o/k57bshnkdpahzs3fv4hvq6wz1s8aq2pm/aufgaben/v171x32ex93v601cy043bg4jrh8f5cr5" target="_blank" rel="noopener">AG-183</a> Nummernkreis-Übergabe Kontakt vs. Vertrag · <span class="st st-b">In Bearbeitung</span> · fällig 01.10.2026 (überfällig)</li></ul></div></article><article class="ph"><h3>Anforderungen & Change Requests</h3><div><div class="lbl">Aufgaben in Bodo</div><ul class="tl"><li><a href="https://bodo-app.com/o/k57bshnkdpahzs3fv4hvq6wz1s8aq2pm/aufgaben/v17142s34zjy8zfv767y7txvyh8e4h99" target="_blank" rel="noopener">AG-114</a> Prozessübergabe an Inkasso durchdenken und definieren · <span class="st st-b">In Bearbeitung</span> · fällig 17.09.2026 (überfällig)</li><li><a href="https://bodo-app.com/o/k57bshnkdpahzs3fv4hvq6wz1s8aq2pm/aufgaben/v178dd7062hngs4t5x5224yyvn8dvzq7" target="_blank" rel="noopener">AG-88</a> Meldungen an den Landesverband · <span class="st st-o">Offen</span></li></ul></div><div class="gapbox">AG-114 ist laut Boris ein klassischer Change Request, noch offen. Für AG-114 und AG-88 fehlt die Anforderungsbewertung (kostenpflichtig? Angebotsbezug? Wertigkeit?). In Bodo haben beide keine Beschreibung; AG-114 hat den Aufgabentyp „Feature Request“, AG-88 keinen.</div></article><article class="ph"><h3>Dokumentvorlagen</h3><div class="gapbox">Keine Aufgabe vorhanden.</div></article><article class="ph"><h3>Datenübernahme</h3><div><div class="lbl">Aufgaben in Bodo</div><ul class="tl"><li><a href="https://bodo-app.com/o/k57bshnkdpahzs3fv4hvq6wz1s8aq2pm/aufgaben/v17dzd7w2rggdesxn66rgq2jtx8bacj2" target="_blank" rel="noopener">AG-1</a> Aktuelle Daten aus MIV-Hagen-Datenbank holen · <span class="st st-e">Erledigt</span></li><li><a href="https://bodo-app.com/o/k57bshnkdpahzs3fv4hvq6wz1s8aq2pm/aufgaben/v174y97xq72pdxdc362ektx3vh8ba467" target="_blank" rel="noopener">AG-2</a> Datenbank in Bodo importieren, als Dev bereitstellen · <span class="st st-e">Erledigt</span></li><li><a href="https://bodo-app.com/o/k57bshnkdpahzs3fv4hvq6wz1s8aq2pm/aufgaben/v17b95pxpdah39anm9qy3sv4358dvrzn" target="_blank" rel="noopener">AG-90</a> Migration von „Hinweisen“ am Kontakt · <span class="st st-e">Erledigt</span></li><li><a href="https://bodo-app.com/o/k57bshnkdpahzs3fv4hvq6wz1s8aq2pm/aufgaben/v17bj8k7h28trdzcwn6yf87wah8dv1je" target="_blank" rel="noopener">AG-81</a> Sachbearbeiter-Klärung: welche User sind aktiv · <span class="st st-e">Erledigt</span></li><li><a href="https://bodo-app.com/o/k57bshnkdpahzs3fv4hvq6wz1s8aq2pm/aufgaben/v175czw98stjcjyt5xndca5md58dttx3" target="_blank" rel="noopener">AG-87</a> Bitfarm Dokumenten-Migration · <span class="st st-b">In Bearbeitung</span> · fällig 18.09.2026 (überfällig)</li><li><a href="https://bodo-app.com/o/k57bshnkdpahzs3fv4hvq6wz1s8aq2pm/aufgaben/v17dbfm3k52qhqq1v80effp6c98dt9b3" target="_blank" rel="noopener">AG-82</a> Lastschrift Oktober simulieren · <span class="st st-o">Offen</span></li></ul></div></article><article class="ph"><h3>Übergabe an Bodo</h3><div class="gapbox">Es gibt zwei Bodo-Organisationen „Mieterverein Hagen e.V.“. Bei beiden ist der KI-Zugang deaktiviert, weil die Angabe zur Rechtsberatung fehlt. Agenten können dort erst arbeiten, wenn das geklärt ist. <b>Vorgehen (Boris):</b> Eingerichtet wird zuerst im Dev-System (Einrichtungssystem). Nach Fertigstellung wird an das Produktivsystem übergeben; welche Organisation das ist, legt Boris später fest. Bis dahin wird nur im Dev-System gearbeitet.</div></article><article class="ph"><h3>Benutzerschulung</h3><div class="gapbox">Keine Aufgabe vorhanden.</div></article><article class="ph"><h3>Go-live</h3><div class="gapbox">Keine Aufgabe vorhanden.</div></article><article class="ph"><h3>Projektsteuerung &amp; Abstimmung</h3><div><div class="lbl">Aufgaben in Bodo</div><ul class="tl"><li><a href="https://bodo-app.com/o/k57bshnkdpahzs3fv4hvq6wz1s8aq2pm/aufgaben/v1732ppjyxhgtpbh266dym6f7n8e1f7t" target="_blank" rel="noopener">AG-100</a> Terminaufzeichnungen 8.9.26 mit Dominik teilen · <span class="st st-e">Erledigt</span></li><li><a href="https://bodo-app.com/o/k57bshnkdpahzs3fv4hvq6wz1s8aq2pm/aufgaben/v17ehsaezwnsncj11v5mc659ph8e1f5r" target="_blank" rel="noopener">AG-101</a> Teams-Abstimmungstermin 15.09. · <span class="st st-e">Erledigt</span> (am 10.10. auf Anweisung von Boris gesetzt)</li></ul></div><div class="gapbox">Abstimmungstermine sind keine Einführungsphase, sondern begleiten alle Phasen. Vorschlag: eigener Bereich „Projektsteuerung“.</div></article></div>
+  </section>
+
+  <!-- 4 Kundeninstanzen -->
+  <section role="tabpanel" id="inst" aria-labelledby="t-inst" hidden>
+    <div class="prose">
+      <h2>Ein Produkt, je Kunde eine eigene Instanz</h2>
+      <p>Company OS wird nicht nur intern genutzt, sondern als eigenes Produkt je Kunde individualisiert angeboten, vorkonfiguriert und verbunden mit Bodo oder sellify. <span class="src s-boris">Boris</span></p>
+      <p>Wichtig ist, zwei Ebenen auseinanderzuhalten. Die Kette im Reiter „Prozesskette“ beschreibt, wie <b>ihr</b> Mietervereine gewinnt und einführt. Ein Mieterverein, der Company OS kauft, bekommt dagegen <b>seine eigenen</b> Prozesse: Mitglieder aufnehmen, Rechtsberatung, Beitragslauf. <span class="src s-ann">Annahme</span></p>
+    </div>
+    <div class="tbl panel"><table>
+      <thead><tr><th>Ebene</th><th>Wer nutzt es</th><th>Organigramm</th><th>Prozesse</th><th>Verbunden mit</th></tr></thead>
+      <tbody>
+        <tr><td><b>Vorlage „Branchenpaket Mieterverein“</b> <span class="src s-boris">Boris, entschieden</span></td><td>ihr, zum Ausrollen</td><td>Vorstand, Geschäftsstelle, Mitgliederverwaltung, Rechtsberatung, Buchhaltung</td><td>Mitglied aufnehmen, Beratungstermin, Beitragslauf, Kündigung, Mieteranfrage</td><td>–</td></tr>
+        <tr><td><b>Instanz Bodo Solutions intern</b></td><td>du und das Team</td><td>Vertrieb, Einführung, Kundenservice, Produktentwicklung</td><td>Kette Vertrieb → Einführung → Betrieb</td><td>Bodo-Organisation „Bodo Solutions“</td></tr>
+        <tr><td><b>Instanz je Kunde</b>, z. B. Musterverein</td><td>Vorstand und Geschäftsstelle des Vereins</td><td>aus dem Paket, angepasst</td><td>aus dem Paket, angepasst</td><td>Bodo-Organisation des Vereins</td></tr>
+      </tbody></table></div>
+    <div class="panel prose" style="border-left:4px solid var(--write)"><h3>Setup einer Kundeninstanz <span class="src s-boris">Boris</span></h3>
+      <p>Beim Einrichten von Company OS für einen Kunden läuft ein geführtes Setup. Es fragt alles ab, was Company OS später als Verbindung und Grundlage braucht.</p>
+      <div class="tbl"><table>
+        <thead><tr><th>Schritt</th><th>Was abgefragt wird</th><th>Herkunft</th></tr></thead>
+        <tbody>
+          <tr><td><b>1 Inhaber-System</b></td><td>Der Kunde in eurem CRM: Eintrag in Bodo (Bodo Solutions) bzw. sellify (business//acts). Darauf bezieht sich die Instanz.</td><td><span class="src s-boris">Boris</span></td></tr>
+          <tr><td><b>2 Projekte</b></td><td>Ein Hauptprojekt und beliebig viele weitere Projekte aus dem Inhaber-System zuordnen.</td><td><span class="src s-boris">Boris</span></td></tr>
+          <tr><td><b>3 Kundensystem</b></td><td>Das System des Kunden, mit dem Company OS arbeitet: Bodo-Organisation, sellify-Mandant oder anderes MCP-System. Dev- und Produktivsystem getrennt angeben. Prüfen, ob der KI-Zugang aktiv ist.</td><td><span class="src s-boris">Boris</span> / <span class="src s-vor">Vorschlag</span></td></tr>
+          <tr><td><b>4 KI-Anbieter &amp; Haupt-KI</b></td><td>Pflicht, sonst kann nicht gearbeitet werden: Haupt-KI aus den von uns freigegebenen Anbietern wählen (heute Claude), weitere Anbieter registrieren, KI-Profile zuordnen, Budget je Anbieter. Anbieter nur mit bestätigter AVV; Datenstufe je Anbieter.</td><td><span class="src s-boris">Boris</span></td></tr>
+          <tr><td><b>5 Abteilungen</b></td><td>Welche Abteilungen gibt es, welche sollen verwaltet werden? Je Abteilung Leitung (genau eine Person) und Vertretung.</td><td><span class="src s-boris">Boris</span></td></tr>
+          <tr><td><b>6 Branchenpaket</b></td><td>Paket wählen (z. B. Mieterverein); daraus Abteilungen, Prozesse, Projektvorlagen und Agenten vorschlagen.</td><td><span class="src s-vor">Vorschlag</span></td></tr>
+          <tr><td><b>7 Menschen</b></td><td>Mitarbeitende je Abteilung, jeweils verknüpft mit ihrem Benutzer im Kundensystem, damit Aufgaben dort richtig landen.</td><td><span class="src s-vor">Vorschlag</span></td></tr>
+          <tr><td><b>8 Prozesse &amp; Projekte</b></td><td>Welche Prozesse und Projektvorlagen aus dem Paket übernommen, angepasst oder weggelassen werden. Je Schritt Arbeitsanweisung, KI-Profil und Datenstufe.</td><td><span class="src s-vor">Vorschlag</span> / <span class="src s-boris">Boris</span></td></tr>
+          <tr><td><b>9 Bibliothek &amp; Vorlagenquellen</b></td><td>Wo Materialien und Vorlagen liegen: im Kundensystem (über den Anschluss) oder in einem Cloud-Ordner (OneDrive/SharePoint, Google Drive).</td><td><span class="src s-boris">Boris</span> / <span class="src s-vor">Vorschlag</span></td></tr>
+          <tr><td><b>10 Agenten &amp; Skills</b></td><td>Welche Agenten aktiv sind und welche Skills sie nutzen dürfen.</td><td><span class="src s-vor">Vorschlag</span></td></tr>
+          <tr><td><b>11 Freigaben &amp; Benachrichtigung</b></td><td>Standard für Pflicht-Freigabe, Eskalationsfristen, Ruhezeiten, Kanäle je Person (Push, App, E-Mail).</td><td><span class="src s-vor">Vorschlag</span></td></tr>
+          <tr><td><b>12 Zugriff</b></td><td>Wer in Company OS was sehen und ändern darf (Geschäftsführung, Leitungen, Mitarbeitende).</td><td><span class="src s-vor">Vorschlag</span></td></tr>
+          <tr><td><b>13 Recht &amp; Datenschutz</b></td><td>AVV zwischen Kunde und uns, Angabe zur Rechtsberatung (in Bodo Voraussetzung für den KI-Zugang), was Agenten nie dürfen. Die Datenstufen sind danach nicht übersteuerbar – Lockern nur durch erneutes Durchlaufen dieses Schritts.</td><td><span class="src s-boris">Boris</span> / <span class="src s-vor">Vorschlag</span></td></tr>
+          <tr><td><b>14 Company-Chat &amp; Übersicht</b></td><td>Chat aktivieren, Kennzahlen für die Übersicht festlegen.</td><td><span class="src s-vor">Vorschlag</span></td></tr>
+          <tr><td><b>15 Abschluss</b></td><td>Verbindungstest (Kundensystem und KI-Anbieter), Probelauf eines Prozesses, Setup-Protokoll in der Kundenakte.</td><td><span class="src s-vor">Vorschlag</span></td></tr>
+        </tbody></table></div>
+      <h3 style="margin-top:6px">Weitere Punkte, an die man leicht nicht denkt <span class="src s-vor">Vorschlag</span></h3>
+      <div class="cols">
+        <div><b>Vertrag &amp; Kosten</b><ul class="plain"><li>Paket, Laufzeit, Anzahl Nutzer und Agenten</li><li><b>KI-Kosten trägt der Kunde</b> <span class="src s-boris">Boris</span>. Offen ist, woher die KI kommt: eigenes neues Abo, ein bestehendes Abo des Kunden oder über euch (Bodo Solutions, business//acts, sellify). Company OS soll bestehende KI-Abos von Anbietern einbinden können. <span class="src s-boris">Boris</span> Risiken dazu legt Claude vor, wenn der Schritt ansteht. Vermutlich lassen sich private Chat-Abos meist nicht als Schnittstelle nutzen. <span class="src s-ann">Annahme, zu prüfen</span></li><li>Abrechnung der KI-Kosten ggf. automatisiert aus AI Head Office heraus <span class="src s-boris">Boris, im Hinterkopf</span></li><li>Budget oder Obergrenze je Instanz</li><li>Verknüpfung mit dem Auftrag im Inhaber-System für die Abrechnung</li></ul></div>
+        <div><b>Grunddaten der Instanz</b><ul class="plain"><li>Name, Logo und Farben des Kunden im Portal</li><li>Zeitzone, Arbeitszeiten, Feiertage – wichtig für Fristen, Eskalationen und Ruhezeiten</li><li>Mehrere Unternehmen beim Kunden? Dann Zuordnung zur übergeordneten Übersicht</li></ul></div>
+        <div><b>Kommunikation nach außen</b><ul class="plain"><li>Absenderadressen und Signaturen je Abteilung oder Person, wenn Agenten E-Mails versenden</li><li>Wo Dokumente abgelegt werden (im Kundensystem oder zusätzlich in einer Dateiablage)</li></ul></div>
+        <div><b>Bestand übernehmen</b><ul class="plain"><li>Laufende Projekte und Aufgaben aus dem Kundensystem einlesen und Aufgabenpaketen zuordnen – wie beim Pilot Mieterverein Hagen</li></ul></div>
+        <div><b>Betrieb &amp; Pflege</b><ul class="plain"><li>Ansprechpartner bei euch (Betreuer, Support)</li><li>Wie neue Versionen des Branchenpakets in die Instanz kommen, ohne Anpassungen zu überschreiben</li><li>Notfallweg, wenn ein Agent oder der Anschluss ausfällt</li><li>Schulung der Nutzer in Company OS selbst</li></ul></div>
+        <div><b>Ende &amp; Nachweise</b><ul class="plain"><li>Aufbewahrung von Verlauf und Freigaben (Nachweis, wer was entschieden hat)</li><li>Datenexport und Abschalten bei Kündigung</li></ul></div>
+      </div>
+      <p><b>Setup als Projekt</b> <span class="src s-boris">Boris</span>: Das Setup ist selbst ein Projekt mit Aufgabenpaketen („Company OS einführen“). Es wird zunächst in der <b>business//acts-Instanz</b> geführt, weil es Bodo Solutions und sellify gleichermaßen betrifft.</p><p><b>Projekte über Instanzen verknüpfen</b> <span class="src s-boris">Boris, noch zu durchdenken</span>: Projekte, die in einzelnen Instanzen entstehen, sollen mit der übergeordneten Instanz verknüpfbar sein – z. B. das Einführungsprojekt beim Kunden mit dem Projekt in der business//acts-Instanz.</p></div>
+    <div class="cols">
+      <div class="panel prose"><h3>Einführung verbindet beide Ebenen <span class="src s-vor">Vorschlag</span></h3>
+        <p>Die Einführungsphase „Setup definieren“ legt Aktivitäts-, Aufgaben- und Dokumenttypen für das Bodo des Vereins fest und erzeugt zugleich die Company-OS-Instanz des Vereins aus dem Branchenpaket. <span class="src s-boris">Boris, entschieden</span> Damit verkauft ihr Bodo und Company OS in einem Zug.</p></div>
+      <div class="panel prose"><h3>Technische Frage dahinter <span class="src s-ann">Annahme</span></h3>
+        <p>Die heutige Anwendung ist eine private Seite in deinem Claude-Konto. Für Kunden braucht es eine eigene Anwendung mit Anmeldung, Mandantentrennung und Anbindung je Kunde. Drei Wege:</p>
+        <ul class="plain"><li><b>Vorführung:</b> je Kunde eine Kopie der Seite. Schnell, aber nur für Demos tragfähig.</li><li><b>Eigenes Produkt:</b> Webanwendung mit Claude über die Schnittstelle. Tragfähig, aber Entwicklungsaufwand.</li><li><b>Teil von Bodo:</b> später als Modul. Für sellify-Kunden dann getrennt zu lösen.</li></ul></div>
+    </div>
+  </section>
+
+  <!-- KI, Daten & Bibliothek -->
+  <section role="tabpanel" id="ki" aria-labelledby="t-ki" hidden>
+    <div class="prose">
+      <h2>KI-Anbieter, Datenschutz und Bibliothek</h2>
+      <p>AI Head Office ist an keinen KI-Anbieter gebunden. KIs haben unterschiedliche Stärken und Kosten je Aufgabe; der Kunde soll nicht auf ein Produkt festgelegt sein. <span class="src s-boris">Boris</span></p>
+    </div>
+    <div class="cols">
+      <div class="panel prose"><h3>Haupt-KI <span class="src s-boris">Boris, entschieden</span></h3>
+        <p>Steuert AI Head Office selbst: Company-Chat, Einordnung neuer Aufträge, Anforderungsbewertung, Zuweisung, Eskalation.</p>
+        <ul class="plain"><li><b>Nicht frei wählbar:</b> Wir geben Haupt-KI-Anbieter einzeln frei, wenn geprüft ist, dass sie alles Nötige können (v. a. Anschluss an Bodo/sellify über MCP). Heute: Claude. Weitere, z. B. ChatGPT, erst nach Prüfung.</li>
+        <li><b>Kein automatischer Ersatz:</b> Fällt der Anbieter aus, pausieren Aufträge, Benachrichtigung.</li></ul></div>
+      <div class="panel prose"><h3>Weitere Anbieter &amp; KI-Profile <span class="src s-boris">Boris, entschieden</span></h3>
+        <p>Für Aufgaben in Prozessen beliebig viele Anbieter. Schritte nennen ein <b>Profil</b>, das Profil zeigt auf Anbieter und Modell.</p>
+        <ul class="plain"><li>„Betriebskostenabrechnung prüfen“ → Profil <i>Gründlich prüfen</i></li><li>„Termin dokumentieren“ → Profil <i>Schnell &amp; günstig</i></li><li>„Porträt erstellen“ → Profil <i>Bilder</i></li></ul>
+        <p>Die genaueste Angabe gewinnt: <b>Auftrag vor Prozessschritt vor Skill vor Haupt-KI.</b></p></div>
+      <div class="panel prose"><h3>Registrierung, AVV, Budget <span class="src s-boris">Boris, entschieden</span></h3>
+        <ul class="plain"><li>Anbieter nur hinterlegbar mit Bestätigung, dass eine <b>AVV mit dem Anbieter</b> besteht (Bestätigung, keine Prüfung).</li><li>Zusätzlich AVV zwischen Kunde und uns (Setup).</li><li><b>Budget erreicht:</b> Ausführung hält an, Benachrichtigung, Budget manuell erhöhen. Kein Ausweichen auf einen anderen Anbieter.</li><li>Jeder Auftrag merkt sich Anbieter, Modell und Kosten.</li></ul></div>
+    </div>
+    <div class="panel prose" style="border-left:4px solid var(--write)"><h3>Datenstufen und Datenschleuse <span class="src s-boris">Boris, entschieden</span></h3>
+      <p>AI Head Office ist eine Prozess-Engine für die Unternehmensorganisation, keine Verarbeitung personenbezogener Daten. Viele Systeme werden wegen Datenschutzbedenken gar nicht angebunden – hier passt der Ansatz besonders gut. <span class="src s-boris">Boris</span></p>
+      <div class="tbl"><table><thead><tr><th>Stufe</th><th>Was zum Anbieter geht</th></tr></thead><tbody>
+        <tr><td><b>0 ohne Personendaten</b></td><td>Nur Organisation und Prozess, z. B. „Paket Migration ist überfällig“.</td></tr>
+        <tr><td><b>1 pseudonymisiert</b></td><td>Die Datenschleuse ersetzt Personen durch „das Mitglied“, „der Mandant“ und entfernt Name, Anschrift, Kontaktdaten, Geburtsdatum, Mitglieds-/Kundennummer, Bankdaten. Rückübersetzung nur in AI Head Office bzw. im Kundensystem.</td></tr>
+        <tr><td><b>2 personenbezogen erlaubt</b></td><td>Nur mit bestätigter AVV und passendem Datenstandort. Die Haupt-KI braucht vermutlich Stufe 2 (Company-Chat). <span class="src s-ann">Annahme</span></td></tr>
+      </tbody></table></div>
+      <ul class="plain"><li>Ein Schritt läuft nur über einen Anbieter mit passender Stufe; sonst wird pseudonymisiert oder angehalten. Besondere Kategorien (z. B. Gesundheit) nie an Stufe 0/1.</li>
+      <li>Dokumente mit Personendaten: KI schreibt mit Platzhaltern, das Kundensystem setzt die Daten ein.</li>
+      <li><b>Nicht übersteuerbar</b> <span class="src s-boris">Boris</span>: keine Stelle in der Software, mit der eine im Setup festgelegte Einstufung übergangen werden kann – auch nicht durch uns als Hersteller. Kein „trotzdem senden“, keine Admin-Hintertür; ein Auftrag kann nur verschärfen. Lockern nur durch erneutes Durchlaufen des Setup-Schritts beim Kunden, mit Begründung und Protokoll. Die Schleuse prüft technisch vor jeder Übertragung. <span class="src s-vor">Umsetzung: Vorschlag</span></li></ul>
+      <p><b>Rechtslage</b> (Quellen, keine Rechtsberatung): Pseudonymisierte Daten bleiben für den Verantwortlichen personenbezogen (Art. 4 Nr. 5 DSGVO). EuGH 04.09.2025, C-413/23 P: Für einen Empfänger, der nicht re-identifizieren kann, können sie im Einzelfall nicht personenbezogen sein. EDPB-Leitlinien 01/2025. <b>Grenze:</b> Namen in Freitext und Dokumenten werden technisch nie zu 100 % erkannt – mit dem Datenschutzbeauftragten prüfen. <span class="src s-ann">Einschätzung</span></p></div>
+    <div class="cols">
+      <div class="panel prose"><h3>Arbeitsanweisung je Schritt <span class="src s-boris">Boris, entschieden</span></h3>
+        <p>Ein Schritt besteht aus Name, <b>Arbeitsanweisung</b> (was, wie, Prüfkriterien, Ergebnisform), KI-Profil, Datenstufe, optional Skill, Agent und Verantwortlichem mit Freigabe.</p>
+        <ul class="plain"><li><b>Anweisungs-Assistent:</b> „Anweisung per KI erstellen“ – die Haupt-KI schreibt aus der Kurzbeschreibung einen Entwurf, stellt Rückfragen, man verfeinert im Dialog. Fassungen bleiben erhalten.</li><li><b>Testlauf</b> mit Beispieldaten im Dev-System.</li><li>Skill = wiederverwendbare Methode, Arbeitsanweisung = Konkretisierung für diesen Schritt; Bewährtes kann Skill werden.</li></ul></div>
+      <div class="panel prose"><h3>Bibliothek <span class="src s-boris">Boris</span> <span class="src s-vor">Aufbau: Vorschlag</span></h3>
+        <p>Informationen und Material, auf das Aufgaben zugreifen – z. B. Produktübersicht, Unternehmenspräsentation, AVV-Entwurf – und Vorlagen für Angebote, Briefe, Verträge.</p>
+        <ul class="plain"><li><b>Material</b> wird unverändert versendet, <b>Vorlage</b> wird befüllt (Layout als Skill).</li><li><b>Quelle:</b> Kundensystem über den Anschluss (System verwaltet, MCP liefert) oder Cloud-Ordner (OneDrive/SharePoint, Google Drive). Lokal nicht.</li><li>Je Eintrag: Art, Quelle, Unternehmen, Version, Freigabestatus, „wann verwenden“.</li><li>Zu prüfen: welche Vorlagen Bodo und sellify heute per MCP liefern.</li></ul></div>
+    </div>
+  </section>
+
+  <!-- 5 Bewertung -->
+  <section role="tabpanel" id="bew" aria-labelledby="t-bew" hidden>
+    <div class="prose">
+      <h2>Einschätzung</h2>
+      <p>Die Idee ist stimmig, und das Muster ist am Markt erprobt: Camunda, UiPath Maestro und ServiceNow verbinden Prozesse, Agenten und menschliche Freigaben. Die angebotenen Lösungen sind aber auf Konzerne ausgerichtet. Eine vorkonfigurierte Fassung für Vereine und kleine Firmen, verbunden mit dem eigenen CRM, sehe ich als echte Lücke. <span class="src s-ann">Annahme</span></p>
+    </div>
+    <div class="risk">
+      <div class="panel"><h3>Zu viel auf einmal</h3><p>Organigramm, Prozesse, Kundenakte, Instanzen und Anbindung sind fünf Baustellen.</p><p class="fix">Erst die Einführungsphase eines echten Vereins durchspielen, dann ausbauen.</p></div>
+      <div class="panel"><h3>Zwei Ebenen vermischen</h3><p>Eure Verkaufskette und die Prozesse des Kunden sehen ähnlich aus, gehören aber in verschiedene Instanzen.</p><p class="fix">Instanz in der Kopfzeile immer sichtbar machen.</p></div>
+      <div class="panel"><h3>Schreiben nach Bodo</h3><p>Jede Übertragung nach Bodo ist Außenwirkung. Fehler landen beim Kunden.</p><p class="fix">Pflicht-Freigabe, Dublettenprüfung, Vorschau vor jedem Schreiben, wie in den vorhandenen Skills.</p></div>
+      <div class="panel"><h3>Doppelte Daten</h3><p>Wenn Company OS Kontakte oder Aufgaben selbst speichert, laufen zwei Stände auseinander.</p><p class="fix">Company OS speichert nur Verweise und Prozessstand.</p></div>
+      <div class="panel"><h3>Erwartung beim Kunden</h3><p>„KI erledigt das“ weckt hohe Erwartungen. Ohne Ausführung (Stufe 2) bleibt es Planung.</p><p class="fix">Vorführung ehrlich trennen: was heute läuft, was folgt.</p></div>
+      <div class="panel"><h3>Aufwand je Kunde</h3><p>Individualisierung kostet Zeit pro Instanz.</p><p class="fix">Branchenpaket mit 80 % Vorgabe, Anpassung nur an wenigen Stellen. <span class="src s-ann">Annahme</span></p></div>
+    </div>
+    <div class="panel prose"><h3>Anregungen</h3>
+      <ul class="plain">
+        <li><b>Rückweg Betrieb → Vertrieb:</b> Erweiterungen und Zusatzmodule als Auslöser, damit die Kette ein Kreislauf wird.</li>
+        <li><b>Phasen-Ergebnis als Abnahme:</b> Jede Phase endet mit einem Ergebnis, das die Abteilungsleitung abnimmt. Das ersetzt viele Einzelfreigaben.</li>
+        <li><b>Demosystem als Startpunkt:</b> Das Demosystem aus dem Vertrieb wird zur Ausgangsbasis für die Einrichtung. Der Skill zur Ersteinrichtung kann laut Beschreibung aus einem anderen Bodo-System übernehmen. <span class="src s-bodo">Bodo</span></li>
+        <li><b>Vorführung als Produkt:</b> Interessenten sehen in einer Musterinstanz, wie ihr eigener Verein in Company OS aussähe. Das beantwortet „Was kann KI für uns tun?“ konkret.</li>
+      </ul></div>
+  </section>
+
+  <!-- 6 Name -->
+  <section role="tabpanel" id="name" aria-labelledby="t-name" hidden>
+    <div class="prose"><h2>Vorschläge für den Produktnamen</h2>
+      <p>Der Name sollte zu Bodo und sellify passen, ohne an eines gebunden zu sein, und auf Deutsch funktionieren. Alle Vorschläge sind ungeprüft: Marken und Domains habe ich nicht recherchiert. <span class="src s-ann">Annahme</span></p></div>
+    <div class="names">
+      <div class="panel name"><span class="n">Leitwerk</span><p>Das Leitwerk steuert ein Flugzeug, „Werk“ steht für das Unternehmen. Kurz und deutsch.</p></div>
+      <div class="panel name"><span class="n">Betriebszentrale</span><p>Sagt wörtlich, was es ist: der Ort, von dem aus der Betrieb gesteuert wird.</p></div>
+      <div class="panel name"><span class="n">Taktwerk</span><p>Prozesse im Takt, Abteilungen greifen ineinander. Einprägsam.</p></div>
+      <div class="panel name"><span class="n">Firmenkompass</span><p>Betont Orientierung und Führung statt Technik. Verständlich für Vereine.</p></div>
+      <div class="panel name"><span class="n">Company OS</span><p>Ohne „My“ klarer. Allerdings ein beschreibender Begriff, den vermutlich auch andere nutzen. <span class="src s-ann">Annahme</span></p></div>
+    </div>
+  </section>
+
+  <!-- 7 Offen -->
+  <section role="tabpanel" id="offen" aria-labelledby="t-offen" hidden>
+    <div class="prose"><h2>Offene Entscheidungen</h2></div>
+    <ol class="dec">
+      <li><s>Gliederung Prozesskette → Prozess → Phase → Aufgaben?</s> <b>Entschieden: ja, BPM-Diagramm nur wo nötig.</b> <span class="src s-boris">Boris</span></li>
+      <li><s>Je Phase eine Abteilung, ein Team, ein Ergebnis?</s> <b>Entschieden: genau eine Abteilung, ein Agententeam, ein Ergebnis, das weitergegeben wird.</b> <span class="src s-boris">Boris</span></li>
+      <li><b>Entschieden:</b> Je Abteilung Leitung <b>und Vertretung</b>; <b>Mitarbeitende (Menschen)</b> werden in die Abteilungen aufgenommen; das Team einer Phase besteht aus Menschen und Agenten. <span class="src s-boris">Boris</span></li>
+      <li><b>Entschieden:</b> Schritt-Bearbeitung durch Agent allein oder Agent mit verantwortlichem Menschen, der zuerst die Eskalationen bekommt · Vertretungsregeln übernommen · Freigabe bei Außenwirkung als Standard, im Auftrag flexibel aufhebbar · Übersicht über mehrere Unternehmen (Bodo Solutions, business//acts) mit je eigener Instanz. <span class="src s-boris">Boris</span></li>
+      <li><b>Entschieden: Company-Chat</b> als wichtiger Baustein, je Unternehmen und optional je Auftrag. <span class="src s-boris">Boris</span></li>
+      <li><b>Entschieden:</b> Je Aufgabenpaket/Schritt genau <b>ein Verantwortlicher</b> und beliebig viele <b>Beteiligte</b>. <span class="src s-boris">Boris</span></li>
+      <li><b>Entschieden:</b> Kundenprojekte wie die Einführung laufen nicht sequenziell. Sie bestehen aus <b>Aufgabenpaketen</b> (Teilthemen), die insgesamt erledigt sein müssen; Pakete können selbst wieder Projekte sein. <span class="src s-boris">Boris</span></li>
+      <li><b>Entschieden: Setup einer Kundeninstanz</b> mit Inhaber-System (Kunde in Bodo/sellify), Hauptprojekt und weiteren Projekten, Abteilungen mit Verantwortlichen. Weitere Setup-Schritte sind Vorschläge. <span class="src s-boris">Boris</span></li>
+      <li><s>Kundenakte?</s> <b>Entschieden: Wir nutzen die Akte des jeweiligen Vereins in Bodo.</b> Company OS zeigt sie an und legt keine eigene Akte an. <span class="src s-boris">Boris</span></li>
+      <li><s>Avatare?</s> <b>Entschieden: Abteilungsleitung mit eigenem Avatar, Agenten mit einem einheitlichen Agentensymbol.</b> <span class="src s-boris">Boris</span></li>
+      <li><s>Phasen der Einführung vollständig?</s> <b>Ergänzt: Phase „Anforderungen &amp; Change Requests“.</b> Einführungsphasen hängen vom Produkt ab (Bodo Standard vs. sellify Enterprise mit Customizing), daher <b>Prozessvarianten je Produkt</b>. <span class="src s-boris">Boris</span></li>
+      <li><s>Soll die Phase „Setup definieren“ später auch die Company-OS-Instanz des Vereins erzeugen?</s> <b>Entschieden: ja.</b> <span class="src s-boris">Boris</span></li>
+      <li><s>Anschluss-Schicht?</s> <b>Entschieden: ja, als wichtiger Teil des Gesamtkonzepts.</b> Prozesse nennen nur Grundaufgaben, je System übersetzt ein Anschluss. <span class="src s-boris">Boris</span></li>
+      <li><s>Weg zum Produkt für Kunden?</s> <b>Entschieden: Während der Entwicklung bleibt es bei Boris, eigene Technik für Kunden folgt später.</b> Erst in der Tiefe prüfen, dann in die Breite. <span class="src s-boris">Boris</span></li>
+      <li><s>Branchenpaket als Vorlage je Branche?</s> <b>Entschieden: ja, „Branchenpaket Mieterverein“ als erstes Paket.</b> <span class="src s-boris">Boris</span></li>
+      <li><s>Pilot?</s> <b>Entschieden: Mieterverein Hagen.</b> <span class="src s-boris">Boris</span></li>
+      <li><b>Entschieden (10.10.):</b> Haupt-KI nur aus freigegebenen Anbietern · weitere Anbieter über KI-Profile · Zuordnung Auftrag vor Schritt vor Skill · AVV-Bestätigung je Anbieter · Budget-Stopp ohne Anbieterwechsel · kein automatischer Ersatz der Haupt-KI · Setup-Schritt „KI-Anbieter &amp; Haupt-KI“. <span class="src s-boris">Boris</span></li>
+      <li><b>Entschieden (10.10.):</b> Datenstufen mit Datenschleuse, nicht übersteuerbar · Arbeitsanweisung je Schritt mit Anweisungs-Assistent. <span class="src s-boris">Boris</span></li>
+      <li><b>Offen:</b> Aufbau der Bibliothek (Material/Vorlage, Felder) · welche Vorlagen Bodo/sellify per MCP liefern · Abrechnung der KI-Kosten · private KI-Abos als Schnittstelle nutzbar? <span class="src s-vor">Vorschlag</span></li>
+    </ol>
+  </section>
+</div></main>
+
+<script>
+const D={bt:"#1f3a5f",ef:"#0d7a6a",ks:"#6a4fb3",pe:"#8a5a12"};
+const P={
+ vt:{name:"Vertrieb · vom Lead zum Abschluss",res:"Ergebnis: Auftrag unterschrieben, Einführung gestartet",phases:[
+  {n:"Zielgruppe & Leads recherchieren",h:"Vertriebsinnendienst (Platzhalter)",d:["Vertrieb","BH",D.bt],team:["Recherche-Agent","Vertriebsassistent Bodo"],tasks:["Zielgruppe festlegen, z. B. Mietervereine in NRW","im Internet recherchieren, Steckbrief je Verein","Dubletten gegen Bodo prüfen"],out:"geprüfte Leadliste",w:["Organisation (Kontakttyp Mieterverein, Interessent)","Ansprechpartner, mit Organisation verknüpft"],gate:1,src:"boris"},
+  {n:"Erstkontakt & Bedarf",d:["Vertrieb","BH",D.bt],team:["Vertriebsassistent Bodo"],tasks:["Anschreiben entwerfen","Gespräch vorbereiten und nachbereiten","Altsystem und Mitgliederzahl erfassen"],out:"Bedarf und Gesprächsnotiz",w:["Verkaufschance","Termin, Chronik-Eintrag"],gate:1,src:"vor"},
+  {n:"Demo vorbereiten",d:["Vertrieb","BH",D.bt],team:["Produktinformations-Agent","Video-Agent"],tasks:["Demosystem mit Demodaten befüllen","Demodokumente erzeugen","Produktinformation zum Bedarf"],out:"Demosystem und Unterlagen",w:["Bodo-Organisation der Art „demo“"],gate:0,src:"boris"},
+  {n:"Angebot",d:["Vertrieb","BH",D.bt],team:["Angebots-Agent"],tasks:["Angebot nach Bodo-Vorlage","Begleitmail"],out:"Angebot verschickt",w:["Dokument an der Chance","E-Mail"],gate:1,src:"bodo"},
+  {n:"Abschluss",d:["Vertrieb","BH",D.bt],team:["Vertriebsassistent Bodo"],tasks:["Auftrag prüfen","Rolle auf Kunde setzen","Übergabe an Einführung vorbereiten"],out:"Auftrag, Übergabe-Formular",w:["Chance gewonnen","Rolle „Kunde“"],gate:1,src:"vor"}],
+  next:"Abschluss startet automatisch Prozess 2 · Einführung, mit der Kundenakte"},
+ ef:{name:"Einführung · Setup bis Go-live",res:"Ergebnis: Verein arbeitet produktiv in Bodo",phases:[
+  {n:"Einführungsprojekt anlegen",d:["Einführung","BH",D.ef],team:["Einführungs-Agent"],tasks:["Verein und Ansprechpartner ermitteln","Projekt und ggf. Migrationsprojekt anlegen","lokalen Ordner anlegen"],out:"Projekt in Bodo",w:["Projekt „Bodo - Einführung bei …“","Bezüge, Leitung, Teilnehmer"],gate:1,src:"bodo"},
+  {n:"Setup definieren",d:["Einführung","BH",D.ef],team:["Einrichtungs-Agent"],tasks:["Aktivitätstypen festlegen","Aufgabentypen festlegen","Dokumenttypen festlegen","Ausgangsbasis: Demosystem oder Branchenprofil"],out:"Setup-Definition, vom Verein bestätigt",w:[],gate:1,src:"boris"},
+  {n:"Anforderungen & Change Requests",d:["Einführung","BH",D.ef],team:["Einrichtungs-Agent","Angebots-Agent"],tasks:["benötigte Funktionen ermitteln, die Bodo heute nicht abdeckt","je Anforderung entscheiden: kostenpflichtig ja/nein","bei kostenpflichtig: Einschätzung Aufwand und Angebotsbezug","je Anforderung Wertigkeit einschätzen","später: Umsetzbarkeit validieren (Entwicklung)"],out:"bewertete Anforderungen, ggf. Zusatzangebot",w:["Feature Requests (Dublettenprüfung, ohne Zuständigen)","Bewertung an der Anforderung","Angebot als Dokument"],gate:1,src:"boris",h:"Projektleitung Einführung (Platzhalter)"},
+  {n:"Dokumentvorlagen",d:["Einführung","BH",D.ef],team:["Vorlagen-Agent"],tasks:["benötigte Vorlagen je Dokumenttyp ermitteln","Vorlagen erstellen","vom Verein abnehmen lassen"],out:"Vorlagensatz",w:[],gate:1,src:"boris"},
+  {n:"Datenübernahme",h:"Projektleitung Einführung (Platzhalter)",d:["Einführung","BH",D.ef],team:["Datenübernahme-Agent"],tasks:["Export aus dem Altsystem, z. B. MIV4Windows","Probelauf und Abgleich","Endübernahme"],out:"Übernahmeprotokoll",w:["Daten im Bodo des Vereins"],gate:1,src:"boris"},
+  {n:"Übergabe an Bodo",d:["Einführung","BH",D.ef],team:["Einrichtungs-Agent"],tasks:["Kataloge Bereich für Bereich schreiben","Vorlagen hinterlegen","Abgleich und Restliste"],out:"eingerichteter Mandant, Protokoll",w:["Aktivitäts-, Aufgaben-, Dokumenttypen","Dokumentvorlagen"],gate:1,src:"bodo"},
+  {n:"Benutzerschulung",h:"Schulung (Platzhalter)",d:["Einführung","BH",D.ef],team:["Schulungs-Agent"],tasks:["Schulungsplan je Rolle","Unterlagen und Kurzvideos","Termine"],out:"geschulte Benutzer",w:["Termine","Schulungsunterlagen als Dokumente"],gate:0,src:"boris"},
+  {n:"Go-live",d:["Einführung","BH",D.ef],team:["Einführungs-Agent"],tasks:["Abnahme mit dem Verein","Übergabe an den Kundenservice"],out:"Abnahme, Übergabe-Formular",w:["Projekt abgeschlossen"],gate:1,src:"vor"}],
+  next:"Go-live startet Prozess 3 · Betrieb · Hinweis: Diese Phasen gelten für Bodo. Bei sellify (Enterprise mit Customizing) sieht die Einführung anders aus, daher Prozessvarianten je Produkt."},
+ bt:{name:"Betrieb · Unterstützung und Tickets",res:"Ergebnis je Anfrage: gelöst und Kunde informiert",phases:[
+  {n:"Anfrage annehmen",d:["Kundenservice","KS",D.ks],team:["Annahme-Agent"],tasks:["Mail, Telefonnotiz oder Portal","Anliegen zusammenfassen"],out:"verstandenes Anliegen",w:["Chronik am Kontakt"],gate:0,src:"boris"},
+  {n:"Einordnen",d:["Kundenservice","KS",D.ks],team:["Annahme-Agent"],tasks:["Frage, Fehler oder Wunsch?","vergleichbare Tickets suchen"],out:"Einordnung mit Dublettenprüfung",w:[],gate:0,src:"bodo"},
+  {n:"Lösen oder Ticket",h:"Support (Platzhalter)",d:["Produktentwicklung","PE",D.pe],team:["Ticket-Agent"],tasks:["Antwort aus Wissensbasis","sonst Ticket-Entwurf mit Screenshot"],out:"Lösung oder Ticket",w:["Ticket ohne Zuständigen, mit Tags"],gate:1,src:"bodo"},
+  {n:"Rückmeldung",d:["Kundenservice","KS",D.ks],team:["Annahme-Agent"],tasks:["Antwort an den Verein"],out:"Kunde informiert",w:["E-Mail mit Signatur"],gate:1,src:"bodo"},
+  {n:"Betreuung",d:["Kundenservice","KS",D.ks],team:["Vertriebsassistent Bodo"],tasks:["Nutzung beobachten","Erweiterungen erkennen"],out:"Anstoß an den Vertrieb",w:["Chance für Erweiterung"],gate:1,src:"vor"}],
+  next:"Erweiterungswunsch startet wieder Prozess 1 · Vertrieb"}
+};
+const SRC={boris:["s-boris","Boris"],bodo:["s-bodo","Bodo"],vor:["s-vor","Vorschlag"]};
+const esc=s=>String(s).replace(/[&<>"]/g,m=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[m]));
+function draw(k){
+  const p=P[k];
+  document.getElementById("proc").innerHTML=`<div class="panel" style="display:flex;flex-direction:column;gap:12px">
+   <div class="phead"><h3>${esc(p.name)}</h3><span class="res">${esc(p.res)}</span></div>
+   <div class="phases">${p.phases.map(f=>`<article class="ph">
+     <h3>${esc(f.n)}</h3>
+     <div class="who"><span class="mini" style="--c:${f.d[2]}">${f.d[1]}</span>${esc(f.d[0])} · Leitung nimmt ab</div>
+     <div><div class="lbl">Team</div><div class="team">${f.team.map(t=>`<span class="chip">${esc(t)}</span>`).join("")}</div></div>
+     <div><div class="lbl">Aufgaben</div><ul>${f.tasks.map(t=>`<li>${esc(t)}</li>`).join("")}</ul></div>
+     <div><div class="lbl">Bearbeitung</div>${f.h?`Agent mit Verantwortlichen: ${esc(f.h)}`:"Agent allein"}</div>
+     <div><div class="lbl">Ergebnis</div>${esc(f.out)}</div>
+     ${f.w.length?`<div class="w"><b>→ in Bodo</b>${f.w.map(t=>`<span>${esc(t)}</span>`).join("")}</div>`:""}
+     <div style="display:flex;gap:6px;flex-wrap:wrap;align-items:center">${f.gate?'<span class="gate">Freigabe nötig</span>':""}<span class="src ${SRC[f.src][0]}">${SRC[f.src][1]}</span></div>
+   </article>`).join("")}</div>
+   <div class="handoff">${esc(p.next)}</div></div>`;
+  document.querySelectorAll(".chain button").forEach(b=>b.setAttribute("aria-pressed",b.dataset.p===k));
+}
+document.querySelectorAll(".chain button").forEach(b=>b.onclick=()=>draw(b.dataset.p));
+draw("vt");
+const AK=[["Lead-Steckbrief","Vertrieb",D.bt],["Bedarf & Notiz","Vertrieb",D.bt],["Demosystem","Vertrieb",D.bt],["Angebot","Vertrieb",D.bt],["Auftrag","Vertrieb",D.bt],["Bodo-Projekt","Einführung",D.ef],["Setup-Definition","Einführung",D.ef],["Vorlagensatz","Einführung",D.ef],["Übernahmeprotokoll","Einführung",D.ef],["Schulung","Einführung",D.ef],["Abnahme","Einführung",D.ef],["Anfragen & Tickets","Betrieb",D.ks]];
+document.getElementById("akte").innerHTML=AK.map(a=>`<div class="it" style="--c:${a[2]}"><b>${esc(a[0])}</b><small>${esc(a[1])}</small></div>`).join("");
+/* Reiter */
+const tabs=[...document.querySelectorAll('[role="tab"]')];
+function show(id){tabs.forEach(t=>{const on=t.getAttribute("aria-controls")===id;t.setAttribute("aria-selected",on);document.getElementById(t.getAttribute("aria-controls")).hidden=!on});}
+tabs.forEach(t=>t.onclick=()=>{show(t.getAttribute("aria-controls"));window.scrollTo({top:0})});
+const h=location.hash.slice(1);if(h&&document.getElementById(h)&&tabs.some(t=>t.getAttribute("aria-controls")===h))show(h);
+</script>

@@ -1,0 +1,744 @@
+<!doctype html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Skill- & Agenten-Cockpit (Entwurf v9)</title>
+<style>
+:root{--bg:#f5f6f8;--panel:#fff;--ink:#1b2333;--mut:#667085;--line:#e3e6ec;--navy:#1f3a5f;--acc:#2f6fdf;--accbg:#e8f0fd;--warn:#b54708;--warnbg:#fef0e6;--ok:#067647;--okbg:#e7f6ee;--vio:#6941c6;--viobg:#f1ecfb;--teal:#0e7090;--tealbg:#e6f6fb;--bodo:#1f3a5f;--bodobg:#e3eaf4;--sell:#30ABE2;--sellbg:#e3f4fb;--selltxt:#1576a3}
+*{box-sizing:border-box}body{margin:0;font:14px/1.45 system-ui,-apple-system,Segoe UI,sans-serif;background:var(--bg);color:var(--ink)}
+header{background:var(--navy);color:#fff;padding:12px 20px;display:flex;align-items:center;gap:14px;flex-wrap:wrap}
+header h1{font-size:17px;margin:0;font-weight:600}header .tag{font-size:11px;background:#ffffff26;padding:2px 8px;border-radius:10px}
+nav{margin-left:auto;display:flex;gap:4px}nav button{background:none;border:1px solid #ffffff40;color:#fff;padding:6px 12px;border-radius:6px;cursor:pointer;font:inherit}
+nav button.on{background:#fff;color:var(--navy)}
+.note{background:var(--warnbg);color:var(--warn);padding:8px 20px;font-size:12.5px;border-bottom:1px solid #f6d3b8}
+main{display:grid;grid-template-columns:370px 1fr;gap:16px;padding:16px;min-height:calc(100vh - 100px)}
+@media(max-width:860px){main{grid-template-columns:1fr}}
+.panel{background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:14px;overflow:auto}
+h2{font-size:12px;text-transform:uppercase;letter-spacing:.05em;color:var(--mut);margin:0 0 10px;display:flex;align-items:center;gap:8px}
+input[type=search],input[type=text],textarea,select{width:100%;padding:7px 9px;border:1px solid var(--line);border-radius:6px;font:inherit;background:#fff;color:var(--ink)}
+textarea{min-height:64px;resize:vertical}
+.libtop{display:flex;gap:6px}.libtop input{flex:1}
+.libtools{display:flex;gap:10px;margin-top:6px;font-size:12px}.libtools button{border:0;background:none;color:var(--acc);cursor:pointer;padding:0;font:inherit}
+.grp{margin-top:10px;border-radius:8px;padding:2px;border:1px solid transparent}
+.grp.over{background:var(--accbg);outline:2px dashed var(--acc)}
+.ghead{display:flex;align-items:center;gap:6px;font-size:12.5px;font-weight:700;color:var(--navy);padding:6px 4px;cursor:pointer;border-radius:6px;user-select:none;background:#f3f5f9}
+.ghead:hover{background:#e9edf4}
+.caret{display:inline-block;width:12px;transition:transform .15s;color:var(--mut)}
+.grp.col .caret{transform:rotate(-90deg)}.grp.col .gbody{display:none}
+.ghead .cnt{font-weight:400;color:var(--mut)}.ghead .ic{margin-left:auto}
+.ic{border:0;background:none;cursor:pointer;color:var(--mut);font-size:15px;padding:2px 5px;border-radius:5px;line-height:1}
+.ic:hover{background:#e3e7ee;color:var(--ink)}
+.skill{border:1px solid var(--line);border-radius:8px;padding:8px 8px 8px 10px;margin-top:6px;cursor:grab;background:#fff;display:flex;gap:8px;align-items:flex-start}
+.skill:hover{border-color:var(--acc)}
+.skill .t{flex:1;min-width:0}.skill b{font-size:13px;display:block}
+.skill code,.box code{font-size:11px;color:var(--mut);background:#f3f4f7;padding:0 4px;border-radius:4px}
+.skill small{display:block;color:var(--mut);font-size:12px;margin-top:2px}
+.side{display:flex;flex-direction:column;align-items:flex-end;gap:4px}
+.badge{font-size:10.5px;padding:1px 6px;border-radius:8px;background:#eef0f4;color:var(--mut);white-space:nowrap}
+.badge.std{background:var(--viobg);color:var(--vio)}.badge.zero{background:var(--warnbg);color:var(--warn)}
+.badge.lp{background:var(--tealbg);color:var(--teal)}
+.agents{display:grid;grid-template-columns:230px 1fr;gap:16px}@media(max-width:860px){.agents{grid-template-columns:1fr}}
+.aitem{border:1px solid var(--line);background:#fff;border-radius:8px;padding:8px 6px 8px 10px;margin-bottom:6px;cursor:pointer;display:flex;gap:4px;align-items:flex-start}
+.aitem.on{border-color:var(--acc);background:var(--accbg)}.aitem .t{flex:1;min-width:0}
+.aitem small{color:var(--mut);display:block;font-size:12px}.aitem input{padding:3px 6px;font-weight:600}
+.field{margin-bottom:14px}.field>label,.flabel{display:block;font-size:12px;color:var(--mut);margin-bottom:4px;font-weight:600}
+.drop{min-height:64px;border:2px dashed var(--line);border-radius:8px;padding:8px;display:flex;flex-wrap:wrap;gap:6px;align-content:flex-start}
+.drop.over{border-color:var(--acc);background:var(--accbg)}
+.chip{background:var(--accbg);color:var(--navy);border-radius:14px;padding:3px 4px 3px 10px;font-size:12.5px;display:flex;align-items:center;gap:2px}
+.row{display:grid;grid-template-columns:1fr 1fr;gap:12px}@media(max-width:600px){.row{grid-template-columns:1fr}}
+.cb{display:flex;gap:6px;align-items:flex-start;font-size:13px;margin-bottom:4px}
+.lpwrap{border:1px solid var(--line);border-radius:8px;overflow:hidden}
+.lpsec{padding:10px 12px;border-top:1px solid var(--line)}.lpsec:first-child{border-top:0}
+.lpsec h4{margin:0 0 6px;font-size:12.5px;display:flex;align-items:center;gap:6px}
+.lpsec h4 .badge{font-weight:600}
+.lprule{display:flex;gap:8px;align-items:flex-start;font-size:13px;padding:3px 0}
+.lprule .txt{flex:1}
+.src{font-size:10.5px;background:var(--tealbg);color:var(--teal);padding:1px 7px;border-radius:8px;white-space:nowrap;cursor:help}
+.ownadd{display:flex;gap:6px;margin-top:6px}.ownadd input{flex:1}
+pre{background:#0f1726;color:#d6e2ff;padding:12px;border-radius:8px;font-size:12px;overflow:auto;white-space:pre-wrap;margin:0}
+details summary{cursor:pointer;font-size:12px;color:var(--mut);font-weight:600;margin-bottom:6px}
+.btns{display:flex;gap:8px;flex-wrap:wrap}.btn{border:1px solid var(--line);background:#fff;border-radius:6px;padding:6px 12px;cursor:pointer;font:inherit;color:var(--ink)}
+.btn.p{background:var(--acc);color:#fff;border-color:var(--acc)}.btn.d{color:#b42318}
+table{border-collapse:collapse;font-size:12.5px;width:100%}th,td{border:1px solid var(--line);padding:5px 7px;text-align:center}
+th:first-child,td:first-child{text-align:left}thead th{background:#f0f2f6;font-weight:600}
+td.gr{background:#f7f8fa;font-weight:700;color:var(--navy);text-align:left}
+td.x{background:var(--okbg);color:var(--ok);font-weight:700;cursor:pointer}td.e{cursor:pointer;color:#c4c9d4}
+.hide{display:none!important}
+.mark{font-size:10.5px;color:var(--warn);background:var(--warnbg);padding:1px 6px;border-radius:8px;text-transform:none;letter-spacing:0;font-weight:600}
+.hint{font-size:12px;color:var(--mut);margin-top:4px}
+.warnbox{background:var(--warnbg);color:var(--warn);font-size:12px;padding:6px 8px;border-radius:6px;margin-top:4px}
+.modal{position:fixed;inset:0;background:#0f172a80;display:flex;align-items:flex-start;justify-content:center;padding:40px 16px;overflow:auto;z-index:10}
+.box{background:#fff;border-radius:12px;max-width:660px;width:100%;padding:18px;display:flex;flex-direction:column}
+.box.max{max-width:none;min-height:calc(100vh - 80px)}
+.box.max #sb{min-height:45vh}
+.bhead{display:flex;align-items:flex-start;gap:8px}.bhead h3{margin:0 0 4px;font-size:16px;flex:1}
+.seg{display:flex;border:1px solid var(--line);border-radius:8px;overflow:hidden;margin:10px 0 6px}
+.seg button{flex:1;border:0;background:#fff;padding:7px 4px;cursor:pointer;font:inherit;font-size:13px;color:var(--ink);border-left:1px solid var(--line)}
+.seg button:first-child{border-left:0}.seg button.on{background:var(--navy);color:#fff}
+.seg button .n{font-size:11px;opacity:.7;margin-left:3px}
+.seg button[data-p=bodo].on{background:var(--bodo)}.seg button[data-p=all].on{background:#475467}.seg button[data-p=sellify].on{background:var(--sell)}
+.opts{display:flex;flex-wrap:wrap;gap:4px 14px;font-size:12px;color:var(--mut)}.opts label{display:flex;gap:5px;align-items:center;cursor:pointer}
+.pb{font-size:10.5px;padding:1px 7px;border-radius:8px;font-weight:600;white-space:nowrap}
+.pb.bodo{background:var(--bodobg);color:var(--bodo)}.pb.sellify{background:var(--sellbg);color:var(--selltxt)}.pb.all{background:#eef0f4;color:#475467}.skill.p-all{border-left:4px solid #98a2b3}.aitem.p-all{border-left-color:#98a2b3}
+.skill.p-bodo{border-left:4px solid var(--bodo)}.skill.p-sellify{border-left:4px solid var(--sell)}
+.skill.neu{border-style:dashed;background:#fcfcfd}.skill.p-bodo.neu,.skill.p-sellify.neu{border-left-style:solid}
+.badge.neu{background:#fff4d6;color:#8a5a00}
+.chip.bad{background:#fde8e7;color:#b42318;outline:1px solid #f5b7b1}
+.aitem{border-left-width:4px}.aitem.p-bodo{border-left-color:var(--bodo)}.aitem.p-sellify{border-left-color:var(--sell)}
+.agrp{font-size:11px;font-weight:700;color:var(--mut);text-transform:uppercase;letter-spacing:.04em;margin:10px 0 4px}
+#build{grid-template-columns:var(--libw,minmax(240px,34%)) 12px minmax(0,1fr);gap:4px}
+.split{cursor:col-resize;display:flex;align-items:flex-start;justify-content:center;border-radius:6px;touch-action:none;outline:none;background:linear-gradient(var(--line),var(--line)) center/1px 100% no-repeat}
+.split:hover{background-color:#eef2fb}
+.split::before{content:"";position:sticky;top:40vh;margin-top:120px;width:6px;height:56px;border-radius:3px;background:#b3bac7;transition:background .15s,height .15s}
+.split:hover::before,.split:focus-visible::before,.split.drag::before{background:var(--acc);height:96px}
+body.resizing{cursor:col-resize;user-select:none}
+@media(max-width:560px){#build{grid-template-columns:1fr;gap:16px}.split{display:none}}
+.agents>div,.row>*,.panel{min-width:0}
+.lprule{flex-wrap:wrap}
+.flowstep{border:1px solid var(--line);border-radius:10px;padding:10px 12px;background:#fff;position:relative}
+.flowstep.p-bodo{border-left:4px solid var(--bodo)}.flowstep.p-sellify{border-left:4px solid var(--sell)}.flowstep.p-all{border-left:4px solid #98a2b3}
+.fshead{display:flex;align-items:center;gap:8px;margin-bottom:8px}
+.num{width:24px;height:24px;border-radius:50%;background:var(--navy);color:#fff;font-size:12px;font-weight:700;display:flex;align-items:center;justify-content:center;flex:none}
+.fshead select{flex:1}
+.handoff{display:flex;align-items:center;gap:8px;font-size:12px;color:var(--mut);padding:6px 0 6px 10px}
+.handoff .arr{font-size:16px;color:#98a2b3}
+.hold{display:inline-flex;align-items:center;gap:4px;font-size:11.5px;font-weight:600;color:#8a5a00;background:#fff4d6;border-radius:8px;padding:2px 8px}
+.kb{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px}@media(max-width:820px){.kb{grid-template-columns:1fr}}
+.kcol{background:#f3f5f9;border-radius:10px;padding:10px;min-height:160px}
+.kcol.wait{background:#fff7e8;outline:1px solid #f6d9a8}
+.kcol h3{font-size:13px;margin:0 0 8px;display:flex;align-items:center;gap:6px}
+.jcard{background:#fff;border:1px solid var(--line);border-radius:8px;padding:9px 10px;margin-bottom:8px;cursor:pointer;border-left-width:4px}
+.jcard:hover{border-color:var(--acc)}.jcard.p-bodo{border-left-color:var(--bodo)}.jcard.p-sellify{border-left-color:var(--sell)}.jcard.p-all{border-left-color:#98a2b3}
+.jcard b{display:block;font-size:13.5px}.jcard small{display:block;color:var(--mut);font-size:12px}
+.dots{display:flex;gap:4px;margin:6px 0 2px}.dots i{width:18px;height:5px;border-radius:3px;background:#dde1e8}.dots i.d{background:var(--ok)}.dots i.c{background:var(--acc)}.dots i.w{background:#e5a50a}
+.qbox{background:#fff7e8;border:1px solid #f6d9a8;border-radius:10px;padding:12px;margin:10px 0}
+.qbox .btns{margin-top:8px}
+.steps{list-style:none;margin:0;padding:0}.steps li{display:flex;gap:8px;align-items:flex-start;padding:5px 0;font-size:13px}
+.steps .st{width:20px;text-align:center;flex:none}
+.tl{border-left:2px solid var(--line);margin:6px 0 0 6px;padding-left:12px}.tl div{font-size:12.5px;margin-bottom:6px;position:relative}
+.tl div::before{content:"";position:absolute;left:-17px;top:5px;width:8px;height:8px;border-radius:50%;background:#98a2b3}
+.tl div.me::before{background:#e5a50a}.tl time{color:var(--mut);font-size:11.5px;margin-right:6px}
+nav .cnt{background:#e5a50a;color:#fff;border-radius:9px;font-size:11px;padding:0 6px;margin-left:5px}
+.field>label.cb{display:flex;font-size:13px;color:var(--ink);font-weight:400;margin-bottom:4px}
+table.nt td:first-child{text-align:left}table.nt td,table.nt th{padding:6px 8px}
+.fhead{display:flex;gap:10px;align-items:center;margin-bottom:10px}.fname{font-size:16px;font-weight:600;flex:1}
+.pal{display:flex;flex-wrap:wrap;gap:6px;align-items:center;margin-bottom:10px}.pal .btn{font-size:12.5px;padding:5px 9px;display:flex;align-items:center;gap:6px}
+.pi{display:inline-block;width:14px;height:14px;border:1.5px solid #667085;background:#fff}
+.pi.start{border-radius:50%;background:#e7f6ee;border-color:var(--ok)}.pi.end{border-radius:50%;border:3px double #1b2333}
+.pi.task{border-radius:3px;width:18px;height:12px}.pi.dec,.pi.human{transform:rotate(45deg) scale(.8)}.pi.human{background:#fff4d6;border-color:#e5a50a}
+.fgrid{display:grid;grid-template-columns:minmax(0,1fr) 290px;gap:12px}@media(max-width:1000px){.fgrid{grid-template-columns:1fr}}
+.cv-wrap{overflow:auto;border:1px solid var(--line);border-radius:10px;height:560px;background:#fafbfc radial-gradient(#d6dbe3 1px,transparent 1px) 0 0/20px 20px}
+.cv-wrap.ro{height:auto;max-height:420px}
+.cv{position:relative}
+svg.edges{position:absolute;left:0;top:0;overflow:visible}
+.ed{fill:none;stroke:#98a2b3;stroke-width:1.7}.ed.back{stroke-dasharray:6 5}.ed.tk{stroke:var(--ok);stroke-width:2.6}.ed.sel{stroke:var(--acc);stroke-width:2.6}.ed.tmp{stroke:var(--acc);stroke-dasharray:4 4}
+.hit{fill:none;stroke:transparent;stroke-width:14;cursor:pointer;pointer-events:stroke}
+.mkk{fill:#98a2b3}.mkg{fill:var(--ok)}.mka{fill:var(--acc)}
+.node{position:absolute;user-select:none;cursor:grab;touch-action:none}
+.cv-wrap.ro .node{cursor:default}
+.node.task{width:170px;min-height:70px;background:#fff;border:1.5px solid #c9ced8;border-left:5px solid var(--bodo);border-radius:10px;padding:6px 9px;font-size:12px;line-height:1.3;box-shadow:0 1px 2px #0000000d}
+.node.task.p-sellify{border-left-color:var(--sell)}.node.task.p-all{border-left-color:#98a2b3}
+.node .ag{font-size:10px;font-weight:700;color:var(--mut);text-transform:uppercase;letter-spacing:.03em;margin-bottom:2px}
+.node.dia{width:150px;height:86px}.node.dia svg{position:absolute;inset:0;width:100%;height:100%}
+.node.dia polygon{fill:#fff;stroke:#7a8699;stroke-width:1.5}.node.human polygon{fill:#fff4d6;stroke:#e5a50a}
+.node .dt{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;text-align:center;padding:0 30px;font-size:11.5px;line-height:1.25;font-weight:600}
+.node.circ{width:46px;height:46px;border-radius:50%;display:flex;align-items:center;justify-content:center}
+.node.start{background:#e7f6ee;border:2px solid var(--ok);color:var(--ok)}.node.end{background:#fff;border:5px double #1b2333;color:#1b2333;font-size:11px}
+.node .cap{position:absolute;top:52px;left:50%;transform:translateX(-50%);white-space:nowrap;font-size:11.5px;color:var(--mut);font-weight:600}
+.node.sel{outline:3px solid var(--acc);outline-offset:2px}.node.dia.sel{outline:none}.node.dia.sel polygon{stroke:var(--acc);stroke-width:3}
+.hd{position:absolute;right:-10px;top:50%;transform:translateY(-50%);width:18px;height:18px;border-radius:50%;background:var(--acc);color:#fff;font-size:13px;line-height:18px;text-align:center;cursor:crosshair;opacity:0;transition:opacity .1s}
+.node:hover .hd,.node.sel .hd{opacity:1}.node.dia .hd{right:-4px}
+.elab{position:absolute;transform:translate(-50%,-50%);background:#fff;border:1px solid #c9ced8;border-radius:9px;font-size:11px;padding:1px 7px;cursor:pointer;white-space:nowrap;font-weight:600;color:#475467}
+.elab small{font-weight:400;color:var(--mut)}.elab.sel{border-color:var(--acc);color:var(--acc)}.elab.tk{border-color:var(--ok);color:var(--ok)}
+.node.todo{opacity:.4}.node.done.task{border-color:var(--ok)}.node.done.dia polygon{stroke:var(--ok)}
+.node.cur{animation:pl 1.6s infinite}.node.cur.task{border-color:var(--acc);box-shadow:0 0 0 4px #cfe0ff}.node.cur.wait.task{border-color:#e5a50a;box-shadow:0 0 0 4px #fde7b8}
+.node.cur.dia polygon{stroke:#e5a50a;stroke-width:3.5}
+@keyframes pl{50%{filter:brightness(1.04)}}
+.props{border:1px solid var(--line);border-radius:10px;padding:12px;max-height:560px;overflow:auto}
+.outrow{display:flex;gap:6px;align-items:center;font-size:12px;margin-bottom:5px}.outrow input{width:110px;flex:none;padding:4px 6px}.outrow span{color:var(--mut)}
+table.nt{font-size:12px}table.nt th{font-size:14px}
+.box.wide{max-width:1100px}
+.legend{font-weight:400;margin-left:8px;font-size:11.5px}.lg{display:inline-block;width:10px;height:10px;border-radius:3px;margin:0 3px 0 8px;vertical-align:-1px}
+.lg.d{background:var(--ok)}.lg.c{background:var(--acc)}.lg.w{background:#e5a50a}.lg.o{background:#d0d5dd}
+.zm{margin-left:auto;display:flex;align-items:center;gap:4px;font-size:12px;color:var(--mut)}.zm .btn{padding:3px 9px}#zv{min-width:42px;text-align:center}
+#fedit{display:flex;flex-direction:column;height:calc(100vh - 92px);min-height:520px}
+#fedit .fgrid{flex:1;min-height:0}#fedit .fgrid>*{min-height:0}
+#fedit .cv-wrap{height:100%}#fedit .props{max-height:none;height:100%}
+@media(max-width:1000px){#fedit{height:auto}#fedit .cv-wrap{height:70vh}#fedit .props{height:auto}}
+.pb.multi{background:#eef0f4;color:#1b2333}
+.skill.p-multi{position:relative;border-left:0;padding-left:14px}.skill.p-multi::before{content:"";position:absolute;left:0;top:0;bottom:0;width:4px;border-radius:8px 0 0 8px;background:linear-gradient(var(--bodo) 50%,var(--sell) 50%)}
+.tabs{display:flex;gap:2px;border-bottom:1px solid var(--line);margin:4px 0 12px}.tabs button{border:0;background:none;padding:8px 12px;cursor:pointer;font:inherit;font-size:13px;color:var(--mut);border-bottom:3px solid transparent;margin-bottom:-1px}
+.tabs button.on{color:var(--ink);font-weight:600;border-bottom-color:var(--navy)}.tabs button.bodo.on{border-bottom-color:var(--bodo)}.tabs button.sellify.on{border-bottom-color:var(--sell)}
+.infobox{background:var(--accbg);color:var(--navy);font-size:12.5px;padding:7px 10px;border-radius:6px;margin-bottom:10px;border-left:4px solid var(--navy)}.infobox.p-bodo{border-left-color:var(--bodo)}.infobox.p-sellify{border-left-color:var(--sell);background:var(--sellbg)}
+pre.tree{background:#f3f5f9;color:#344054;padding:8px 12px;font-size:12px;margin:0 0 12px}
+.cmpcore{background:#f3f5f9;border-radius:8px;padding:8px 12px;font-size:13px;margin-bottom:10px}
+.cmp{display:grid;grid-template-columns:1fr 1fr;gap:10px}.cmpcol{border:1px solid var(--line);border-radius:8px;padding:10px 12px;border-top:4px solid var(--bodo)}.cmpcol.p-sellify{border-top-color:var(--sell)}
+.cmpcol h4{margin:0 0 2px;font-size:14px}.cmptxt{font-size:13px}
+.chip .prf{color:var(--mut);font-size:11px}
+.toast{position:fixed;bottom:18px;left:50%;transform:translateX(-50%);background:var(--navy);color:#fff;padding:8px 14px;border-radius:8px;font-size:13px;z-index:20}
+</style>
+</head>
+<body>
+<header>
+  <h1>Skill- &amp; Agenten-Cockpit</h1><span class="tag">Entwurf v9 zum Kommentieren</span>
+  <nav><button data-v="jobs">Aufträge<span class="cnt" id="wcnt"></span></button><button data-v="flows">Abläufe</button><button class="on" data-v="build">Agenten bauen</button><button data-v="matrix">Matrix</button></nav>
+</header>
+
+<main id="build">
+  <section class="panel">
+    <h2>Skill-Bibliothek</h2>
+    <div class="libtop"><input type="search" id="q" placeholder="Skill suchen …"><button class="btn" id="newG" title="Neue Gruppe anlegen">+ Gruppe</button></div>
+    <div class="seg" id="seg"></div>
+    <div class="opts"><label><input type="checkbox" id="gen"> „Andere“ zusätzlich einblenden</label><label><input type="checkbox" id="follow" checked> Skills und Agenten gemeinsam umschalten</label></div>
+    <div class="libtools"><button id="colAll">Alle zuklappen</button><button id="expAll">Alle aufklappen</button></div>
+    <div id="lib"></div>
+    <div class="hint" style="margin-top:10px">Gruppenkopf antippen = auf-/zuklappen · Skill antippen = zum aktiven Agenten · ⚙ = bearbeiten · Skill auf eine Gruppe ziehen = umsortieren</div>
+  </section>
+  <div class="split" id="split" role="separator" aria-orientation="vertical" tabindex="0" title="Ziehen = Breite ändern · Doppelklick = zurücksetzen · Pfeiltasten = feinjustieren"></div>
+  <section class="panel">
+    <div class="agents">
+      <div><h2>Agenten</h2><div class="seg" id="aseg" style="margin-top:0"></div><div id="alist"></div><button class="btn" id="newA" style="width:100%">+ Neuer Agent</button>
+        <div class="hint">✎ = direkt umbenennen</div></div>
+      <div id="editor"></div>
+    </div>
+  </section>
+</main>
+<main id="matrix" class="hide" style="grid-template-columns:1fr">
+  <section class="panel"><h2>Welcher Agent nutzt welchen Skill? <span class="mark" id="mf"></span> <span style="text-transform:none;letter-spacing:0;font-weight:400">(Klick schaltet um)</span></h2><div id="mtx" style="overflow:auto"></div>
+  <p class="hint">Orange Zähler = Skill wird von keinem Agenten genutzt.</p></section>
+</main>
+<main id="flows" class="hide" style="grid-template-columns:260px minmax(0,1fr)">
+  <section class="panel"><h2>Abläufe <span class="mark">Beispiele von Claude</span></h2><div class="seg" id="fseg" style="margin-top:0"></div><div id="flist"></div><button class="btn" id="newF" style="width:100%">+ Neuer Ablauf</button>
+  <div class="hint">Ein Ablauf ist eine Vorlage als Prozessdiagramm: Agenten-Schritte, Entscheidungen (durch Agent oder dich) und Rücksprünge.</div></section>
+  <section class="panel" id="fedit"></section>
+</main>
+<main id="jobs" class="hide" style="grid-template-columns:1fr">
+  <section class="panel"><h2>Aufträge <span class="mark">Beispieldaten</span></h2><div class="kb" id="kb"></div>
+  <div class="hint" style="margin-top:8px">Auftrag antippen = Verlauf, Schritte und offene Rückfragen.</div></section>
+</main>
+<div id="modal"></div>
+
+<script>
+let GR=["Kunden & Kontakte im CRM","Einführung & Einrichtung","Produktentwicklung","Angebote & Unterlagen","Kommunikation","Videoproduktion","Webseiten","Standard-Werkzeuge (Anthropic)"];
+const COL=new Set();
+let PF="bodo",AF="bodo",GEN=false;
+const PK=[["bodo","Bodo"],["sellify","sellify"],["all","Andere"]];
+const PN={bodo:"Bodo",sellify:"sellify",all:"Andere",multi:"Bodo + sellify"};
+const vis=s=>s.p===PF||(s.p==="multi"&&PF!=="all")||(GEN&&PF!=="all"&&s.p==="all");
+const isNeu=s=>s.neu||(s.prof&&Object.values(s.prof).some(x=>x.neu));
+const allLp=s=>s.lp.length+(s.prof?Object.values(s.prof).reduce((n,x)=>n+x.lp.length,0):0);
+const profOf=(a,s)=>s.p!=="multi"?"":a.p==="all"?"Profil per Rückfrage":PN[a.p]+"-Profil";
+const agVis=()=>AG.map((a,i)=>[a,i]).filter(([a])=>a.p===AF);
+const bad=(a,s)=>a.p!=="all"&&s.p!=="all"&&s.p!=="multi"&&s.p!==a.p;
+const SK=[
+ {id:"kontakt-anlegen",p:"multi",n:"Kontakt im CRM anlegen",g:0,d:"Person und/oder Organisation in Bodo oder sellify anlegen – Ziel-Mandant per Abfrage, Dublettenprüfung je Mandant.",lp:["Ziel-Mandant immer abfragen","Vor Anlage auf Dubletten prüfen"],prof:{bodo:{from:"kontakt-anlegen (Bodo-Teil)",txt:"Anlage über die Bodo-Schnittstelle (MCP).\nKontakttypen der Organisation verwenden (z. B. Mitglied, Freund).",lp:[]},sellify:{from:"kontakt-anlegen (sellify-Teil)",txt:"Anlage über die sellify-Schnittstelle (MCP).\nOrganisation und Person getrennt anlegen und verknüpfen.",lp:[]}}},
+ {id:"einfuehrung-anlegen",p:"multi",n:"Einführungsprojekt anlegen",g:1,d:"Neues Einführungsprojekt anlegen – bei Bodo für einen Mieterverein, bei sellify für ein Unternehmen; fragt alles Nötige ab.",lp:["Alle Pflichtangaben abfragen, bevor angelegt wird"],prof:{bodo:{from:"bodo-einfuehrung-anlegen",txt:"Kunde ist ein Mieterverein.\nProjekt in Bodo Solutions anlegen.\nPhasen und Aufgaben der Bodo-Einführung verwenden.",lp:[]},sellify:{neu:1,txt:"Kunde ist ein Unternehmen.\nProjekt in sellify anlegen.\nPhasen der sellify-Einführung verwenden.",lp:[]}}},
+ {id:"mandant-einrichten",p:"multi",n:"Neuen Mandanten einrichten",g:1,d:"Ersteinrichtung eines neuen Mandanten Schritt für Schritt im Dialog – Bereich für Bereich mit Bestätigung.",lp:["Jeden Bereich einzeln bestätigen lassen"],prof:{bodo:{from:"bodo-ersteinrichtung",txt:"Übernahme aus einem anderen Bodo-System oder nach Branchenprofil (Mietervereine).",lp:[]},sellify:{neu:1,txt:"Einrichtung nach Vorlage oder Branchenprofil.",lp:[]}}},
+ {id:"ticket-anlegen",p:"multi",n:"Entwicklungsticket erfassen",g:2,d:"Feature Request, Issue oder Entwicklungsticket für Bodo oder sellify anlegen.",lp:["Vor Anlage auf vergleichbare Tickets prüfen","Ticket-Entwurf erst zur Freigabe zeigen"],prof:{bodo:{from:"bodo-ticket-anlegen",txt:"Ticket in Bodo Solutions anlegen.\nTags aus dem Tag-Katalog der Organisation.\nScreenshot unter „Screenshot“ in die Beschreibung.",lp:["Ohne Zuständigen anlegen"]},sellify:{neu:1,txt:"Zielsystem für sellify-Tickets noch offen.",lp:[]}}},
+ {id:"feature-request-screenshot",p:"all",n:"Entwurfsbild für Feature Request zeichnen",g:2,d:"Entwurfs-Screenshots aus einem Original-Screenshot zeichnen, ohne bestehende Funktionen zu verdecken.",lp:["Bestehende Funktionen im Bild nicht verdecken"]},
+ {id:"angebot-erstellen",p:"multi",n:"Angebot als One-Pager",g:3,d:"Einseitiges Angebot als PDF mit Positionskacheln, Preistabelle und Beauftragungsfeld.",lp:["Angebot passt auf genau eine Seite"],prof:{bodo:{from:"bodo-angebot",txt:"Stil: bodo-solutions, Navy.\nPositionen und Preise aus der Bodo-Preisliste.\nAbsender: Bodo Solutions GmbH.",lp:[]},sellify:{neu:1,txt:"Stil: sellify, #30ABE2.\nPositionen und Preise aus der sellify-Preisliste.\nAbsender: business//acts GmbH.",lp:[]}}},
+ {id:"produktblatt-erstellen",p:"multi",n:"Produktblatt erstellen (A4-PDF)",g:3,d:"Produktinhalte als Produktinformation im festen Produkt-Stil (A4-PDF) aufbereiten.",lp:[],prof:{bodo:{from:"bodo-produktinformation",txt:"Fester bodo-solutions-Stil.\nFunktionsübersicht aus Bodo.",lp:[]},sellify:{neu:1,txt:"Fester sellify-Stil.\nFunktionsübersicht aus sellify.",lp:[]}}},
+ {id:"email-erstellung",p:"all",n:"E-Mail in Boris' Stil schreiben",g:4,d:"Aus Stichpunkten, Diktat, Textanfang oder als Antwort eine versandfertige, knappe E-Mail.",lp:["Knapp und versandfertig formulieren"]},
+ {id:"szenenvideo",p:"multi",n:"Szenenvideo produzieren",g:5,d:"Storyboard, KI-Szenen in Google Flow/Veo, echte Produkt-Screens, Titelseite, Abspann und Schnitt.",lp:["Storyboard vor der Produktion freigeben lassen"],prof:{bodo:{from:"bodo-video",txt:"Echte Bodo-Screens.\nBodo-Sprecherin.",lp:[]},sellify:{from:"sellify-video",txt:"Echte sellify-Screens.\nSprecher/Avatare.",lp:[]}}},
+ {id:"mobil-optimierung",p:"all",n:"Webseite fürs Handy reparieren",g:6,d:"Querscrollen messen, typische Ursachen beheben, Kopfzeile iOS-sicher lösen.",lp:["Kein seitliches Scrollen zulassen"]},
+ {id:"iphone-vorschau",p:"all",n:"Webseite im iPhone-Rahmen vorführen",g:6,d:"HTML-Seite in einen iPhone-Rahmen packen, um die mobile Darstellung zu prüfen und vorzuführen.",lp:[]},
+ {id:"pdf",p:"all",n:"PDF lesen & erzeugen",g:7,std:1,d:"PDFs lesen, zusammenführen, teilen, ausfüllen, erzeugen.",lp:[]},
+ {id:"docx",p:"all",n:"Word-Datei bearbeiten",g:7,std:1,d:"Word-Dokumente erstellen und bearbeiten.",lp:[]},
+ {id:"xlsx",p:"all",n:"Excel-Tabelle bearbeiten",g:7,std:1,d:"Tabellen lesen, bereinigen, erstellen.",lp:[]},
+ {id:"pptx",p:"all",n:"PowerPoint erstellen",g:7,std:1,d:"PowerPoint-Dateien lesen und erstellen.",lp:[]},
+ {id:"skill-creator",p:"all",n:"Skills bauen & testen",g:7,std:1,d:"Neue Skills erstellen, verbessern und testen.",lp:[]}
+];
+SK.forEach(s=>s.body=`---\nname: ${s.id}\ndescription: ${s.d}\n---\n\n# ${s.n}\n\n`+(s.p==="multi"?`## Produkt bestimmen\nErmittle, ob es um Bodo oder sellify geht. Ist das nicht eindeutig, frag nach.\nLies dann bodo.md bzw. sellify.md und wende die Abweichungen an.\n\n## Gemeinsamer Ablauf\n`:"")+`(Im Entwurf Platzhalter – in der echten Version steht hier der Inhalt der SKILL.md.)`);
+// aus Boris' gespeicherten Vorgaben (gekürzt)
+const GLOBAL=["Eigene Annahmen und Schätzungen immer als solche kennzeichnen","Mandant/Zielsystem im Zweifel erfragen","Person UND Organisation verknüpfen","CRM-Anlagen erst nach Freigabe des Entwurfs","Tickets: Dublettenprüfung, Entwurf zur Freigabe, ohne Zuständigen, Tags, Screenshot in Beschreibung","Dokumente: saubere Seitenumbrüche"];
+let AG=[
+ {n:"Vertriebsassistent Bodo",p:"bodo",r:"Begleitet Interessenten vom Erstkontakt bis zum Angebot.",note:"Einsatz z. B. nach einem Erstgespräch: Kontakt anlegen, Produktblatt + Angebot erstellen, Begleitmail formulieren.",s:["kontakt-anlegen","produktblatt-erstellen","angebot-erstellen","email-erstellung"],mcp:["Bodo"],m:"Opus",own:["Angebot und Mail erst gemeinsam zur Freigabe zeigen"],gl:[1,1,1,1,0,1]},
+ {n:"Vertriebsassistent sellify",p:"sellify",r:"Begleitet sellify-Interessenten vom Erstkontakt bis zum Angebot.",note:"Gegenstück zum Bodo-Vertriebsassistenten – für die sellify-Kollegen.",s:["kontakt-anlegen","produktblatt-erstellen","angebot-erstellen","email-erstellung"],mcp:["sellify"],m:"Opus",own:["Angebot und Mail erst gemeinsam zur Freigabe zeigen"],gl:[1,1,1,1,0,1]},
+ {n:"Bodo Produkt & Tickets",p:"bodo",r:"Nimmt Wünsche und Fehler auf und bereitet Tickets für die Bodo-Entwicklung vor.",note:"",s:["ticket-anlegen","feature-request-screenshot"],mcp:["Bodo"],m:"Sonnet",own:[],gl:[1,1,0,0,1,0]},
+ {n:"sellify Produkt & Tickets",p:"sellify",r:"Nimmt Wünsche und Fehler auf und bereitet Tickets für die sellify-Entwicklung vor.",note:"Offen: In welchem System landen sellify-Tickets?",s:["ticket-anlegen","feature-request-screenshot"],mcp:["sellify"],m:"Sonnet",own:[],gl:[1,1,0,0,1,0]},
+ {n:"Onboarding Mieterverein",p:"bodo",r:"Führt neue Bodo-Kunden durch Einführungsprojekt und Ersteinrichtung.",note:"",s:["einfuehrung-anlegen","mandant-einrichten","kontakt-anlegen"],mcp:["Bodo"],m:"Opus",own:[],gl:[1,1,1,1,0,0]},
+ {n:"Onboarding sellify-Kunde",p:"sellify",r:"Führt neue sellify-Kunden durch Einführungsprojekt und Ersteinrichtung.",note:"",s:["einfuehrung-anlegen","mandant-einrichten","kontakt-anlegen"],mcp:["sellify"],m:"Opus",own:[],gl:[1,1,1,1,0,0]},
+ {n:"Bodo Video-Studio",p:"bodo",r:"Erstellt Storyboards und Szenenvideos für Bodo.",note:"",s:["szenenvideo"],mcp:[],m:"Opus",own:[],gl:[1,0,0,0,0,0]},
+ {n:"sellify Video-Studio",p:"sellify",r:"Erstellt Storyboards und Szenenvideos für sellify.",note:"",s:["szenenvideo"],mcp:[],m:"Opus",own:[],gl:[1,0,0,0,0,0]},
+ {n:"Web-QA",p:"all",r:"Prüft Webseiten mobil und führt sie im iPhone-Rahmen vor.",note:"",s:["mobil-optimierung","iphone-vorschau"],mcp:[],m:"Sonnet",own:[],gl:[1,0,0,0,0,0]}
+];
+let cur=0,renaming=-1;
+const $=s=>document.querySelector(s),esc=t=>String(t).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/"/g,"&quot;");
+const sk=id=>SK.find(s=>s.id===id),use=id=>AG.filter(a=>a.s.includes(id)).length;
+function toast(t){document.querySelectorAll(".toast").forEach(x=>x.remove());const d=document.createElement("div");d.className="toast";d.textContent=t;document.body.appendChild(d);setTimeout(()=>d.remove(),2200)}
+
+function lib(){
+  const q=$("#q").value.toLowerCase();let h="";
+  GR.forEach((g,gi)=>{
+    const all=SK.filter(s=>s.g===gi&&vis(s)),items=all.filter(s=>(s.id+s.n+s.d).toLowerCase().includes(q));
+    if(!all.length&&SK.some(s=>s.g===gi))return;
+    if(q&&!items.length)return;
+    const col=!q&&COL.has(gi);
+    h+=`<div class="grp ${col?'col':''}" data-g="${gi}"><div class="ghead" data-tg="${gi}"><span class="caret">▾</span>${esc(g)} <span class="cnt">(${q?items.length+"/":""}${all.length})</span><button class="ic" data-rg="${gi}" title="Gruppe umbenennen">✎</button></div><div class="gbody">`;
+    items.forEach(s=>{const u=use(s.id);
+      h+=`<div class="skill p-${s.p} ${s.neu?'neu':''}" draggable="true" data-id="${s.id}"><div class="t"><b>${esc(s.n)}</b>${s.p==="multi"?`<span class="pb multi">Kern</span> <span class="pb bodo">Bodo</span> <span class="pb sellify">sellify${s.prof.sellify?.neu?" · neu":""}</span>`:`<span class="pb ${s.p}">${PN[s.p]}</span>`} <code>${s.id}</code>${s.neu?' <span class="badge neu" title="Existiert noch nicht – Vorschlag für die Vorführung">Neu · Entwurf</span>':''}<small>${esc(s.d)}</small></div>
+      <div class="side"><button class="ic" data-edit="${s.id}" title="Skill bearbeiten">⚙</button><span class="badge ${s.std?'std':''} ${u?'':'zero'}">${u} Ag.</span>${allLp(s)?`<span class="badge lp" title="${allLp(s)} Leitplanke(n)">⛨ ${allLp(s)}</span>`:''}</div></div>`});
+    if(!items.length)h+=`<div class="hint" style="padding:6px 4px">leer – Skills hierher ziehen</div>`;
+    h+=`</div></div>`});
+  $("#lib").innerHTML=h||'<p class="hint">Keine Skills für diesen Filter.</p>';seg();
+  document.querySelectorAll("[data-tg]").forEach(e=>e.onclick=ev=>{if(ev.target.closest("[data-rg]"))return;const g=+e.dataset.tg;COL.has(g)?COL.delete(g):COL.add(g);lib()});
+  document.querySelectorAll(".skill").forEach(e=>{
+    e.ondragstart=ev=>ev.dataTransfer.setData("t",e.dataset.id);
+    e.onclick=ev=>{if(ev.target.closest("[data-edit]"))return;const a=AG[cur];if(a&&!a.s.includes(e.dataset.id)){a.s.push(e.dataset.id);render();toast("Zu „"+a.n+"“ hinzugefügt")}}});
+  document.querySelectorAll("[data-edit]").forEach(b=>b.onclick=()=>skillModal(b.dataset.edit));
+  document.querySelectorAll("[data-rg]").forEach(b=>b.onclick=()=>{const n=prompt("Gruppe umbenennen:",GR[+b.dataset.rg]);if(n){GR[+b.dataset.rg]=n;render()}});
+  document.querySelectorAll(".grp").forEach(g=>{
+    g.ondragover=e=>{e.preventDefault();g.classList.add("over")};g.ondragleave=()=>g.classList.remove("over");
+    g.ondrop=e=>{e.preventDefault();g.classList.remove("over");const s=sk(e.dataTransfer.getData("t"));if(s){s.g=+g.dataset.g;COL.delete(s.g);render();toast("Verschoben nach „"+GR[s.g]+"“")}}});
+}
+
+function seg(){
+  const c=p=>SK.filter(s=>s.p===p||(s.p==="multi"&&p!=="all")).length;
+  $("#seg").innerHTML=PK.map(([p,l])=>`<button data-p="${p}" class="${PF===p?'on':''}">${l}<span class="n">${c(p)}</span></button>`).join("");
+  document.querySelectorAll("#seg button").forEach(b=>b.onclick=()=>{PF=b.dataset.p;if($("#follow").checked&&AF!==PF){AF=PF;const f=agVis()[0];cur=f?f[1]:-1}render()});
+  $("#gen").disabled=PF==="all";$("#gen").parentElement.style.opacity=PF==="all"?.45:1;
+  $("#aseg").innerHTML=PK.map(([p,l])=>`<button data-p="${p}" class="${AF===p?'on':''}">${l}<span class="n">${AG.filter(a=>a.p===p).length}</span></button>`).join("");
+  document.querySelectorAll("#aseg button").forEach(b=>b.onclick=()=>{AF=b.dataset.p;const f=agVis()[0];cur=f?f[1]:-1;if($("#follow").checked)PF=AF;render()});
+}
+function skillModal(id){
+  const s=sk(id);if(s.p==="multi")return multiModal(s);
+  $("#modal").innerHTML=`<div class="modal"><div class="box" id="box">
+   <div class="bhead"><h3>Skill bearbeiten</h3><button class="ic" id="mmax" title="Dialog vergrößern" style="font-size:18px">⤢</button><button class="ic" id="mclose" title="Schließen" style="font-size:18px">✕</button></div>
+   <div class="hint" style="margin:0 0 12px"><code>${s.id}</code>${s.neu?' · <b>Neu – existiert noch nicht</b>':''}${s.std?' · Standard-Skill von Anthropic – Inhalt nicht änderbar':''}</div>
+   <div class="row"><div class="field"><label>Anzeigename im Cockpit <span class="mark">Vorschlag Claude</span></label><input type="text" id="sn" value="${esc(s.n)}"></div>
+   <div class="field"><label>Produkt</label><select id="sp">${["bodo","sellify","all"].map(p=>`<option value="${p}" ${s.p===p?'selected':''}>${PN[p]}</option>`).join("")}</select></div></div>
+   <div class="row"><div class="field"><label>Gruppe</label><select id="sg">${GR.map((g,i)=>`<option value="${i}" ${i===s.g?'selected':''}>${esc(g)}</option>`).join("")}<option value="new">+ Neue Gruppe …</option></select></div><div></div></div>
+   <div class="field"><label>Beschreibung – wann Claude den Skill benutzt</label><textarea id="sd" ${s.std?'disabled':''}>${esc(s.d)}</textarea>
+     <div class="warnbox">Diese Beschreibung steuert, wann Claude den Skill automatisch auswählt. Der Anzeigename oben ist dagegen nur Kosmetik.</div></div>
+   <div class="field"><label>Leitplanken dieses Skills – eine pro Zeile <span class="mark">Beispiele von Claude</span></label><textarea id="slp" ${s.std?'disabled':''} placeholder="z. B. Vor Anlage auf Dubletten prüfen">${esc(s.lp.join("\n"))}</textarea>
+     <div class="hint">Gelten immer, wenn der Skill läuft – und werden in jedem Agenten mit diesem Skill angezeigt.</div></div>
+   <details ${s.std?'':'open'}><summary>Inhalt (SKILL.md)</summary><textarea id="sb" style="min-height:160px;font-family:ui-monospace,monospace;font-size:12px" ${s.std?'disabled':''}>${esc(s.body)}</textarea></details>
+   <div class="btns" style="margin-top:14px;justify-content:flex-end">${s.std?'':'<button class="btn" id="split" style="margin-right:auto">In Kern + Profile aufteilen</button>'}<button class="btn" id="mx">Abbrechen</button><button class="btn p" id="ms">Speichern</button></div>
+  </div></div>`;
+  const close=()=>$("#modal").innerHTML="";
+  const sp=$("#split");if(sp)sp.onclick=()=>{const o=s.p;s.p="multi";s.prof={bodo:{txt:o==="bodo"?"(bisherige Bodo-Besonderheiten hierher verschieben)":"",lp:[]},sellify:{txt:o==="sellify"?"(bisherige sellify-Besonderheiten hierher verschieben)":"",lp:[],neu:o!=="sellify"?1:0}};render();multiModal(s);toast("Aufgeteilt in Kern + Bodo + sellify")};
+  $("#mmax").onclick=()=>{const b=$("#box");b.classList.toggle("max");$("#mmax").textContent=b.classList.contains("max")?"⤡":"⤢";$("#mmax").title=b.classList.contains("max")?"Dialog verkleinern":"Dialog vergrößern"};
+  $("#mclose").onclick=close;$("#mx").onclick=close;
+  $("#sg").onchange=e=>{if(e.target.value==="new"){const n=prompt("Name der neuen Gruppe:");if(n){GR.push(n);e.target.add(new Option(n,GR.length-1,true,true),e.target.options.length-1)}else e.target.value=s.g}};
+  $("#ms").onclick=()=>{s.n=$("#sn").value;s.g=+$("#sg").value;s.p=$("#sp").value;if(!s.std){s.d=$("#sd").value;s.body=$("#sb").value;s.lp=$("#slp").value.split("\n").map(x=>x.trim()).filter(Boolean)}close();render();toast("Gespeichert (im Entwurf nur in dieser Ansicht)")};
+}
+
+function multiModal(s){
+  const W=JSON.parse(JSON.stringify({n:s.n,g:s.g,d:s.d,lp:s.lp,body:s.body,prof:s.prof}));let tab="core";
+  const ta=(id,v,ph,mono)=>`<textarea id="${id}" ${ph?`placeholder="${ph}"`:''} style="${mono?'min-height:150px;font-family:ui-monospace,monospace;font-size:12px':''}">${esc(v)}</textarea>`;
+  const pane=()=>{
+    if(tab==="core")return `<div class="infobox">✎ Änderungen hier wirken auf <b>Bodo und sellify</b>.</div>
+      <pre class="tree">${s.id}/\n├─ SKILL.md     ← Kern (gemeinsam)\n├─ bodo.md      ← nur Bodo\n└─ sellify.md   ← nur sellify</pre>
+      <div class="field"><label>Beschreibung – wann Claude den Skill benutzt</label>${ta("md_d",W.d)}<div class="warnbox">Steuert, wann Claude den Skill auswählt – gilt für beide Produkte.</div></div>
+      <div class="field"><label>Gemeinsame Leitplanken – eine pro Zeile</label>${ta("md_lp",W.lp.join("\n"))}</div>
+      <details open><summary>SKILL.md (Kern)</summary>${ta("md_b",W.body,"",1)}</details>`;
+    if(tab==="cmp"){const col=k=>`<div class="cmpcol p-${k}"><h4>${PN[k]}${W.prof[k].neu?' <span class="badge neu">neu</span>':''}</h4><div class="hint" style="margin:0 0 6px">${k}.md${W.prof[k].from?" · bisher: "+W.prof[k].from:""}</div>
+        <div class="cmptxt">${esc(W.prof[k].txt||"–").replace(/\n/g,"<br>")}</div>${W.prof[k].lp.length?`<div class="hint" style="margin-top:8px"><b>Nur hier:</b> ${W.prof[k].lp.map(esc).join(" · ")}</div>`:""}</div>`;
+      return `<div class="cmpcore"><b>Gemeinsam (Kern):</b> ${esc(W.d)}${W.lp.length?`<br><span class="hint">Leitplanken: ${W.lp.map(esc).join(" · ")}</span>`:""}</div><div class="cmp">${col("bodo")}${col("sellify")}</div>`}
+    const P=W.prof[tab];
+    return `<div class="infobox p-${tab}">Nur was bei <b>${PN[tab]}</b> anders ist – Datei <code>${tab}.md</code>${P.from?` · zusammengeführt aus <code>${P.from}</code>`:""}${P.neu?' · <span class="badge neu">neu – existiert noch nicht</span>':""}</div>
+      <div class="field"><label>Abweichungen für ${PN[tab]}</label>${ta("md_pt",P.txt,"z. B. Stil, Preise, Zielsystem, Texte",1)}</div>
+      <div class="field"><label>Leitplanken nur für ${PN[tab]} – eine pro Zeile</label>${ta("md_plp",P.lp.join("\n"))}</div>
+      <div class="hint">Tipp: Was sich nur in Kleinigkeiten unterscheidet, besser in den Kern mit einem Hinweis – je kleiner die Profile, desto weniger läuft auseinander.</div>`;
+  };
+  const grab=()=>{const g=id=>document.getElementById(id);
+    if(tab==="core"){W.d=g("md_d").value;W.lp=g("md_lp").value.split("\n").map(x=>x.trim()).filter(Boolean);W.body=g("md_b").value}
+    else if(tab!=="cmp"){W.prof[tab].txt=g("md_pt").value;W.prof[tab].lp=g("md_plp").value.split("\n").map(x=>x.trim()).filter(Boolean)}};
+  $("#modal").innerHTML=`<div class="modal"><div class="box" id="box">
+   <div class="bhead"><h3>Skill bearbeiten</h3><button class="ic" id="mmax" title="Dialog vergrößern" style="font-size:18px">⤢</button><button class="ic" id="mclose" title="Schließen" style="font-size:18px">✕</button></div>
+   <div class="hint" style="margin:0 0 12px"><code>${s.id}</code> · ein Skill mit gemeinsamem Kern und Produkt-Profilen</div>
+   <div class="row"><div class="field"><label>Anzeigename im Cockpit</label><input type="text" id="sn" value="${esc(W.n)}"></div>
+    <div class="field"><label>Gruppe</label><select id="sg">${GR.map((g,i)=>`<option value="${i}" ${i===W.g?'selected':''}>${esc(g)}</option>`).join("")}</select></div></div>
+   <div class="tabs" id="mtabs">${[["core","Gemeinsam (Kern)"],["bodo","Bodo-Profil"],["sellify","sellify-Profil"],["cmp","Vergleich"]].map(([k,l])=>`<button data-tab="${k}" class="${k}">${l}</button>`).join("")}</div>
+   <div id="mpane"></div>
+   <div class="btns" style="margin-top:14px;justify-content:flex-end"><button class="btn" id="mx">Abbrechen</button><button class="btn p" id="ms">Speichern</button></div></div></div>`;
+  const show=()=>{$("#mpane").innerHTML=pane();document.querySelectorAll("#mtabs button").forEach(b=>b.classList.toggle("on",b.dataset.tab===tab))};
+  document.querySelectorAll("#mtabs button").forEach(b=>b.onclick=()=>{grab();tab=b.dataset.tab;show()});show();
+  const close=()=>$("#modal").innerHTML="";$("#mclose").onclick=close;$("#mx").onclick=close;
+  $("#mmax").onclick=()=>{const b=$("#box");b.classList.toggle("max");$("#mmax").textContent=b.classList.contains("max")?"⤡":"⤢"};
+  $("#ms").onclick=()=>{grab();Object.assign(s,{n:$("#sn").value,g:+$("#sg").value,d:W.d,lp:W.lp,body:W.body,prof:W.prof});close();render();toast(tab==="core"?"Gespeichert – gilt für Bodo und sellify":"Gespeichert")};
+}
+
+function inherited(a){ // Leitplanken aus Skills, gleiche Regel aus mehreren Skills zusammengefasst
+  const m=new Map(),add=(r,src)=>{if(!m.has(r))m.set(r,[]);m.get(r).push(src)};
+  a.s.forEach(id=>{const s=sk(id);if(!s)return;s.lp.forEach(r=>add(r,{s,l:s.n+(s.p==="multi"?" · Kern":"")}));
+    if(s.p==="multi")(a.p==="all"?["bodo","sellify"]:[a.p]).forEach(k=>s.prof[k]&&s.prof[k].lp.forEach(r=>add(r,{s,l:s.n+" · "+PN[k]})))});
+  return [...m.entries()];
+}
+function md(a){
+  const slug=a.n.toLowerCase().replace(/ä/g,"ae").replace(/ö/g,"oe").replace(/ü/g,"ue").replace(/ß/g,"ss").replace(/[^a-z0-9]+/g,"-").replace(/^-|-$/g,"");
+  const inh=inherited(a),gl=GLOBAL.filter((r,i)=>a.gl[i]);
+  return `---\nname: ${slug}\ndescription: ${a.r}\nmodel: ${a.m.toLowerCase()}\nskills: ${a.s.join(", ")}\n---\n\nDu bist der Agent „${a.n}“ für Boris (business//acts / Bodo Solutions).\n\nAufgabe: ${a.r}\n\nSkills:\n${a.s.map(id=>"- "+id+" ("+(sk(id)?.n||"")+")"+(profOf(a,sk(id))?" – "+profOf(a,sk(id)):"")).join("\n")||"- (keine)"}\n${a.mcp.length?"\nZielsysteme (MCP): "+a.mcp.join(", ")+"\n":""}\nRegeln dieses Agenten:\n${a.own.map(r=>"- "+r).join("\n")||"- (keine)"}\n${gl.length?"\nAllgemeine Vorgaben von Boris:\n"+gl.map(r=>"- "+r).join("\n")+"\n":""}\n# Hinweis: Die ${inh.length} Leitplanken aus den Skills stehen in den Skills selbst und wirken automatisch, sobald ein Skill läuft.`;
+}
+function editor(){
+  const a=AG[cur];if(!a||a.p!==AF){$("#editor").innerHTML=`<p class="hint">Keine ${PN[AF]}-Agenten vorhanden – links „+ Neuer Agent“ legt einen an.</p>`;return}
+  const inh=inherited(a);
+  $("#editor").innerHTML=`
+  <h2>Agent bearbeiten <span class="mark">Beispiel von Claude</span></h2>
+  <div class="row"><div class="field"><label>Name</label><input type="text" id="an" value="${esc(a.n)}"></div><div>
+  <div class="row"><div class="field"><label>Produkt</label><select id="ap">${["bodo","sellify","all"].map(p=>`<option value="${p}" ${a.p===p?'selected':''}>${PN[p]}</option>`).join("")}</select></div>
+  <div class="field"><label>Modell</label><select id="am">${["Opus","Sonnet","Haiku"].map(m=>`<option ${m==a.m?'selected':''}>${m}</option>`).join("")}</select></div></div></div></div>
+  <div class="field"><label>Auftrag – wann wird der Agent eingesetzt? (geht in die Agent-Definition)</label><textarea id="ar">${esc(a.r)}</textarea></div>
+  <div class="field"><label>Notizen – nur für dich, z. B. Einsatzbeispiele, offene Punkte</label><textarea id="ano" placeholder="Was macht der Agent genau? Wann setze ich ihn ein? Was fehlt noch?">${esc(a.note)}</textarea></div>
+  <div class="field"><label>Skills – aus der Bibliothek hierher ziehen oder dort antippen</label>
+   <div class="drop" id="drop">${a.s.map(id=>`<span class="chip ${bad(a,sk(id))?'bad':''}" title="${bad(a,sk(id))?'Gehört zu '+PN[sk(id).p]+' – passt nicht zum Produkt dieses Agenten':id}">${bad(a,sk(id))?'⚠ ':''}${esc(sk(id)?.n||id)}${profOf(a,sk(id))?` <small class="prf">· ${profOf(a,sk(id))}</small>`:""}<button class="ic" data-r="${id}">×</button></span>`).join("")||'<span class="hint">noch keine Skills</span>'}</div></div>
+  <div class="field"><label>Verbindungen (MCP)</label><div style="display:flex;gap:16px">${["Bodo","sellify"].map(m=>`<label class="cb"><input type="checkbox" data-m="${m}" ${a.mcp.includes(m)?'checked':''}> ${m}</label>`).join("")}</div></div>
+  <div class="field"><span class="flabel">Leitplanken – woher sie kommen</span><div class="lpwrap">
+    <div class="lpsec"><h4>1 · Aus den Skills geerbt <span class="badge lp">${inh.length}</span><span class="hint" style="margin:0;font-weight:400">automatisch, nur im Skill änderbar</span></h4>
+      ${inh.map(([r,srcs])=>`<div class="lprule"><span class="txt">${esc(r)}</span>${srcs.map(x=>`<span class="src" title="${x.s.id}" data-edit="${x.s.id}">⛨ ${esc(x.l)}</span>`).join(" ")}</div>`).join("")||'<div class="hint">Die gewählten Skills bringen keine Leitplanken mit.</div>'}</div>
+    <div class="lpsec"><h4>2 · Eigene Regeln dieses Agenten <span class="badge">${a.own.length}</span></h4>
+      ${a.own.map((r,i)=>`<div class="lprule"><span class="txt">${esc(r)}</span><button class="ic" data-ro="${i}" title="entfernen">×</button></div>`).join("")||'<div class="hint">Noch keine.</div>'}
+      <div class="ownadd"><input type="text" id="ownin" placeholder="Neue Regel für diesen Agenten …"><button class="btn" id="ownbtn">Hinzufügen</button></div></div>
+    <div class="lpsec"><h4>3 · Deine allgemeinen Vorgaben</h4><div class="hint" style="margin:0 0 6px">Gelten in Cowork sowieso immer. Häkchen = zusätzlich fest in den Agenten schreiben (wichtig, falls er außerhalb von Cowork läuft).</div>
+      ${GLOBAL.map((r,i)=>`<label class="cb"><input type="checkbox" data-gl="${i}" ${a.gl[i]?'checked':''}> ${esc(r)}</label>`).join("")}</div>
+  </div></div>
+  <div class="field"><details><summary>Erzeugte Agent-Definition anzeigen</summary><pre id="pv"></pre></details></div>
+  <div class="btns"><button class="btn p" onclick="toast('Im Entwurf ohne Funktion')">In Cowork installieren</button><button class="btn" onclick="toast('Im Entwurf ohne Funktion')">Exportieren</button><button class="btn d" id="del">Löschen</button></div>`;
+  upd();
+  $("#an").oninput=e=>{a.n=e.target.value;alist();matrix();upd()};
+  $("#ar").oninput=e=>{a.r=e.target.value;upd()};$("#ano").oninput=e=>{a.note=e.target.value;alist()};
+  $("#am").onchange=e=>{a.m=e.target.value;upd()};
+  $("#ap").onchange=e=>{a.p=e.target.value;AF=a.p;if($("#follow").checked)PF=a.p;render()};
+  $("#del").onclick=()=>{if(confirm("Agent „"+a.n+"“ löschen?")){AG.splice(cur,1);cur=0;render()}};
+  document.querySelectorAll("[data-r]").forEach(b=>b.onclick=()=>{a.s=a.s.filter(x=>x!==b.dataset.r);render()});
+  document.querySelectorAll("[data-m]").forEach(c=>c.onchange=()=>{a.mcp=c.checked?[...a.mcp,c.dataset.m]:a.mcp.filter(x=>x!==c.dataset.m);alist();upd()});
+  document.querySelectorAll("[data-gl]").forEach(c=>c.onchange=()=>{a.gl[+c.dataset.gl]=c.checked?1:0;upd()});
+  document.querySelectorAll("#editor [data-edit]").forEach(b=>b.onclick=()=>skillModal(b.dataset.edit));
+  document.querySelectorAll("[data-ro]").forEach(b=>b.onclick=()=>{a.own.splice(+b.dataset.ro,1);editor()});
+  const add=()=>{const v=$("#ownin").value.trim();if(v){a.own.push(v);editor()}};$("#ownbtn").onclick=add;$("#ownin").onkeydown=e=>{if(e.key==="Enter")add()};
+  const d=$("#drop");d.ondragover=e=>{e.preventDefault();d.classList.add("over")};d.ondragleave=()=>d.classList.remove("over");
+  d.ondrop=e=>{e.preventDefault();const id=e.dataTransfer.getData("t");if(id&&!a.s.includes(id))a.s.push(id);render()};
+}
+function upd(){const p=$("#pv");if(p)p.textContent=md(AG[cur])}
+function alist(){
+  const L=agVis();$("#alist").innerHTML=(L.length?"":`<p class="hint">Noch keine ${PN[AF]}-Agenten.</p>`)+L.map(([a,i])=>`<div class="aitem p-${a.p} ${i==cur?'on':''}" data-i="${i}"><div class="t">${i===renaming?`<input type="text" id="rn" value="${esc(a.n)}">`:`<b>${esc(a.n)}</b>`}
+   <small>${a.s.length} Skills${a.mcp.length?' · '+a.mcp.join(", "):''}${a.note?' · 📝':''}</small></div><button class="ic" data-ren="${i}" title="Umbenennen">✎</button></div>`).join("");
+  document.querySelectorAll(".aitem").forEach(b=>b.onclick=e=>{if(e.target.closest("[data-ren],input"))return;cur=+b.dataset.i;renaming=-1;if($("#follow").checked)PF=AG[cur].p;render()});
+  document.querySelectorAll("[data-ren]").forEach(b=>b.onclick=()=>startRename(+b.dataset.ren));
+}
+function startRename(i){renaming=i;cur=i;render();const r=$("#rn");r.focus();r.select();
+  const done=()=>{if(renaming<0)return;AG[renaming].n=r.value||AG[renaming].n;renaming=-1;render()};
+  r.onkeydown=e=>{if(e.key==="Enter")done();if(e.key==="Escape"){renaming=-1;render()}};r.onblur=done}
+function matrix(){
+  const AV=agVis();
+  let h=`<table><thead><tr><th>Skill</th>${AV.map(([a])=>`<th>${esc(a.n)}</th>`).join("")}</tr></thead><tbody>`;
+  GR.forEach((g,gi)=>{const items=SK.filter(s=>s.g===gi&&vis(s));if(!items.length)return;
+    h+=`<tr><td class="gr" colspan="${AV.length+1}">${esc(g)}</td></tr>`;
+    items.forEach(s=>{const u=use(s.id);h+=`<tr><td><span class="pb ${s.p}">${PN[s.p]}</span> ${esc(s.n)}${isNeu(s)?' <span class="badge neu">Neu</span>':''} <span class="badge ${u?'':'zero'}">${u}</span></td>${AV.map(([a,i])=>`<td class="${a.s.includes(s.id)?'x':'e'}" data-a="${i}" data-s="${s.id}">${a.s.includes(s.id)?'●':'·'}</td>`).join("")}</tr>`})});
+  $("#mtx").innerHTML=h+"</tbody></table>";
+  document.querySelectorAll("#mtx td[data-a]").forEach(td=>td.onclick=()=>{const a=AG[+td.dataset.a],id=td.dataset.s;a.s=a.s.includes(id)?a.s.filter(x=>x!==id):[...a.s,id];render()});
+}
+function render(){lib();alist();if(renaming<0)editor();matrix();$("#mf").textContent="Skills: "+PN[PF]+(GEN&&PF!=="all"?" + Andere":"")+" · Agenten: "+PN[AF]}
+$("#q").oninput=lib;
+$("#gen").onchange=e=>{GEN=e.target.checked;render()};
+$("#colAll").onclick=()=>{GR.forEach((g,i)=>COL.add(i));lib()};
+$("#expAll").onclick=()=>{COL.clear();lib()};
+$("#newG").onclick=()=>{const n=prompt("Name der neuen Gruppe:");if(n){GR.push(n);render();toast("Gruppe angelegt – Skills per Ziehen hinein")}};
+$("#newA").onclick=()=>{AG.push({n:"Neuer Agent",p:AF,r:"",note:"",s:[],mcp:[],m:"Sonnet",own:[],gl:[1,1,1,1,0,0]});startRename(AG.length-1)};
+
+// ===== Ebene 3: Abläufe (Prozessdiagramm) und Aufträge (Ausführungen) =====
+const ag=n=>AG.find(a=>a.n===n);
+let FF="bodo",fcur=0,SEL=null,ZM=null;
+const fitZ=(w,W,H,maxH)=>Math.max(.35,Math.min(1,(w.clientWidth-12)/W,maxH?(maxH-12)/H:9));
+const Z=()=>ZM||1;
+function NTD(){return {mix:1,ev:{ask:[1,1,0],hold:[1,1,0],done:[1,1,0],err:[1,1,1]}}}
+const CH=["📱 Handy (Push)","💻 Cowork-App","✉️ E-Mail"];
+const EV=[["ask","Rückfrage, die die Agenten nicht klären konnten"],["hold","Deine Entscheidung / Freigabe"],["done","Auftrag fertig"],["err","Fehler / Auftrag hängt"]];
+const HO=["Entscheidungen mit Begründung","Verweise auf die Dokumente","Offene Fragen","Was der Nächste darf / nicht darf"];
+const NS={start:{w:46,h:46,l:"Start"},task:{w:170,h:70,l:"Agenten-Schritt"},dec:{w:150,h:86,l:"Entscheidung (Agent)"},human:{w:150,h:86,l:"Entscheidung (du)"},end:{w:46,h:46,l:"Ende"}};
+let NID=1;const nid=()=>"n"+(NID++);
+// lineare Vorlage -> Graph (Haltepunkt wird zur Entscheidung durch dich)
+function lin(f,steps){
+  const N=[],E=[];let x=20,y=190;const s={id:nid(),type:"start",x,y:y+12,label:"Start"};N.push(s);let prev=s;x+=90;
+  steps.forEach(st=>{const t={id:nid(),type:"task",x,y,a:st.a,t:st.t,o:st.o,ho:[1,1,1,1]};N.push(t);E.push({f:prev.id,t:t.id,l:""});prev=t;x+=220;
+    if(st.h){const hm={id:nid(),type:"human",x,y:y-8,label:"Freigabe: "+st.o+"?"};N.push(hm);E.push({f:t.id,t:hm.id,l:""});E.push({f:hm.id,t:t.id,l:"ändern",back:1,max:3});prev=hm;prev._out="freigeben";x+=200}});
+  const e={id:nid(),type:"end",x,y:y+12,label:"Ergebnis an dich"};N.push(e);E.push({f:prev.id,t:e.id,l:prev._out||""});
+  return {...f,N,E};
+}
+const A=n=>ag(n);
+function ticketFlow(){
+  const N=[
+   {id:"s",type:"start",x:20,y:200,label:"Kundenwunsch"},
+   {id:"t1",type:"task",x:100,y:188,a:A("Bodo Produkt & Tickets"),t:"Wunsch verstehen, auf vergleichbare Tickets prüfen",o:"Prüfergebnis",ho:[1,1,1,1]},
+   {id:"d1",type:"dec",x:310,y:180,label:"Vergleichbares Ticket gefunden?",a:A("Bodo Produkt & Tickets")},
+   {id:"t2",type:"task",x:510,y:60,a:A("Bodo Produkt & Tickets"),t:"Ergänzung zum bestehenden Ticket entwerfen",o:"Entwurf Ergänzung",ho:[1,1,1,1]},
+   {id:"t3",type:"task",x:510,y:310,a:A("Bodo Produkt & Tickets"),t:"Ticket-Entwurf + Entwurfsbild erstellen",o:"Ticket-Entwurf + Bild",ho:[1,1,1,1]},
+   {id:"h1",type:"human",x:740,y:180,label:"Deine Freigabe?"},
+   {id:"t4",type:"task",x:960,y:60,a:A("Bodo Produkt & Tickets"),t:"Ticket anlegen bzw. Ergänzung eintragen (ohne Zuständigen)",o:"Ticket-Nummer",ho:[1,1,0,1]},
+   {id:"t5",type:"task",x:1180,y:60,a:A("Vertriebsassistent Bodo"),t:"Kunden per Mail informieren",o:"Mail-Entwurf",ho:[1,1,1,1]},
+   {id:"t6",type:"task",x:960,y:330,a:A("Vertriebsassistent Bodo"),t:"Kunden informieren, dass es nicht umgesetzt wird",o:"Mail-Entwurf",ho:[1,1,1,1]},
+   {id:"e",type:"end",x:1400,y:200,label:"Erledigt"}];
+  const E=[{f:"s",t:"t1",l:""},{f:"t1",t:"d1",l:""},{f:"d1",t:"t2",l:"ja"},{f:"d1",t:"t3",l:"nein"},{f:"t2",t:"h1",l:""},{f:"t3",t:"h1",l:""},
+   {f:"h1",t:"t4",l:"freigeben"},{f:"h1",t:"t3",l:"ändern",back:1,max:3},{f:"h1",t:"t6",l:"verwerfen"},{f:"t4",t:"t5",l:""},{f:"t5",t:"e",l:""},{f:"t6",t:"e",l:""}];
+  return {n:"Kundenwunsch → Ticket → Rückmeldung",p:"bodo",goal:"Ein Kundenwunsch wird sauber als Ticket erfasst (oder an ein bestehendes angehängt) und der Kunde informiert.",start:"Kundenmail oder Notiz, ggf. Screenshot",nt:NTD(),rec:"manuell",N,E};
+}
+let FL=[
+ lin({n:"Vom Erstgespräch zum Angebot",p:"bodo",goal:"Aus einem Erstgespräch wird ein versandfertiges Angebot mit Begleitmail.",start:"Gesprächsnotizen, Name von Verein und Ansprechpartner",nt:NTD(),rec:"manuell"},
+  [{a:A("Vertriebsassistent Bodo"),t:"Kontakt (Person + Organisation) anlegen, Dubletten prüfen",o:"Kontakt-Datensatz",h:0},
+   {a:A("Vertriebsassistent Bodo"),t:"Produktblatt und Angebot erstellen",o:"Angebot + Produktblatt",h:1},
+   {a:A("Vertriebsassistent Bodo"),t:"Begleitmail formulieren",o:"Mail-Entwurf",h:1}]),
+ lin({n:"Neukunde: vom Auftrag zum Start",p:"bodo",goal:"Nach der Beauftragung läuft die Einführung ohne Lücke an.",start:"Beauftragung (Mail/PDF), Ansprechpartner",nt:NTD(),rec:"manuell"},
+  [{a:A("Vertriebsassistent Bodo"),t:"Beauftragung im CRM vermerken, Kontakte prüfen",o:"Kunde + Ansprechpartner",h:0},
+   {a:A("Onboarding Mieterverein"),t:"Einführungsprojekt anlegen",o:"Projekt + Zeitplan",h:0},
+   {a:A("Onboarding Mieterverein"),t:"Ersteinrichtung vorbereiten",o:"Einrichtungsplan",h:1},
+   {a:A("Vertriebsassistent Bodo"),t:"Willkommensmail an den Kunden",o:"Mail-Entwurf",h:1}]),
+ ticketFlow(),
+ lin({n:"Vom Erstgespräch zum Angebot (sellify)",p:"sellify",goal:"Aus einem Erstgespräch wird ein versandfertiges sellify-Angebot.",start:"Gesprächsnotizen, Firma und Ansprechpartner",nt:NTD(),rec:"manuell"},
+  [{a:A("Vertriebsassistent sellify"),t:"Kontakt anlegen, Dubletten prüfen",o:"Kontakt-Datensatz",h:0},
+   {a:A("Vertriebsassistent sellify"),t:"Produktblatt und Angebot erstellen",o:"Angebot + Produktblatt",h:1},
+   {a:A("Vertriebsassistent sellify"),t:"Begleitmail formulieren",o:"Mail-Entwurf",h:1}]),
+ lin({n:"Neukunde sellify: vom Auftrag zum Start",p:"sellify",goal:"Nach der Beauftragung startet die sellify-Einführung.",start:"Beauftragung, Ansprechpartner",nt:NTD(),rec:"manuell"},
+  [{a:A("Vertriebsassistent sellify"),t:"Beauftragung im CRM vermerken",o:"Kunde + Ansprechpartner",h:0},
+   {a:A("Onboarding sellify-Kunde"),t:"Einführungsprojekt anlegen",o:"Projekt + Zeitplan",h:0},
+   {a:A("Onboarding sellify-Kunde"),t:"Ersteinrichtung vorbereiten",o:"Einrichtungsplan",h:1}]),
+ lin({n:"Webseite prüfen und vorführen",p:"all",goal:"Eine Webseite ist mobil fehlerfrei und als iPhone-Vorschau vorführbar.",start:"Link oder HTML-Datei",nt:NTD(),rec:"manuell"},
+  [{a:A("Web-QA"),t:"Mobil prüfen und Fehler beheben",o:"Korrigierte Seite + Fehlerliste",h:0},
+   {a:A("Web-QA"),t:"iPhone-Vorschau erstellen",o:"Vorschau-Seite",h:0}])
+];
+fcur=FL.findIndex(f=>f.n.startsWith("Kundenwunsch"));
+const fl=n=>FL.find(f=>f.n===n);
+const nodeOf=(f,id)=>f.N.find(n=>n.id===id);
+const nodesOfType=(f,t)=>f.N.filter(n=>n.type===t);
+const nlabel=n=>n.type==="task"?(n.a?.n||"?")+": "+n.t:(n.label||NS[n.type].l);
+// Aufträge: Weg durch den Graphen (path) + aktueller Knoten
+function pathLin(f,k){const T=f.N.filter(n=>n.type!=="human"&&n.type!=="end");return T.slice(0,k+1).map(n=>n.id)}
+const F2=fl("Neukunde: vom Auftrag zum Start"),F3=fl("Kundenwunsch → Ticket → Rückmeldung"),F4=fl("Vom Erstgespräch zum Angebot (sellify)"),F1=fl("Vom Erstgespräch zum Angebot"),F6=fl("Webseite prüfen und vorführen");
+const allPath=f=>{const P=[f.N[0].id];let c=f.N[0];for(let i=0;i<40;i++){const e=f.E.find(e=>e.f===c.id&&!e.back);if(!e)break;c=nodeOf(f,e.t);P.push(c.id)}return P};
+let AU=[
+ {id:"A-104",f:F2,t:"Mieterverein Musterstadt e. V.",in:"Beauftragung vom 07.10., Ansprechpartnerin Frau Beispiel",path:pathLin(F2,3),st:"wait",
+  q:{from:"Onboarding Mieterverein",kind:"Rückfrage",text:"Der Verein nutzt bisher ein anderes Programm. Sollen die Mitgliederdaten übernommen werden oder startet der Verein leer?",why:"Vertriebsassistent und Onboarding konnten das nicht klären – in der Beauftragung steht nichts dazu.",opts:["Daten übernehmen","Leer starten","Ich kläre das mit dem Kunden"]},
+  log:[["09:12","Auftrag gestartet von Boris"],["09:14","Vertriebsassistent Bodo: Beauftragung vermerkt → übergibt an Onboarding"],["09:19","Onboarding Mieterverein: Einführungsprojekt angelegt"],["09:23","Onboarding fragt Vertriebsassistent: Datenübernahme vereinbart? → nicht bekannt"],["09:24","Rückfrage an Boris gesendet (📱 Handy, 💻 Cowork)",1]]},
+ {id:"A-103",f:F3,t:"Wunsch: Serienbrief mit Anlagen",in:"Kundenmail vom 08.10. mit Screenshot",path:["s","t1","d1","t3","h1"],st:"wait",
+  q:{from:"Bodo Produkt & Tickets",kind:"Freigabe",text:"Ticket-Entwurf „Serienbrief: mehrere Anlagen anhängen“ ist fertig, inkl. Entwurfsbild.",why:"Entscheidung „Vergleichbares Ticket gefunden?“ → nein. Tickets werden erst nach deiner Freigabe angelegt."},
+  log:[["08:40","Auftrag gestartet von Boris"],["08:43","Bodo Produkt & Tickets: Dublettenprüfung"],["08:44","Entscheidung: Vergleichbares Ticket gefunden? → nein"],["08:51","Ticket-Entwurf + Entwurfsbild erstellt"],["08:51","Freigabe bei Boris angefragt (📱 Handy, 💻 Cowork)",1]]},
+ {id:"A-102",f:F4,t:"Muster Maschinenbau GmbH",in:"Notizen aus dem Termin am 08.10.",path:pathLin(F4,2),st:"run",
+  log:[["10:02","Auftrag gestartet von Boris"],["10:05","Vertriebsassistent sellify: Kontakt angelegt"],["10:06","erstellt Produktblatt und Angebot …"]]},
+ {id:"A-101",f:F1,t:"Mieterverein Beispielstadt e. V.",in:"Gesprächsnotizen vom 06.10.",path:allPath(F1),st:"done",
+  log:[["Mo 14:10","Auftrag gestartet"],["Mo 14:31","Angebot freigegeben von Boris"],["Mo 14:40","Mail-Entwurf freigegeben – fertig"]]},
+ {id:"A-100",f:F6,t:"Bodo-Homepage Startseite",in:"Link zur Testseite",path:allPath(F6),st:"done",
+  log:[["Mo 09:00","Auftrag gestartet"],["Mo 09:22","3 Fehler behoben, iPhone-Vorschau erstellt – fertig"]]}
+];
+// ---------- Diagramm zeichnen ----------
+const SIDE={r:[1,0],l:[-1,0],t:[0,-1],b:[0,1]};
+function anc(n,s){const z=NS[n.type];return s==="r"?[n.x+z.w,n.y+z.h/2]:s==="l"?[n.x,n.y+z.h/2]:s==="t"?[n.x+z.w/2,n.y]:[n.x+z.w/2,n.y+z.h]}
+function geo(f,e){
+  const a=nodeOf(f,e.f),b=nodeOf(f,e.t);if(!a||!b)return null;
+  const za=NS[a.type],zb=NS[b.type],ax=a.x+za.w/2,ay=a.y+za.h/2,bx=b.x+zb.w/2,by=b.y+zb.h/2,dx=bx-ax,dy=by-ay;
+  let ss,ts;
+  if(e.back||dx<-20){ss="b";ts="b"}
+  else{ss=(a.type==="dec"||a.type==="human")&&Math.abs(dy)>40?(dy<0?"t":"b"):dx>20?"r":dy>0?"b":"t";
+       ts=dx>20&&Math.abs(dx)>Math.abs(dy)*0.4?"l":dy>0?"t":"b"}
+  const p0=anc(a,ss),p3=anc(b,ts);
+  let p1,p2;
+  if(ss==="b"&&ts==="b"){const ly=Math.max(p0[1],p3[1])+70;p1=[p0[0],ly];p2=[p3[0],ly]}
+  else{const k=Math.max(40,Math.hypot(p3[0]-p0[0],p3[1]-p0[1])/2.2);p1=[p0[0]+SIDE[ss][0]*k,p0[1]+SIDE[ss][1]*k];p2=[p3[0]+SIDE[ts][0]*k,p3[1]+SIDE[ts][1]*k]}
+  const m=[(p0[0]+3*p1[0]+3*p2[0]+p3[0])/8,(p0[1]+3*p1[1]+3*p2[1]+p3[1])/8];
+  return {d:`M${p0} C${p1} ${p2} ${p3}`,m};
+}
+function nodeHTML(f,n,o){
+  const st=o.state?o.state(n):"",sel=!o.ro&&SEL&&SEL.k==="n"&&SEL.id===n.id?"sel":"";
+  const prod=n.a?.p||f.p,hd=o.ro||n.type==="end"?"":`<span class="hd" data-hd="${n.id}" title="Ziehen = verbinden">+</span>`;
+  if(n.type==="task")return `<div class="node task p-${prod} ${st} ${sel}" data-n="${n.id}" style="left:${n.x}px;top:${n.y}px"><div class="ag">${esc(n.a?.n||"Agent wählen")}</div><div>${esc(n.t||"Aufgabe …")}</div>${hd}</div>`;
+  if(n.type==="dec"||n.type==="human"){const hu=n.type==="human";
+    return `<div class="node dia ${n.type} ${st} ${sel}" data-n="${n.id}" style="left:${n.x}px;top:${n.y}px"><svg viewBox="0 0 150 86" preserveAspectRatio="none"><polygon points="75,2 148,43 75,84 2,43"/></svg><div class="dt">${hu?"👤 ":""}${esc(n.label||"Frage …")}</div>${hd}</div>`}
+  return `<div class="node circ ${n.type} ${st} ${sel}" data-n="${n.id}" style="left:${n.x}px;top:${n.y}px"><span class="ci">${n.type==="start"?"▶":"■"}</span><div class="cap">${esc(n.label||"")}</div>${hd}</div>`;
+}
+function drawGraph(box,f,o={}){
+  const W=Math.max(...f.N.map(n=>n.x+NS[n.type].w))+120,H=Math.max(...f.N.map(n=>n.y+NS[n.type].h))+130;
+  let svg=`<svg class="edges" width="${W}" height="${H}"><defs>${["g","k","a"].map(c=>`<marker id="ar${c}${o.ro?'r':''}" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0L10,5L0,10z" class="mk${c}"/></marker>`).join("")}</defs>`;
+  let labs="";
+  f.E.forEach((e,i)=>{const g=geo(f,e);if(!g)return;const tk=o.taken&&o.taken(e),sel=!o.ro&&SEL&&SEL.k==="e"&&SEL.i===i;
+    const c=sel?"a":tk?"g":"k";
+    svg+=`<path d="${g.d}" class="ed ${e.back?'back':''} ${tk?'tk':''} ${sel?'sel':''}" marker-end="url(#ar${c}${o.ro?'r':''})"/>`;
+    if(!o.ro)svg+=`<path d="${g.d}" class="hit" data-e="${i}"/>`;
+    if(e.l||e.back)labs+=`<div class="elab ${sel?'sel':''} ${tk?'tk':''}" data-e="${i}" style="left:${g.m[0]}px;top:${g.m[1]}px">${e.back?"↩ ":""}${esc(e.l||"zurück")}${e.back&&e.max?` <small>max ${e.max}×</small>`:""}</div>`});
+  svg+=`<path id="tmp" class="ed tmp" d=""/></svg>`;
+  box.dataset.w=W;box.dataset.h=H;box.innerHTML=`<div class="cv" style="width:${W}px;height:${H}px;zoom:${o.z||1}">${svg}${f.N.map(n=>nodeHTML(f,n,o)).join("")}${labs}</div>`;
+}
+// ---------- Ablauf-Editor ----------
+function fseg(){
+  $("#fseg").innerHTML=PK.map(([p,l])=>`<button data-p="${p}" class="${FF===p?'on':''}">${l}<span class="n">${FL.filter(f=>f.p===p).length}</span></button>`).join("");
+  document.querySelectorAll("#fseg button").forEach(b=>b.onclick=()=>{FF=b.dataset.p;fcur=FL.findIndex(f=>f.p===FF);SEL=null;ZM=null;flows()});
+}
+function flows(){
+  fseg();
+  const L=FL.map((f,i)=>[f,i]).filter(([f])=>f.p===FF);
+  $("#flist").innerHTML=(L.length?"":`<p class="hint">Noch keine ${PN[FF]}-Abläufe.</p>`)+L.map(([f,i])=>{const k=nodesOfType(f,"task").length,d=nodesOfType(f,"dec").length+nodesOfType(f,"human").length;
+    return `<div class="aitem p-${f.p} ${i==fcur?'on':''}" data-fi="${i}"><div class="t"><b>${esc(f.n)}</b><small>${k} Schritte · ${d} Entscheidungen</small></div></div>`}).join("");
+  document.querySelectorAll("[data-fi]").forEach(e=>e.onclick=()=>{fcur=+e.dataset.fi;SEL=null;ZM=null;flows()});
+  fedit();
+}
+function fedit(){
+  const f=FL[fcur];if(!f||f.p!==FF){$("#fedit").innerHTML='<p class="hint">Kein Ablauf ausgewählt.</p>';return}
+  $("#fedit").innerHTML=`<div class="fhead"><input type="text" id="fn" value="${esc(f.n)}" class="fname"><span class="mark">Beispiel von Claude</span>
+     <button class="btn p" id="runF">▶ Auftrag starten</button></div>
+   <div class="pal"><span class="hint" style="margin:0">Hinzufügen:</span>${Object.entries(NS).map(([k,v])=>`<button class="btn" data-add="${k}"><span class="pi ${k}"></span>${v.l}</button>`).join("")}
+     <span class="hint" style="margin:0">↩ Rücksprung = Verbindung zu einem früheren Schritt ziehen</span>
+     <span class="zm"><button class="btn" data-z="-" title="verkleinern">−</button><span id="zv"></span><button class="btn" data-z="+" title="vergrößern">+</button><button class="btn" data-z="fit">Einpassen</button></span></div>
+   <div class="fgrid"><div class="cv-wrap" id="cvw"></div><div class="props" id="props"></div></div>`;
+  drawGraph($("#cvw"),f);const w=$("#cvw");if(!ZM)ZM=Math.max(.75,fitZ(w,+w.dataset.w,+w.dataset.h));redraw(f);props(f);
+  document.querySelectorAll("[data-z]").forEach(b=>b.onclick=()=>{const v=b.dataset.z;ZM=v==="fit"?fitZ(w,+w.dataset.w,+w.dataset.h):Math.max(.3,Math.min(1.6,Z()+(v==="+"?.1:-.1)));redraw(f)});
+  $("#fn").oninput=e=>{f.n=e.target.value;const b=document.querySelector(`[data-fi="${fcur}"] b`);if(b)b.textContent=f.n};
+  $("#runF").onclick=()=>startModal(f);
+  document.querySelectorAll("[data-add]").forEach(b=>b.onclick=()=>{const t=b.dataset.add,w=$("#cvw");
+    const n={id:nid(),type:t,x:Math.round((w.scrollLeft/Z()+60)/10)*10,y:Math.round((w.scrollTop/Z()+40)/10)*10,label:t==="dec"||t==="human"?"":t==="start"?"Start":t==="end"?"Ergebnis an dich":undefined};
+    if(t==="task"){n.a=AG.find(a=>a.p===f.p)||AG[0];n.t="";n.o="";n.ho=[1,1,1,1]}
+    if(t==="dec")n.a=AG.find(a=>a.p===f.p)||AG[0];
+    f.N.push(n);SEL={k:"n",id:n.id};fedit();toast(NS[t].l+" hinzugefügt – an die richtige Stelle ziehen")});
+}
+function redraw(f){const w=$("#cvw"),sl=w.scrollLeft,st=w.scrollTop;drawGraph(w,f,{z:Z()});const zv=$("#zv");if(zv)zv.textContent=Math.round(Z()*100)+" %";w.scrollLeft=sl;w.scrollTop=st;bindCanvas(f)}
+function bindCanvas(f){
+  const w=$("#cvw");
+  w.querySelectorAll(".node").forEach(el=>{
+    el.onpointerdown=ev=>{if(ev.target.closest(".hd"))return;ev.preventDefault();const n=nodeOf(f,el.dataset.n),x0=ev.clientX,y0=ev.clientY,nx=n.x,ny=n.y;let mv=false;
+      const mm=e=>{const dx=e.clientX-x0,dy=e.clientY-y0;if(Math.abs(dx)+Math.abs(dy)>3)mv=true;if(!mv)return;n.x=Math.max(0,Math.round((nx+dx/Z())/10)*10);n.y=Math.max(0,Math.round((ny+dy/Z())/10)*10);redrawLive(f,n)};
+      const mu=()=>{removeEventListener("pointermove",mm);removeEventListener("pointerup",mu);SEL={k:"n",id:n.id};redraw(f);props(f)};
+      addEventListener("pointermove",mm);addEventListener("pointerup",mu)}});
+  w.querySelectorAll(".hd").forEach(h=>h.onpointerdown=ev=>{ev.preventDefault();ev.stopPropagation();const a=nodeOf(f,h.dataset.hd),tmp=w.querySelector("#tmp"),cv=w.querySelector(".cv").getBoundingClientRect(),p0=anc(a,"r");
+    const mm=e=>{tmp.setAttribute("d",`M${p0} L${(e.clientX-cv.left)/Z()},${(e.clientY-cv.top)/Z()}`)};
+    const mu=e=>{removeEventListener("pointermove",mm);removeEventListener("pointerup",mu);tmp.setAttribute("d","");
+      const t=document.elementFromPoint(e.clientX,e.clientY)?.closest(".node");if(!t||t.dataset.n===a.id){return}
+      if(f.E.some(x=>x.f===a.id&&x.t===t.dataset.n))return toast("Diese Verbindung gibt es schon");
+      const b=nodeOf(f,t.dataset.n),k=f.E.filter(x=>x.f===a.id).length,back=b.x<a.x-20;
+      const l=a.type==="dec"?(["ja","nein"][k]||"Weg "+(k+1)):a.type==="human"?(["freigeben","ändern","verwerfen"][k]||"Weg "+(k+1)):"";
+      f.E.push({f:a.id,t:b.id,l,back:back?1:0,max:back?3:undefined});SEL={k:"e",i:f.E.length-1};redraw(f);props(f);
+      toast(back?"Rücksprung angelegt (höchstens 3 Runden)":"Verbindung angelegt")};
+    addEventListener("pointermove",mm);addEventListener("pointerup",mu)});
+  w.querySelectorAll("[data-e]").forEach(el=>el.onclick=ev=>{ev.stopPropagation();SEL={k:"e",i:+el.dataset.e};redraw(f);props(f)});
+  w.querySelector(".cv").onclick=ev=>{if(ev.target.closest(".node,[data-e]"))return;if(SEL){SEL=null;redraw(f);props(f)}};
+}
+function redrawLive(f,n){const w=$("#cvw"),el=w.querySelector(`[data-n="${n.id}"]`);el.style.left=n.x+"px";el.style.top=n.y+"px";
+  const svg=w.querySelector("svg.edges"),paths=svg.querySelectorAll("path.ed:not(.tmp)"),hits=svg.querySelectorAll("path.hit"),labs=w.querySelectorAll(".elab");let li=0;
+  f.E.forEach((e,i)=>{const g=geo(f,e);if(!g)return;paths[i]&&paths[i].setAttribute("d",g.d);hits[i]&&hits[i].setAttribute("d",g.d);
+    if(e.l||e.back){const L=[...labs].find(x=>+x.dataset.e===i);if(L){L.style.left=g.m[0]+"px";L.style.top=g.m[1]+"px"}}})}
+function agentSel(f,cur,id){return `<select id="${id}">${AG.filter(a=>a.p===f.p||a.p==="all").map(a=>`<option value="${AG.indexOf(a)}" ${cur===a?'selected':''}>${esc(a.n)}</option>`).join("")}</select>`}
+function props(f){
+  const P=$("#props");
+  if(!SEL){ // Ablauf-Einstellungen
+    P.innerHTML=`<h2>Ablauf-Einstellungen</h2>
+     <div class="field"><label>Bereich</label><select id="fp">${PK.map(([p,l])=>`<option value="${p}" ${f.p===p?'selected':''}>${l}</option>`).join("")}</select></div>
+     <div class="field"><label>Start</label><select id="frec">${["manuell","täglich","wöchentlich","bei neuer Mail (später)"].map(r=>`<option ${f.rec===r?'selected':''}>${r}</option>`).join("")}</select></div>
+     <div class="field"><label>Ziel – was ist am Ende erledigt?</label><textarea id="fg">${esc(f.goal)}</textarea></div>
+     <div class="field"><label>Was brauche ich zum Start?</label><textarea id="fs">${esc(f.start)}</textarea></div>
+     <div class="field"><span class="flabel">Rückfragen &amp; Benachrichtigung</span>
+      <label class="cb"><input type="checkbox" id="fmix" ${f.nt.mix?'checked':''}> Agenten klären Fragen zuerst untereinander</label>
+      <table class="nt"><thead><tr><th></th>${CH.map(c=>`<th title="${c}">${c.split(" ")[0]}</th>`).join("")}</tr></thead><tbody>
+      ${EV.map(([k,l])=>`<tr><td>${l}</td>${CH.map((c,ci)=>`<td><input type="checkbox" data-ev="${k}" data-ch="${ci}" ${f.nt.ev[k][ci]?'checked':''}></td>`).join("")}</tr>`).join("")}</tbody></table>
+      <div class="hint">📱 Handy · 💻 Cowork-App · ✉️ E-Mail</div></div>
+     <button class="btn d" id="delF">Ablauf löschen</button>
+     <p class="hint">Tipp: Knoten oder Verbindung antippen, um sie zu bearbeiten.</p>`;
+    $("#fp").onchange=e=>{f.p=e.target.value;FF=f.p;flows()};$("#frec").onchange=e=>f.rec=e.target.value;
+    $("#fg").oninput=e=>f.goal=e.target.value;$("#fs").oninput=e=>f.start=e.target.value;$("#fmix").onchange=e=>f.nt.mix=e.target.checked?1:0;
+    P.querySelectorAll("[data-ev]").forEach(e=>e.onchange=()=>f.nt.ev[e.dataset.ev][+e.dataset.ch]=e.checked?1:0);
+    $("#delF").onclick=()=>{if(confirm("Ablauf „"+f.n+"“ löschen?")){FL.splice(fcur,1);fcur=FL.findIndex(x=>x.p===FF);flows()}};
+    return}
+  if(SEL.k==="e"){const e=f.E[SEL.i];if(!e){SEL=null;return props(f)}const a=nodeOf(f,e.f),b=nodeOf(f,e.t);
+    P.innerHTML=`<h2>Verbindung</h2><p class="hint" style="margin-top:0">${esc(nlabel(a))}<br>→ ${esc(nlabel(b))}</p>
+     <div class="field"><label>Beschriftung ${a.type==="dec"||a.type==="human"?"(Antwort auf die Frage)":"(optional)"}</label><input type="text" id="el" value="${esc(e.l||"")}"></div>
+     <label class="cb"><input type="checkbox" id="eb" ${e.back?'checked':''}> Rücksprung (zurück zu einem früheren Schritt)</label>
+     ${e.back?`<div class="field"><label>Höchstens so viele Runden, danach fragt der Ablauf dich</label><input type="text" id="em" value="${e.max||3}"></div>`:""}
+     <button class="btn d" id="edel">Verbindung löschen</button>`;
+    $("#el").oninput=ev=>{e.l=ev.target.value;redraw(f)};
+    $("#eb").onchange=ev=>{e.back=ev.target.checked?1:0;if(e.back&&!e.max)e.max=3;redraw(f);props(f)};
+    const em=$("#em");if(em)em.oninput=ev=>{e.max=+ev.target.value||3;redraw(f)};
+    $("#edel").onclick=()=>{f.E.splice(SEL.i,1);SEL=null;redraw(f);props(f)};return}
+  const n=nodeOf(f,SEL.id);if(!n){SEL=null;return props(f)}
+  const outs=f.E.map((e,i)=>[e,i]).filter(([e])=>e.f===n.id);
+  const outHTML=n.type==="dec"||n.type==="human"?`<div class="field"><span class="flabel">Ausgänge</span>${outs.length?outs.map(([e,i])=>`<div class="outrow"><input type="text" data-ol="${i}" value="${esc(e.l||"")}"> → <span>${esc(nlabel(nodeOf(f,e.t)))}</span></div>`).join(""):'<div class="hint">Noch keine – am „+“ des Knotens ziehen.</div>'}</div>`:"";
+  let body="";
+  if(n.type==="task")body=`<div class="field"><label>Agent</label>${agentSel(f,n.a,"na")}</div>
+    <div class="field"><label>Aufgabe</label><textarea id="nt">${esc(n.t)}</textarea></div>
+    <div class="field"><label>Ergebnis</label><input type="text" id="no" value="${esc(n.o||"")}"></div>
+    <div class="field"><span class="flabel">Übergabe-Formular an den nächsten Schritt</span>${HO.map((h,i)=>`<label class="cb"><input type="checkbox" data-ho="${i}" ${n.ho[i]?'checked':''}> ${h}</label>`).join("")}</div>`;
+  if(n.type==="dec")body=`<div class="field"><label>Wer entscheidet?</label>${agentSel(f,n.a,"na")}</div>
+    <div class="field"><label>Frage, nach der entschieden wird</label><textarea id="nl">${esc(n.label||"")}</textarea></div>
+    <div class="field"><label>Woran erkennt der Agent die Antwort? (Kriterien)</label><textarea id="nc" placeholder="z. B. gleicher Bereich und gleiche Funktion in einem offenen Ticket">${esc(n.c||"")}</textarea></div>
+    <div class="hint">Ist sich der Agent nicht sicher, kommt die Frage als Rückfrage zu dir.</div>`;
+  if(n.type==="human")body=`<div class="field"><label>Frage an dich</label><textarea id="nl">${esc(n.label||"")}</textarea></div>
+    <div class="hint">Du bekommst sie laut Ablauf-Einstellungen aufs Handy und in die Cowork-App – die Ausgänge erscheinen dort als Antwortknöpfe.</div>`;
+  if(n.type==="start"||n.type==="end")body=`<div class="field"><label>Beschriftung</label><input type="text" id="nl" value="${esc(n.label||"")}"></div>`;
+  P.innerHTML=`<h2>${NS[n.type].l}</h2>${body}${outHTML}<button class="btn d" id="ndel">Knoten löschen</button>`;
+  const na=$("#na");if(na)na.onchange=e=>{n.a=AG[+e.target.value];redraw(f)};
+  const nt=$("#nt");if(nt)nt.oninput=e=>{n.t=e.target.value;redraw(f)};
+  const no=$("#no");if(no)no.oninput=e=>n.o=e.target.value;
+  const nl=$("#nl");if(nl)nl.oninput=e=>{n.label=e.target.value;redraw(f)};
+  const nc=$("#nc");if(nc)nc.oninput=e=>n.c=e.target.value;
+  P.querySelectorAll("[data-ho]").forEach(c=>c.onchange=()=>n.ho[+c.dataset.ho]=c.checked?1:0);
+  P.querySelectorAll("[data-ol]").forEach(c=>c.oninput=()=>{f.E[+c.dataset.ol].l=c.value;redraw(f)});
+  $("#ndel").onclick=()=>{f.N=f.N.filter(x=>x!==n);f.E=f.E.filter(e=>e.f!==n.id&&e.t!==n.id);SEL=null;redraw(f);props(f)};
+}
+// ---------- Aufträge ----------
+function startModal(f){
+  const s=f.N.find(n=>n.type==="start");if(!s)return toast("Der Ablauf braucht einen Start-Knoten");
+  $("#modal").innerHTML=`<div class="modal"><div class="box"><div class="bhead"><h3>Auftrag starten: ${esc(f.n)}</h3><button class="ic" id="mclose" style="font-size:18px">✕</button></div>
+   <div class="field" style="margin-top:10px"><label>Kurzbezeichnung</label><input type="text" id="jt" placeholder="z. B. Name des Kunden"></div>
+   <div class="field"><label>${esc(f.start||"Eingabe")}</label><textarea id="ji" placeholder="Hier einfügen oder Datei anhängen (im Entwurf nur Text)"></textarea></div>
+   <div class="btns" style="margin-top:14px;justify-content:flex-end"><button class="btn" id="mx">Abbrechen</button><button class="btn p" id="go">▶ Starten</button></div></div></div>`;
+  const close=()=>$("#modal").innerHTML="";$("#mclose").onclick=close;$("#mx").onclick=close;
+  $("#go").onclick=()=>{const n=Math.max(...AU.map(j=>+j.id.slice(2)))+1,e=f.E.find(e=>e.f===s.id),nx=e&&nodeOf(f,e.t);
+    AU.unshift({id:"A-"+n,f,t:$("#jt").value||"Neuer Auftrag",in:$("#ji").value,path:[s.id].concat(nx?[nx.id]:[]),st:"run",log:[["jetzt","Auftrag gestartet von Boris"],["jetzt",nx?nlabel(nx)+" – beginnt":"–"]]});
+    close();show("jobs");toast("Auftrag gestartet")};
+}
+const curN=j=>nodeOf(j.f,j.path[j.path.length-1]);
+function jobs(){
+  const col=(st,title,cls)=>{const L=AU.filter(j=>j.st===st);return `<div class="kcol ${cls||''}"><h3>${title} <span class="badge">${L.length}</span></h3>${L.map(j=>{const c=curN(j),done=j.path.filter(id=>{const n=nodeOf(j.f,id);return n.type==="task"}).length,tot=nodesOfType(j.f,"task").length;
+    return `<div class="jcard p-${j.f.p}" data-j="${j.id}"><b>${esc(j.t)}</b><small>${j.id} · ${esc(j.f.n)}</small>
+     <div class="dots">${j.path.slice(1).map((id,i,a)=>`<i class="${j.st==='done'||i<a.length-1?'d':j.st==='wait'?'w':'c'}"></i>`).join("")}</div>
+     <small>${j.st==='done'?'fertig':j.st==='wait'?`<b style="display:inline;color:#8a5a00">${j.q.kind}:</b> ${esc(c.type==="human"?c.label:j.q.from)}`:`läuft: ${esc(nlabel(c))}`}</small></div>`}).join("")||'<div class="hint">–</div>'}</div>`};
+  $("#kb").innerHTML=col("wait","⏸ Wartet auf dich","wait")+col("run","▶ Läuft")+col("done","✓ Erledigt");
+  document.querySelectorAll("[data-j]").forEach(e=>e.onclick=()=>jobModal(AU.find(j=>j.id===e.dataset.j)));
+  const w=AU.filter(j=>j.st==="wait").length;$("#wcnt").textContent=w||"";$("#wcnt").style.display=w?"":"none";
+}
+function jobModal(j){
+  const f=j.f,c=curN(j);
+  const opts=j.st==="wait"?(c.type==="human"?f.E.filter(e=>e.f===c.id).map(e=>e.l||"weiter"):j.q.opts):[];
+  $("#modal").innerHTML=`<div class="modal"><div class="box wide"><div class="bhead"><h3>${esc(j.t)}</h3><span class="pb ${f.p}">${PN[f.p]}</span><button class="ic" id="mclose" style="font-size:18px">✕</button></div>
+   <div class="hint" style="margin:0 0 8px">${j.id} · ${esc(f.n)} · Eingabe: ${esc(j.in||"–")}</div>
+   ${j.st==="wait"?`<div class="qbox"><b>${j.q.kind} von ${esc(j.q.from)}${c.type==="human"?": "+esc(c.label):""}</b><p style="margin:6px 0">${esc(j.q.text)}</p><div class="hint" style="margin:0">${esc(j.q.why)}</div>
+     <div class="hint" style="margin:4px 0 0">Benachrichtigt über: ${CH.filter((x,ci)=>f.nt.ev[j.q.kind==="Freigabe"?"hold":"ask"][ci]).join(" · ")}</div>
+     <div class="btns">${opts.map((o,i)=>`<button class="btn ${i?'':'p'}" data-ans="${esc(o)}">${esc(o)}</button>`).join("")}</div>
+     <input type="text" id="free" placeholder="… oder eigene Antwort schreiben und Enter" style="margin-top:8px"></div>`:""}
+   <span class="flabel">Wo steht der Auftrag? <span class="legend"><i class="lg d"></i>erledigt <i class="lg c"></i>läuft <i class="lg w"></i>wartet auf dich <i class="lg o"></i>offen</span></span>
+   <div class="cv-wrap ro" id="jcv"></div>
+   <span class="flabel" style="margin-top:10px">Verlauf</span><div class="tl">${j.log.map(l=>`<div class="${l[2]?'me':''}"><time>${l[0]}</time>${esc(l[1])}</div>`).join("")}</div>
+   <div class="btns" style="margin-top:14px;justify-content:flex-end">${j.st!=="done"?'<button class="btn d" id="stop">Auftrag abbrechen</button>':''}<button class="btn" id="mx">Schließen</button></div></div></div>`;
+  const P=new Set(j.path),pairs=new Set(j.path.slice(1).map((id,i)=>j.path[i]+">"+id));
+  const jo={ro:true,taken:e=>pairs.has(e.f+">"+e.t),state:n=>n.id===c.id&&j.st!=="done"?(j.st==="wait"?"cur wait":"cur"):P.has(n.id)||j.st==="done"?"done":"todo"};
+  const jw=$("#jcv");drawGraph(jw,f,jo);drawGraph(jw,f,{...jo,z:fitZ(jw,+jw.dataset.w,+jw.dataset.h,400)});
+  const close=()=>$("#modal").innerHTML="";$("#mclose").onclick=close;$("#mx").onclick=close;
+  const answer=a=>{j.log.push(["jetzt","Boris: "+a,1]);j.st="run";
+    if(c.type==="human"){const e=f.E.find(e=>e.f===c.id&&(e.l||"weiter")===a);if(e){const t=nodeOf(f,e.t);j.path.push(t.id);j.log.push(["jetzt",(e.back?"↩ zurück zu ":"weiter: ")+nlabel(t)]);if(t.type==="end")j.st="done"}}
+    else j.log.push(["jetzt",nlabel(c)+" – macht weiter"]);
+    delete j.q;close();jobs();jobModal(j);toast("Antwort übermittelt")};
+  document.querySelectorAll("[data-ans]").forEach(b=>b.onclick=()=>answer(b.dataset.ans));
+  const fr=$("#free");if(fr)fr.onkeydown=e=>{if(e.key==="Enter"&&fr.value.trim())answer(fr.value.trim())};
+  const sb=$("#stop");if(sb)sb.onclick=()=>{if(confirm("Auftrag abbrechen?")){AU=AU.filter(x=>x!==j);close();jobs()}};
+}
+$("#newF").onclick=()=>{const a=AG.find(x=>x.p===FF)||AG[0];
+  FL.push({n:"Neuer Ablauf",p:FF,goal:"",start:"",nt:NTD(),rec:"manuell",N:[{id:nid(),type:"start",x:20,y:120,label:"Start"}],E:[]});
+  const f=FL[FL.length-1],t={id:nid(),type:"task",x:110,y:108,a,t:"",o:"",ho:[1,1,1,1]},e={id:nid(),type:"end",x:340,y:120,label:"Ergebnis an dich"};
+  f.N.push(t,e);f.E.push({f:f.N[0].id,t:t.id,l:""},{f:t.id,t:e.id,l:""});fcur=FL.length-1;SEL=null;flows();$("#fn").focus();$("#fn").select()};
+
+function show(v){document.querySelectorAll("nav button").forEach(x=>x.classList.toggle("on",x.dataset.v===v));
+  ["build","matrix","flows","jobs"].forEach(id=>$("#"+id).classList.toggle("hide",id!==v));
+  if(v==="flows")flows();if(v==="jobs")jobs()}
+document.querySelectorAll("nav button").forEach(b=>b.onclick=()=>show(b.dataset.v));
+render();jobs();
+// Breitenregler zwischen Bibliothek und Agenten
+(function(){
+  const sp=$("#split"),main=$("#build"),MIN=220;
+  const max=()=>Math.max(MIN,main.clientWidth-300);
+  const set=w=>{w=Math.round(Math.min(max(),Math.max(MIN,w)));main.style.setProperty("--libw",w+"px");sp.setAttribute("aria-valuenow",w)};
+  const cur=()=>main.querySelector(".panel").getBoundingClientRect().width;
+  sp.onpointerdown=e=>{e.preventDefault();sp.setPointerCapture(e.pointerId);sp.classList.add("drag");document.body.classList.add("resizing");
+    const x0=e.clientX,w0=cur();
+    sp.onpointermove=ev=>set(w0+ev.clientX-x0);
+    sp.onpointerup=()=>{sp.onpointermove=null;sp.classList.remove("drag");document.body.classList.remove("resizing")}};
+  sp.ondblclick=()=>{main.style.removeProperty("--libw")};
+  sp.onkeydown=e=>{if(e.key==="ArrowLeft"){set(cur()-20);e.preventDefault()}if(e.key==="ArrowRight"){set(cur()+20);e.preventDefault()}};
+  addEventListener("resize",()=>{if(cur()>max())set(max())});
+})();
+</script>
+</body>
+</html>

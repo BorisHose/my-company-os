@@ -1,0 +1,1364 @@
+{
+ "groups": [
+  "Kunden & Kontakte im CRM",
+  "Einführung & Einrichtung",
+  "Produktentwicklung",
+  "Angebote & Unterlagen",
+  "Kommunikation",
+  "Videoproduktion",
+  "Webseiten",
+  "Standard-Werkzeuge (Anthropic)"
+ ],
+ "agents": [
+  {
+   "n": "Vertriebsassistent Bodo",
+   "p": "bodo",
+   "r": "Begleitet Interessenten vom Erstkontakt bis zum Angebot.",
+   "note": "Einsatz z. B. nach einem Erstgespräch: Kontakt anlegen, Produktblatt + Angebot erstellen, Begleitmail formulieren.",
+   "s": [
+    "kontakt-anlegen",
+    "produktblatt-erstellen",
+    "angebot-erstellen",
+    "email-erstellung"
+   ],
+   "mcp": [
+    "Bodo"
+   ],
+   "m": "Opus",
+   "own": [
+    "Angebot und Mail erst gemeinsam zur Freigabe zeigen"
+   ],
+   "gl": [
+    1,
+    1,
+    1,
+    1,
+    0,
+    1
+   ],
+   "id": "ag-vertriebsassistent-bodo"
+  },
+  {
+   "n": "Vertriebsassistent sellify",
+   "p": "sellify",
+   "r": "Begleitet sellify-Interessenten vom Erstkontakt bis zum Angebot.",
+   "note": "Gegenstück zum Bodo-Vertriebsassistenten – für die sellify-Kollegen.",
+   "s": [
+    "kontakt-anlegen",
+    "produktblatt-erstellen",
+    "angebot-erstellen",
+    "email-erstellung"
+   ],
+   "mcp": [
+    "sellify"
+   ],
+   "m": "Opus",
+   "own": [
+    "Angebot und Mail erst gemeinsam zur Freigabe zeigen"
+   ],
+   "gl": [
+    1,
+    1,
+    1,
+    1,
+    0,
+    1
+   ],
+   "id": "ag-vertriebsassistent-sellify"
+  },
+  {
+   "n": "Bodo Produkt & Tickets",
+   "p": "bodo",
+   "r": "Nimmt Wünsche und Fehler auf und bereitet Tickets für die Bodo-Entwicklung vor.",
+   "note": "",
+   "s": [
+    "ticket-anlegen",
+    "feature-request-screenshot"
+   ],
+   "mcp": [
+    "Bodo"
+   ],
+   "m": "Sonnet",
+   "own": [],
+   "gl": [
+    1,
+    1,
+    0,
+    0,
+    1,
+    0
+   ],
+   "id": "ag-bodo-produkt-tickets"
+  },
+  {
+   "n": "sellify Produkt & Tickets",
+   "p": "sellify",
+   "r": "Nimmt Wünsche und Fehler auf und bereitet Tickets für die sellify-Entwicklung vor.",
+   "note": "Offen: In welchem System landen sellify-Tickets?",
+   "s": [
+    "ticket-anlegen",
+    "feature-request-screenshot"
+   ],
+   "mcp": [
+    "sellify"
+   ],
+   "m": "Sonnet",
+   "own": [],
+   "gl": [
+    1,
+    1,
+    0,
+    0,
+    1,
+    0
+   ],
+   "id": "ag-sellify-produkt-tickets"
+  },
+  {
+   "n": "Onboarding Mieterverein",
+   "p": "bodo",
+   "r": "Führt neue Bodo-Kunden durch Einführungsprojekt und Ersteinrichtung.",
+   "note": "",
+   "s": [
+    "einfuehrung-anlegen",
+    "mandant-einrichten",
+    "kontakt-anlegen"
+   ],
+   "mcp": [
+    "Bodo"
+   ],
+   "m": "Opus",
+   "own": [],
+   "gl": [
+    1,
+    1,
+    1,
+    1,
+    0,
+    0
+   ],
+   "id": "ag-onboarding-mieterverein"
+  },
+  {
+   "n": "Onboarding sellify-Kunde",
+   "p": "sellify",
+   "r": "Führt neue sellify-Kunden durch Einführungsprojekt und Ersteinrichtung.",
+   "note": "",
+   "s": [
+    "einfuehrung-anlegen",
+    "mandant-einrichten",
+    "kontakt-anlegen"
+   ],
+   "mcp": [
+    "sellify"
+   ],
+   "m": "Opus",
+   "own": [],
+   "gl": [
+    1,
+    1,
+    1,
+    1,
+    0,
+    0
+   ],
+   "id": "ag-onboarding-sellify-kunde"
+  },
+  {
+   "n": "Bodo Video-Studio",
+   "p": "bodo",
+   "r": "Erstellt Storyboards und Szenenvideos für Bodo.",
+   "note": "",
+   "s": [
+    "szenenvideo"
+   ],
+   "mcp": [],
+   "m": "Opus",
+   "own": [],
+   "gl": [
+    1,
+    0,
+    0,
+    0,
+    0,
+    0
+   ],
+   "id": "ag-bodo-video-studio"
+  },
+  {
+   "n": "sellify Video-Studio",
+   "p": "sellify",
+   "r": "Erstellt Storyboards und Szenenvideos für sellify.",
+   "note": "",
+   "s": [
+    "szenenvideo"
+   ],
+   "mcp": [],
+   "m": "Opus",
+   "own": [],
+   "gl": [
+    1,
+    0,
+    0,
+    0,
+    0,
+    0
+   ],
+   "id": "ag-sellify-video-studio"
+  },
+  {
+   "n": "Web-QA",
+   "p": "all",
+   "r": "Prüft Webseiten mobil und führt sie im iPhone-Rahmen vor.",
+   "note": "",
+   "s": [
+    "mobil-optimierung",
+    "iphone-vorschau"
+   ],
+   "mcp": [],
+   "m": "Sonnet",
+   "own": [],
+   "gl": [
+    1,
+    0,
+    0,
+    0,
+    0,
+    0
+   ],
+   "id": "ag-web-qa"
+  }
+ ],
+ "flows": [
+  {
+   "n": "Vom Erstgespräch zum Angebot",
+   "p": "bodo",
+   "goal": "Aus einem Erstgespräch wird ein versandfertiges Angebot mit Begleitmail.",
+   "start": "Gesprächsnotizen, Name von Verein und Ansprechpartner",
+   "nt": {
+    "mix": 1,
+    "ev": {
+     "ask": [
+      1,
+      1,
+      0
+     ],
+     "hold": [
+      1,
+      1,
+      0
+     ],
+     "done": [
+      1,
+      1,
+      0
+     ],
+     "err": [
+      1,
+      1,
+      1
+     ]
+    }
+   },
+   "rec": "manuell",
+   "N": [
+    {
+     "id": "n1",
+     "type": "start",
+     "x": 20,
+     "y": 202,
+     "label": "Start",
+     "aid": null
+    },
+    {
+     "id": "n2",
+     "type": "task",
+     "x": 110,
+     "y": 190,
+     "t": "Kontakt (Person + Organisation) anlegen, Dubletten prüfen",
+     "o": "Kontakt-Datensatz",
+     "ho": [
+      1,
+      1,
+      1,
+      1
+     ],
+     "aid": "ag-vertriebsassistent-bodo"
+    },
+    {
+     "id": "n3",
+     "type": "task",
+     "x": 330,
+     "y": 190,
+     "t": "Produktblatt und Angebot erstellen",
+     "o": "Angebot + Produktblatt",
+     "ho": [
+      1,
+      1,
+      1,
+      1
+     ],
+     "aid": "ag-vertriebsassistent-bodo"
+    },
+    {
+     "id": "n4",
+     "type": "human",
+     "x": 550,
+     "y": 182,
+     "label": "Freigabe: Angebot + Produktblatt?",
+     "aid": null
+    },
+    {
+     "id": "n5",
+     "type": "task",
+     "x": 750,
+     "y": 190,
+     "t": "Begleitmail formulieren",
+     "o": "Mail-Entwurf",
+     "ho": [
+      1,
+      1,
+      1,
+      1
+     ],
+     "aid": "ag-vertriebsassistent-bodo"
+    },
+    {
+     "id": "n6",
+     "type": "human",
+     "x": 970,
+     "y": 182,
+     "label": "Freigabe: Mail-Entwurf?",
+     "aid": null
+    },
+    {
+     "id": "n7",
+     "type": "end",
+     "x": 1170,
+     "y": 202,
+     "label": "Ergebnis an dich",
+     "aid": null
+    }
+   ],
+   "E": [
+    {
+     "f": "n1",
+     "t": "n2",
+     "l": ""
+    },
+    {
+     "f": "n2",
+     "t": "n3",
+     "l": ""
+    },
+    {
+     "f": "n3",
+     "t": "n4",
+     "l": ""
+    },
+    {
+     "f": "n4",
+     "t": "n3",
+     "l": "ändern",
+     "back": 1,
+     "max": 3
+    },
+    {
+     "f": "n4",
+     "t": "n5",
+     "l": ""
+    },
+    {
+     "f": "n5",
+     "t": "n6",
+     "l": ""
+    },
+    {
+     "f": "n6",
+     "t": "n5",
+     "l": "ändern",
+     "back": 1,
+     "max": 3
+    },
+    {
+     "f": "n6",
+     "t": "n7",
+     "l": "freigeben"
+    }
+   ],
+   "id": "fl-vom-erstgespraech-zum-angebot"
+  },
+  {
+   "n": "Neukunde: vom Auftrag zum Start",
+   "p": "bodo",
+   "goal": "Nach der Beauftragung läuft die Einführung ohne Lücke an.",
+   "start": "Beauftragung (Mail/PDF), Ansprechpartner",
+   "nt": {
+    "mix": 1,
+    "ev": {
+     "ask": [
+      1,
+      1,
+      0
+     ],
+     "hold": [
+      1,
+      1,
+      0
+     ],
+     "done": [
+      1,
+      1,
+      0
+     ],
+     "err": [
+      1,
+      1,
+      1
+     ]
+    }
+   },
+   "rec": "manuell",
+   "N": [
+    {
+     "id": "n8",
+     "type": "start",
+     "x": 20,
+     "y": 202,
+     "label": "Start",
+     "aid": null
+    },
+    {
+     "id": "n9",
+     "type": "task",
+     "x": 110,
+     "y": 190,
+     "t": "Beauftragung im CRM vermerken, Kontakte prüfen",
+     "o": "Kunde + Ansprechpartner",
+     "ho": [
+      1,
+      1,
+      1,
+      1
+     ],
+     "aid": "ag-vertriebsassistent-bodo"
+    },
+    {
+     "id": "n10",
+     "type": "task",
+     "x": 330,
+     "y": 190,
+     "t": "Einführungsprojekt anlegen",
+     "o": "Projekt + Zeitplan",
+     "ho": [
+      1,
+      1,
+      1,
+      1
+     ],
+     "aid": "ag-onboarding-mieterverein"
+    },
+    {
+     "id": "n11",
+     "type": "task",
+     "x": 550,
+     "y": 190,
+     "t": "Ersteinrichtung vorbereiten",
+     "o": "Einrichtungsplan",
+     "ho": [
+      1,
+      1,
+      1,
+      1
+     ],
+     "aid": "ag-onboarding-mieterverein"
+    },
+    {
+     "id": "n12",
+     "type": "human",
+     "x": 770,
+     "y": 182,
+     "label": "Freigabe: Einrichtungsplan?",
+     "aid": null
+    },
+    {
+     "id": "n13",
+     "type": "task",
+     "x": 970,
+     "y": 190,
+     "t": "Willkommensmail an den Kunden",
+     "o": "Mail-Entwurf",
+     "ho": [
+      1,
+      1,
+      1,
+      1
+     ],
+     "aid": "ag-vertriebsassistent-bodo"
+    },
+    {
+     "id": "n14",
+     "type": "human",
+     "x": 1190,
+     "y": 182,
+     "label": "Freigabe: Mail-Entwurf?",
+     "aid": null
+    },
+    {
+     "id": "n15",
+     "type": "end",
+     "x": 1390,
+     "y": 202,
+     "label": "Ergebnis an dich",
+     "aid": null
+    }
+   ],
+   "E": [
+    {
+     "f": "n8",
+     "t": "n9",
+     "l": ""
+    },
+    {
+     "f": "n9",
+     "t": "n10",
+     "l": ""
+    },
+    {
+     "f": "n10",
+     "t": "n11",
+     "l": ""
+    },
+    {
+     "f": "n11",
+     "t": "n12",
+     "l": ""
+    },
+    {
+     "f": "n12",
+     "t": "n11",
+     "l": "ändern",
+     "back": 1,
+     "max": 3
+    },
+    {
+     "f": "n12",
+     "t": "n13",
+     "l": ""
+    },
+    {
+     "f": "n13",
+     "t": "n14",
+     "l": ""
+    },
+    {
+     "f": "n14",
+     "t": "n13",
+     "l": "ändern",
+     "back": 1,
+     "max": 3
+    },
+    {
+     "f": "n14",
+     "t": "n15",
+     "l": "freigeben"
+    }
+   ],
+   "id": "fl-neukunde-vom-auftrag-zum-start"
+  },
+  {
+   "n": "Kundenwunsch → Ticket → Rückmeldung",
+   "p": "bodo",
+   "goal": "Ein Kundenwunsch wird sauber als Ticket erfasst (oder an ein bestehendes angehängt) und der Kunde informiert.",
+   "start": "Kundenmail oder Notiz, ggf. Screenshot",
+   "nt": {
+    "mix": 1,
+    "ev": {
+     "ask": [
+      1,
+      1,
+      0
+     ],
+     "hold": [
+      1,
+      1,
+      0
+     ],
+     "done": [
+      1,
+      1,
+      0
+     ],
+     "err": [
+      1,
+      1,
+      1
+     ]
+    }
+   },
+   "rec": "manuell",
+   "N": [
+    {
+     "id": "s",
+     "type": "start",
+     "x": 20,
+     "y": 200,
+     "label": "Kundenwunsch",
+     "aid": null
+    },
+    {
+     "id": "t1",
+     "type": "task",
+     "x": 100,
+     "y": 188,
+     "t": "Wunsch verstehen, auf vergleichbare Tickets prüfen",
+     "o": "Prüfergebnis",
+     "ho": [
+      1,
+      1,
+      1,
+      1
+     ],
+     "aid": "ag-bodo-produkt-tickets"
+    },
+    {
+     "id": "d1",
+     "type": "dec",
+     "x": 310,
+     "y": 180,
+     "label": "Vergleichbares Ticket gefunden?",
+     "aid": "ag-bodo-produkt-tickets"
+    },
+    {
+     "id": "t2",
+     "type": "task",
+     "x": 510,
+     "y": 60,
+     "t": "Ergänzung zum bestehenden Ticket entwerfen",
+     "o": "Entwurf Ergänzung",
+     "ho": [
+      1,
+      1,
+      1,
+      1
+     ],
+     "aid": "ag-bodo-produkt-tickets"
+    },
+    {
+     "id": "t3",
+     "type": "task",
+     "x": 510,
+     "y": 310,
+     "t": "Ticket-Entwurf + Entwurfsbild erstellen",
+     "o": "Ticket-Entwurf + Bild",
+     "ho": [
+      1,
+      1,
+      1,
+      1
+     ],
+     "aid": "ag-bodo-produkt-tickets"
+    },
+    {
+     "id": "h1",
+     "type": "human",
+     "x": 740,
+     "y": 180,
+     "label": "Deine Freigabe?",
+     "aid": null
+    },
+    {
+     "id": "t4",
+     "type": "task",
+     "x": 960,
+     "y": 60,
+     "t": "Ticket anlegen bzw. Ergänzung eintragen (ohne Zuständigen)",
+     "o": "Ticket-Nummer",
+     "ho": [
+      1,
+      1,
+      0,
+      1
+     ],
+     "aid": "ag-bodo-produkt-tickets"
+    },
+    {
+     "id": "t5",
+     "type": "task",
+     "x": 1180,
+     "y": 60,
+     "t": "Kunden per Mail informieren",
+     "o": "Mail-Entwurf",
+     "ho": [
+      1,
+      1,
+      1,
+      1
+     ],
+     "aid": "ag-vertriebsassistent-bodo"
+    },
+    {
+     "id": "t6",
+     "type": "task",
+     "x": 960,
+     "y": 330,
+     "t": "Kunden informieren, dass es nicht umgesetzt wird",
+     "o": "Mail-Entwurf",
+     "ho": [
+      1,
+      1,
+      1,
+      1
+     ],
+     "aid": "ag-vertriebsassistent-bodo"
+    },
+    {
+     "id": "e",
+     "type": "end",
+     "x": 1400,
+     "y": 200,
+     "label": "Erledigt",
+     "aid": null
+    }
+   ],
+   "E": [
+    {
+     "f": "s",
+     "t": "t1",
+     "l": ""
+    },
+    {
+     "f": "t1",
+     "t": "d1",
+     "l": ""
+    },
+    {
+     "f": "d1",
+     "t": "t2",
+     "l": "ja"
+    },
+    {
+     "f": "d1",
+     "t": "t3",
+     "l": "nein"
+    },
+    {
+     "f": "t2",
+     "t": "h1",
+     "l": ""
+    },
+    {
+     "f": "t3",
+     "t": "h1",
+     "l": ""
+    },
+    {
+     "f": "h1",
+     "t": "t4",
+     "l": "freigeben"
+    },
+    {
+     "f": "h1",
+     "t": "t3",
+     "l": "ändern",
+     "back": 1,
+     "max": 3
+    },
+    {
+     "f": "h1",
+     "t": "t6",
+     "l": "verwerfen"
+    },
+    {
+     "f": "t4",
+     "t": "t5",
+     "l": ""
+    },
+    {
+     "f": "t5",
+     "t": "e",
+     "l": ""
+    },
+    {
+     "f": "t6",
+     "t": "e",
+     "l": ""
+    }
+   ],
+   "id": "fl-kundenwunsch-ticket-rueckmeldung"
+  },
+  {
+   "n": "Vom Erstgespräch zum Angebot (sellify)",
+   "p": "sellify",
+   "goal": "Aus einem Erstgespräch wird ein versandfertiges sellify-Angebot.",
+   "start": "Gesprächsnotizen, Firma und Ansprechpartner",
+   "nt": {
+    "mix": 1,
+    "ev": {
+     "ask": [
+      1,
+      1,
+      0
+     ],
+     "hold": [
+      1,
+      1,
+      0
+     ],
+     "done": [
+      1,
+      1,
+      0
+     ],
+     "err": [
+      1,
+      1,
+      1
+     ]
+    }
+   },
+   "rec": "manuell",
+   "N": [
+    {
+     "id": "n16",
+     "type": "start",
+     "x": 20,
+     "y": 202,
+     "label": "Start",
+     "aid": null
+    },
+    {
+     "id": "n17",
+     "type": "task",
+     "x": 110,
+     "y": 190,
+     "t": "Kontakt anlegen, Dubletten prüfen",
+     "o": "Kontakt-Datensatz",
+     "ho": [
+      1,
+      1,
+      1,
+      1
+     ],
+     "aid": "ag-vertriebsassistent-sellify"
+    },
+    {
+     "id": "n18",
+     "type": "task",
+     "x": 330,
+     "y": 190,
+     "t": "Produktblatt und Angebot erstellen",
+     "o": "Angebot + Produktblatt",
+     "ho": [
+      1,
+      1,
+      1,
+      1
+     ],
+     "aid": "ag-vertriebsassistent-sellify"
+    },
+    {
+     "id": "n19",
+     "type": "human",
+     "x": 550,
+     "y": 182,
+     "label": "Freigabe: Angebot + Produktblatt?",
+     "aid": null
+    },
+    {
+     "id": "n20",
+     "type": "task",
+     "x": 750,
+     "y": 190,
+     "t": "Begleitmail formulieren",
+     "o": "Mail-Entwurf",
+     "ho": [
+      1,
+      1,
+      1,
+      1
+     ],
+     "aid": "ag-vertriebsassistent-sellify"
+    },
+    {
+     "id": "n21",
+     "type": "human",
+     "x": 970,
+     "y": 182,
+     "label": "Freigabe: Mail-Entwurf?",
+     "aid": null
+    },
+    {
+     "id": "n22",
+     "type": "end",
+     "x": 1170,
+     "y": 202,
+     "label": "Ergebnis an dich",
+     "aid": null
+    }
+   ],
+   "E": [
+    {
+     "f": "n16",
+     "t": "n17",
+     "l": ""
+    },
+    {
+     "f": "n17",
+     "t": "n18",
+     "l": ""
+    },
+    {
+     "f": "n18",
+     "t": "n19",
+     "l": ""
+    },
+    {
+     "f": "n19",
+     "t": "n18",
+     "l": "ändern",
+     "back": 1,
+     "max": 3
+    },
+    {
+     "f": "n19",
+     "t": "n20",
+     "l": ""
+    },
+    {
+     "f": "n20",
+     "t": "n21",
+     "l": ""
+    },
+    {
+     "f": "n21",
+     "t": "n20",
+     "l": "ändern",
+     "back": 1,
+     "max": 3
+    },
+    {
+     "f": "n21",
+     "t": "n22",
+     "l": "freigeben"
+    }
+   ],
+   "id": "fl-vom-erstgespraech-zum-angebot-sellify"
+  },
+  {
+   "n": "Neukunde sellify: vom Auftrag zum Start",
+   "p": "sellify",
+   "goal": "Nach der Beauftragung startet die sellify-Einführung.",
+   "start": "Beauftragung, Ansprechpartner",
+   "nt": {
+    "mix": 1,
+    "ev": {
+     "ask": [
+      1,
+      1,
+      0
+     ],
+     "hold": [
+      1,
+      1,
+      0
+     ],
+     "done": [
+      1,
+      1,
+      0
+     ],
+     "err": [
+      1,
+      1,
+      1
+     ]
+    }
+   },
+   "rec": "manuell",
+   "N": [
+    {
+     "id": "n23",
+     "type": "start",
+     "x": 20,
+     "y": 202,
+     "label": "Start",
+     "aid": null
+    },
+    {
+     "id": "n24",
+     "type": "task",
+     "x": 110,
+     "y": 190,
+     "t": "Beauftragung im CRM vermerken",
+     "o": "Kunde + Ansprechpartner",
+     "ho": [
+      1,
+      1,
+      1,
+      1
+     ],
+     "aid": "ag-vertriebsassistent-sellify"
+    },
+    {
+     "id": "n25",
+     "type": "task",
+     "x": 330,
+     "y": 190,
+     "t": "Einführungsprojekt anlegen",
+     "o": "Projekt + Zeitplan",
+     "ho": [
+      1,
+      1,
+      1,
+      1
+     ],
+     "aid": "ag-onboarding-sellify-kunde"
+    },
+    {
+     "id": "n26",
+     "type": "task",
+     "x": 550,
+     "y": 190,
+     "t": "Ersteinrichtung vorbereiten",
+     "o": "Einrichtungsplan",
+     "ho": [
+      1,
+      1,
+      1,
+      1
+     ],
+     "aid": "ag-onboarding-sellify-kunde"
+    },
+    {
+     "id": "n27",
+     "type": "human",
+     "x": 770,
+     "y": 182,
+     "label": "Freigabe: Einrichtungsplan?",
+     "aid": null
+    },
+    {
+     "id": "n28",
+     "type": "end",
+     "x": 970,
+     "y": 202,
+     "label": "Ergebnis an dich",
+     "aid": null
+    }
+   ],
+   "E": [
+    {
+     "f": "n23",
+     "t": "n24",
+     "l": ""
+    },
+    {
+     "f": "n24",
+     "t": "n25",
+     "l": ""
+    },
+    {
+     "f": "n25",
+     "t": "n26",
+     "l": ""
+    },
+    {
+     "f": "n26",
+     "t": "n27",
+     "l": ""
+    },
+    {
+     "f": "n27",
+     "t": "n26",
+     "l": "ändern",
+     "back": 1,
+     "max": 3
+    },
+    {
+     "f": "n27",
+     "t": "n28",
+     "l": "freigeben"
+    }
+   ],
+   "id": "fl-neukunde-sellify-vom-auftrag-zum-start"
+  },
+  {
+   "n": "Webseite prüfen und vorführen",
+   "p": "all",
+   "goal": "Eine Webseite ist mobil fehlerfrei und als iPhone-Vorschau vorführbar.",
+   "start": "Link oder HTML-Datei",
+   "nt": {
+    "mix": 1,
+    "ev": {
+     "ask": [
+      1,
+      1,
+      0
+     ],
+     "hold": [
+      1,
+      1,
+      0
+     ],
+     "done": [
+      1,
+      1,
+      0
+     ],
+     "err": [
+      1,
+      1,
+      1
+     ]
+    }
+   },
+   "rec": "manuell",
+   "N": [
+    {
+     "id": "n29",
+     "type": "start",
+     "x": 20,
+     "y": 202,
+     "label": "Start",
+     "aid": null
+    },
+    {
+     "id": "n30",
+     "type": "task",
+     "x": 110,
+     "y": 190,
+     "t": "Mobil prüfen und Fehler beheben",
+     "o": "Korrigierte Seite + Fehlerliste",
+     "ho": [
+      1,
+      1,
+      1,
+      1
+     ],
+     "aid": "ag-web-qa"
+    },
+    {
+     "id": "n31",
+     "type": "task",
+     "x": 330,
+     "y": 190,
+     "t": "iPhone-Vorschau erstellen",
+     "o": "Vorschau-Seite",
+     "ho": [
+      1,
+      1,
+      1,
+      1
+     ],
+     "aid": "ag-web-qa"
+    },
+    {
+     "id": "n32",
+     "type": "end",
+     "x": 550,
+     "y": 202,
+     "label": "Ergebnis an dich",
+     "aid": null
+    }
+   ],
+   "E": [
+    {
+     "f": "n29",
+     "t": "n30",
+     "l": ""
+    },
+    {
+     "f": "n30",
+     "t": "n31",
+     "l": ""
+    },
+    {
+     "f": "n31",
+     "t": "n32",
+     "l": ""
+    }
+   ],
+   "id": "fl-webseite-pruefen-und-vorfuehren"
+  }
+ ],
+ "jobs": [
+  {
+   "id": "A-104",
+   "t": "Mieterverein Musterstadt e. V.",
+   "in": "Beauftragung vom 07.10., Ansprechpartnerin Frau Beispiel",
+   "path": [
+    "n8",
+    "n9",
+    "n10",
+    "n11"
+   ],
+   "st": "wait",
+   "q": {
+    "from": "Onboarding Mieterverein",
+    "kind": "Rückfrage",
+    "text": "Der Verein nutzt bisher ein anderes Programm. Sollen die Mitgliederdaten übernommen werden oder startet der Verein leer?",
+    "why": "Vertriebsassistent und Onboarding konnten das nicht klären – in der Beauftragung steht nichts dazu.",
+    "opts": [
+     "Daten übernehmen",
+     "Leer starten",
+     "Ich kläre das mit dem Kunden"
+    ]
+   },
+   "log": [
+    [
+     "09:12",
+     "Auftrag gestartet von Boris"
+    ],
+    [
+     "09:14",
+     "Vertriebsassistent Bodo: Beauftragung vermerkt → übergibt an Onboarding"
+    ],
+    [
+     "09:19",
+     "Onboarding Mieterverein: Einführungsprojekt angelegt"
+    ],
+    [
+     "09:23",
+     "Onboarding fragt Vertriebsassistent: Datenübernahme vereinbart? → nicht bekannt"
+    ],
+    [
+     "09:24",
+     "Rückfrage an Boris gesendet (📱 Handy, 💻 Cowork)",
+     1
+    ]
+   ],
+   "fid": "fl-neukunde-vom-auftrag-zum-start"
+  },
+  {
+   "id": "A-103",
+   "t": "Wunsch: Serienbrief mit Anlagen",
+   "in": "Kundenmail vom 08.10. mit Screenshot",
+   "path": [
+    "s",
+    "t1",
+    "d1",
+    "t3",
+    "h1"
+   ],
+   "st": "wait",
+   "q": {
+    "from": "Bodo Produkt & Tickets",
+    "kind": "Freigabe",
+    "text": "Ticket-Entwurf „Serienbrief: mehrere Anlagen anhängen“ ist fertig, inkl. Entwurfsbild.",
+    "why": "Entscheidung „Vergleichbares Ticket gefunden?“ → nein. Tickets werden erst nach deiner Freigabe angelegt."
+   },
+   "log": [
+    [
+     "08:40",
+     "Auftrag gestartet von Boris"
+    ],
+    [
+     "08:43",
+     "Bodo Produkt & Tickets: Dublettenprüfung"
+    ],
+    [
+     "08:44",
+     "Entscheidung: Vergleichbares Ticket gefunden? → nein"
+    ],
+    [
+     "08:51",
+     "Ticket-Entwurf + Entwurfsbild erstellt"
+    ],
+    [
+     "08:51",
+     "Freigabe bei Boris angefragt (📱 Handy, 💻 Cowork)",
+     1
+    ]
+   ],
+   "fid": "fl-kundenwunsch-ticket-rueckmeldung"
+  },
+  {
+   "id": "A-102",
+   "t": "Muster Maschinenbau GmbH",
+   "in": "Notizen aus dem Termin am 08.10.",
+   "path": [
+    "n16",
+    "n17",
+    "n18"
+   ],
+   "st": "run",
+   "log": [
+    [
+     "10:02",
+     "Auftrag gestartet von Boris"
+    ],
+    [
+     "10:05",
+     "Vertriebsassistent sellify: Kontakt angelegt"
+    ],
+    [
+     "10:06",
+     "erstellt Produktblatt und Angebot …"
+    ]
+   ],
+   "fid": "fl-vom-erstgespraech-zum-angebot-sellify"
+  },
+  {
+   "id": "A-101",
+   "t": "Mieterverein Beispielstadt e. V.",
+   "in": "Gesprächsnotizen vom 06.10.",
+   "path": [
+    "n1",
+    "n2",
+    "n3",
+    "n4",
+    "n5",
+    "n6",
+    "n7"
+   ],
+   "st": "done",
+   "log": [
+    [
+     "Mo 14:10",
+     "Auftrag gestartet"
+    ],
+    [
+     "Mo 14:31",
+     "Angebot freigegeben von Boris"
+    ],
+    [
+     "Mo 14:40",
+     "Mail-Entwurf freigegeben – fertig"
+    ]
+   ],
+   "fid": "fl-vom-erstgespraech-zum-angebot"
+  },
+  {
+   "id": "A-100",
+   "t": "Bodo-Homepage Startseite",
+   "in": "Link zur Testseite",
+   "path": [
+    "n29",
+    "n30",
+    "n31",
+    "n32"
+   ],
+   "st": "done",
+   "log": [
+    [
+     "Mo 09:00",
+     "Auftrag gestartet"
+    ],
+    [
+     "Mo 09:22",
+     "3 Fehler behoben, iPhone-Vorschau erstellt – fertig"
+    ]
+   ],
+   "fid": "fl-webseite-pruefen-und-vorfuehren"
+  }
+ ],
+ "globals": [
+  "Eigene Annahmen und Schätzungen immer als solche kennzeichnen",
+  "Mandant/Zielsystem im Zweifel erfragen",
+  "Person UND Organisation verknüpfen",
+  "CRM-Anlagen erst nach Freigabe des Entwurfs",
+  "Tickets: Dublettenprüfung, Entwurf zur Freigabe, ohne Zuständigen, Tags, Screenshot in Beschreibung",
+  "Dokumente: saubere Seitenumbrüche"
+ ]
+}

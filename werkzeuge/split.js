@@ -1,0 +1,14 @@
+const {chromium}=require('playwright');
+(async()=>{const b=await chromium.launch();const p=await b.newPage({viewport:{width:1440,height:900}});const errs=[];p.on('pageerror',e=>errs.push(e.message));
+await p.goto('file:///tmp/claude-0/-home-claude/5db755db-81e4-5556-aa5e-7fdc40a9cf8b/scratchpad/fass/company-os-prototyp-pilot.html');
+const c=async s=>{const el=await p.$(s);if(!el){errs.push('missing '+s);return}await p.evaluate(e=>e.click(),el);await p.waitForTimeout(150)};
+const sh=async n=>{await p.evaluate(()=>{document.getElementById('pop').hidden=true;document.getElementById('toast').hidden=true});await p.screenshot({path:'/home/claude/sp_'+n+'.png'})};
+await c('[data-co="bs"]');await p.evaluate(()=>document.getElementById('view').scrollTop=600);await sh('cockpit');
+await c('[data-area="proj"]');await sh('projlist');
+await c('[data-pjtab="tpl"]');await sh('projtpl');
+await c('[data-pjtab="des"]');await c('[data-desstage="1"]');await sh('projdes');
+await c('[data-area="proc"]');await sh('procmine');
+await c('[data-ptab="tpl"]');await sh('proctpl');
+await c('[data-ptab="des"]');await c('[data-desstage="1"]');await sh('procdes');
+await c('[data-area="proj"]');await c('[data-pjtab="list"]');await c('[data-proj="dev"]');await c('[data-pjtab="des"][data-desfill]');await sh('fromproj');
+console.log(errs);await b.close()})();

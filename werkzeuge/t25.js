@@ -1,0 +1,33 @@
+const {chromium}=require('playwright');
+const F='file:///tmp/claude-0/-home-claude/5db755db-81e4-5556-aa5e-7fdc40a9cf8b/scratchpad/ai-head-office-prototyp.html';
+const O='/tmp/claude-0/-home-claude/5db755db-81e4-5556-aa5e-7fdc40a9cf8b/scratchpad/v17/';
+(async()=>{const b=await chromium.launch();
+for(const [w,h,tag] of [[1440,900,'d'],[390,844,'m']]){
+const p=await b.newPage({viewport:{width:w,height:h}});const errs=[];p.on('pageerror',e=>errs.push(e.message));p.on('console',m=>{if(m.type()==='error')errs.push(m.text())});
+await p.goto(F);
+const c=async s=>{const el=await p.$(s);if(!el){errs.push('missing '+s);return}await p.evaluate(e=>e.click(),el);await p.waitForTimeout(80)};
+const ov=async n=>{const r=await p.evaluate(()=>document.documentElement.scrollWidth-innerWidth);if(r>1)errs.push('overflow '+n+' '+r)};
+const shot=async n=>{if(tag==='d'||n.startsWith('m'))await p.screenshot({path:O+tag+'-'+n+'.png',fullPage:false})};
+await c('[data-area="tag"]');await ov('tag');await shot('tag');await p.waitForTimeout(3600);await shot('pop');await c('[data-gotag="sess"]');await ov('sess');await shot('sess');
+await c('[data-sassign="1:0"]');await c('[data-sact="2:done"]');await c('[data-sact="0:park"]');await c('[data-resttoggle]');await shot('rest');await c('[data-sact="7:arch"]');await c('[data-sact="8:open"]');
+await c('[data-daytab="heute"]');await shot('heute2');await c('#bell');await shot('bell');await c('[data-gotag]');
+await c('#meBtn');await c('[data-stab="tag"]');await ov('settag');await shot('settag');await c('[data-stab="conn"]');await ov('conn');await shot('conn');await c('[data-orgco="ba"]');await ov('connba');await shot('connba');
+await c('[data-co="bs"]');await c('[data-area="cockpit"]');await ov('cockpit');await shot('cockpit');
+await c('#meBtn');await c('[data-stab="firmen"]');await ov('firmen');await shot('firmen');await c('[data-orgco="ba"]');await ov('firmenba');await shot('firmenba');await c('[data-co="bs"]');await c('[data-stab="firmen"]');
+await c('[data-area="proc"]');await ov('mine');await shot('mine');
+await c('[data-proc="lead"]');await ov('detail');await shot('detail');
+await c('[data-stepedit]');await ov('step');await c('[data-procback]');await c('[data-procback]');
+await c('[data-ptab="tpl"]');await ov('tpl');await shot('tpl');await c('[data-tplf="Vertrieb"]');await c('[data-tpl="5"]');await shot('tplmodal');await c('[data-adopt="5"]');
+await c('[data-ptab="sug"]');await ov('sug');await shot('sug');await c('[data-sugchk="1"]');await c('[data-sugchk="2"]');await c('[data-sugall]');await c('[data-suga="3:no"]');await c('[data-sugno]');await c('[data-suga="0:ok"]');await c('[data-suga="4:edit"]');
+await c('[data-desstage="1"]');await ov('des');await shot('desproc');await c('[data-desstage="2"]');await c('[data-desstage="3"]');await c('[data-desstage="4"]');
+await c('[data-area="proj"]');await c('[data-pjtab="des"]');await c('[data-desstage="1"]');await ov('desproj');await shot('desproj');
+await c('[data-area="proj"]');await c('[data-pjtab="tpl"]');await ov('pjtpl');await c('[data-pjtab="list"]');await c('[data-proj="dev"]');await ov('proj');await shot('proj');await c('[data-phase="p3"]');await c('[data-pjob]');await shot('pjob');await c('[data-start]');
+await c('[data-proj="hagen"]');await ov('hagen');
+await c('[data-area="jobs"]');await ov('jobs');await shot('jobs');
+await c('#newJob');await c('[data-close]');
+await c('#meBtn');await c('[data-stab="agents"]');await ov('agents');await shot('agents');await c('[data-agent="2"]');await shot('agmodal');await c('[data-close-btn]');
+await c('[data-stab="setup"]');await c('[data-step="7"]');await c('[data-ptabgo="sug"]');
+await c('[data-co="ba"]');await c('[data-area="proc"]');await c('[data-ptab="mine"]');await c('[data-proc="ang"]');await c('[data-area="proj"]');await ov('ba-proj');await c('[data-area="jobs"]');
+await c('#chatBtn');await c('[data-ask="Entwirf einen Prozess für die Lead-Gewinnung"]');await p.waitForTimeout(500);await c('[data-ptabgo="des"]');await ov('chatdes');
+console.log(tag,errs.length?errs:'no errors');await p.close()}
+await b.close()})();

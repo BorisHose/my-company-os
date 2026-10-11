@@ -1,0 +1,16 @@
+const {chromium}=require('playwright');
+(async()=>{const b=await chromium.launch();const p=await b.newPage({viewport:{width:1440,height:900},deviceScaleFactor:1});const errs=[];p.on('pageerror',e=>errs.push(e.message));
+await p.goto('file:///tmp/claude-0/-home-claude/5db755db-81e4-5556-aa5e-7fdc40a9cf8b/scratchpad/fass/company-os-prototyp-pilot.html');
+const c=async s=>{const el=await p.$(s);if(!el){errs.push('missing '+s);return}await p.evaluate(e=>e.click(),el);await p.waitForTimeout(150)};
+const cnt=async()=>p.evaluate(()=>[...document.querySelectorAll('#view a[href*="bodo-app.com"]')].length);
+await c('[data-co="bs"]');await c('[data-area="cockpit"]');console.log('cockpit links',await cnt());
+await p.evaluate(()=>{document.getElementById('pop').hidden=true});
+await p.screenshot({path:'/home/claude/h_cockpit.png'});
+await c('[data-area="proj"]');await c('[data-proj="hagen"]');console.log('projekt links',await cnt());
+await p.screenshot({path:'/home/claude/h_proj1.png',fullPage:false});
+await p.evaluate(()=>document.getElementById('view').scrollTop=900);await p.screenshot({path:'/home/claude/h_proj2.png'});
+await p.evaluate(()=>document.getElementById('view').scrollTop=1800);await p.screenshot({path:'/home/claude/h_proj3.png'});
+await c('[data-area="jobs"]');console.log('jobs links',await cnt());
+await c('#chatBtn');await c('[data-ask="Wie steht die Einführung in Hagen?"]');await p.waitForTimeout(900);console.log('chat links',await p.evaluate(()=>document.querySelectorAll('#msgs a.bodolink').length));
+await c('[data-area="tag"]');console.log('tag links',await cnt());
+console.log(errs);await b.close()})();
