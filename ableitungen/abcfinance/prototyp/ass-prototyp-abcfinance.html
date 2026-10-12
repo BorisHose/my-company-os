@@ -1,0 +1,590 @@
+<title>ASS Prototyp abcfinance</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=IBM+Plex+Mono:wght@500&display=swap">
+<style>
+/* Layout: App-Rahmen mit linker Navigation (Unternehmen + Bereiche), Kopfzeile, Arbeitsfläche; Chat als rechtes Panel */
+:root{
+  --bg:#f3f4f7; --surface:#ffffff; --sunk:#eceef3; --fg:#141b2d; --muted:#5d6579; --line:#dde1ea;
+  --ink:#16223f; --ink-soft:#e5e9f3; --accent:#c8641a; --accent-soft:#fbeee2;
+  --ok:#147a5c; --ok-soft:#e1f3ec; --info:#2457c5; --info-soft:#e6edfb; --bad:#b4232a; --bad-soft:#fbe9ea;
+  --bodo:#1f3a5f; --sell:#30ABE2;
+  --f-ui:"Plus Jakarta Sans",system-ui,-apple-system,"Segoe UI",sans-serif; --f-mono:"IBM Plex Mono",ui-monospace,Consolas,monospace;
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  --bg:#0e1322; --surface:#161d30; --sunk:#111829; --fg:#e8ecf5; --muted:#9aa3b9; --line:#283350;
+  --ink:#a9bdf0; --ink-soft:#1f2a47; --accent:#f0a05e; --accent-soft:#3a2614;
+  --ok:#5fd0aa; --ok-soft:#123a30; --info:#8fb0ff; --info-soft:#18284d; --bad:#ff8f8a; --bad-soft:#3d1c1f; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#0e1322; --surface:#161d30; --sunk:#111829; --fg:#e8ecf5; --muted:#9aa3b9; --line:#283350;
+  --ink:#a9bdf0; --ink-soft:#1f2a47; --accent:#f0a05e; --accent-soft:#3a2614;
+  --ok:#5fd0aa; --ok-soft:#123a30; --info:#8fb0ff; --info-soft:#18284d; --bad:#ff8f8a; --bad-soft:#3d1c1f; color-scheme:dark}
+*{box-sizing:border-box}
+[hidden]{display:none!important}
+html,body{height:100%}
+body{background:var(--bg);color:var(--fg);font-family:var(--f-ui);font-size:14px;line-height:1.45}
+button,input,select,textarea{font:inherit;color:inherit}
+button{cursor:pointer}
+:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+/* Hover nur bei echter Maus – auf Touch-Geräten bleibt :hover sonst nach dem Tippen hängen */
+@media (hover:hover) and (pointer:fine){.me:hover{border-color:var(--ink);background:var(--ink-soft)}.me:hover .chev{color:var(--ink)}.nav button:hover{background:var(--sunk)}.asst:hover{border-color:var(--accent)}.chat header .ib:hover{background:var(--sunk)}.agcard:hover{border-color:var(--ink);box-shadow:0 6px 18px rgba(10,14,28,.08)}}
+button,a{-webkit-tap-highlight-color:transparent}
+
+.app{display:grid;grid-template-columns:204px minmax(0,1fr);grid-template-rows:auto minmax(0,1fr);height:100%}
+.demo{grid-column:1/-1;background:var(--ink);color:var(--surface);font-size:12px;padding:5px 14px;display:flex;gap:10px;flex-wrap:nowrap;align-items:center;white-space:nowrap;overflow:hidden}
+.demo span{overflow:hidden;text-overflow:ellipsis}
+.demo b{font-weight:700}
+aside{background:var(--surface);border-right:1px solid var(--line);display:flex;flex-direction:column;gap:10px;padding:12px 8px;font-size:13.5px;overflow:auto;min-height:0}
+.logo{display:flex;gap:10px;align-items:center;padding:0 6px}
+.mark{width:32px;height:32px;border-radius:9px;background:var(--ink);color:var(--surface);display:grid;place-items:center;font-weight:800;font-size:13px;letter-spacing:-.02em}
+.logo b{font-size:15px;letter-spacing:-.01em}.logo small{display:block;color:var(--muted);font-size:11px}
+.me *{pointer-events:none}
+.me{margin-top:auto;border:1px solid var(--line);background:var(--bg);border-radius:14px;padding:8px 10px;display:flex;gap:10px;align-items:center;text-align:left;width:100%}
+.me[aria-current="true"]{border-color:var(--ink);background:var(--ink-soft)}
+.me b{display:block;font-size:13px}.me small{display:block;font-size:11px;color:var(--muted)}
+.me{padding:6px 8px;gap:8px}.me .chev{margin-left:auto;font-size:18px !important;white-space:nowrap;color:var(--muted);font-size:13px;display:inline-flex;align-items:center;gap:2px}
+
+.ava{border-radius:50%;flex-shrink:0;box-shadow:0 0 0 2px var(--surface),0 0 0 4px var(--accent)}
+.prof{display:flex;gap:20px;align-items:center;flex-wrap:wrap}
+.prof h2{margin:0}
+.lbl{font-family:var(--f-mono);font-size:10.5px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);padding:0 6px}
+.nav{display:flex;flex-direction:column;gap:2px}
+.nav button{border:0;background:none;text-align:left;padding:6px 8px;font-size:13.5px;border-radius:8px;display:flex;gap:10px;align-items:center;color:var(--fg)}
+
+.nav button[aria-current="true"]{background:var(--ink-soft);color:var(--ink);font-weight:700}
+.nav .cnt{margin-left:auto;font-family:var(--f-mono);font-size:11px;background:var(--accent);color:#fff;border-radius:999px;padding:0 7px}
+.co{display:flex;gap:9px;align-items:center}
+.dot{width:10px;height:10px;border-radius:3px;flex:none}
+.ic{width:18px;text-align:center;color:var(--muted);flex:none}
+main{display:flex;flex-direction:column;min-width:0;min-height:0}
+.top{display:flex;gap:12px;align-items:center;padding:14px 22px;border-bottom:1px solid var(--line);background:var(--surface);flex-wrap:wrap}
+.top h1{font-size:19px;margin:0;font-weight:800;letter-spacing:-.01em}
+.top .crumb{color:var(--muted);font-size:12.5px}
+.top .sp{flex:1}
+.btn{border:1px solid var(--line);background:var(--surface);border-radius:9px;padding:7px 13px;font-weight:600}
+.btn.pri{background:var(--ink);border-color:var(--ink);color:var(--surface)}
+.btn.acc{background:var(--accent);border-color:var(--accent);color:#fff}
+.btn.sm{padding:4px 10px;font-size:12.5px}
+.work{display:grid;grid-template-columns:minmax(0,1fr);flex:1;min-height:0}
+
+.view{overflow:auto;padding:20px 22px 96px;min-width:0}
+.stack{display:flex;flex-direction:column;gap:18px}
+.grid{display:grid;gap:14px;grid-template-columns:repeat(auto-fit,minmax(260px,1fr))}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:16px;min-width:0;display:flex;flex-direction:column;gap:10px}
+.card h2{font-size:15px;margin:0;font-weight:700;display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+.card h3{font-size:14px;margin:0;font-weight:700}
+.sub{color:var(--muted);font-size:12.5px}
+.kpis{display:flex;gap:18px;flex-wrap:wrap}
+.kpi b{display:block;font-size:24px;font-weight:800;font-variant-numeric:tabular-nums;letter-spacing:-.02em}
+.kpi span{font-size:12px;color:var(--muted)}
+.kpi.warn b{color:var(--accent)}.kpi.bad b{color:var(--bad)}
+.pill{font-size:11.5px;font-weight:600;padding:2px 8px;border-radius:999px;white-space:nowrap}
+.p-ok{background:var(--ok-soft);color:var(--ok)}.p-run{background:var(--info-soft);color:var(--info)}.p-open{background:var(--sunk);color:var(--muted)}.p-wait{background:var(--accent-soft);color:var(--accent)}.p-bad{background:var(--bad-soft);color:var(--bad)}
+.row{display:flex;gap:10px;align-items:flex-start}
+.list{display:flex;flex-direction:column}
+.item{display:flex;gap:12px;align-items:flex-start;padding:11px 0;border-top:1px solid var(--line)}
+.item:first-child{border-top:0}
+.item .t{flex:1;min-width:0}
+.item .t b{display:block}
+.ava{width:34px;height:34px;border-radius:50%;background:var(--c,#1f3a5f);color:#fff;font-weight:700;font-size:12px;display:grid;place-items:center;flex:none}
+.ava.lead{box-shadow:0 0 0 2px var(--surface),0 0 0 4px var(--accent)}
+.ava.s{width:24px;height:24px;font-size:9.5px}
+.bot{width:24px;height:24px;border-radius:7px;background:var(--sunk);border:1px solid var(--line);display:grid;place-items:center;font-size:12px;color:var(--muted);flex:none}
+.conseq{background:var(--sunk);border-radius:9px;padding:9px 11px;font-size:13px;display:flex;flex-direction:column;gap:3px}
+.conseq .k{color:var(--muted);font-size:11.5px;font-family:var(--f-mono);text-transform:uppercase;letter-spacing:.05em}
+.acts{display:flex;gap:8px;flex-wrap:wrap}
+.gf{border-top:4px solid var(--ink);display:grid;grid-template-columns:minmax(220px,300px) 1fr;gap:18px;align-items:start}
+.gf .who{display:flex;gap:12px;align-items:center}
+.pa{border:1px solid var(--line);border-left:4px solid var(--accent);border-radius:12px;padding:12px 14px;display:flex;flex-direction:column;gap:10px;background:var(--bg)}
+.pa .ttl{display:flex;gap:10px;align-items:center}
+.pa .spark{width:30px;height:30px;border-radius:50%;background:var(--accent);color:#fff;display:inline-flex;align-items:center;justify-content:center;flex-shrink:0}
+.skills{display:flex;flex-wrap:wrap;gap:6px}
+.skills button{border:1px solid var(--line);background:var(--surface);border-radius:999px;padding:4px 11px;font-size:12.5px}
+.skills button[aria-pressed="true"]{background:var(--ink);border-color:var(--ink);color:var(--surface)}
+.skills button.add{border-style:dashed;color:var(--muted)}
+.orgtop{display:grid;grid-template-columns:1fr minmax(260px,320px) 1fr;align-items:center}
+.gfbox{border-top:4px solid var(--ink);text-align:center;align-items:center}
+.gfbox .ava{margin:4px auto}
+.staff{display:flex;align-items:center;gap:0}
+.staff .hl{width:34px;height:2px;background:var(--line);flex-shrink:0}
+.staffcol{display:flex;flex-direction:column;gap:8px}
+.asst{border:1px solid var(--line);border-left:4px solid var(--accent);border-radius:12px;background:var(--surface);padding:9px 12px;display:flex;gap:10px;align-items:center;text-align:left;max-width:270px}
+
+.asst .spark{width:30px;height:30px;border-radius:50%;background:var(--accent);color:#fff;display:inline-flex;align-items:center;justify-content:center;flex-shrink:0}
+.asst.human{border-left-color:var(--muted);border-style:dashed;color:var(--muted)}
+.asst b{display:block;font-size:13px}.asst small{display:block;font-size:11.5px;color:var(--muted)}
+.orgline{width:2px;height:18px;background:var(--line);margin:-4px auto -4px}
+.sklist{display:flex;flex-direction:column;gap:6px;max-height:52vh;overflow:auto}
+.sk{display:flex;gap:10px;align-items:center;border:1px solid var(--line);border-radius:10px;padding:8px 10px;background:var(--surface);text-align:left}
+.sk .bx{width:20px;height:20px;border-radius:6px;border:2px solid var(--line);flex-shrink:0;display:inline-flex;align-items:center;justify-content:center;font-size:13px;color:#fff}
+.sk[aria-pressed="true"] .bx{background:var(--ink);border-color:var(--ink)}
+.sk b{display:block;font-size:13.5px}.sk small{color:var(--muted);font-size:12px}
+@media (max-width:860px){.orgtop{grid-template-columns:1fr}.staff{justify-content:center;margin-top:10px}.staff .hl{display:none}}
+.orgrow{border-top:2px solid var(--line);padding-top:14px}
+@media (max-width:860px){.gf{grid-template-columns:1fr}}
+.org{display:grid;gap:14px;grid-template-columns:repeat(auto-fill,minmax(250px,1fr))}
+.dept .head{display:flex;gap:11px;align-items:center}
+.sec{display:flex;flex-direction:column;gap:6px}
+.sec .m{display:flex;gap:8px;align-items:center;font-size:13px}
+.alert{border-radius:8px;padding:7px 10px;font-size:12.5px;background:var(--accent-soft);color:var(--accent)}
+.alert.ok{background:var(--sunk);color:var(--muted)}
+.tabs{display:flex;gap:4px;border-bottom:1px solid var(--line);flex-wrap:wrap}
+.tabs button{border:0;background:none;padding:8px 12px;border-bottom:3px solid transparent;color:var(--muted);font-weight:600}
+.tabs button[aria-selected="true"]{color:var(--fg);border-bottom-color:var(--ink)}
+.chain{display:flex;gap:6px;align-items:stretch;overflow-x:auto;padding-bottom:4px}
+.step{min-width:150px;flex:1;background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:10px 12px;display:flex;flex-direction:column;gap:5px;font-size:12.5px}
+.step b{font-size:13px}
+.arrow{align-self:center;color:var(--muted)}
+.pkgs{display:grid;gap:12px;grid-template-columns:repeat(auto-fill,minmax(290px,1fr))}
+.pkg{border-left:4px solid var(--c,var(--line))}
+.tl{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:5px;font-size:12.5px}
+.tl li{display:flex;gap:8px;align-items:baseline}
+.tl code{font-family:var(--f-mono);font-size:11px;color:var(--muted)}
+.meta{display:flex;gap:12px;flex-wrap:wrap;font-size:12px;color:var(--muted);align-items:center}
+.eval{border:1px dashed var(--accent);border-radius:9px;padding:9px 11px;font-size:12.5px;display:flex;flex-direction:column;gap:4px}
+.eval .an{font-size:11px;color:var(--accent);font-weight:700}
+.chat{position:fixed;right:20px;bottom:20px;width:400px;height:min(620px,calc(100vh - 110px));z-index:30;background:var(--surface);border:1px solid var(--line);border-radius:16px;box-shadow:0 18px 48px rgba(10,14,28,.22);display:flex;flex-direction:column;min-height:0;overflow:hidden}
+.chat.big{top:48px;bottom:16px;height:auto;width:min(880px,calc(100vw - 48px));left:50%;right:auto;transform:translateX(-50%)}
+.chat header .ib{border:0;background:none;width:30px;height:30px;border-radius:8px;font-size:16px;color:var(--muted)}
+
+.fab{position:fixed;right:20px;bottom:20px;z-index:29;display:inline-flex;align-items:center;gap:10px;border:0;border-radius:999px;padding:12px 20px 12px 14px;background:var(--ink);color:var(--surface);font-weight:700;box-shadow:0 10px 28px rgba(10,14,28,.25)}
+.fab .spark{width:30px;height:30px;border-radius:50%;background:var(--accent);color:#fff;display:inline-flex;align-items:center;justify-content:center}
+.chat .hint{font-size:11px;color:var(--muted);padding:0 16px 10px}
+.chat header{padding:14px 16px;border-bottom:1px solid var(--line);display:flex;align-items:center;gap:10px}
+.chat header b{flex:1}
+.msgs{flex:1;overflow:auto;padding:14px 16px;display:flex;flex-direction:column;gap:10px}
+.msg{max-width:92%;padding:9px 12px;border-radius:12px;font-size:13px}
+.msg.me{align-self:flex-end;background:var(--ink);color:var(--surface);border-bottom-right-radius:4px}
+.msg.ai{align-self:flex-start;background:var(--sunk);border-bottom-left-radius:4px}
+.msg ul{margin:4px 0 0;padding-left:18px}
+.prev{background:var(--surface);border:1px solid var(--line);border-radius:9px;padding:8px 10px;margin-top:6px;display:flex;flex-direction:column;gap:3px}
+.chips{display:flex;gap:6px;flex-wrap:wrap;padding:0 16px 8px}
+.chips button{border:1px solid var(--line);background:var(--surface);border-radius:999px;padding:4px 10px;font-size:12px}
+.composer{display:flex;gap:8px;padding:10px 16px 16px}
+.composer input{flex:1;border:1px solid var(--line);border-radius:9px;padding:8px 10px;background:var(--bg);min-width:0}
+.wiz{display:grid;grid-template-columns:240px minmax(0,1fr);gap:16px}
+.wsteps{display:flex;flex-direction:column;gap:2px}
+.wsteps button{border:0;background:none;text-align:left;padding:7px 10px;border-radius:8px;display:flex;gap:8px;align-items:center;font-size:13px}
+.wsteps button[aria-current="true"]{background:var(--ink-soft);color:var(--ink);font-weight:700}
+.num{font-family:var(--f-mono);font-size:11px;width:20px;height:20px;border-radius:50%;border:1px solid var(--line);display:grid;place-items:center;flex:none}
+.wsteps .done .num{background:var(--ok);border-color:var(--ok);color:#fff}
+.tblw{overflow-x:auto}.tblw table{border-collapse:collapse;width:100%;font-size:13px}.tblw th,.tblw td{text-align:left;padding:8px 10px;border-bottom:1px solid var(--line);vertical-align:top}.tblw th{font-size:12px;color:var(--muted);font-weight:600}
+.ta{width:100%;border:1px solid var(--line);border-radius:9px;padding:8px 10px;background:var(--bg);line-height:1.45;resize:vertical}
+.lock{display:inline-flex;gap:6px;align-items:center;font-size:12px;font-weight:600;color:var(--muted)}
+.assist{border:1px solid var(--line);border-left:4px solid var(--accent);border-radius:9px;padding:10px 12px;display:flex;flex-direction:column;gap:8px;background:var(--surface)}
+.assist .q{display:flex;flex-wrap:wrap;gap:6px;align-items:center}
+.two{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:12px}
+.field{display:flex;flex-direction:column;gap:4px}
+.field label{font-size:12px;font-weight:600;color:var(--muted)}
+.field .val{border:1px solid var(--line);border-radius:9px;padding:8px 10px;background:var(--bg)}
+.conn{display:flex;gap:12px;align-items:center}
+.conn .sym{width:38px;height:38px;border-radius:10px;display:grid;place-items:center;color:#fff;font-weight:800;font-size:13px;flex:none}
+.modal{position:fixed;inset:0;background:rgba(10,14,28,.5);display:flex;align-items:center;justify-content:center;padding:16px;z-index:30}
+.modal .card{width:min(560px,100%);max-height:90%;overflow:auto}
+.modal .card.wide{width:min(820px,100%)}
+.agcard{text-align:left;cursor:pointer;font:inherit;color:inherit}
+
+.agcard .open{font-size:12px;color:var(--info);font-weight:600}
+.lv{display:inline-block;font-family:var(--f-mono);font-size:11px;border-radius:6px;padding:1px 6px;background:var(--sunk);color:var(--muted)}
+.lv.l1{background:var(--info-soft);color:var(--info)}.lv.l2{background:var(--accent-soft);color:var(--accent)}
+.seg{display:inline-flex;border:1px solid var(--line);border-radius:9px;overflow:hidden;flex-wrap:wrap}
+.seg button{border:0;background:var(--surface);padding:6px 11px;font-size:12.5px;border-right:1px solid var(--line)}
+.seg button:last-child{border-right:0}
+.seg button[aria-pressed="true"]{background:var(--ink);color:var(--surface);font-weight:700}
+.perm{display:flex;justify-content:space-between;gap:10px;align-items:center;padding:8px 0;border-bottom:1px solid var(--line);flex-wrap:wrap}
+.perm:last-child{border-bottom:0}
+.sec2{display:flex;flex-direction:column;gap:8px}
+.sec2 h3{margin:0;font-size:14px}
+.opt{border:1px solid var(--line);border-radius:10px;padding:10px 12px;display:flex;gap:10px;align-items:flex-start;cursor:pointer;background:var(--surface);text-align:left}
+.opt[aria-pressed="true"]{border-color:var(--ink);box-shadow:0 0 0 1px var(--ink)}
+.toast{position:fixed;left:50%;bottom:calc(18px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);background:var(--ink);color:var(--surface);padding:9px 15px;border-radius:9px;font-size:13px;z-index:40}
+.menu-btn{display:none}
+@media (max-width:900px){
+  .app{grid-template-columns:1fr}
+  aside{position:fixed;inset:0 auto 0 0;width:260px;z-index:20;transform:translateX(-105%);transition:transform .2s}
+  aside.open{transform:none;box-shadow:0 0 0 100vmax rgba(10,14,28,.4)}
+  .menu-btn{display:inline-flex}
+  .chat,.chat.big{inset:0;width:auto;height:auto;border-radius:0;transform:none}
+  .wiz{grid-template-columns:1fr}
+}
+.bot.lead{background:var(--ink);color:var(--surface);border-color:var(--ink)}
+.three{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:10px}
+.canvas{background-color:var(--bg);background-image:radial-gradient(var(--line) 1px,transparent 1px);background-size:16px 16px;border:1px solid var(--line);border-radius:12px;padding:20px;overflow-x:auto}
+.flow{display:flex;align-items:center;min-width:max-content}
+.node{border:1px solid var(--line);background:var(--surface);border-radius:10px;padding:8px 10px;width:170px;font-size:12.5px;display:flex;flex-direction:column;gap:3px}
+.node.gap{border:2px dashed var(--accent)}
+.ev{width:28px;height:28px;border-radius:50%;border:2px solid var(--ink);background:var(--surface);flex:none}
+.ev.end{border-width:5px}
+.gwrap{display:flex;flex-direction:column;align-items:center;gap:8px;font-size:11px;color:var(--muted);text-align:center;min-width:70px}
+.gw{width:30px;height:30px;transform:rotate(45deg);border:2px solid var(--ink);background:var(--surface);flex:none;display:grid;place-items:center}
+.gw span{transform:rotate(-45deg);font-weight:800;font-size:13px}
+.gw.sm{width:22px;height:22px}
+.ln{width:26px;height:2px;background:var(--muted);flex:none;position:relative}
+.ln::after{content:"";position:absolute;right:-1px;top:-4px;border-left:7px solid var(--muted);border-top:5px solid transparent;border-bottom:5px solid transparent}
+.parcol{display:flex;flex-direction:column;gap:10px;padding:8px;border:1px dashed var(--muted);border-radius:12px}
+.msn{display:flex;flex-direction:column;align-items:center;gap:8px;font-size:11px;color:var(--muted);text-align:center;width:104px}
+.dia{width:16px;height:16px;transform:rotate(45deg);background:var(--accent);border-radius:3px;display:inline-block;flex:none}
+.dia.done{background:var(--ok)}
+.phases{display:flex;align-items:center;gap:8px;overflow-x:auto;padding:6px 2px}
+.ph{width:190px;flex:none;border:1px solid var(--line);border-radius:12px;padding:10px 12px;background:var(--surface);text-align:left;display:flex;flex-direction:column;gap:4px}
+.ph[aria-current="true"]{border-color:var(--ink);box-shadow:0 0 0 1px var(--ink)}
+.ph.st-done{border-left:4px solid var(--ok)}.ph.st-run{border-left:4px solid var(--info)}.ph.st-open{border-left:4px solid var(--line)}
+.ms{display:flex;flex-direction:column;align-items:center;gap:8px;width:110px;flex:none;font-size:11px;color:var(--muted);text-align:center}
+.par{display:flex;flex-direction:column;gap:8px;padding:8px;border:1px dashed var(--muted);border-radius:12px;flex:none}
+.cobadges{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+.cobadge{border:1px solid var(--line);background:var(--surface);border-radius:999px;padding:6px 14px;font-weight:600;display:inline-flex;gap:8px;align-items:center}
+.cobadge[aria-pressed="true"]{background:var(--ink);border-color:var(--ink);color:var(--surface)}
+.cobadge.add{border-style:dashed;color:var(--muted);font-weight:600}
+.bell{position:relative;padding:6px 10px}.bell .cnt{position:absolute;top:-6px;right:-6px;font-family:var(--f-mono);font-size:10.5px;background:var(--accent);color:#fff;border-radius:999px;padding:0 6px}
+.pop{position:fixed;top:16px;right:20px;z-index:45;background:var(--surface);border:1px solid var(--line);border-left:4px solid var(--accent);border-radius:12px;box-shadow:0 14px 36px rgba(10,14,28,.22);padding:12px 14px;display:flex;gap:12px;align-items:center;max-width:min(460px,calc(100vw - 32px))}
+.pop .spark{width:30px;height:30px;border-radius:50%;background:var(--accent);color:#fff;display:inline-flex;align-items:center;justify-content:center;flex-shrink:0}
+.pop b{display:block;font-size:13px}.pop small{color:var(--muted);font-size:12px}
+.pop .ib{border:0;background:none;font-size:18px;color:var(--muted)}
+.modal.top{align-items:flex-start;justify-content:flex-end;padding-top:64px}
+.srct{font-size:11.5px;font-weight:600;color:var(--muted);font-family:var(--f-mono)}
+.sess h3{font-size:14.5px}
+.sess.big{border-left:4px solid var(--accent)}.sess.big h3{font-size:17px}
+.kv{display:grid;grid-template-columns:86px 1fr;gap:4px 10px;font-size:13px}
+.kv .k{font-family:var(--f-mono);font-size:10.5px;text-transform:uppercase;letter-spacing:.05em;color:var(--muted);padding-top:2px}
+.askbox{border:1px dashed var(--accent);border-radius:9px;padding:8px 10px;font-size:12.5px;display:flex;flex-direction:column;gap:6px;background:var(--accent-soft)}
+.lanes{display:grid;gap:14px;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));align-items:start}
+.lane{background:var(--sunk);border-radius:12px;padding:10px;display:flex;flex-direction:column;gap:10px}
+.lane-h{display:flex;justify-content:space-between;align-items:center;padding:2px 4px}
+.daycard{border-top:4px solid var(--ink)}
+.lnk{border:0;background:none;padding:0;color:var(--info);text-align:left;font:inherit;text-decoration:underline;cursor:pointer}
+.tline{display:flex;flex-direction:column;gap:8px}
+.tl-row{display:grid;grid-template-columns:50px 1fr;gap:10px;align-items:start}
+.tm{font-family:var(--f-mono);font-size:12px;color:var(--muted);padding-top:8px}
+.slot{border-radius:9px;padding:8px 11px;display:flex;flex-direction:column;gap:2px;font-size:12.5px}
+.slot.cal{background:var(--ink-soft);border-left:4px solid var(--ink)}
+.slot.free{border:1px dashed var(--line);color:var(--muted)}.slot.free b{color:var(--fg)}
+a.btn{text-decoration:none;color:var(--ink);display:inline-flex;align-items:center}
+.bodolink{color:inherit;text-decoration:underline;text-decoration-color:#C8641A;text-underline-offset:2px;font-weight:600}
+.modebtn{margin-left:auto;border:1px solid rgba(255,255,255,.35);background:none;color:inherit;border-radius:999px;padding:1px 10px;font-size:11.5px;font-weight:600;flex:none}
+@media (prefers-reduced-motion:reduce){*{transition:none!important}}
+/* Ergänzungen für den abcfinance-Prototyp (Posteingang, Deckungsgrad, Anlernen) */
+.ex{font-family:var(--f-mono);font-size:10px;letter-spacing:.06em;text-transform:uppercase;border:1px dashed var(--muted);color:var(--muted);border-radius:6px;padding:0 5px;white-space:nowrap}
+.an{font-family:var(--f-mono);font-size:10px;letter-spacing:.06em;text-transform:uppercase;border:1px dashed var(--accent);color:var(--accent);border-radius:6px;padding:0 5px;white-space:nowrap}
+.bar{height:8px;border-radius:99px;background:var(--sunk);overflow:hidden;min-width:70px;flex:1}
+.bar i{display:block;height:100%;border-radius:99px;background:var(--ink)}
+.bar.ki i{background:var(--accent)}
+.bar.lo i{background:var(--bad)}
+.meter{display:flex;gap:8px;align-items:center;font-size:12px;font-variant-numeric:tabular-nums}
+.meter .k{width:92px;color:var(--muted);flex:none}
+.meter b{width:40px;text-align:right;flex:none}
+.mail{display:grid;grid-template-columns:84px minmax(0,1.5fr) minmax(0,1fr) minmax(0,1fr) 120px;gap:12px;align-items:center;padding:11px 12px;border-top:1px solid var(--line);text-align:left;background:none;border-left:0;border-right:0;border-bottom:0;width:100%}
+.mail:first-child{border-top:0}
+.mail[aria-current="true"]{background:var(--ink-soft)}
+.mail .tm2{font-family:var(--f-mono);font-size:12px;color:var(--muted)}
+.mail b{display:block;font-size:13px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.mail small{display:block;color:var(--muted);font-size:12px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+@media (hover:hover) and (pointer:fine){.mail:hover{background:var(--sunk)}}
+@media (max-width:980px){.mail{grid-template-columns:84px minmax(0,1fr) 110px}.mail .hide-s{display:none}}
+.split{display:grid;grid-template-columns:minmax(0,1.25fr) minmax(0,1fr);gap:16px;align-items:start}
+@media (max-width:1100px){.split{grid-template-columns:1fr}}
+.doc{background:var(--bg);border:1px solid var(--line);border-radius:10px;padding:12px 14px;font-size:13px;line-height:1.6;white-space:pre-wrap}
+.doc mark{background:var(--accent-soft);color:var(--fg);border-radius:3px;padding:0 2px;box-shadow:inset 0 -2px 0 var(--accent)}
+.terms{display:flex;flex-wrap:wrap;gap:6px}
+.term{border:1px solid var(--line);background:var(--surface);border-radius:999px;padding:3px 10px;font-size:12px;display:inline-flex;gap:6px;align-items:center}
+.term i{font-style:normal;font-family:var(--f-mono);font-size:10.5px;color:var(--muted)}
+.term.hit{border-color:var(--accent);background:var(--accent-soft)}
+.term.new{border-style:dashed}
+.cmp{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+@media (max-width:700px){.cmp{grid-template-columns:1fr}}
+.cmp>div{border:1px solid var(--line);border-radius:10px;padding:12px;display:flex;flex-direction:column;gap:8px;background:var(--surface)}
+.cmp .h{font-family:var(--f-mono);font-size:10.5px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
+.cmp .neu{border-color:var(--ink);box-shadow:0 0 0 1px var(--ink)}
+.hn{display:flex;gap:10px;align-items:stretch;flex-wrap:wrap}
+.hn>div{flex:1;min-width:220px;border:1px dashed var(--line);border-radius:10px;padding:10px 12px;font-size:13px}
+.hn>div.neu{border:1px solid var(--ink);background:var(--ink-soft)}
+.hn .ar{flex:0 0 auto;min-width:0;border:0;align-self:center;font-size:20px;color:var(--muted);padding:0}
+.typerow{display:grid;grid-template-columns:minmax(0,1.3fr) 90px minmax(0,1fr) minmax(0,1fr) 110px;gap:12px;align-items:center;padding:11px 12px;border-top:1px solid var(--line);text-align:left;background:none;border-left:0;border-right:0;border-bottom:0;width:100%}
+.typerow:first-child{border-top:0}
+.typerow[aria-current="true"]{background:var(--ink-soft)}
+@media (max-width:980px){.typerow{grid-template-columns:minmax(0,1fr) 100px}.typerow .hide-s{display:none}}
+@media (hover:hover) and (pointer:fine){.typerow:hover{background:var(--sunk)}}
+.flow2{display:flex;align-items:center;min-width:max-content;gap:0}
+.branch{display:flex;align-items:center;gap:0;margin:14px 0 0 0;min-width:max-content}
+.vln{width:2px;height:22px;background:var(--muted);margin-left:0}
+.node.hum{border-left:4px solid var(--muted);border-style:dashed}
+.node.ag{border-left:4px solid var(--accent)}
+.rangewrap{display:flex;gap:10px;align-items:center}
+.rangewrap input{flex:1}
+.ta.test{min-height:110px}
+.qa{display:flex;flex-direction:column;gap:2px;padding:9px 0;border-top:1px solid var(--line)}
+.qa:first-child{border-top:0}
+.legend{display:flex;gap:14px;flex-wrap:wrap;font-size:12px;color:var(--muted);align-items:center}
+.mail .pill,.typerow .pill{justify-self:start}
+.typerow small{display:block}
+.canvas .node{width:126px}
+.sw{display:inline-block;width:10px;height:10px;border-radius:3px;margin-right:5px;vertical-align:-1px}
+</style>
+<div class="app" id="app">
+  <div class="demo"><b>Konzept-Prototyp für abcfinance</b><span>ASS · Auftragssteuerung mit KI · alle Namen, Mails und Zahlen sind Beispieldaten · keine fertige Software</span></div>
+  <aside id="side">
+    <div class="logo"><div class="mark">OS</div><div><b>Company OS</b><small>Arbeitstitel</small></div></div>
+    <div class="lbl">Unternehmen</div>
+    <div class="nav"><button aria-current="true"><span class="co"><span class="dot" style="background:#2c4a5e"></span>abcfinance</span><span class="ex" style="margin-left:auto">Beispiel</span></button></div>
+    <div class="lbl">Modul ASS</div>
+    <div class="nav" id="areas"></div>
+    <button class="me" id="meBtn" aria-label="Profil"><span class="ava s" style="--c:#2c4a5e">SW</span><span><b>Sandra Weber</b><small>Leitung Posteingang · Beispiel</small></span><span class="chev" aria-hidden="true">›</span></button>
+  </aside>
+  <main>
+    <div class="top">
+      <button class="btn sm menu-btn" id="menuBtn" aria-label="Menü">☰ Menü</button>
+      <div><div class="crumb" id="crumb"></div><h1 id="title"></h1></div>
+      <div class="sp"></div>
+      <button class="btn" id="goKonzept">Annahmen zum Konzept</button>
+    </div>
+    <div class="work" id="work">
+      <section class="view" id="view"></section>
+      <section class="chat" id="chat" hidden>
+        <header><b>✦ KI-Assistent</b><span class="pill p-open">abcfinance · Posteingang</span><button class="ib" id="chatClose" aria-label="Minimieren" title="Minimieren">–</button></header>
+        <div class="msgs" id="msgs"></div>
+        <div class="chips" id="chips"></div>
+        <form class="composer" id="composer"><input id="chatIn" placeholder="Frage zum Posteingang …" aria-label="Nachricht"><button class="btn pri">Senden</button></form>
+        <div class="hint">Im Prototyp vorbereitete Antworten. Was nach außen wirkt, wird vor dem Ausführen freigegeben.</div>
+      </section>
+    </div>
+    <button class="fab" id="chatBtn"><span class="spark">✦</span>KI-Assistent</button>
+  </main>
+</div>
+<div id="modal"></div>
+<div class="toast" id="toast" hidden></div>
+<script>
+const $=s=>document.querySelector(s);
+const esc=s=>String(s).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+function toast(t){const e=$("#toast");e.textContent=t;e.hidden=false;clearTimeout(toast.t);toast.t=setTimeout(()=>e.hidden=true,2800)}
+const EX='<span class="ex">Beispiel</span>', AN='<span class="an">Annahme</span>';
+
+/* ---------- Beispieldaten ---------- */
+const TEAMS={
+  vs:{n:"Vertragsservice",lead:["JN","Julia Neumann"],dep:"Vertretung: Lars Otto",c:"#2457c5",m:["Lars Otto","Mia Schröder","Tobias Brandt","Eva Kaiser","Jonas Wirth"],korb:14},
+  fm:{n:"Forderungsmanagement",lead:["SK","Stefan Krause"],dep:"Vertretung: Nina Albers",c:"#b4232a",m:["Nina Albers","Ole Martens","Lea Fuchs"],korb:9},
+  ks:{n:"Kundenservice",lead:["AD","Aylin Demir"],dep:"Vertretung: Paul Richter",c:"#147a5c",m:["Paul Richter","Sara Lenz","Ben Hofmann","Clara Busch"],korb:11},
+  sd:{n:"Stammdaten",lead:["PV","Peter Vogt"],dep:"Vertretung: Hanna Brandt",c:"#7a4fc9",m:["Hanna Brandt"],korb:6}
+};
+/* Dokumenttypen: Kennbegriffe [Anzeige, Suchstamm, Gewicht] wie in der heutigen Posteingangsverarbeitung */
+const TYPES=[
+ {id:"rek",n:"Vertragsreklamation",terms:[["Reklamation","reklam",3],["beanstanden","beanstand",3],["fehlerhaft","fehlerhaft",2],["nicht einverstanden","nicht einverstanden",2],["Widerspruch","widerspr",2],["Korrektur","korrektur",1],["Abrechnung","abrechnung",1],["Vertragsnummer","vertragsnummer",1]],
+  docs:600,rule:78,ki:94,thr:85,team:"vs",mode:"korb",sla:"3 Werktage",status:"aktiv",
+  tasks:["Reklamation prüfen und entscheiden","Eingangsbestätigung an den Kunden (Entwurf, Versand nach Freigabe)"],
+  sug:[["nicht nachvollziehbar",212],["Gutschrift",148],["falsch berechnet",131],["zu viel berechnet",77]]},
+ {id:"abl",n:"Ablöseanfrage",terms:[["Ablösung","ablös",3],["vorzeitig","vorzeitig",2],["Ablösesumme","ablösesumme",2],["Restwert","restwert",2],["Angebot","angebot",1],["Leasingvertrag","leasingvertrag",1]],
+  docs:420,rule:81,ki:96,thr:85,team:"vs",mode:"person",sla:"2 Werktage",status:"aktiv",
+  tasks:["Ablöseangebot berechnen","Angebot an den Kunden (Versand nach Freigabe)"],sug:[["auslösen",64],["Vertrag beenden",51]]},
+ {id:"kue",n:"Kündigung",terms:[["Kündigung","kündig",3],["fristgerecht","fristgerecht",2],["Vertragsende","vertragsende",2],["zum Ablauf","zum ablauf",1],["schriftlich bestätigen","bestätigen",1]],
+  docs:310,rule:88,ki:97,thr:90,team:"vs",mode:"korb",sla:"5 Werktage",status:"aktiv",
+  tasks:["Kündigung prüfen und Vertragsende in sellify setzen","Kündigungsbestätigung (Entwurf, Versand nach Freigabe)"],sug:[["beenden",44]]},
+ {id:"adr",n:"Adress- und Stammdatenänderung",terms:[["neue Anschrift","neue anschrift",3],["umziehen / Umzug","umz",2],["Adressänderung","adressänderung",3],["Firmierung","firmierung",2],["Bankverbindung","bankverbindung",2]],
+  docs:280,rule:74,ki:95,thr:90,team:"sd",mode:"korb",sla:"2 Werktage",status:"aktiv",
+  tasks:["Änderung in sellify übernehmen (Vorschlag der KI, Freigabe durch Stammdaten)"],sug:[["neue Adresse",58],["IBAN",41]]},
+ {id:"zah",n:"Zahlungsklärung",terms:[["Zahlung","zahlung",2],["überwiesen","überwiesen",3],["Zahlungsavis","avis",2],["Lastschrift","lastschrift",2],["Mahnung","mahnung",2],["Rechnung","rechnung",1]],
+  docs:510,rule:80,ki:93,thr:85,team:"fm",mode:"korb",sla:"1 Werktag",status:"aktiv",
+  tasks:["Zahlungseingang abgleichen","Mahnstufe prüfen und ggf. aussetzen"],sug:[["Rücklastschrift",39],["Zahlungsbeleg",36]]},
+ {id:"ver",n:"Versicherungsnachweis",terms:[["Versicherung","versicherung",3],["Police","police",2],["Nachweis","nachweis",2],["Sicherungsschein","sicherungsschein",3]],
+  docs:190,rule:86,ki:95,thr:85,team:"vs",mode:"korb",sla:"5 Werktage",status:"aktiv",
+  tasks:["Nachweis am Vertrag in sellify ablegen","Wiedervorlage bei fehlendem Sicherungsschein"],sug:[["Versicherungsbestätigung",29]]},
+ {id:"kop",n:"Rechnungskopie / allgemeine Anfrage",terms:[["Rechnungskopie","rechnungskopie",3],["Kopie","kopie",2],["Duplikat","duplikat",2],["Rechnung","rechnung",1]],
+  docs:350,rule:83,ki:96,thr:85,team:"ks",mode:"korb",sla:"1 Werktag",status:"aktiv",
+  tasks:["Antwort mit Rechnungskopie (Entwurf durch KI, Versand nach Freigabe)"],sug:[["nochmal zusenden",33]]},
+ {id:"ins",n:"Insolvenzmitteilung",terms:[["Insolvenzverfahren","insolvenz",3],["Insolvenzverwalter","insolvenzverwalter",3],["Amtsgericht","amtsgericht",2],["Forderungen anmelden","forderungen",1]],
+  docs:40,rule:0,ki:88,thr:95,team:"fm",mode:"person",sla:"sofort",status:"im Anlernen",
+  tasks:["Forderungsanmeldung vorbereiten","Leitung Forderungsmanagement informieren (hohe Priorität)"],sug:[["Eröffnungsbeschluss",22],["vorläufige Insolvenz",14]]}
+];
+const T=id=>TYPES.find(t=>t.id===id);
+const MAILS=[
+ {id:1,tm:"08:12",box:"Verträge",from:"Metallbau Krüger GmbH",subj:"Widerspruch zur Abrechnung Vertrag 4711-2083",
+  body:"Sehr geehrte Damen und Herren,\nwir beanstanden die Abrechnung zu unserem Vertrag mit der Vertragsnummer 4711-2083. Die berechnete Nutzungsentschädigung ist aus unserer Sicht fehlerhaft und nicht nachvollziehbar. Wir bitten um Korrektur und eine Gutschrift.\nMit freundlichen Grüßen\nJens Krüger",
+  type:"rek",ki:97,kontakt:"Metallbau Krüger GmbH · Jens Krüger",vertrag:"4711-2083",st:"auto",why:"Der Kunde widerspricht einer konkreten Abrechnung und verlangt eine Korrektur mit Gutschrift."},
+ {id:2,tm:"08:40",box:"Service",from:"Praxis Dr. Sommer",subj:"Vorzeitige Ablösung Leasingvertrag",
+  body:"Guten Tag,\nwir möchten unseren Leasingvertrag 5520-1147 für das Ultraschallgerät vorzeitig ablösen. Bitte senden Sie uns ein Angebot über die Ablösesumme zum 30.11.\nViele Grüße\nDr. Anna Sommer",
+  type:"abl",ki:95,kontakt:"Praxis Dr. Sommer · Dr. Anna Sommer",vertrag:"5520-1147",st:"auto",person:"Tobias Brandt",why:"Eindeutige Bitte um ein Ablöseangebot mit Stichtag."},
+ {id:3,tm:"09:05",box:"Buchhaltung",from:"Spedition Wolff KG",subj:"Zahlung Rechnung 2026-08812",
+  body:"Hallo,\ndie Zahlung zur Rechnung 2026-08812 haben wir am 08.10. überwiesen. Anbei der Zahlungsavis. Bitte die Mahnung stornieren.\nGruß\nBuchhaltung Spedition Wolff",
+  type:"zah",ki:92,kontakt:"Spedition Wolff KG",vertrag:"8810-0231",st:"auto",why:"Kunde meldet Zahlung zu einer gemahnten Rechnung und legt einen Beleg bei."},
+ {id:4,tm:"09:31",box:"Service",from:"Hoffmann Druck GmbH",subj:"Ihr Schreiben vom 02.10.",
+  body:"Sehr geehrte Damen und Herren,\nzu Ihrem Schreiben: Wir sind mit dem Betrag nicht einverstanden. Gleichzeitig teilen wir mit, dass wir zum 01.11. umziehen, neue Anschrift: Industriestraße 12, 50829 Köln.\nMit freundlichen Grüßen\nK. Hoffmann",
+  type:"rek",ki:71,also:["adr",88],kontakt:"Hoffmann Druck GmbH · Klaus Hoffmann",vertrag:"2 Verträge möglich (3120-0871, 3120-1102)",st:"pruefen",
+  why:"Zwei Anliegen in einer Mail: Widerspruch gegen einen Betrag (ohne Vertragsnummer) und eine Adressänderung. Der Vertrag ist nicht eindeutig."},
+ {id:5,tm:"10:02",box:"Verträge",from:"Bäckerei Lange",subj:"Kündigung",
+  body:"Hiermit kündigen wir den Mietvertrag 3301-0442 fristgerecht zum Vertragsende. Bitte bestätigen Sie die Kündigung schriftlich.\nFamilie Lange",
+  type:"kue",ki:98,kontakt:"Bäckerei Lange · Martin Lange",vertrag:"3301-0442",st:"auto",why:"Fristgerechte Kündigung mit Vertragsnummer und Bitte um Bestätigung."},
+ {id:6,tm:"10:17",box:"Service",from:"Kanzlei Berger & Partner",subj:"Insolvenzverfahren Nordlicht Events GmbH",
+  body:"Sehr geehrte Damen und Herren,\nwir teilen mit, dass das Amtsgericht Düsseldorf das Insolvenzverfahren über das Vermögen der Nordlicht Events GmbH eröffnet hat. Der Unterzeichner wurde zum Insolvenzverwalter bestellt. Wir bitten Sie, Ihre Forderungen anzumelden.\nRA Dr. Berger",
+  type:"ins",ki:88,kontakt:"Nordlicht Events GmbH (Kunde) · Kanzlei Berger & Partner (Absender)",vertrag:"1 aktiver Vertrag (9902-0017)",st:"pruefen",person:"Stefan Krause",
+  why:"Mitteilung über ein eröffnetes Insolvenzverfahren. Der Dokumenttyp ist noch im Anlernen, deshalb prüft immer ein Mensch."},
+ {id:7,tm:"10:44",box:"Service",from:"Elektro Yilmaz",subj:"Rechnungskopie",
+  body:"Hallo,\nkönnen Sie uns bitte eine Kopie der Rechnung für September zum Vertrag 6120-0098 schicken? Danke.\nE. Yilmaz",
+  type:"kop",ki:96,kontakt:"Elektro Yilmaz · Emre Yilmaz",vertrag:"6120-0098",st:"freigabe",why:"Einfache Bitte um eine Rechnungskopie. Die KI hat die Antwort samt Anhang vorbereitet."},
+ {id:8,tm:"11:03",box:"Verträge",from:"Autohaus Peters",subj:"Versicherungsnachweis",
+  body:"Guten Tag,\nanbei die Police als Nachweis der Versicherung für das Fahrzeug aus Vertrag 7781-3310. Der Sicherungsschein folgt.\nAutohaus Peters",
+  type:"ver",ki:93,kontakt:"Autohaus Peters",vertrag:"7781-3310",st:"auto",why:"Police als Versicherungsnachweis, der Sicherungsschein fehlt noch, deshalb Wiedervorlage."},
+ {id:9,tm:"11:20",box:"Service",from:"m.schulz@… (unbekannt)",subj:"Frage",
+  body:"Hallo,\nich habe eine Frage zu meinem Vertrag, bitte rufen Sie mich zurück.\nM. Schulz",
+  type:"kop",ki:41,kontakt:"nicht eindeutig: 3 Personen „Schulz“ in sellify",vertrag:"–",st:"pruefen",why:"Kein erkennbares Anliegen und kein eindeutiger Kontakt."}
+];
+const STL={auto:["p-ok","automatisch verteilt"],pruefen:["p-wait","Mensch prüft"],freigabe:["p-run","wartet auf Freigabe"],done:["p-ok","erledigt"]};
+
+/* Deckungsgrad wie heute: gewichtete Kennbegriffe, die im Text vorkommen */
+function cover(text,t){const s=text.toLowerCase();let hit=0,all=0;const h=[];t.terms.forEach(([d,st,w])=>{all+=w;if(s.includes(st)){hit+=w;h.push(st)}});return {pct:Math.round(100*hit/all),hits:h}}
+function bestRule(text){return TYPES.map(t=>({t,...cover(text,t)})).sort((a,b)=>b.pct-a.pct)}
+function markText(text,stems){let h=esc(text);[...stems].sort((a,b)=>b.length-a.length).forEach(st=>{const re=new RegExp("("+st.replace(/[.*+?^${}()|[\]\\]/g,"\\$&")+"[\\wäöüß]*)","gi");h=h.replace(re,"<mark>$1</mark>")});return h}
+const meter=(k,v,cls="")=>`<div class="meter"><span class="k">${k}</span><span class="bar ${cls}"><i style="width:${v}%"></i></span><b>${v} %</b></div>`;
+const target=(t,m)=>{const tm=TEAMS[t.team];if(m&&m.person)return `Direkt an ${m.person}`;return t.mode==="person"?`Zuständige Person laut sellify (${tm.n})`:`Arbeitskorb ${tm.n}`};
+
+/* ---------- Navigation ---------- */
+const AREAS=[["cockpit","◎","Cockpit"],["eingang","✉","Posteingang"],["prozess","↝","Prozess"],["typen","◆","Dokumenttypen & Anlernen"],["vert","⇥","Verteilung & Arbeitskörbe"],["org","▦","Organigramm"],["setup","⚙","Einrichtung"],["konzept","?","Annahmen zum Konzept"]];
+const state={area:"cockpit",mail:4,type:"rek",test:MAILS[3].body};
+function nav(){$("#areas").innerHTML=AREAS.map(([k,i,l])=>{const c=k==="eingang"?MAILS.filter(m=>m.st==="pruefen").length:0;return `<button data-area="${k}" aria-current="${state.area===k}"><span class="ic">${i}</span>${l}${c?`<span class="cnt">${c}</span>`:""}</button>`}).join("")}
+function go(a){state.area=a;$("#side").classList.remove("open");render();$("#view").scrollTop=0}
+function render(){nav();const a=AREAS.find(x=>x[0]===state.area);$("#crumb").textContent="abcfinance · ASS";$("#title").textContent=a[2];$("#view").innerHTML=V[state.area]()}
+
+/* ---------- Ansichten ---------- */
+const V={};
+V.cockpit=()=>{const n=MAILS.length,au=MAILS.filter(m=>m.st==="auto").length,pr=MAILS.filter(m=>m.st==="pruefen").length,fr=MAILS.filter(m=>m.st==="freigabe").length;
+return `<div class="stack">
+<div class="card"><h2>Was sich ändert</h2>
+ <div class="hn"><div><div class="lbl" style="padding:0">Heute</div>Posteingangsverarbeitung als Teil von sellify: Kennbegriffe je Dokumenttyp, Deckungsgrad, Aufgaben dahinter.</div><div class="ar" aria-hidden="true">→</div>
+ <div class="neu"><div class="lbl" style="padding:0">Neu mit ASS</div>Eigenes Modul im Web-Portal, angebunden an sellify. KI-Agenten lesen jede Mail ganz, ordnen Kontakt und Vertrag zu, legen die Aufgaben an und verteilen sie. Die bewährten Kennbegriffe bleiben als Startwissen und Gegenprüfung.</div></div>
+</div>
+<div class="card"><h2>Heute im Posteingang ${EX}</h2>
+ <div class="kpis"><div class="kpi"><b>${n}</b><span>Mails eingegangen</span></div><div class="kpi"><b>${au}</b><span>automatisch verteilt</span></div><div class="kpi warn"><b>${pr}</b><span>Mensch prüft</span></div><div class="kpi"><b>${fr}</b><span>Antwort wartet auf Freigabe</span></div><div class="kpi"><b>4 Min.</b><span>Ø von Eingang bis Arbeitskorb</span></div></div>
+ <div class="sub">Neun Beispiel-Mails aus drei Postfächern. In der echten Umgebung kommen die Zahlen aus dem laufenden Betrieb.</div>
+</div>
+<div class="grid">
+ <div class="card"><h2>Wartet auf einen Menschen</h2><div class="list">${MAILS.filter(m=>m.st!=="auto").map(m=>`<div class="item"><span class="bot">✉</span><div class="t"><b>${esc(m.from)}</b><span class="sub">${esc(m.why)}</span></div><button class="btn sm" data-mail="${m.id}">Öffnen</button></div>`).join("")}</div></div>
+ <div class="card"><h2>Treffsicherheit je Dokumenttyp ${EX}</h2><div class="legend"><span><span class="sw" style="background:var(--ink)"></span>Kennbegriffe (heute)</span><span><span class="sw" style="background:var(--accent)"></span>KI-Agent</span></div>
+ ${TYPES.filter(t=>t.status==="aktiv").map(t=>`<div class="sec"><span style="font-size:12.5px;font-weight:600">${t.n}</span>${meter("Begriffe",t.rule)}${meter("KI",t.ki,"ki")}</div>`).join("")}
+ <div class="sub">Messung im Schattenbetrieb: beide Verfahren laufen parallel auf denselben Mails, ein Mensch bestätigt das richtige Ergebnis. ${AN}</div></div>
+</div></div>`};
+
+V.eingang=()=>{const m=MAILS.find(x=>x.id===state.mail)||MAILS[0];const t=T(m.type);const r=cover(m.body,t);const ranked=bestRule(m.body);const s=STL[m.st];
+return `<div class="stack"><div class="card" style="padding:6px 4px">
+<div class="mail" style="font-size:11.5px;color:var(--muted);font-weight:600;pointer-events:none"><span>Zeit</span><span>Absender · Betreff</span><span class="hide-s">Dokumenttyp</span><span class="hide-s">Ziel</span><span>Status</span></div>
+${MAILS.map(x=>{const tt=T(x.type),st=STL[x.st];return `<button class="mail" data-mail="${x.id}" aria-current="${x.id===m.id}"><span class="tm2">${x.tm}<br>${x.box}</span><span><b>${esc(x.from)}</b><small>${esc(x.subj)}</small></span><span class="hide-s"><b>${tt.n}${x.also?" + 1":""}</b><small>KI ${x.ki} %</small></span><span class="hide-s"><small style="white-space:normal">${esc(target(tt,x))}</small></span><span class="pill ${st[0]}">${st[1]}</span></button>`}).join("")}
+</div>
+<div class="split">
+ <div class="card"><h2>${esc(m.subj)} <span class="pill ${s[0]}">${s[1]}</span></h2><div class="meta"><span>Postfach ${m.box}</span><span>${m.tm} Uhr</span><span>${esc(m.from)}</span>${EX}</div>
+  <div class="doc">${markText(m.body,r.hits.concat(m.also?cover(m.body,T(m.also[0])).hits:[]))}</div>
+  <div class="sub">Markiert: Kennbegriffe aus der heutigen Begriffsliste, die im Text vorkommen.</div>
+ </div>
+ <div class="card"><h2>Einordnung</h2>
+  <div class="cmp"><div><span class="h">Heute · Kennbegriffe</span><b>${ranked[0].t.n}</b>${meter("Deckungsgrad",ranked[0].pct)}<span class="sub">${ranked[0].hits.length} von ${ranked[0].t.terms.length} Begriffen gefunden. Live aus dem Text berechnet.</span></div>
+  <div class="neu"><span class="h">Neu · KI-Agent</span><b>${t.n}${m.also?` + ${T(m.also[0]).n}`:""}</b>${meter("Sicherheit",m.ki,m.ki<t.thr?"lo":"ki")}${m.also?meter("2. Anliegen",m.also[1],"ki"):""}<span class="sub">Schwelle für ${t.n}: ${t.thr} % · im Prototyp feste Beispielwerte</span></div></div>
+  <div class="conseq"><span class="k">Begründung der KI</span>${esc(m.why)}</div>
+  <div class="kv"><span class="k">Kontakt</span><span>${esc(m.kontakt)}</span><span class="k">Vertrag</span><span>${esc(m.vertrag)}</span><span class="k">Ziel</span><span>${esc(target(t,m))}</span><span class="k">Aufgaben</span><span>${t.tasks.map(esc).join("<br>")}</span></div>
+  ${m.st==="pruefen"?`<div class="alert">Ein Mensch aus dem Team Posteingang prüft, weil ${m.ki<t.thr?`die Sicherheit unter der Schwelle von ${t.thr} % liegt`:"der Dokumenttyp noch angelernt wird"}${/nicht eindeutig|möglich/.test(m.vertrag+m.kontakt)?" und Kontakt oder Vertrag nicht eindeutig sind":""}.</div>`:""}
+  ${m.st==="freigabe"?`<div class="alert">Antwortentwurf mit Rechnungskopie liegt bereit. Versand erst nach Freigabe.</div>`:""}
+  <div class="acts">${m.st==="pruefen"?`<button class="btn pri" data-ok="${m.id}">Bestätigen und verteilen</button><button class="btn" data-fix="${m.id}">Korrigieren</button>`:m.st==="freigabe"?`<button class="btn pri" data-ok="${m.id}">Antwort freigeben</button><button class="btn" data-fix="${m.id}">Ändern</button>`:`<button class="btn" data-fix="${m.id}">Einordnung korrigieren</button><span class="sub">in sellify: Aufgaben angelegt, Mail am Vertrag abgelegt</span>`}</div>
+  <div class="sub">Jede Korrektur wird als Lernbeispiel für den Dokumenttyp gespeichert. ${AN}</div>
+ </div>
+</div></div>`};
+
+V.prozess=()=>{const N=(t,a,c="")=>`<div class="node ${c}"><b>${t}</b><span class="sub">${a}</span></div>`;const L='<span class="ln" aria-hidden="true"></span>';
+const STEPS=[["1","Postfächer überwachen","Posteingangs-Agent","–","nein"],["2","Mail und Anhänge lesen (auch Scans)","Posteingangs-Agent","–","nein"],["3","Dokumenttyp erkennen, Kennbegriffe gegenprüfen","Klassifizierungs-Agent","–","nein"],["4","Unter Schwelle oder unklar: prüfen","Mensch · Team Posteingang","Korrektur wird Lernbeispiel","–"],["5","Kontakt und Vertrag zuordnen","Zuordnungs-Agent","liest Kontakte und Verträge","nein"],["6","Aufgaben nach Dokumenttyp anlegen, Mail ablegen","Zuordnungs-Agent","legt Aufgaben an, legt Dokument am Vertrag ab","nein"],["7","Verteilen: Arbeitskorb oder Person","Verteil-Agent","setzt Zuständigkeit, beachtet Abwesenheit","nein"],["8","Antwort an Kunden vorbereiten (wo vorgesehen)","Antwort-Agent","Entwurf am Vorgang","ja, immer"]];
+return `<div class="stack">
+<div class="card"><h2>Prozess „Posteingangsverarbeitung“ <span class="pill p-run">im Test</span></h2><div class="sub">Der heutige Ablauf aus sellify, nachgebaut als Prozess in Company OS. Orange: KI-Agent, gestrichelt: Mensch.</div>
+<div class="canvas"><div class="flow2"><span class="ev" title="Start"></span>${L}${N("Postfächer überwachen","Posteingangs-Agent","ag")}${L}${N("Lesen & Anhänge auslesen","Posteingangs-Agent","ag")}${L}${N("Dokumenttyp erkennen","Klassifizierungs-Agent · Kennbegriffe als Gegenprüfung","ag")}${L}<div class="gwrap"><span class="gw"><span>?</span></span>sicher genug?</div>${L}<small style="color:var(--muted);padding:0 4px">ja</small>${L}${N("Kontakt & Vertrag zuordnen","Zuordnungs-Agent · sellify","ag")}${L}${N("Aufgaben anlegen","je Dokumenttyp","ag")}${L}${N("Verteilen","Arbeitskorb oder Person","ag")}${L}<span class="ev end" title="Ende"></span></div>
+<div class="branch" style="padding-left:514px"><small style="color:var(--muted);padding-right:6px">nein</small>${L}${N("Mensch prüft","Team Posteingang · Korrektur = Lernbeispiel","hum")}${L}<small style="color:var(--muted)">weiter bei „Kontakt & Vertrag zuordnen“</small></div></div>
+</div>
+<div class="card"><h2>Schritte, Verantwortung, Wirkung in sellify</h2><div class="tblw"><table><thead><tr><th>#</th><th>Schritt</th><th>Wer</th><th>In sellify</th><th>Freigabe nötig</th></tr></thead><tbody>${STEPS.map(r=>`<tr>${r.map(c=>`<td>${esc(c)}</td>`).join("")}</tr>`).join("")}</tbody></table></div>
+<div class="sub">Ergebnisverantwortlich für den Prozess: Leitung Posteingang (Mensch). Sie erhält Eskalationen, wenn ein Schritt hängt oder eine Frist droht. Bei Abwesenheit geht es an die Vertretung. ${AN}</div></div>
+<div class="card"><h2>Was ein Auftrag hier ist</h2><div class="sub">Jede eingehende Mail startet einen Auftrag im Prozess. Er bleibt nachvollziehbar: wer (Agent oder Mensch) hat wann was entschieden, mit welcher Sicherheit und Begründung. Das Protokoll liegt am Vorgang in sellify. ${AN}</div></div>
+</div>`};
+
+V.typen=()=>{const t=T(state.type);const res=bestRule(state.test);
+return `<div class="stack">
+<div class="card" style="padding:6px 4px">
+<div class="typerow" style="font-size:11.5px;color:var(--muted);font-weight:600;pointer-events:none"><span>Dokumenttyp</span><span>Beispiele</span><span class="hide-s">Treffsicherheit</span><span class="hide-s">Ziel</span><span>Status</span></div>
+${TYPES.map(x=>`<button class="typerow" data-type="${x.id}" aria-current="${x.id===t.id}"><span><b>${x.n}</b><small class="sub">${x.terms.length} Kennbegriffe · Schwelle ${x.thr} %</small></span><span style="font-variant-numeric:tabular-nums">${x.docs}</span><span class="hide-s">${x.rule?meter("Begriffe",x.rule):`<span class="sub">noch keine Regel</span>`}${meter("KI",x.ki,"ki")}</span><span class="hide-s sub">${esc(target(x))}</span><span class="pill ${x.status==="aktiv"?"p-ok":"p-wait"}">${x.status}</span></button>`).join("")}
+<div style="padding:10px 12px"><button class="btn sm" id="newType">+ Dokumenttyp anlernen</button> <span class="sub">Zahlen sind Beispielwerte.</span></div>
+</div>
+<div class="split">
+<div class="card"><h2>${t.n}</h2>
+ <div class="sec2"><h3>Kennbegriffe mit Gewicht <span class="sub" style="font-weight:400">· heute in sellify gepflegt, werden übernommen</span></h3><div class="terms">${t.terms.map(([d,,w])=>`<span class="term">${esc(d)} <i>×${w}</i></span>`).join("")}</div></div>
+ <div class="sec2"><h3>Vorschläge der KI aus ${t.docs} Beispieldokumenten ${EX}</h3><div class="terms">${t.sug.map(([d,c])=>`<button class="term new" data-sug="${esc(d)}">+ ${esc(d)} <i>in ${c}</i></button>`).join("")}</div><span class="sub">Begriffe, die in vielen Beispielen vorkommen, aber noch fehlen. Übernahme nur nach Freigabe durch die Fachverantwortung.</span></div>
+ <div class="sec2"><h3>Schwelle für automatische Verteilung</h3><div class="rangewrap"><input type="range" id="thr" min="50" max="99" value="${t.thr}" aria-label="Schwelle"><b id="thrv" style="width:44px;text-align:right">${t.thr} %</b></div><span class="sub">Darunter prüft ein Mensch. Höher = sicherer, aber mehr Handarbeit.</span></div>
+ <div class="sec2"><h3>Aufgaben dahinter</h3><ul class="tl">${t.tasks.map(x=>`<li>▸ ${esc(x)}</li>`).join("")}</ul></div>
+ <div class="kv"><span class="k">Ziel</span><span>${esc(target(t))}</span><span class="k">Frist</span><span>${t.sla}</span><span class="k">Lernbasis</span><span>${t.docs} Beispieldokumente${t.id==="rek"?" (z. B. aus der heutigen Ablage eingelesen)":""}</span></div>
+</div>
+<div class="card"><h2>Ausprobieren</h2><div class="sub">Text einfügen oder eine Beispiel-Mail nehmen. Berechnet wird der Deckungsgrad nach heutigem Prinzip über alle Dokumenttypen.</div>
+ <textarea class="ta test" id="testIn" aria-label="Testtext">${esc(state.test)}</textarea>
+ <div class="acts">${MAILS.slice(0,6).map(m=>`<button class="btn sm" data-sample="${m.id}">${esc(m.from.split(" ")[0])}</button>`).join("")}</div>
+ <div class="sec" id="testOut">${res.slice(0,4).map(r=>meter(r.t.n.split(" ")[0],r.pct,r.pct<35?"lo":"")).join("")}</div>
+ <div class="conseq"><span class="k">Und die KI?</span>Im Prototyp nicht live. In der Umsetzung liest der Klassifizierungs-Agent den ganzen Text, erkennt auch Anliegen ohne Kennbegriffe (z. B. „mit dem Betrag nicht einverstanden“) und mehrere Anliegen in einer Mail und begründet seine Einordnung.</div>
+</div></div></div>`};
+
+V.vert=()=>`<div class="stack">
+<div class="card"><h2>Verteilregeln je Dokumenttyp</h2><div class="sub">Ganz wie gewünscht: in den Arbeitskorb eines Teams oder direkt an die zuständige Person aus sellify. Bei Abwesenheit greift die Vertretung, sonst der Arbeitskorb. ${AN}</div>
+<div class="tblw"><table><thead><tr><th>Dokumenttyp</th><th>Verteilung</th><th>Team</th><th>Frist</th></tr></thead><tbody>${TYPES.map(t=>`<tr><td><b>${t.n}</b></td><td><div class="seg" role="group" aria-label="Verteilung ${t.n}"><button data-mode="${t.id}|korb" aria-pressed="${t.mode==="korb"}">Arbeitskorb</button><button data-mode="${t.id}|person" aria-pressed="${t.mode==="person"}">Zuständige Person</button></div></td><td>${TEAMS[t.team].n}</td><td>${t.sla}</td></tr>`).join("")}</tbody></table></div></div>
+<div class="grid">${Object.values(TEAMS).map(tm=>`<div class="card"><h2><span class="dot" style="background:${tm.c}"></span>Arbeitskorb ${tm.n}</h2><div class="kpis"><div class="kpi"><b>${tm.korb}</b><span>offen ${EX}</span></div></div><div class="sec"><div class="m"><span class="ava s lead" style="--c:${tm.c}">${tm.lead[0]}</span>${tm.lead[1]} · Leitung</div><div class="m"><span class="sub">${tm.m.length} Mitarbeitende · ${tm.dep}</span></div></div><div class="sub">Dokumenttypen: ${TYPES.filter(t=>t.team===Object.keys(TEAMS).find(k=>TEAMS[k]===tm)).map(t=>t.n).join(", ")}</div></div>`).join("")}</div>
+</div>`;
+
+V.org=()=>{const AG=[["Posteingangs-Agent","überwacht die Postfächer, liest Mails und Anhänge"],["Klassifizierungs-Agent","erkennt Dokumenttyp und Anliegen, prüft gegen die Kennbegriffe"],["Zuordnungs-Agent","findet Kontakt und Vertrag in sellify, legt Aufgaben an"],["Verteil-Agent","verteilt in Arbeitskorb oder an die zuständige Person"],["Antwort-Agent","bereitet Antworten vor, Versand nur nach Freigabe"]];
+return `<div class="stack">
+<div class="card" style="border-top:4px solid var(--ink)"><h2>Posteingang & Auftragssteuerung</h2>
+ <div class="row" style="flex-wrap:wrap;gap:18px"><div class="sec"><div class="m"><span class="ava lead" style="--c:#2c4a5e">SW</span><span><b>Sandra Weber</b><br><span class="sub">Leitung · erhält Eskalationen · Vertretung: Markus Hahn</span></span></div><div class="m"><span class="ava s" style="--c:#5d6579">MH</span>Markus Hahn · Prüfung unklarer Mails</div><div class="m"><span class="ava s" style="--c:#5d6579">LK</span>Lisa Koch · Prüfung unklarer Mails</div></div>
+ <div class="sec" style="flex:1;min-width:260px">${AG.map(([n,d])=>`<div class="m"><span class="bot">✦</span><span><b>${n}</b> <span class="sub">${d}</span></span></div>`).join("")}</div></div>
+ <div class="sub">Alle Namen sind Beispiele. Menschen und KI-Agenten arbeiten in derselben Abteilung: die Agenten erledigen das Wiederkehrende, die Menschen entscheiden in Zweifelsfällen und übernehmen die Verantwortung.</div>
+</div>
+<div class="orgline"></div>
+<div class="org">${Object.values(TEAMS).map(tm=>`<div class="card dept"><div class="head"><span class="ava lead" style="--c:${tm.c}">${tm.lead[0]}</span><div><b>${tm.n}</b><div class="sub">${tm.lead[1]} · ${tm.dep}</div></div></div><div class="sec">${tm.m.map(x=>`<div class="m"><span class="ava s" style="--c:${tm.c}">${x.split(" ").map(w=>w[0]).join("")}</span>${x}</div>`).join("")}</div><div class="alert ok">Empfängt Vorgänge aus dem Posteingang über den Arbeitskorb</div></div>`).join("")}</div>
+</div>`};
+
+V.setup=()=>{const P=[["Postfach Service","alle allgemeinen Anfragen","aktiv"],["Postfach Verträge","Vertragsangelegenheiten","aktiv"],["Postfach Buchhaltung","Zahlungen, Mahnungen","aktiv"],["Papierpost (Scan)","eingescannte Briefe","geplant"]];
+const R=[["Kontakte, Personen, Verträge lesen","ja"],["Aufgaben anlegen und zuweisen","ja"],["Mails und Anhänge am Vertrag ablegen","ja"],["Stammdaten ändern","nur nach Freigabe"],["E-Mails an Kunden senden","nur nach Freigabe"],["Datensätze löschen","nie"]];
+return `<div class="stack"><div class="grid">
+<div class="card"><h2>Postfächer ${EX}</h2><div class="list">${P.map(([n,d,s])=>`<div class="item"><span class="bot">✉</span><div class="t"><b>${n}</b><span class="sub">${d}</span></div><span class="pill ${s==="aktiv"?"p-ok":"p-open"}">${s}</span></div>`).join("")}</div></div>
+<div class="card"><h2>Anbindung an sellify</h2><div class="conn"><span class="sym" style="background:var(--sell)">s</span><div><b>sellify · abcfinance</b><div class="sub">über das sellify AI Integration Kit (MCP-Server und REST-Schnittstelle)</div></div></div>
+ ${R.map(([a,b])=>`<div class="perm"><span>${a}</span><span class="pill ${b==="ja"?"p-ok":b==="nie"?"p-bad":"p-wait"}">${b}</span></div>`).join("")}</div>
+<div class="card"><h2>KI und Datenschutz ${AN}</h2><div class="kv"><span class="k">Haupt-KI</span><span>wählbar je Kunde (z. B. Claude, Mistral), Verarbeitung in der EU</span><span class="k">Datenstufe</span><span>personenbezogen · Auftragsverarbeitung erforderlich</span><span class="k">Protokoll</span><span>jede Entscheidung mit Begründung am Vorgang</span><span class="k">Lernen</span><span>Beispiele bleiben bei abcfinance, kein Training fremder Modelle</span></div><div class="sub">Im Konzept mit dem Datenschutz von abcfinance abzustimmen.</div></div>
+</div></div>`};
+
+V.konzept=()=>{const A=[
+["Rahmen",[["ASS ist ein eigenes Modul im Web-Portal und läuft im Browser. sellify bleibt das führende System für Kontakte, Verträge, Aufgaben und Dokumente.","Annahme"],["Technische Basis ist Company OS: Prozess, Agenten, Menschen und Freigaben werden dort konfiguriert, nicht programmiert.","Annahme"]]],
+["Erkennung",[["Die KI liest die ganze Mail samt Anhängen, auch Scans, und erkennt mehrere Anliegen in einer Mail.","Annahme"],["Die heutigen Dokumenttypen und Kennbegriffe werden aus sellify übernommen: als Startwissen und als Gegenprüfung der KI.","Annahme"],["Die vorhandenen Beispieldokumente (je Typ mehrere Hundert) dienen als Lern- und Testmenge.","Annahme"],["Je Dokumenttyp gibt es eine eigene Schwelle. Darunter prüft immer ein Mensch.","Annahme"]]],
+["Verteilung",[["Je Dokumenttyp wählbar: Arbeitskorb eines Teams oder direkt die zuständige Person aus sellify; bei Abwesenheit Vertretung oder Arbeitskorb.","Annahme"],["Aufgaben je Dokumenttyp sind wie heute hinterlegt und werden in sellify angelegt.","Annahme"]]],
+["Sicherheit",[["Alles mit Außenwirkung (Antworten an Kunden, Änderung von Stammdaten) erst nach Freigabe durch einen Menschen.","Annahme"],["Korrekturen werden Lernbeispiele. Neue Kennbegriffe oder Schwellen ändert nur die Fachverantwortung.","Annahme"]]],
+["Einführung",[["Start im Schattenbetrieb: ASS läuft parallel zur heutigen Verarbeitung, beide Ergebnisse werden verglichen, bevor ASS übernimmt.","Annahme"],["Einführung Dokumenttyp für Dokumenttyp, beginnend mit den häufigsten.","Annahme"]]]];
+const Q=["Welche Postfächer und wie viele Mails pro Tag?","Welche Dokumenttypen, Kennbegriffe und Aufgaben gibt es heute in sellify, und lassen sie sich exportieren?","Welche Formate kommen an (PDF, Scans, Fax, Papier)?","Wie sind Arbeitskörbe und Zuständigkeiten heute in sellify abgebildet?","Welche KI-Anbieter und welches Hosting lässt der Datenschutz zu?","Welche Rollen und Rechte brauchen Posteingang, Fachteams und Leitung?","Woran messen wir den Erfolg (z. B. Quote automatisch verteilt, Durchlaufzeit, Fehlzuordnungen)?","Wer pflegt Dokumenttypen und Schwellen im Betrieb?"];
+return `<div class="stack">
+<div class="card"><h2>Annahmen, die das Konzept ausarbeiten muss</h2><div class="sub">Diese Seite fasst zusammen, was im Prototyp vorausgesetzt ist. Nichts davon ist abgestimmt; es ist die Grundlage für das gemeinsame Konzept.</div></div>
+<div class="grid">${A.map(([h,L])=>`<div class="card"><h2>${h}</h2><div class="list">${L.map(([t])=>`<div class="item">${AN}<div class="t">${esc(t)}</div></div>`).join("")}</div></div>`).join("")}</div>
+<div class="card"><h2>Offene Fragen an abcfinance</h2><div class="list">${Q.map((q,i)=>`<div class="qa"><b>${i+1}. ${esc(q)}</b></div>`).join("")}</div></div>
+</div>`};
+
+/* ---------- Aktionen ---------- */
+document.addEventListener("click",e=>{const b=e.target.closest("button");if(!b)return;const d=b.dataset;
+ if(d.area){go(d.area);return}
+ if(d.mail){state.mail=+d.mail;go("eingang");return}
+ if(d.type){state.type=d.type;render();return}
+ if(d.sample){state.test=MAILS.find(m=>m.id===+d.sample).body;render();return}
+ if(d.sug){b.classList.remove("new");b.classList.add("hit");b.disabled=true;toast(`„${d.sug}“ zur Freigabe an die Fachverantwortung gegeben`);return}
+ if(d.ok){const m=MAILS.find(x=>x.id===+d.ok);const was=m.st;m.st=was==="freigabe"?"done":"auto";render();toast(was==="freigabe"?"Antwort freigegeben und versendet (simuliert)":`Bestätigt: ${target(T(m.type),m)}`);return}
+ if(d.fix){fixModal(+d.fix);return}
+ if(d.pick){const [id,ty]=d.pick.split("|");const m=MAILS.find(x=>x.id===+id);m.type=ty;m.also=null;m.st="auto";$("#modal").innerHTML="";render();toast(`Als ${T(ty).n} verteilt · als Lernbeispiel gespeichert`);return}
+ if(d.mode){const [id,mo]=d.mode.split("|");T(id).mode=mo;render();toast(`${T(id).n}: ${mo==="korb"?"Arbeitskorb":"zuständige Person"}`);return}
+ if(b.id==="newType"){toast("Neuer Dokumenttyp: Name, Beispieldokumente hochladen, KI schlägt Kennbegriffe vor");return}
+ if(b.id==="goKonzept"){go("konzept");return}
+ if(b.id==="menuBtn"){$("#side").classList.toggle("open");return}
+ if(b.id==="meBtn"){toast("Profil im Prototyp nicht ausgebaut");return}
+ if(b.id==="chatBtn"){openChat();return}
+ if(b.id==="chatClose"){$("#chat").hidden=true;$("#chatBtn").hidden=false;return}
+ if(d.close!==undefined){$("#modal").innerHTML="";return}
+ if(d.q){ask(d.q);return}
+});
+document.addEventListener("input",e=>{if(e.target.id==="thr"){T(state.type).thr=+e.target.value;$("#thrv").textContent=e.target.value+" %"}
+ if(e.target.id==="testIn"){state.test=e.target.value;$("#testOut").innerHTML=bestRule(state.test).slice(0,4).map(r=>meter(r.t.n.split(" ")[0],r.pct,r.pct<35?"lo":"")).join("")}});
+function fixModal(id){const m=MAILS.find(x=>x.id===id);$("#modal").innerHTML=`<div class="modal" data-close><div class="card"><h2>Einordnung korrigieren</h2><div class="sub">${esc(m.subj)} · ${esc(m.from)}</div><div class="sklist">${TYPES.map(t=>`<button class="sk" data-pick="${id}|${t.id}" aria-pressed="${t.id===m.type}"><span class="bx">${t.id===m.type?"✓":""}</span><span><b>${t.n}</b><small>${esc(target(t))}</small></span></button>`).join("")}</div><div class="acts"><button class="btn" data-close>Abbrechen</button></div></div></div>`}
+$("#modal").addEventListener("click",e=>{if(e.target.classList.contains("modal"))$("#modal").innerHTML=""});
+
+/* ---------- KI-Assistent (vorbereitete Antworten) ---------- */
+const QA=[["Warum prüft bei Hoffmann Druck ein Mensch?","Die Mail enthält zwei Anliegen: einen Widerspruch gegen einen Betrag und eine Adressänderung. Für den Widerspruch liegt die Sicherheit mit 71 % unter der Schwelle von 85 %, und zu Hoffmann Druck gibt es zwei Verträge. Vorschlag: Vertrag 3120-1102 (Schreiben vom 02.10. bezog sich darauf), Adressänderung an Stammdaten."],
+["Was liegt im Arbeitskorb Vertragsservice?","14 offene Vorgänge (Beispiel): 6 Reklamationen, 4 Kündigungen, 3 Versicherungsnachweise, 1 Ablöseanfrage. Zwei Reklamationen erreichen morgen ihre Frist."],
+["Wie lerne ich einen neuen Dokumenttyp an?","Name anlegen, Beispieldokumente hochladen (z. B. 50 bis 500), ich schlage Kennbegriffe und eine Schwelle vor, die Fachverantwortung gibt frei. Danach läuft der Typ zuerst im Schattenbetrieb."]];
+function openChat(){$("#chat").hidden=false;$("#chatBtn").hidden=true;if(!$("#msgs").children.length){addMsg("ai","Hallo, ich kenne den heutigen Posteingang von abcfinance. Was möchten Sie wissen?")}$("#chips").innerHTML=QA.map((q,i)=>`<button data-q="${i}">${esc(q[0])}</button>`).join("")}
+function addMsg(w,t){const d=document.createElement("div");d.className="msg "+w;d.textContent=t;$("#msgs").appendChild(d);$("#msgs").scrollTop=1e6}
+function ask(i){const q=QA[+i];addMsg("me",q[0]);setTimeout(()=>addMsg("ai",q[1]),350)}
+$("#composer").addEventListener("submit",e=>{e.preventDefault();const v=$("#chatIn").value.trim();if(!v)return;addMsg("me",v);$("#chatIn").value="";setTimeout(()=>addMsg("ai","Im Prototyp sind nur die vorbereiteten Fragen hinterlegt. In der Umsetzung beantworte ich Fragen zu Vorgängen, Arbeitskörben und Dokumenttypen aus den Daten in sellify."),350)});
+
+render();
+</script>

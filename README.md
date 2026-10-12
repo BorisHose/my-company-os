@@ -1,14 +1,16 @@
 # Company OS (Arbeitstitel)
 
 Sicherung des Arbeitsstands: Prototyp, Präsentationen, Konzept und Werkzeuge.
-Stand: 11.10.2026 · Repository privat (github.com/BorisHose/my-company-os)
+Stand: 12.10.2026 · Repository privat (github.com/BorisHose/my-company-os)
 
 ## Inhalt
 
 | Ordner | Was | Live-Fassung auf claude.ai |
 |---|---|---|
-| `prototyp/company-os-prototyp.html` | Prototyp, startet als „Musterfirma“ (erfundene Daten), Knopf „Pilotdaten zeigen“ | https://claude.ai/artifact/9hY1WKqMz4Ziy4En4QGHwM |
-| `prototyp/company-os-prototyp-pilot.html` | Prototyp Pilot: Bodo Solutions und business//acts, echte Bodo-Daten (Projekt MIV Hagen Migration, Stand 11.10.2026) mit Links in Bodo – **nur intern** | https://claude.ai/artifact/WQY9F8gvWox6PKfiX9hnw7 |
+| `basis/company-os-prototyp.html` | Genereller Prototyp (Basis für alle Ableitungen), startet als „Musterfirma“ (erfundene Daten), Knopf „Pilotdaten zeigen“ | https://claude.ai/artifact/9hY1WKqMz4Ziy4En4QGHwM |
+| `ableitungen/` | Kundenspezifische Ableitungen der Basis, je Kunde ein Ordner mit `konfiguration/`, `prototyp/`, `konzept/`, `LIESMICH.md`; Vorlage: `_vorlage/`. Aufbau und Regeln: `ableitungen/LIESMICH.md` | – |
+| `ableitungen/abcfinance/` | Posteingang mit KI (ASS) für abcfinance, Beispieldaten, kundentauglich | https://claude.ai/artifact/RSqJ1Q2eSgxHvoPfGV8hsZ |
+| `ableitungen/pilot-business-acts-bodo/` | Prototyp Pilot: Bodo Solutions und business//acts, echte Bodo-Daten (Projekt MIV Hagen Migration, Stand 11.10.2026) mit Links in Bodo – **nur intern** | https://claude.ai/artifact/WQY9F8gvWox6PKfiX9hnw7 |
 | `marketing/vorstellung-neutral/` | Detail-Präsentation, neutral mit Musterfirma (32 Folien); `gen.py` erzeugt die Bildschirm-Folien | https://claude.ai/artifact/KUxJuoTYq3SUdZd3md4wrR |
 | `marketing/vorstellung-pilot/` | Detail-Präsentation Pilot business//acts · Bodo (33 Folien, echte Daten) – **nur intern** | https://claude.ai/artifact/4tzo3KSdLWSyK5ZENyKW9X |
 | `marketing/elevator-pitch/` | Elevator Pitch (8 Folien, neutral) | https://claude.ai/artifact/NBtdCmL1LTtGg5X94dYY4o |
