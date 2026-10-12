@@ -15,7 +15,7 @@
  --text:#E7EAEE;--muted:#A3AAB5;--faint:#8A919C;--line:#2B313A;--soft:#232830;--bg:#15191F;--surface:#1C2128;
  --danger:#FF8F86;--danger-bg:#3A1D1B;--success:#5FD0A0;--success-bg:#143528;--warn:#F2B66B;--warn-bg:#3A2A14;--info:#8DB4FF;--info-bg:#1A2A45;color-scheme:dark}
 *{box-sizing:border-box}[hidden]{display:none!important}
-html,body{height:100%}body{margin:0;background:var(--bg);color:var(--text);font-family:var(--f);font-size:14px;line-height:1.45}
+html,body,#k-root{height:100%}body{margin:0;background:var(--bg);color:var(--text);font-family:var(--f);font-size:14px;line-height:1.45}
 button,input,textarea,select{font:inherit;color:inherit}button{cursor:pointer}
 :focus-visible{outline:2px solid var(--brand);outline-offset:2px}
 .k-app{display:grid;grid-template-columns:248px minmax(0,1fr);height:100%}
@@ -242,7 +242,9 @@ const K={st:{v:null,id:null,tab:{},q:""},cfg:null,
  inbox({head,tabs,list,detail}){return `${head}${tabs||""}<div class="k-split"><div class="k-card k-pane" aria-label="Liste">${list}</div><div class="k-card k-pane" aria-label="Detail"><div class="scroll" id="k-det">${detail}</div></div></div>`},
  /* ---------- Rahmen ---------- */
  shell(){const c=K.cfg,m=c.mandant;
-  document.body.innerHTML=`<div class="k-app"><aside class="k-side" id="k-side"><div class="k-ws"><div class="k-wsl" style="background:${m.farbe}">${esc(m.ini)}</div><div><b>${esc(m.name)}</b><small>${esc(m.rolle)}</small></div></div>
+  /* nur in den eigenen Container schreiben – Stile und Skripte der Seite bleiben erhalten */
+  const root=document.getElementById("k-root")||document.body.appendChild(Object.assign(document.createElement("div"),{id:"k-root"}));
+  root.innerHTML=`<div class="k-app"><aside class="k-side" id="k-side"><div class="k-ws"><div class="k-wsl" style="background:${m.farbe}">${esc(m.ini)}</div><div><b>${esc(m.name)}</b><small>${esc(m.rolle)}</small></div></div>
    <button class="k-fi" id="k-find"><span>⌕&nbsp; Finden…</span><span class="k-kb">Strg F</span></button><button class="k-neu" id="k-new"><span>＋&nbsp; ${esc(c.neu||"Neu")}</span><span class="k-kb">N</span></button>
    <nav id="k-nav" aria-label="Menü"></nav><div class="k-foot"><span>${esc(c.fuss||"")}</span><span>⇅ Menü anordnen</span></div></aside>
    <div class="k-main"><div class="k-top"><button class="k-ib k-menu" id="k-menu" aria-label="Menü">☰</button><span id="k-tl"></span><span class="sp"></span><button class="k-ib wide" data-hist="-1" aria-label="Zurück">‹</button><button class="k-ki" id="k-kibtn">✦ KI-Assistent</button><button class="k-ib" data-toast="Benachrichtigungen (Prototyp)" aria-label="Benachrichtigungen">🔔</button><button class="k-av" aria-label="Profil" ${K.go("profil")}>${esc(m.user)}</button></div>

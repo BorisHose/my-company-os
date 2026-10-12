@@ -13,7 +13,7 @@
  --text:#E7EAEE;--muted:#A3AAB5;--faint:#8A919C;--line:#2B313A;--soft:#232830;--bg:#15191F;--surface:#1C2128;
  --danger:#FF8F86;--danger-bg:#3A1D1B;--success:#5FD0A0;--success-bg:#143528;--warn:#F2B66B;--warn-bg:#3A2A14;--info:#8DB4FF;--info-bg:#1A2A45;color-scheme:dark}
 *{box-sizing:border-box}[hidden]{display:none!important}
-html,body{height:100%}body{margin:0;background:var(--bg);color:var(--text);font-family:var(--f);font-size:14px;line-height:1.45}
+html,body,#k-root{height:100%}body{margin:0;background:var(--bg);color:var(--text);font-family:var(--f);font-size:14px;line-height:1.45}
 button,input,textarea,select{font:inherit;color:inherit}button{cursor:pointer}
 :focus-visible{outline:2px solid var(--brand);outline-offset:2px}
 .k-app{display:grid;grid-template-columns:248px minmax(0,1fr);height:100%}

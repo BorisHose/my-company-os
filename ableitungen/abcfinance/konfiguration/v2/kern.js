@@ -33,7 +33,9 @@ const K={st:{v:null,id:null,tab:{},q:""},cfg:null,
  inbox({head,tabs,list,detail}){return `${head}${tabs||""}<div class="k-split"><div class="k-card k-pane" aria-label="Liste">${list}</div><div class="k-card k-pane" aria-label="Detail"><div class="scroll" id="k-det">${detail}</div></div></div>`},
  /* ---------- Rahmen ---------- */
  shell(){const c=K.cfg,m=c.mandant;
-  document.body.innerHTML=`<div class="k-app"><aside class="k-side" id="k-side"><div class="k-ws"><div class="k-wsl" style="background:${m.farbe}">${esc(m.ini)}</div><div><b>${esc(m.name)}</b><small>${esc(m.rolle)}</small></div></div>
+  /* nur in den eigenen Container schreiben – Stile und Skripte der Seite bleiben erhalten */
+  const root=document.getElementById("k-root")||document.body.appendChild(Object.assign(document.createElement("div"),{id:"k-root"}));
+  root.innerHTML=`<div class="k-app"><aside class="k-side" id="k-side"><div class="k-ws"><div class="k-wsl" style="background:${m.farbe}">${esc(m.ini)}</div><div><b>${esc(m.name)}</b><small>${esc(m.rolle)}</small></div></div>
    <button class="k-fi" id="k-find"><span>⌕&nbsp; Finden…</span><span class="k-kb">Strg F</span></button><button class="k-neu" id="k-new"><span>＋&nbsp; ${esc(c.neu||"Neu")}</span><span class="k-kb">N</span></button>
    <nav id="k-nav" aria-label="Menü"></nav><div class="k-foot"><span>${esc(c.fuss||"")}</span><span>⇅ Menü anordnen</span></div></aside>
    <div class="k-main"><div class="k-top"><button class="k-ib k-menu" id="k-menu" aria-label="Menü">☰</button><span id="k-tl"></span><span class="sp"></span><button class="k-ib wide" data-hist="-1" aria-label="Zurück">‹</button><button class="k-ki" id="k-kibtn">✦ KI-Assistent</button><button class="k-ib" data-toast="Benachrichtigungen (Prototyp)" aria-label="Benachrichtigungen">🔔</button><button class="k-av" aria-label="Profil" ${K.go("profil")}>${esc(m.user)}</button></div>
