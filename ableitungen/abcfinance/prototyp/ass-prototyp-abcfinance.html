@@ -317,6 +317,12 @@ a.btn{text-decoration:none;color:var(--ink);display:inline-flex;align-items:cent
 .canvas .node{width:126px}
 .sw{display:inline-block;width:10px;height:10px;border-radius:3px;margin-right:5px;vertical-align:-1px}
 </style>
+<style>
+/* Posteingang: Liste mit fester Höhe, scrollt in sich; Kopfzeile bleibt stehen */
+.inbox{padding:0 4px 6px;height:min(420px,52vh);overflow-y:auto;position:relative;overscroll-behavior:contain;gap:0}
+.inbox .mail.head{position:sticky;top:0;z-index:1;background:var(--surface);border-bottom:1px solid var(--line)}
+.inbox .mail.head+.mail{border-top:0}
+</style>
 <div class="app" id="app">
   <div class="demo"><b>Konzept-Prototyp für abcfinance</b><span>ASS · Auftragssteuerung mit KI · alle Namen, Mails und Zahlen sind Beispieldaten · keine fertige Software</span></div>
   <aside id="side">
@@ -435,6 +441,9 @@ const target=(t,m)=>{const tm=TEAMS[t.team];if(m&&m.person)return `Direkt an ${m
 const AREAS=[["cockpit","◎","Cockpit"],["eingang","✉","Posteingang"],["prozess","↝","Prozess"],["typen","◆","Dokumenttypen & Anlernen"],["vert","⇥","Verteilung & Arbeitskörbe"],["org","▦","Organigramm"],["setup","⚙","Einrichtung"],["konzept","?","Annahmen zum Konzept"]];
 const state={area:"cockpit",mail:4,type:"rek",test:MAILS[3].body};
 function nav(){$("#areas").innerHTML=AREAS.map(([k,i,l])=>{const c=k==="eingang"?MAILS.filter(m=>m.st==="pruefen").length:0;return `<button data-area="${k}" aria-current="${state.area===k}"><span class="ic">${i}</span>${l}${c?`<span class="cnt">${c}</span>`:""}</button>`}).join("")}
+/* Neu zeichnen, ohne dass Posteingang-Liste und Seite an den Anfang springen */
+function keepRender(){const ib=$("#inbox"),vs=$("#view").scrollTop,ls=ib?ib.scrollTop:0;render();$("#view").scrollTop=vs;const nb=$("#inbox");if(nb)nb.scrollTop=ls}
+function selIntoView(){const ib=$("#inbox"),el=ib&&ib.querySelector('.mail[aria-current="true"]');if(el)ib.scrollTop=Math.max(0,el.offsetTop-ib.clientHeight/2+el.offsetHeight/2)}
 function go(a){state.area=a;$("#side").classList.remove("open");render();$("#view").scrollTop=0}
 function render(){nav();const a=AREAS.find(x=>x[0]===state.area);$("#crumb").textContent="abcfinance · ASS";$("#title").textContent=a[2];$("#view").innerHTML=V[state.area]()}
 
@@ -458,8 +467,8 @@ return `<div class="stack">
 </div></div>`};
 
 V.eingang=()=>{const m=MAILS.find(x=>x.id===state.mail)||MAILS[0];const t=T(m.type);const r=cover(m.body,t);const ranked=bestRule(m.body);const s=STL[m.st];
-return `<div class="stack"><div class="card" style="padding:6px 4px">
-<div class="mail" style="font-size:11.5px;color:var(--muted);font-weight:600;pointer-events:none"><span>Zeit</span><span>Absender · Betreff</span><span class="hide-s">Dokumenttyp</span><span class="hide-s">Ziel</span><span>Status</span></div>
+return `<div class="stack"><div class="card inbox" id="inbox" aria-label="Posteingang">
+<div class="mail head" style="font-size:11.5px;color:var(--muted);font-weight:600;pointer-events:none"><span>Zeit</span><span>Absender · Betreff</span><span class="hide-s">Dokumenttyp</span><span class="hide-s">Ziel</span><span>Status</span></div>
 ${MAILS.map(x=>{const tt=T(x.type),st=STL[x.st];return `<button class="mail" data-mail="${x.id}" aria-current="${x.id===m.id}"><span class="tm2">${x.tm}<br>${x.box}</span><span><b>${esc(x.from)}</b><small>${esc(x.subj)}</small></span><span class="hide-s"><b>${tt.n}${x.also?" + 1":""}</b><small>KI ${x.ki} %</small></span><span class="hide-s"><small style="white-space:normal">${esc(target(tt,x))}</small></span><span class="pill ${st[0]}">${st[1]}</span></button>`}).join("")}
 </div>
 <div class="split">
@@ -555,13 +564,13 @@ return `<div class="stack">
 /* ---------- Aktionen ---------- */
 document.addEventListener("click",e=>{const b=e.target.closest("button");if(!b)return;const d=b.dataset;
  if(d.area){go(d.area);return}
- if(d.mail){state.mail=+d.mail;go("eingang");return}
+ if(d.mail){state.mail=+d.mail;if(state.area==="eingang")keepRender();else{go("eingang");selIntoView()}return}
  if(d.type){state.type=d.type;render();return}
  if(d.sample){state.test=MAILS.find(m=>m.id===+d.sample).body;render();return}
  if(d.sug){b.classList.remove("new");b.classList.add("hit");b.disabled=true;toast(`„${d.sug}“ zur Freigabe an die Fachverantwortung gegeben`);return}
- if(d.ok){const m=MAILS.find(x=>x.id===+d.ok);const was=m.st;m.st=was==="freigabe"?"done":"auto";render();toast(was==="freigabe"?"Antwort freigegeben und versendet (simuliert)":`Bestätigt: ${target(T(m.type),m)}`);return}
+ if(d.ok){const m=MAILS.find(x=>x.id===+d.ok);const was=m.st;m.st=was==="freigabe"?"done":"auto";keepRender();toast(was==="freigabe"?"Antwort freigegeben und versendet (simuliert)":`Bestätigt: ${target(T(m.type),m)}`);return}
  if(d.fix){fixModal(+d.fix);return}
- if(d.pick){const [id,ty]=d.pick.split("|");const m=MAILS.find(x=>x.id===+id);m.type=ty;m.also=null;m.st="auto";$("#modal").innerHTML="";render();toast(`Als ${T(ty).n} verteilt · als Lernbeispiel gespeichert`);return}
+ if(d.pick){const [id,ty]=d.pick.split("|");const m=MAILS.find(x=>x.id===+id);m.type=ty;m.also=null;m.st="auto";$("#modal").innerHTML="";keepRender();toast(`Als ${T(ty).n} verteilt · als Lernbeispiel gespeichert`);return}
  if(d.mode){const [id,mo]=d.mode.split("|");T(id).mode=mo;render();toast(`${T(id).n}: ${mo==="korb"?"Arbeitskorb":"zuständige Person"}`);return}
  if(b.id==="newType"){toast("Neuer Dokumenttyp: Name, Beispieldokumente hochladen, KI schlägt Kennbegriffe vor");return}
  if(b.id==="goKonzept"){go("konzept");return}
