@@ -1,0 +1,136 @@
+<!doctype html><html lang="de"><head><meta charset="utf-8"><title>Company OS abcfinance – Strukturvorschlag</title>
+<style>
+:root{--brand:#2C4A5E;--brand-dark:#1E3545;--brand-bg:#E8EEF2;--sand:#B9A37A;--text:#1f2329;--muted:#8a909c;--line:#e6e8ec;--bg:#f6f7f9;--danger:#B42318;--danger-bg:#FDECEA;--success:#0F7B4E;--success-bg:#E5F5EC;--warn:#8A4B00;--warn-bg:#FFF4E5;--info:#1F5FBF;--info-bg:#EAF1FB}
+*{box-sizing:border-box}body{margin:0;font-family:"Segoe UI",system-ui,sans-serif;font-size:14px;color:var(--text);background:var(--bg)}
+.app{display:grid;grid-template-columns:256px 1fr;height:1000px}
+aside{background:#fff;border-right:1px solid var(--line);display:flex;flex-direction:column;padding:14px 16px 10px;gap:6px}
+.ws{display:flex;gap:10px;align-items:center;padding:4px 2px 10px}
+.wsl{width:34px;height:34px;border-radius:9px;background:var(--brand);color:#fff;font-weight:800;display:grid;place-items:center;font-size:15px}
+.ws b{display:block;font-size:15px}.ws small{color:#6b7280;font-size:12px}.ws .chev{margin-left:auto;color:#6b7280}
+.fi{border:1px solid var(--line);border-radius:8px;padding:7px 10px;display:flex;justify-content:space-between;color:#6b7280;background:#fafbfc}
+.kb{border:1px solid #d6d9de;border-radius:5px;font-size:11px;padding:0 5px;color:#6b7280;background:#fff}
+.neu{border:1px solid var(--brand);color:var(--brand);border-radius:8px;padding:7px 10px;display:flex;justify-content:space-between;background:var(--brand-bg);font-weight:600}
+.grp{font-size:11px;letter-spacing:.08em;color:#8a909c;margin:12px 4px 2px;font-weight:600}
+.ni{display:flex;align-items:center;gap:11px;padding:7px 10px;border-radius:8px;font-size:14.5px}
+.ni .ic{width:18px;text-align:center;color:#4b5563}
+.ni .cnt{margin-left:auto;background:var(--danger);color:#fff;border-radius:999px;font-size:11px;padding:0 7px;font-weight:700}
+.ni .cnt.g{background:none;color:#6b7280;font-weight:500}
+.ni.on{background:var(--brand-bg);color:var(--brand);font-weight:700}.ni.on .ic{color:var(--brand)}
+.foot{white-space:nowrap;margin-top:auto;border-top:1px solid var(--line);padding-top:10px;color:#6b7280;font-size:12.5px;display:flex;justify-content:space-between}
+main{display:flex;flex-direction:column;min-width:0;overflow:hidden}
+.top{margin:14px 20px 0;background:#fff;border:1px solid var(--line);border-radius:12px;padding:10px 16px;display:flex;align-items:center;gap:14px;font-size:14px;white-space:nowrap}
+.top .sep{color:#c4c8cf}.bdg{background:var(--brand);color:#fff;border-radius:999px;font-size:11px;padding:1px 7px;font-weight:700;margin-left:4px}.bdg.r{background:var(--danger)}.bdg.o{background:#C2650A}
+.top .sp{flex:1}.ibx{width:30px;height:30px;border:1px solid var(--line);border-radius:8px;display:grid;place-items:center;color:#4b5563}
+.ki{border:1px solid var(--sand);background:#FBF7EF;color:#6b5a32;border-radius:8px;padding:5px 11px;font-weight:600}
+.av{width:30px;height:30px;border-radius:50%;background:var(--brand);color:#fff;display:grid;place-items:center;font-weight:700;font-size:12px}
+.page{padding:14px 20px 40px;display:flex;flex-direction:column;gap:14px;overflow:hidden}
+.card{background:#fff;border:1px solid var(--line);border-radius:12px}
+.head{padding:14px 18px;display:flex;align-items:center;gap:10px;flex-wrap:nowrap}
+.head h1{font-size:19px;margin:0;font-weight:700;white-space:nowrap}.num{color:#6b7280;white-space:nowrap}
+.chip{border:1px solid var(--line);border-radius:999px;padding:2px 10px;font-size:12.5px;display:inline-flex;align-items:center;gap:5px;white-space:nowrap}
+.chip.b{background:var(--info-bg);border-color:transparent;color:var(--info);font-weight:600}
+.chip.w{background:var(--warn-bg);border-color:transparent;color:var(--warn);font-weight:600}
+.chip.d{background:var(--danger);border-color:var(--danger);color:#fff;font-weight:700}
+.dot{width:7px;height:7px;border-radius:50%;background:currentColor;display:inline-block}
+.btn{border:1px solid #d6d9de;background:#fff;border-radius:8px;padding:7px 13px;font-weight:600;font-size:14px;white-space:nowrap}
+.btn.p{background:var(--brand);border-color:var(--brand);color:#fff}.btn.sm{padding:4px 10px;font-size:13px}
+.sum{display:grid;grid-template-columns:1.15fr 1fr 1fr;gap:14px}
+.sc{padding:14px 18px;display:flex;flex-direction:column;gap:9px}
+.sc h2{font-size:15.5px;margin:0;display:flex;justify-content:space-between;align-items:center}
+.lbl{font-size:12px;color:#6b7280}
+.mtr{display:grid;grid-template-columns:150px 1fr 44px;gap:10px;align-items:center;font-size:13px}
+.bar{height:7px;border-radius:9px;background:#eef0f3;overflow:hidden}.bar i{display:block;height:100%;border-radius:9px;background:var(--brand)}
+.bar.lo i{background:var(--danger)}.bar.ok i{background:var(--sand)}
+.mtr b{text-align:right}
+.kv{display:grid;grid-template-columns:110px 1fr;gap:6px 10px;font-size:13.5px}.kv .k{color:#6b7280}
+.lnk{color:var(--brand);text-decoration:underline;text-decoration-color:#9fb3c1;text-underline-offset:3px}
+.pp{display:flex;align-items:center;gap:9px;font-size:13.5px}.pa{width:26px;height:26px;border-radius:50%;background:#5b7385;color:#fff;font-size:10.5px;display:grid;place-items:center;font-weight:700}
+.agent{width:26px;height:26px;border-radius:7px;background:#FBF7EF;border:1px solid var(--sand);color:#6b5a32;display:grid;place-items:center;font-size:12px}
+.role{margin-left:auto;font-size:11.5px;color:#6b7280;background:#f1f3f5;border-radius:6px;padding:1px 7px}
+.jump{background:var(--brand-bg);border:1px solid #d4dfe6;border-radius:12px;padding:6px;display:flex;align-items:center;gap:4px}
+.jm{padding:6px 11px;border-radius:8px;font-weight:600;color:var(--brand);display:flex;gap:7px;align-items:center;font-size:14px;white-space:nowrap}
+.jm .c{background:#fff;border-radius:999px;font-size:11.5px;padding:0 7px;color:#4b5563}
+.jm.on{background:var(--brand);color:#fff}.jm.on .c{background:rgba(255,255,255,.25);color:#fff}
+.jm.off{color:#8a909c;font-weight:500}
+.vsep{width:1px;height:22px;background:#c9d5dd;margin:0 4px}
+.sec{padding:0}
+.sh{display:flex;align-items:center;gap:10px;padding:12px 18px;border-bottom:1px solid var(--line)}
+.sh h3{margin:0;font-size:16px}.sh .c{background:#eef0f3;border-radius:999px;font-size:12px;padding:0 8px}
+.sh .sp{flex:1}
+.mailg{display:grid;grid-template-columns:1.25fr 1fr;gap:18px;padding:14px 18px}
+.from{display:flex;gap:10px;align-items:center;font-size:13.5px}
+.mtxt{font-size:14px;line-height:1.65;margin-top:10px}
+mark{background:#FBF1DD;box-shadow:inset 0 -2px 0 var(--sand);padding:0 2px;border-radius:3px;color:inherit}
+.sugg{background:#FBF7EF;border:1px solid #E8DCC3;border-radius:10px;padding:12px 14px;display:flex;flex-direction:column;gap:10px}
+.sugg .t{font-weight:700;color:#6b5a32;display:flex;gap:7px;align-items:center}
+.sr{display:flex;gap:10px;align-items:flex-start;font-size:13.5px}.sr .n{width:20px;height:20px;border-radius:50%;background:var(--sand);color:#fff;font-size:11px;font-weight:700;display:grid;place-items:center;flex:none;margin-top:1px}
+.sr .r{margin-left:auto}
+.why{font-size:12.5px;color:#6b5a32;border-top:1px dashed #E2D3B4;padding-top:8px}
+.tl{padding:6px 18px 0}
+.tli{display:flex;gap:12px;align-items:flex-start;padding:9px 0;border-bottom:1px solid #f1f3f5;font-size:13.5px}
+.tli .st{width:22px;height:22px;border-radius:50%;display:grid;place-items:center;font-size:11px;font-weight:700;flex:none}
+.ok{background:var(--success-bg);color:var(--success)}.wn{background:var(--warn-bg);color:var(--warn)}
+.tli .tm{margin-left:auto;color:#8a909c;font-size:12.5px}
+.badge{white-space:nowrap;position:fixed;right:18px;bottom:18px;background:#1f2329;color:#fff;border-radius:12px;padding:12px 16px;display:flex;gap:18px;justify-content:space-between;font-size:13px;box-shadow:0 10px 30px rgba(0,0,0,.25)}
+.badge span{color:#9aa1ad}
+</style></head><body>
+<div class="app">
+<aside>
+ <div class="ws"><div class="wsl">a</div><div><b>abcfinance</b><small>Leitung Operations</small></div><span class="chev">⌃⌄</span></div>
+ <div class="fi"><span>⌕&nbsp; Finden…</span><span class="kb">Strg F</span></div>
+ <div class="neu"><span>＋&nbsp; Neuer Auftrag</span><span class="kb">N</span></div>
+ <div class="grp">ARBEITSBEREICH</div>
+ <div class="ni"><span class="ic">☀</span>Mein Tag</div>
+ <div class="ni"><span class="ic">☰</span>Meine Arbeit<span class="cnt">3</span></div>
+ <div class="ni on"><span class="ic">✉</span>Posteingang<span class="cnt">16</span></div>
+ <div class="ni"><span class="ic">▤</span>Aufträge<span class="cnt g">214</span></div>
+ <div class="grp">STEUERUNG</div>
+ <div class="ni"><span class="ic">↝</span>Prozesse</div>
+ <div class="ni"><span class="ic">▦</span>Projekte</div>
+ <div class="ni"><span class="ic">⌂</span>Organigramm</div>
+ <div class="grp">WISSEN</div>
+ <div class="ni"><span class="ic">◆</span>Dokumenttypen</div>
+ <div class="ni"><span class="ic">✦</span>Agenten &amp; Skills</div>
+ <div class="ni"><span class="ic">▣</span>Bibliothek</div>
+ <div class="grp">EINRICHTUNG</div>
+ <div class="ni"><span class="ic">⇄</span>Anschlüsse</div>
+ <div class="ni"><span class="ic">⚙</span>KI &amp; Daten</div>
+ <div class="foot"><span>Company OS</span><span>⇅ Menü anordnen</span></div>
+</aside>
+<main>
+ <div class="top"><b>Mo., 12.10.2026</b><b>14:47</b><span class="sep">·</span><span>Wartet auf dich<span class="bdg o">3</span></span><span class="sep">·</span><span>Mensch prüft<span class="bdg">16</span></span><span class="sep">·</span><span>Eskalation<span class="bdg r">1</span></span><span class="sep">·</span><span>Posteingang heute <b>214</b></span><span class="sp"></span><span class="ibx">‹</span><span class="ibx">›</span><span class="ki">✦ KI-Assistent</span><span class="ibx">🔔</span><span class="ibx">⚙</span><span class="av">SW</span></div>
+ <div class="page">
+  <div class="card head"><h1>Ihr Schreiben vom 02.10.</h1><span class="num">· V-2026-10-0412</span>
+   <span class="chip">✉ Vorgang</span><span class="chip b">Vertragsreklamation + 1</span><span class="chip w"><span class="dot"></span>Mensch prüft</span><span class="chip d">Frist 35 Min.</span>
+   <span style="flex:1"></span><button class="btn">Anders einordnen</button><button class="btn p">Bestätigen und weitergeben</button></div>
+  <div class="sum">
+   <div class="card sc"><h2>Einordnung <span class="lbl">Schwelle Vertragsreklamation 85 %</span></h2>
+    <div class="mtr"><span>KI · Vertragsreklamation</span><span class="bar lo"><i style="width:71%"></i></span><b>71 %</b></div>
+    <div class="mtr"><span>KI · Adressänderung</span><span class="bar ok"><i style="width:88%"></i></span><b>88 %</b></div>
+    <div class="mtr"><span class="lbl" style="font-size:13px">Kennbegriffe (heute)</span><span class="bar"><i style="width:42%"></i></span><b>42 %</b></div>
+    <div class="lbl">Zwei Anliegen erkannt · Kennbegriffe als Gegenprüfung</div></div>
+   <div class="card sc"><h2>Zuordnung in sellify <span class="chip w">Vertrag nicht eindeutig</span></h2>
+    <div class="kv"><span class="k">Organisation</span><span class="lnk">Hoffmann Druck GmbH</span><span class="k">Person</span><span class="lnk">Klaus Hoffmann</span><span class="k">Vertrag</span><span><span class="lnk">3120-1102</span> <span class="lbl">Vorschlag</span> · <span class="lnk">3120-0871</span></span><span class="k">Bezug</span><span>Schreiben vom 02.10. zu 3120-1102</span></div></div>
+   <div class="card sc"><h2>Zuständigkeit <button class="btn sm">Übernehmen</button></h2>
+    <div class="pp"><span class="agent">✦</span>Posteingangs-Prozessagent<span class="role">führt</span></div>
+    <div class="pp"><span class="pa">LK</span>Lisa Koch<span class="role">prüft jetzt</span></div>
+    <div class="pp"><span class="pa">MH</span>Markus Hahn<span class="role">ergebnisverantwortlich</span></div>
+    <div class="lbl">Prozess Posteingangsverarbeitung · Schritt 4 von 6</div></div>
+  </div>
+  <div class="jump"><span class="jm on">Mail &amp; Anhänge <span class="c">1</span></span><span class="jm">Vorschlag der KI <span class="c">2</span></span><span class="jm">Protokoll <span class="c">6</span></span><span class="jm">Aufgaben <span class="c">2</span></span><span class="jm">Chronik <span class="c">8</span></span><span class="jm">Ähnliche Fälle <span class="c">3</span></span><span class="vsep"></span><span class="jm off">Ohne Einträge <span class="c">2</span></span><span style="flex:1"></span><span class="jm" style="color:#4b5563">⇅</span></div>
+  <div class="card sec"><div class="sh"><h3>✉ Mail &amp; Anhänge</h3><span class="c">1</span><span class="sp"></span><button class="btn sm">In sellify öffnen</button><button class="btn sm">Antworten</button></div>
+   <div class="mailg">
+    <div><div class="from"><span class="pa">KH</span><div><b>K. Hoffmann</b> <span class="lnk">k.hoffmann@hoffmann-druck.example</span><div class="lbl">an Postfach Service · 12.10.2026, 09:31 · keine Anhänge</div></div></div>
+     <div class="mtxt">Sehr geehrte Damen und Herren,<br>zu Ihrem Schreiben: Wir sind mit dem Betrag <mark>nicht einverstanden</mark>. Gleichzeitig teilen wir mit, dass wir zum 01.11. <mark>umziehen</mark>, <mark>neue Anschrift</mark>: Industriestraße 12, 50829 Köln.<br>Mit freundlichen Grüßen<br>K. Hoffmann</div></div>
+    <div class="sugg"><div class="t">✦ Vorschlag der KI · 2 Vorgänge</div>
+     <div class="sr"><span class="n">1</span><div><b>Vertragsreklamation</b> zu Vertrag 3120-1102<br><span class="lbl">→ Arbeitskorb Vertragsservice · Folgeprozess „Vertragsreklamation bearbeiten“</span></div><button class="btn sm p r">Übernehmen</button></div>
+     <div class="sr"><span class="n">2</span><div><b>Adressänderung</b> Hoffmann Druck GmbH<br><span class="lbl">→ Arbeitskorb Stammdaten · Änderung nach Freigabe</span></div><button class="btn sm p r">Übernehmen</button></div>
+     <div class="why">Warum: Widerspruch gegen einen Betrag ohne Vertragsnummer; das Schreiben vom 02.10. ging zu Vertrag 3120-1102. Sicherheit unter der Schwelle, deshalb prüft ein Mensch.</div></div>
+   </div></div>
+  <div class="card sec"><div class="sh"><h3>↝ Protokoll</h3><span class="c">6</span><span class="sp"></span><span class="lbl">jeder Schritt mit Ergebnis, Sicherheit und Begründung</span></div>
+   <div class="tl"><div class="tli"><span class="st ok">✓</span><div><b>Posteingangs-Agent</b> hat Mail und Anhänge gelesen</div><span class="tm">09:31</span></div>
+   <div class="tli"><span class="st ok">✓</span><div><b>Klassifizierungs-Agent</b> hat 2 Anliegen erkannt · Vertragsreklamation 71 %, Adressänderung 88 %</div><span class="tm">09:31</span></div></div></div>
+ </div>
+</main></div>
+<div class="badge"><b>Entwurf · Strukturvorschlag</b><span>Beispieldaten</span></div>
+</body></html>

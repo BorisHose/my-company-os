@@ -1,0 +1,716 @@
+<title>Company OS abcfinance v2</title>
+<style>
+/* ===== Company OS · Kern (Entwurf v2) · Aufbau nach dem Bodo-Muster =====
+   Rahmen: Menü links (Mandant, Finden, Neu, Gruppen) · Tagesleiste oben · Inhaltsbereich
+   Seitentypen: Startseite (Kacheln) · Übersicht (Reiter + Tabelle) · Detailseite (Kopf, Karten, Sprungmarken, Bereiche) · Postfach (zweigeteilt)
+   Die Akzentfarbe kommt vom Mandanten (--brand), alles andere ist für alle Ableitungen gleich. */
+:root{--brand:#2C4A5E;--brand-dark:#1E3545;--brand-bg:#E8EEF2;--brand-line:#d4dfe6;--ai:#B9A37A;--ai-bg:#FBF7EF;--ai-line:#E8DCC3;--ai-ink:#6b5a32;
+ --text:#1f2329;--muted:#6b7280;--faint:#8a909c;--line:#e6e8ec;--soft:#f1f3f5;--bg:#f6f7f9;--surface:#fff;
+ --danger:#B42318;--danger-bg:#FDECEA;--success:#0F7B4E;--success-bg:#E5F5EC;--warn:#8A4B00;--warn-bg:#FFF4E5;--info:#1F5FBF;--info-bg:#EAF1FB;
+ --f:"Segoe UI",system-ui,-apple-system,sans-serif;--mono:ui-monospace,Consolas,monospace}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--brand:#8FB3CC;--brand-dark:#B5CFE0;--brand-bg:#1D2B36;--brand-line:#2E4252;--ai:#C9B48A;--ai-bg:#2A2519;--ai-line:#4A4130;--ai-ink:#E2D3B4;
+ --text:#E7EAEE;--muted:#A3AAB5;--faint:#8A919C;--line:#2B313A;--soft:#232830;--bg:#15191F;--surface:#1C2128;
+ --danger:#FF8F86;--danger-bg:#3A1D1B;--success:#5FD0A0;--success-bg:#143528;--warn:#F2B66B;--warn-bg:#3A2A14;--info:#8DB4FF;--info-bg:#1A2A45;color-scheme:dark}}
+:root[data-theme="dark"]{--brand:#8FB3CC;--brand-dark:#B5CFE0;--brand-bg:#1D2B36;--brand-line:#2E4252;--ai:#C9B48A;--ai-bg:#2A2519;--ai-line:#4A4130;--ai-ink:#E2D3B4;
+ --text:#E7EAEE;--muted:#A3AAB5;--faint:#8A919C;--line:#2B313A;--soft:#232830;--bg:#15191F;--surface:#1C2128;
+ --danger:#FF8F86;--danger-bg:#3A1D1B;--success:#5FD0A0;--success-bg:#143528;--warn:#F2B66B;--warn-bg:#3A2A14;--info:#8DB4FF;--info-bg:#1A2A45;color-scheme:dark}
+*{box-sizing:border-box}[hidden]{display:none!important}
+html,body{height:100%}body{margin:0;background:var(--bg);color:var(--text);font-family:var(--f);font-size:14px;line-height:1.45}
+button,input,textarea,select{font:inherit;color:inherit}button{cursor:pointer}
+:focus-visible{outline:2px solid var(--brand);outline-offset:2px}
+.k-app{display:grid;grid-template-columns:248px minmax(0,1fr);height:100%}
+/* Menü */
+.k-side{background:var(--surface);border-right:1px solid var(--line);display:flex;flex-direction:column;padding:12px 14px 8px;gap:6px;overflow:auto;min-height:0}
+.k-ws{display:flex;gap:10px;align-items:center;padding:2px 2px 8px}
+.k-wsl{width:32px;height:32px;border-radius:9px;background:var(--brand);color:var(--surface);font-weight:800;display:grid;place-items:center}
+.k-ws b{display:block;font-size:14.5px}.k-ws small{color:var(--muted);font-size:12px}
+.k-fi,.k-neu{border:1px solid var(--line);border-radius:8px;padding:6px 10px;display:flex;justify-content:space-between;align-items:center;background:var(--bg);color:var(--muted);text-align:left;width:100%}
+.k-neu{border-color:var(--brand);color:var(--brand);background:var(--brand-bg);font-weight:600}
+.k-kb{border:1px solid var(--line);border-radius:5px;font-size:11px;padding:0 5px;color:var(--muted);background:var(--surface)}
+.k-grp{font-size:11px;letter-spacing:.08em;color:var(--faint);margin:10px 4px 2px;font-weight:600}
+.k-ni{display:flex;align-items:center;gap:10px;padding:6px 10px;border-radius:8px;font-size:14px;border:0;background:none;text-align:left;width:100%}
+.k-ni .i{width:18px;text-align:center;color:var(--muted)}
+.k-ni .n{margin-left:auto;background:var(--danger);color:#fff;border-radius:999px;font-size:11px;padding:0 7px;font-weight:700}
+.k-ni .n.g{background:none;color:var(--muted);font-weight:500}
+.k-ni[aria-current="true"]{background:var(--brand-bg);color:var(--brand);font-weight:700}.k-ni[aria-current="true"] .i{color:var(--brand)}
+@media (hover:hover){.k-ni:hover{background:var(--soft)}.k-row:hover td{background:var(--soft)}.k-mi:hover{background:var(--soft)}}
+.k-foot{margin-top:auto;border-top:1px solid var(--line);padding-top:8px;color:var(--muted);font-size:12px;display:flex;justify-content:space-between;white-space:nowrap}
+/* Tagesleiste */
+.k-main{display:flex;flex-direction:column;min-width:0;min-height:0}
+.k-top{margin:12px 18px 0;background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:8px 14px;display:flex;align-items:center;gap:12px;white-space:nowrap;overflow:hidden}
+.k-top .sep{color:var(--line)}.k-top .sp{flex:1}
+.k-tl{border:0;background:none;padding:2px 4px;border-radius:6px;display:inline-flex;align-items:center;gap:6px}
+.k-bdg{background:var(--brand);color:var(--surface);border-radius:999px;font-size:11px;padding:0 7px;font-weight:700}.k-bdg.r{background:var(--danger);color:#fff}.k-bdg.o{background:#C2650A;color:#fff}
+.k-ib{width:30px;height:30px;border:1px solid var(--line);border-radius:8px;display:grid;place-items:center;background:var(--surface);color:var(--muted)}
+.k-ki{border:1px solid var(--ai);background:var(--ai-bg);color:var(--ai-ink);border-radius:8px;padding:4px 11px;font-weight:600}
+.k-av{width:30px;height:30px;border-radius:50%;background:var(--brand);color:var(--surface);display:grid;place-items:center;font-weight:700;font-size:12px;border:0}
+.k-menu{display:none}
+/* Inhaltsbereich */
+.k-page{flex:1;min-height:0;overflow:auto;padding:12px 18px 90px;display:flex;flex-direction:column;gap:12px;scroll-padding-top:70px}
+.k-page>*{flex-shrink:0}
+.k-page.fix>.k-split{flex-shrink:1}
+.k-page.fix{overflow:hidden;padding-bottom:12px}
+.k-card{background:var(--surface);border:1px solid var(--line);border-radius:12px}
+.k-ph{padding:12px 18px;display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.k-ph h1{font-size:18px;margin:0;font-weight:700}
+.k-num{color:var(--muted)}
+.k-sp{flex:1}
+.k-chip{border:1px solid var(--line);border-radius:999px;padding:1px 10px;font-size:12.5px;display:inline-flex;align-items:center;gap:5px;white-space:nowrap;background:var(--surface)}
+.k-chip.info{background:var(--info-bg);border-color:transparent;color:var(--info);font-weight:600}
+.k-chip.warn{background:var(--warn-bg);border-color:transparent;color:var(--warn);font-weight:600}
+.k-chip.ok{background:var(--success-bg);border-color:transparent;color:var(--success);font-weight:600}
+.k-chip.bad{background:var(--danger);border-color:var(--danger);color:#fff;font-weight:700}
+.k-chip.ai{background:var(--ai-bg);border-color:var(--ai-line);color:var(--ai-ink);font-weight:600}
+.k-chip.ex{border-style:dashed;color:var(--muted);font-size:11.5px}
+.k-chip .d{width:7px;height:7px;border-radius:50%;background:currentColor}
+.k-btn{border:1px solid var(--line);background:var(--surface);border-radius:8px;padding:6px 12px;font-weight:600;white-space:nowrap}
+.k-btn.p{background:var(--brand);border-color:var(--brand);color:var(--surface)}
+.k-btn.sm{padding:3px 10px;font-size:13px}
+.k-btn:disabled{opacity:.45;cursor:default}
+.k-lbl{font-size:12px;color:var(--muted)}
+.k-note{font-size:12.5px;color:var(--muted)}
+.k-lnk{color:var(--brand);text-decoration:underline;text-decoration-color:var(--brand-line);text-underline-offset:3px;border:0;background:none;padding:0;text-align:left;font:inherit}
+.k-sect{font-size:11.5px;letter-spacing:.08em;color:var(--muted);font-weight:700;margin:6px 2px -2px;display:flex;gap:10px}
+.k-sect span{font-weight:400;letter-spacing:0}
+/* Startseite */
+.k-hello{padding:20px 24px;display:flex;align-items:center;gap:16px;background:linear-gradient(90deg,var(--surface),var(--brand-bg))}
+.k-hello h1{margin:0;font-size:24px}.k-hello h1 em{font-style:normal;color:var(--brand)}
+.k-tiles{display:grid;gap:12px;grid-template-columns:repeat(auto-fill,minmax(260px,1fr))}
+.k-tile{border-left:4px solid var(--c,var(--brand));padding:14px 16px;display:flex;flex-direction:column;gap:8px;text-align:left;width:100%}
+.k-tile h3{margin:0;font-size:14px;font-weight:600;display:flex;gap:8px;align-items:baseline}.k-tile h3 small{font-weight:600;color:var(--muted)}
+.k-tile .big{font-size:26px;font-weight:700;font-variant-numeric:tabular-nums;color:var(--c,var(--text))}
+.k-tile .kp{display:flex;gap:26px}.k-tile .kp div{display:flex;flex-direction:column}
+/* Übersicht */
+.k-tabs{display:flex;gap:18px;border-bottom:1px solid var(--line);padding:0 2px;flex-wrap:wrap}
+.k-tab{border:0;background:none;padding:8px 0;border-bottom:2px solid transparent;color:var(--muted);font-weight:600;display:inline-flex;gap:6px;align-items:center}
+.k-tab small{font-size:11px;color:var(--faint);font-weight:600}
+.k-tab[aria-selected="true"]{color:var(--text);border-bottom-color:var(--brand)}
+.k-lh{padding:12px 16px 8px;display:flex;gap:10px;align-items:center;flex-wrap:wrap}
+.k-search{flex:1;min-width:200px;border:1px solid var(--line);border-radius:8px;padding:6px 10px;background:var(--bg)}
+.k-tw{overflow-x:auto}
+.k-t{width:100%;border-collapse:collapse;font-size:13.5px}
+.k-t th{text-align:left;font-size:12.5px;color:var(--muted);font-weight:600;padding:8px 12px;border-bottom:1px solid var(--line);white-space:nowrap}
+.k-t td{padding:9px 12px;border-bottom:1px solid var(--line);vertical-align:top}
+.k-t tr:last-child td{border-bottom:0}
+.k-row{cursor:pointer}
+.k-t .nm{font-weight:600;color:var(--brand)}
+.k-pg{display:flex;justify-content:space-between;padding:8px 16px 12px;color:var(--muted);font-size:12.5px}
+/* Detailseite */
+.k-sum{display:grid;gap:12px;grid-template-columns:repeat(auto-fit,minmax(260px,1fr))}
+.k-sc{padding:14px 18px;display:flex;flex-direction:column;gap:9px;min-width:0}
+.k-sc h2{font-size:15px;margin:0;display:flex;justify-content:space-between;align-items:center;gap:8px}
+.k-kv{display:grid;grid-template-columns:120px 1fr;gap:5px 10px;font-size:13.5px}.k-kv .k{color:var(--muted)}
+.k-jump{position:sticky;top:0;z-index:5;background:var(--brand-bg);border:1px solid var(--brand-line);border-radius:12px;padding:5px;display:flex;align-items:center;gap:2px;overflow-x:auto;box-shadow:0 6px 14px -12px rgba(0,0,0,.35)}
+.k-jm{border:0;background:none;padding:5px 11px;border-radius:8px;font-weight:600;color:var(--brand);display:flex;gap:7px;align-items:center;white-space:nowrap}
+.k-jm small{background:var(--surface);border-radius:999px;font-size:11.5px;padding:0 7px;color:var(--muted)}
+.k-jm[aria-current="true"]{background:var(--brand);color:var(--surface)}.k-jm[aria-current="true"] small{background:rgba(255,255,255,.25);color:var(--surface)}
+.k-jm.off{color:var(--faint);font-weight:500}
+.k-vs{width:1px;height:22px;background:var(--brand-line);margin:0 4px;flex:none}
+.k-sec{scroll-margin-top:64px}
+.k-sh{display:flex;align-items:center;gap:10px;padding:11px 18px;border-bottom:1px solid var(--line);flex-wrap:wrap}
+.k-sh h3{margin:0;font-size:15.5px}.k-sh .c{background:var(--soft);border-radius:999px;font-size:12px;padding:0 8px}
+.k-sb{padding:12px 18px}
+.k-sb.flush{padding:0}
+.k-pop{position:fixed;z-index:40;background:var(--surface);border:1px solid var(--line);border-radius:12px;box-shadow:0 14px 34px rgba(0,0,0,.18);padding:10px;width:280px;display:flex;flex-direction:column;gap:2px}
+.k-mi{border:0;background:none;display:flex;justify-content:space-between;padding:6px 8px;border-radius:7px;text-align:left}
+/* KI-Vorschlag */
+.k-ai{background:var(--ai-bg);border:1px solid var(--ai-line);border-radius:10px;padding:12px 14px;display:flex;flex-direction:column;gap:10px}
+.k-ai .t{font-weight:700;color:var(--ai-ink)}
+.k-ai .why{font-size:12.5px;color:var(--ai-ink);border-top:1px dashed var(--ai-line);padding-top:8px}
+.k-air{display:flex;gap:10px;align-items:flex-start;font-size:13.5px}.k-air .n{width:20px;height:20px;border-radius:50%;background:var(--ai);color:#fff;font-size:11px;font-weight:700;display:grid;place-items:center;flex:none}
+.k-air .r{margin-left:auto}
+/* Zeitleiste */
+.k-tli{display:flex;gap:12px;align-items:flex-start;padding:9px 18px;border-bottom:1px solid var(--soft);font-size:13.5px}
+.k-tli:last-child{border-bottom:0}
+.k-st{width:22px;height:22px;border-radius:50%;display:grid;place-items:center;font-size:11px;font-weight:700;flex:none}
+.k-st.ok{background:var(--success-bg);color:var(--success)}.k-st.warn{background:var(--warn-bg);color:var(--warn)}.k-st.now{background:var(--info-bg);color:var(--info)}.k-st.skip{background:var(--soft);color:var(--faint)}
+.k-tli .tm{margin-left:auto;color:var(--faint);font-size:12.5px;white-space:nowrap}
+/* Personen und Agenten */
+.k-pp{display:flex;align-items:center;gap:9px;font-size:13.5px}
+.k-pa{width:26px;height:26px;border-radius:50%;background:#5b7385;color:#fff;font-size:10.5px;display:grid;place-items:center;font-weight:700;flex:none}
+.k-ag{width:26px;height:26px;border-radius:7px;background:var(--ai-bg);border:1px solid var(--ai);color:var(--ai-ink);display:grid;place-items:center;font-size:12px;flex:none}
+.k-role{margin-left:auto;font-size:11.5px;color:var(--muted);background:var(--soft);border-radius:6px;padding:1px 7px;white-space:nowrap}
+/* Postfach zweigeteilt */
+.k-split{flex:1;min-height:0;display:grid;grid-template-columns:minmax(320px,.95fr) minmax(0,1.3fr);gap:12px}
+.k-pane{min-height:0;display:flex;flex-direction:column;overflow:hidden}
+.k-pane .scroll{flex:1;min-height:0;overflow:auto;overscroll-behavior:contain}
+.k-it{display:block;width:100%;text-align:left;border:0;border-bottom:1px solid var(--line);background:none;padding:10px 14px;border-left:3px solid transparent}
+.k-it[aria-current="true"]{background:var(--brand-bg);border-left-color:var(--brand)}
+.k-it .a{display:flex;justify-content:space-between;gap:8px}.k-it .a b{font-weight:600}
+.k-it .s{font-weight:600;font-size:13.5px;margin-top:2px}.k-it .x{color:var(--muted);font-size:12.5px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.k-it .ch{display:flex;gap:6px;margin-top:6px;flex-wrap:wrap}
+/* Organigramm */
+.k-org{display:grid;gap:12px;grid-template-columns:repeat(auto-fill,minmax(250px,1fr))}
+.k-dep{border-top:4px solid var(--c);padding:14px 16px;display:flex;flex-direction:column;gap:9px;text-align:left;width:100%}
+/* Modal, Hinweis, Chat */
+.k-modal{position:fixed;inset:0;background:rgba(10,14,28,.45);display:flex;align-items:center;justify-content:center;padding:16px;z-index:50}
+.k-modal .k-card{width:min(560px,100%);max-height:90%;overflow:auto;padding:16px 18px;display:flex;flex-direction:column;gap:10px}
+.k-toast{position:fixed;left:50%;bottom:18px;transform:translateX(-50%);background:var(--text);color:var(--bg);padding:9px 15px;border-radius:9px;font-size:13px;z-index:60}
+.k-chat{position:fixed;right:18px;bottom:18px;width:400px;height:min(600px,calc(100% - 110px));z-index:45;display:flex;flex-direction:column;overflow:hidden;box-shadow:0 18px 48px rgba(10,14,28,.22)}
+.k-chat header{display:flex;align-items:center;gap:8px;padding:12px 14px;border-bottom:1px solid var(--line)}
+.k-msgs{flex:1;overflow:auto;padding:12px 14px;display:flex;flex-direction:column;gap:8px}
+.k-msg{max-width:92%;padding:8px 11px;border-radius:11px;font-size:13px}.k-msg.me{align-self:flex-end;background:var(--brand);color:var(--surface)}.k-msg.ai{align-self:flex-start;background:var(--soft)}
+.k-msg ul{margin:4px 0 0;padding-left:18px}
+.k-chips{display:flex;gap:6px;flex-wrap:wrap;padding:0 14px 8px}.k-chips button{border:1px solid var(--line);background:var(--surface);border-radius:999px;padding:3px 10px;font-size:12px}
+.k-comp{display:flex;gap:8px;padding:8px 14px 14px}.k-comp input{flex:1;min-width:0;border:1px solid var(--line);border-radius:8px;padding:6px 10px;background:var(--bg)}
+.k-badge{position:fixed;right:18px;bottom:14px;background:var(--text);color:var(--bg);border-radius:10px;padding:6px 12px;font-size:12px;z-index:30;white-space:nowrap}
+@media (max-width:900px){
+ .k-app{grid-template-columns:1fr}
+ .k-side{position:fixed;inset:0 auto 0 0;width:270px;z-index:48;transform:translateX(-105%);transition:transform .2s}
+ .k-side.open{transform:none;box-shadow:0 0 0 100vmax rgba(10,14,28,.4)}
+ .k-menu{display:grid}.k-top{margin:10px 12px 0}.k-top .wide{display:none}
+ .k-page{padding:10px 12px 90px}
+ .k-split{grid-template-columns:1fr;grid-template-rows:minmax(0,38%) minmax(0,1fr)}
+ .k-chat{inset:0;width:auto;height:auto;border-radius:0}
+ .k-badge{right:12px;bottom:auto;top:auto;display:none}
+ .k-kv{grid-template-columns:100px 1fr}
+}
+@media (prefers-reduced-motion:reduce){*{transition:none!important;scroll-behavior:auto!important}}
+
+/* abcfinance · Ergänzungen zum Kern (Messbalken, Markierungen, Kennzeichen aus den abcfinance-Daten) */
+.meter{display:flex;gap:8px;align-items:center;font-size:12.5px;font-variant-numeric:tabular-nums}
+.meter .k{width:150px;color:var(--muted);flex:none;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.meter b{width:42px;text-align:right;flex:none}
+.bar{height:7px;border-radius:9px;background:var(--soft);overflow:hidden;min-width:60px;flex:1}
+.bar i{display:block;height:100%;border-radius:9px;background:var(--brand)}
+.bar.ki i{background:var(--ai)}.bar.lo i{background:var(--danger)}
+.k-t .meter .k{width:62px}
+mark{background:var(--ai-bg);box-shadow:inset 0 -2px 0 var(--ai);padding:0 2px;border-radius:3px;color:inherit}
+.pill{font-size:11.5px;font-weight:600;padding:1px 8px;border-radius:999px;white-space:nowrap}
+.p-wait{background:var(--warn-bg);color:var(--warn)}.p-run{background:var(--info-bg);color:var(--info)}.p-ok{background:var(--success-bg);color:var(--success)}.p-open{background:var(--soft);color:var(--muted)}.p-bad{background:var(--danger-bg);color:var(--danger)}
+.ex,.an{font-family:var(--mono);font-size:10px;letter-spacing:.06em;text-transform:uppercase;border:1px dashed var(--faint);color:var(--muted);border-radius:6px;padding:0 5px;white-space:nowrap}
+.an{border-color:var(--ai);color:var(--ai-ink)}
+.abc-mail{display:grid;grid-template-columns:minmax(0,1.2fr) minmax(0,1fr);gap:18px}
+@media (max-width:1100px){.abc-mail{grid-template-columns:1fr}}
+.abc-txt{font-size:14px;line-height:1.65;white-space:pre-wrap;margin-top:10px}
+.abc-from{display:flex;gap:10px;align-items:center;font-size:13.5px}
+.abc-terms{display:flex;flex-wrap:wrap;gap:6px}
+.abc-term{border:1px solid var(--line);border-radius:999px;padding:3px 10px;font-size:12.5px;display:inline-flex;gap:6px;background:var(--surface)}
+.abc-term i{font-style:normal;color:var(--muted);font-size:11.5px;font-family:var(--mono)}
+.abc-term.new{border-style:dashed}.abc-term.hit{border-color:var(--ai);background:var(--ai-bg)}
+.abc-filter{display:flex;gap:6px;flex-wrap:wrap;padding:10px 12px;border-bottom:1px solid var(--line);align-items:center}
+.abc-f{border:1px solid var(--line);background:var(--surface);border-radius:999px;padding:2px 10px;font-size:12.5px;display:inline-flex;gap:6px}
+.abc-f small{color:var(--muted)}
+.abc-f[aria-pressed="true"]{background:var(--brand);border-color:var(--brand);color:var(--surface)}.abc-f[aria-pressed="true"] small{color:var(--surface)}
+.abc-dh{padding:14px 18px;display:flex;flex-direction:column;gap:10px}
+.abc-dh h2{margin:0;font-size:17px}
+.abc-row{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+.abc-perm{display:flex;justify-content:space-between;gap:10px;padding:8px 0;border-bottom:1px solid var(--soft);flex-wrap:wrap}
+.abc-perm:last-child{border-bottom:0}
+.abc-ta{width:100%;min-height:110px;border:1px solid var(--line);border-radius:8px;padding:8px 10px;background:var(--bg);resize:vertical;line-height:1.5}
+.abc-orgtop{display:flex;gap:16px;align-items:center;padding:14px 18px;border-top:4px solid var(--brand)}
+.abc-orgtop .big{width:56px;height:56px;border-radius:50%;background:var(--brand);color:var(--surface);display:grid;place-items:center;font-weight:700;font-size:19px}
+.k-msg .btn{border:1px solid var(--line);background:var(--surface);border-radius:8px;padding:3px 10px;font-weight:600;font-size:12.5px;margin-top:6px}
+.k-msg .btn.acc{background:var(--brand);border-color:var(--brand);color:var(--surface)}
+input[type=range]{accent-color:var(--brand)}
+.k-dep .pill{white-space:normal}
+</style>
+<div id="k-root"></div>
+<script>
+/* ===== Company OS · Kern (Entwurf v2) =====
+   Allgemeiner Rahmen und Seitentypen. Enthält keine Kundendaten.
+   Eine Ableitung ruft K.start(cfg) mit Mandant, Menü, Tagesleiste, Ansichten und KI-Assistent auf. */
+const $=s=>document.querySelector(s);
+const esc=s=>String(s??"").replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+const K={st:{v:null,id:null,tab:{},q:""},cfg:null,
+ /* ---------- Bausteine ---------- */
+ chip:(t,tone="",dot=false)=>`<span class="k-chip ${tone}">${dot?'<span class="d"></span>':""}${t}</span>`,
+ btn:(t,attr="",p=false,sm=false)=>`<button class="k-btn${p?" p":""}${sm?" sm":""}" ${attr}>${t}</button>`,
+ kv:rows=>`<div class="k-kv">${rows.map(([k,v])=>`<span class="k">${k}</span><span>${v}</span>`).join("")}</div>`,
+ person:(ini,n,role="")=>`<div class="k-pp"><span class="k-pa">${esc(ini)}</span>${esc(n)}${role?`<span class="k-role">${esc(role)}</span>`:""}</div>`,
+ agent:(n,role="")=>`<div class="k-pp"><span class="k-ag" aria-hidden="true">✦</span>${esc(n)}${role?`<span class="k-role">${esc(role)}</span>`:""}</div>`,
+ go:(v,id)=>`data-go="${v}${id!=null?"|"+id:""}"`,
+ ini:n=>String(n).split(/[\s·]+/).filter(Boolean).slice(0,2).map(w=>w[0]).join("").toUpperCase(),
+ table(cols,rows,{rowGo,empty="Keine Einträge."}={}){
+  if(!rows.length)return `<div class="k-sb k-note">${empty}</div>`;
+  return `<div class="k-tw"><table class="k-t"><thead><tr>${cols.map(c=>`<th>${c}</th>`).join("")}</tr></thead><tbody>${rows.map((r,i)=>{const g=rowGo&&rowGo(i);return `<tr ${g?`class="k-row" ${g}`:""}>${r.map(c=>`<td>${c}</td>`).join("")}</tr>`}).join("")}</tbody></table></div>`},
+ tabs(view,items){const cur=K.st.tab[view]??items[0][0];return `<div class="k-tabs" role="tablist">${items.map(([k,l,n])=>`<button class="k-tab" role="tab" aria-selected="${k===cur}" data-tab="${view}|${k}">${l}${n!=null?` <small>${n}</small>`:""}</button>`).join("")}</div>`},
+ tab:(view,def)=>K.st.tab[view]??def,
+ timeline:items=>items.map(([st,sym,html,tm])=>`<div class="k-tli"><span class="k-st ${st}">${sym}</span><div>${html}</div>${tm?`<span class="tm">${tm}</span>`:""}</div>`).join(""),
+ /* ---------- Seitentypen ---------- */
+ pageHead:(title,{chips=[],actions=""}={})=>`<div class="k-card k-ph"><h1>${title}</h1>${chips.join("")}<span class="k-sp"></span>${actions}</div>`,
+ dash({hello,sub,stand,groups}){return `<div class="k-card k-hello"><div><h1>${hello}</h1><div class="k-note">${sub}</div></div><span class="k-sp"></span><span class="k-lbl">${stand}</span></div>
+  ${groups.map(g=>`<div class="k-sect">${g.t}<span>${g.s||""}</span></div><div class="k-tiles">${g.tiles.map(t=>`<button class="k-card k-tile" style="--c:${t.c||"var(--brand)"}" ${t.go||""}><h3>${t.t}<small>${t.k||""}</small></h3>${t.kp?`<div class="kp">${t.kp.map(([n,l])=>`<div><span class="big">${n}</span><span class="k-lbl">${l}</span></div>`).join("")}</div>`:`<span class="big">${t.n}</span>`}<span class="k-note">${t.d||""}</span></button>`).join("")}</div>`).join("")}`},
+ list({title,chips=[],actions="",view,tabs,tools="",cols,rows,rowGo,note,count}){
+  return `${K.pageHead(title,{chips,actions})}${tabs?K.tabs(view,tabs):""}<div class="k-card"><div class="k-lh"><b>${count??rows.length} ${esc(title.replace(/^Übersicht\s*/,""))}</b>${tools}</div>${K.table(cols,rows,{rowGo})}<div class="k-pg"><span>1–${rows.length} von ${count??rows.length}</span><span>${note||""}</span></div></div>`},
+ detail({title,num,chips=[],actions="",cards=[],sections=[],empty=[]}){
+  const S=sections.filter(s=>!s.hide);
+  return `<div class="k-card k-ph"><h1>${title}</h1>${num?`<span class="k-num">· ${num}</span>`:""}${chips.join("")}<span class="k-sp"></span>${actions}</div>
+  ${cards.length?`<div class="k-sum">${cards.map(c=>`<div class="k-card k-sc"><h2>${c.t}${c.r?`<span>${c.r}</span>`:""}</h2>${c.b}</div>`).join("")}</div>`:""}
+  <nav class="k-jump" aria-label="Sprungmarken">${S.map((s,i)=>`<button class="k-jm" data-jump="${s.id}" aria-current="${i===0}">${s.t}${s.n!=null?` <small>${s.n}</small>`:""}</button>`).join("")}${empty.length?`<span class="k-vs"></span><button class="k-jm off" data-empty="${esc(empty.join("|"))}">Ohne Einträge <small>${empty.length}</small></button>`:""}<span class="k-sp"></span><button class="k-jm" data-toast="Reihenfolge der Bereiche anpassen (Prototyp)" title="Bereiche anordnen">⇅</button></nav>
+  ${S.map(s=>`<section class="k-card k-sec" id="sec-${s.id}"><div class="k-sh"><h3>${s.t}</h3>${s.n!=null?`<span class="c">${s.n}</span>`:""}<span class="k-sp"></span>${s.a||""}</div><div class="k-sb ${s.flush?"flush":""}">${s.b}</div></section>`).join("")}`},
+ inbox({head,tabs,list,detail}){return `${head}${tabs||""}<div class="k-split"><div class="k-card k-pane" aria-label="Liste">${list}</div><div class="k-card k-pane" aria-label="Detail"><div class="scroll" id="k-det">${detail}</div></div></div>`},
+ /* ---------- Rahmen ---------- */
+ shell(){const c=K.cfg,m=c.mandant;
+  document.body.innerHTML=`<div class="k-app"><aside class="k-side" id="k-side"><div class="k-ws"><div class="k-wsl" style="background:${m.farbe}">${esc(m.ini)}</div><div><b>${esc(m.name)}</b><small>${esc(m.rolle)}</small></div></div>
+   <button class="k-fi" id="k-find"><span>⌕&nbsp; Finden…</span><span class="k-kb">Strg F</span></button><button class="k-neu" id="k-new"><span>＋&nbsp; ${esc(c.neu||"Neu")}</span><span class="k-kb">N</span></button>
+   <nav id="k-nav" aria-label="Menü"></nav><div class="k-foot"><span>${esc(c.fuss||"")}</span><span>⇅ Menü anordnen</span></div></aside>
+   <div class="k-main"><div class="k-top"><button class="k-ib k-menu" id="k-menu" aria-label="Menü">☰</button><span id="k-tl"></span><span class="sp"></span><button class="k-ib wide" data-hist="-1" aria-label="Zurück">‹</button><button class="k-ki" id="k-kibtn">✦ KI-Assistent</button><button class="k-ib" data-toast="Benachrichtigungen (Prototyp)" aria-label="Benachrichtigungen">🔔</button><button class="k-av" aria-label="Profil" ${K.go("profil")}>${esc(m.user)}</button></div>
+   <main class="k-page" id="k-page"></main></div></div>
+   <div id="k-modal"></div><div class="k-toast" id="k-toast" hidden></div>
+   <section class="k-card k-chat" id="k-chat" hidden><header><b>✦ KI-Assistent</b>${K.chip(esc(m.name))}<span class="k-sp"></span><button class="k-ib" id="k-chatx" aria-label="Schließen">×</button></header><div class="k-msgs" id="k-msgs"></div><div class="k-chips" id="k-chips"></div><form class="k-comp" id="k-comp"><input id="k-in" placeholder="Frage oder Auftrag …" aria-label="Nachricht"><button class="k-btn p">Senden</button></form></section>
+   ${c.badge?`<div class="k-badge">${c.badge}</div>`:""}`;
+  document.documentElement.style.setProperty("--brand",m.farbe)},
+ nav(){const c=K.cfg;$("#k-nav").innerHTML=c.menu.map(g=>`<div class="k-grp">${g.t}</div>${g.items.map(it=>{const n=it.n?it.n():null;const cur=it.v===K.st.v||(it.also||[]).includes(K.st.v);return `<button class="k-ni" ${K.go(it.v)} aria-current="${cur}"><span class="i">${it.i}</span>${it.l}${n?`<span class="n ${it.g?"g":""}">${n}</span>`:""}</button>`}).join("")}`).join("");
+  $("#k-tl").innerHTML=c.tagesleiste()},
+ hist:[],
+ open(v,id,{keep=false}={}){if(!keep&&K.st.v)K.hist.push([K.st.v,K.st.id]);K.st.v=v;K.st.id=id??null;K.render();if(!keep)$("#k-page").scrollTop=0;$("#k-side").classList.remove("open")},
+ render(){const c=K.cfg,f=c.views[K.st.v]||c.views[c.start];const r=f(K.st.id);const pg=$("#k-page");pg.classList.toggle("fix",!!(r&&r.fix));pg.innerHTML=typeof r==="string"?r:r.html;K.nav();K.spy();if(r&&r.after)r.after()},
+ refresh(){const pg=$("#k-page"),s=pg.scrollTop,d=$("#k-det"),ds=d?d.scrollTop:0,l=document.querySelector(".k-pane .scroll"),ls=l?l.scrollTop:0;K.render();pg.scrollTop=s;const d2=$("#k-det");if(d2)d2.scrollTop=ds;const l2=document.querySelector(".k-pane .scroll");if(l2)l2.scrollTop=ls},
+ spy(){const pg=$("#k-page"),secs=[...pg.querySelectorAll(".k-sec")];if(!secs.length)return;
+  const upd=()=>{let cur=secs[0].id;const top=pg.getBoundingClientRect().top+80;secs.forEach(s=>{if(s.getBoundingClientRect().top<=top)cur=s.id});pg.querySelectorAll(".k-jm[data-jump]").forEach(b=>b.setAttribute("aria-current","sec-"+b.dataset.jump===cur))};
+  pg.onscroll=upd;upd()},
+ toast(t){const e=$("#k-toast");e.textContent=t;e.hidden=false;clearTimeout(K.toast.t);K.toast.t=setTimeout(()=>e.hidden=true,2800)},
+ modal(html){$("#k-modal").innerHTML=html?`<div class="k-modal" data-mclose><div class="k-card" role="dialog" aria-modal="true">${html}</div></div>`:""},
+ pop(anchor,html){K.closePop();const r=anchor.getBoundingClientRect();const p=document.createElement("div");p.className="k-pop";p.id="k-pop";p.innerHTML=html;document.body.appendChild(p);p.style.top=(r.bottom+6)+"px";p.style.left=Math.max(8,Math.min(innerWidth-290,r.left))+"px"},
+ closePop(){const p=$("#k-pop");if(p)p.remove()},
+ /* ---------- KI-Assistent ---------- */
+ chat(open){const c=$("#k-chat");c.hidden=!open;if(open&&!$("#k-msgs").innerHTML){K.ai(K.cfg.ki.hallo)}$("#k-chips").innerHTML=Object.keys(K.cfg.ki.script).map(k=>`<button data-ask="${esc(k)}">${esc(k)}</button>`).join("")},
+ me(t){$("#k-msgs").insertAdjacentHTML("beforeend",`<div class="k-msg me">${esc(t)}</div>`)},
+ ai(h){$("#k-msgs").insertAdjacentHTML("beforeend",`<div class="k-msg ai">${h}</div>`);$("#k-msgs").scrollTop=1e6},
+ ask(t){K.me(t);setTimeout(()=>K.ai(K.cfg.ki.script[t]||K.cfg.ki.sonst),300)},
+ /* ---------- Finden ---------- */
+ find(){K.modal(`<h2 style="margin:0;font-size:16px">Finden</h2><input class="k-search" id="k-fq" placeholder="Name, Nummer, Begriff …" autofocus><div id="k-fr"></div>`);const i=$("#k-fq");const run=()=>{const q=i.value.trim().toLowerCase();const R=q?K.cfg.suche().filter(x=>x[0].toLowerCase().includes(q)).slice(0,12):[];$("#k-fr").innerHTML=R.map(([n,typ,go])=>`<button class="k-mi" ${go}><span>${esc(n)}</span><span class="k-lbl">${typ}</span></button>`).join("")||`<div class="k-note">${q?"Nichts gefunden.":"Suchbegriff eingeben."}</div>`};i.addEventListener("input",run);run();setTimeout(()=>i.focus(),50)},
+ /* ---------- Start und Ereignisse ---------- */
+ start(cfg){K.cfg=cfg;K.shell();K.st.v=cfg.start;K.render();
+  document.addEventListener("click",e=>{const b=e.target.closest("button,[data-go],[data-mclose]");if(!b){K.closePop();return}const d=b.dataset;
+   if(d.mclose!==undefined){if(e.target===b)K.modal("");return}
+   if(!b.closest("#k-pop")&&!d.empty)K.closePop();
+   if(cfg.onClick&&cfg.onClick(b,d,e)===true)return;
+   if(d.go){const [v,id]=d.go.split("|");K.modal("");K.closePop();if(innerWidth<900)K.chat(false);K.open(v,id);return}
+   if(d.tab){const [v,k]=d.tab.split("|");K.st.tab[v]=k;K.refresh();return}
+   if(d.jump){const s=$("#sec-"+d.jump);if(s)s.scrollIntoView({behavior:"smooth",block:"start"});return}
+   if(d.empty){K.pop(b,`<b style="padding:4px 8px">Bereiche ohne Einträge</b>${d.empty.split("|").map(n=>`<button class="k-mi" data-toast="Bereich „${esc(n)}“ hinzugefügt – direkt zur Eingabe (Prototyp)"><span>${esc(n)}</span><span>＋</span></button>`).join("")}<div class="k-note" style="padding:4px 8px">Bereich anklicken: wird zur Ansicht hinzugefügt.</div>`);return}
+   if(d.toast){K.toast(d.toast);return}
+   if(d.ask){K.ask(d.ask);return}
+   if(d.hist){const h=K.hist.pop();if(h){K.st.v=h[0];K.st.id=h[1];K.render()}return}
+   if(b.id==="k-find"){K.find();return}
+   if(b.id==="k-new"){cfg.neu&&cfg.onNeu?cfg.onNeu():K.toast("Neu (Prototyp)");return}
+   if(b.id==="k-kibtn"){K.chat($("#k-chat").hidden);return}
+   if(b.id==="k-chatx"){K.chat(false);return}
+   if(b.id==="k-menu"){$("#k-side").classList.toggle("open");return}
+  });
+  document.addEventListener("keydown",e=>{const tag=(e.target.tagName||"");if(e.key==="Escape"){K.modal("");K.closePop();$("#k-side").classList.remove("open");return}
+   if(/INPUT|TEXTAREA/.test(tag))return;if((e.ctrlKey||e.metaKey)&&e.key.toLowerCase()==="f"){e.preventDefault();K.find()}else if(e.key.toLowerCase()==="n"&&!e.ctrlKey&&!e.metaKey&&cfg.onNeu){cfg.onNeu()}});
+  $("#k-comp").addEventListener("submit",e=>{e.preventDefault();const v=$("#k-in").value.trim();if(!v)return;$("#k-in").value="";K.ask(v)});
+ }
+};
+
+/* ===== abcfinance · Posteingang mit KI (ASS) – Konfiguration von Company OS mit Beispieldaten ===== */
+const DEMO=false;function demoTxt(s){return s}
+const ME={n:"Sandra Weber",ini:"SW",rolle:"Leitung Operations",dep:"Vertretung: Markus Hahn"};
+const CO={af:{name:"abcfinance",color:"#2c4a5e",sys:"sellify · Mandant „abcfinance“"}};
+const AREAS=[["tag","☀","Mein Tag"],["cockpit","◎","Cockpit"],["proj","▦","Projekte"],["proc","↝","Prozesse"],["jobs","☰","Aufträge"],["abgl","✓","ASS-Abgleich"]];
+let state={co:"af",area:"cockpit",dayTab:"heute",showRest:false,projTab:"mine",pjTab:"list",setTab:"profil",procSel:null,procView:"list",tplF:"Posteingang & Dokumente",projSel:null,phaseSel:"p1",desMode:"proc",desStage:0,desPrompt:"",showNo:false,orgCo:null,jobF:"alle"};
+let assistStage=0;
+const EXT='<span class="pill p-wait" title="Nicht im generellen Prototyp vorhanden – nötige Erweiterung von Company OS">Erweiterung</span>';
+const UMD='<span class="pill p-run" title="Vorhandener Baustein, für den Posteingang anders genutzt">Umdeutung</span>';
+const EX='<span class="ex">Beispiel</span>', AN='<span class="an">Annahme</span>';
+
+/* ---------- Dokumenttypen = Profile des Skills posteingang-einordnen ---------- */
+const TEAMS={vs:"Vertragsservice",fm:"Forderungsmanagement",ks:"Kundenservice",sd:"Stammdaten",pe:"Posteingang & Auftragssteuerung"};
+const TYPES=[
+ {id:"rek",n:"Vertragsreklamation",terms:[["Reklamation","reklam",3],["beanstanden","beanstand",3],["fehlerhaft","fehlerhaft",2],["nicht einverstanden","nicht einverstanden",2],["Widerspruch","widerspr",2],["Korrektur","korrektur",1],["Abrechnung","abrechnung",1],["Vertragsnummer","vertragsnummer",1]],docs:600,rule:78,ki:94,thr:85,team:"vs",mode:"korb",proc:"Vertragsreklamation bearbeiten",ver:"v3",st:"aktiv",sug:[["nicht nachvollziehbar",212],["Gutschrift",148],["falsch berechnet",131],["zu viel berechnet",77]]},
+ {id:"abl",n:"Ablöseanfrage",terms:[["Ablösung","ablös",3],["vorzeitig","vorzeitig",2],["Ablösesumme","ablösesumme",2],["Restwert","restwert",2],["Angebot","angebot",1],["Leasingvertrag","leasingvertrag",1]],docs:420,rule:81,ki:96,thr:85,team:"vs",mode:"person",proc:"Ablöseanfrage beantworten",ver:"v2",st:"aktiv",sug:[["auslösen",64],["Vertrag beenden",51]]},
+ {id:"kue",n:"Kündigung",terms:[["Kündigung","kündig",3],["fristgerecht","fristgerecht",2],["Vertragsende","vertragsende",2],["zum Ablauf","zum ablauf",1],["schriftlich bestätigen","bestätigen",1]],docs:310,rule:88,ki:97,thr:90,team:"vs",mode:"korb",proc:"Kündigung bearbeiten",ver:"v2",st:"aktiv",sug:[["beenden",44]]},
+ {id:"adr",n:"Adress- und Stammdatenänderung",terms:[["neue Anschrift","neue anschrift",3],["Umzug / umziehen","umz",2],["Adressänderung","adressänderung",3],["Firmierung","firmierung",2],["Bankverbindung","bankverbindung",2]],docs:280,rule:74,ki:95,thr:90,team:"sd",mode:"korb",proc:"Stammdatenänderung übernehmen",ver:"v2",st:"aktiv",sug:[["neue Adresse",58],["IBAN",41]]},
+ {id:"zah",n:"Zahlungsklärung",terms:[["Zahlung","zahlung",2],["überwiesen","überwiesen",3],["Zahlungsavis","avis",2],["Lastschrift","lastschrift",2],["Mahnung","mahnung",2],["Rechnung","rechnung",1]],docs:510,rule:80,ki:93,thr:85,team:"fm",mode:"korb",proc:"Zahlungsklärung",ver:"v2",st:"aktiv",sug:[["Rücklastschrift",39],["Zahlungsbeleg",36]]},
+ {id:"ver",n:"Versicherungsnachweis",terms:[["Versicherung","versicherung",3],["Police","police",2],["Nachweis","nachweis",2],["Sicherungsschein","sicherungsschein",3]],docs:190,rule:86,ki:95,thr:85,team:"vs",mode:"korb",proc:"Versicherungsnachweis ablegen",ver:"v1",st:"aktiv",sug:[["Versicherungsbestätigung",29]]},
+ {id:"kop",n:"Rechnungskopie / allgemeine Anfrage",terms:[["Rechnungskopie","rechnungskopie",3],["Kopie","kopie",2],["Duplikat","duplikat",2],["Rechnung","rechnung",1]],docs:350,rule:83,ki:96,thr:85,team:"ks",mode:"korb",proc:"Rechnungskopie senden",ver:"v2",st:"aktiv",sug:[["nochmal zusenden",33]]},
+ {id:"ins",n:"Insolvenzmitteilung",terms:[["Insolvenzverfahren","insolvenz",3],["Insolvenzverwalter","insolvenzverwalter",3],["Amtsgericht","amtsgericht",2],["Forderungen anmelden","forderungen",1]],docs:40,rule:0,ki:88,thr:95,team:"fm",mode:"person",proc:"Insolvenzmitteilung bearbeiten",ver:"v1",st:"im Anlernen",sug:[["Eröffnungsbeschluss",22],["vorläufige Insolvenz",14]]}
+];
+const T=id=>TYPES.find(t=>t.id===id);
+const MAILS=[
+ {id:1,tm:"08:12",box:"Verträge",from:"Metallbau Krüger GmbH",subj:"Widerspruch zur Abrechnung Vertrag 4711-2083",body:"Sehr geehrte Damen und Herren,\nwir beanstanden die Abrechnung zu unserem Vertrag mit der Vertragsnummer 4711-2083. Die berechnete Nutzungsentschädigung ist aus unserer Sicht fehlerhaft und nicht nachvollziehbar. Wir bitten um Korrektur und eine Gutschrift.\nMit freundlichen Grüßen\nJens Krüger",type:"rek",ki:97,kontakt:"Metallbau Krüger GmbH · Jens Krüger",vertrag:"4711-2083",st:"auto",why:"Der Kunde widerspricht einer konkreten Abrechnung und verlangt eine Korrektur mit Gutschrift."},
+ {id:2,tm:"08:40",box:"Service",from:"Praxis Dr. Sommer",subj:"Vorzeitige Ablösung Leasingvertrag",body:"Guten Tag,\nwir möchten unseren Leasingvertrag 5520-1147 für das Ultraschallgerät vorzeitig ablösen. Bitte senden Sie uns ein Angebot über die Ablösesumme zum 30.11.\nViele Grüße\nDr. Anna Sommer",type:"abl",ki:95,kontakt:"Praxis Dr. Sommer · Dr. Anna Sommer",vertrag:"5520-1147",st:"auto",person:"Tobias Brandt",why:"Eindeutige Bitte um ein Ablöseangebot mit Stichtag."},
+ {id:3,tm:"09:05",box:"Buchhaltung",from:"Spedition Wolff KG",subj:"Zahlung Rechnung 2026-08812",body:"Hallo,\ndie Zahlung zur Rechnung 2026-08812 haben wir am 08.10. überwiesen. Anbei der Zahlungsavis. Bitte die Mahnung stornieren.\nGruß\nBuchhaltung Spedition Wolff",type:"zah",ki:92,kontakt:"Spedition Wolff KG",vertrag:"8810-0231",st:"auto",why:"Kunde meldet Zahlung zu einer gemahnten Rechnung und legt einen Beleg bei."},
+ {id:4,tm:"09:31",box:"Service",from:"Hoffmann Druck GmbH",subj:"Ihr Schreiben vom 02.10.",body:"Sehr geehrte Damen und Herren,\nzu Ihrem Schreiben: Wir sind mit dem Betrag nicht einverstanden. Gleichzeitig teilen wir mit, dass wir zum 01.11. umziehen, neue Anschrift: Industriestraße 12, 50829 Köln.\nMit freundlichen Grüßen\nK. Hoffmann",type:"rek",ki:71,also:["adr",88],kontakt:"Hoffmann Druck GmbH · Klaus Hoffmann",vertrag:"2 Verträge möglich (3120-0871, 3120-1102)",st:"pruefen",why:"Zwei Anliegen in einer Mail: Widerspruch gegen einen Betrag (ohne Vertragsnummer) und eine Adressänderung. Der Vertrag ist nicht eindeutig."},
+ {id:5,tm:"10:02",box:"Verträge",from:"Bäckerei Lange",subj:"Kündigung",body:"Hiermit kündigen wir den Mietvertrag 3301-0442 fristgerecht zum Vertragsende. Bitte bestätigen Sie die Kündigung schriftlich.\nFamilie Lange",type:"kue",ki:98,kontakt:"Bäckerei Lange · Martin Lange",vertrag:"3301-0442",st:"auto",why:"Fristgerechte Kündigung mit Vertragsnummer und Bitte um Bestätigung."},
+ {id:6,tm:"10:17",box:"Service",from:"Kanzlei Berger & Partner",subj:"Insolvenzverfahren Nordlicht Events GmbH",body:"Sehr geehrte Damen und Herren,\nwir teilen mit, dass das Amtsgericht Düsseldorf das Insolvenzverfahren über das Vermögen der Nordlicht Events GmbH eröffnet hat. Der Unterzeichner wurde zum Insolvenzverwalter bestellt. Wir bitten Sie, Ihre Forderungen anzumelden.\nRA Dr. Berger",type:"ins",ki:88,kontakt:"Nordlicht Events GmbH (Kunde) · Kanzlei Berger & Partner (Absender)",vertrag:"1 aktiver Vertrag (9902-0017)",st:"pruefen",person:"Stefan Krause",why:"Mitteilung über ein eröffnetes Insolvenzverfahren. Der Dokumenttyp ist noch im Anlernen, deshalb prüft immer ein Mensch."},
+ {id:7,tm:"10:44",box:"Service",from:"Elektro Yilmaz",subj:"Rechnungskopie",body:"Hallo,\nkönnen Sie uns bitte eine Kopie der Rechnung für September zum Vertrag 6120-0098 schicken? Danke.\nE. Yilmaz",type:"kop",ki:96,kontakt:"Elektro Yilmaz · Emre Yilmaz",vertrag:"6120-0098",st:"freigabe",why:"Einfache Bitte um eine Rechnungskopie. Die Antwort samt Anhang ist vorbereitet."},
+ {id:8,tm:"11:03",box:"Verträge",from:"Autohaus Peters",subj:"Versicherungsnachweis",body:"Guten Tag,\nanbei die Police als Nachweis der Versicherung für das Fahrzeug aus Vertrag 7781-3310. Der Sicherungsschein folgt.\nAutohaus Peters",type:"ver",ki:93,kontakt:"Autohaus Peters",vertrag:"7781-3310",st:"auto",why:"Police als Versicherungsnachweis; der Sicherungsschein fehlt noch, deshalb Wiedervorlage."},
+ {id:9,tm:"11:20",box:"Service",from:"m.schulz@… (unbekannt)",subj:"Frage",body:"Hallo,\nich habe eine Frage zu meinem Vertrag, bitte rufen Sie mich zurück.\nM. Schulz",type:"kop",ki:41,kontakt:"nicht eindeutig: 3 Personen „Schulz“ in sellify",vertrag:"–",st:"pruefen",why:"Kein erkennbares Anliegen und kein eindeutiger Kontakt."}
+];
+const MST={auto:["p-ok","verteilt"],pruefen:["p-wait","Mensch prüft"],freigabe:["p-run","wartet auf Freigabe"],done:["p-ok","erledigt"]};
+function cover(text,t){const s=text.toLowerCase();let hit=0,all=0;const h=[];t.terms.forEach(([d,st,w])=>{all+=w;if(s.includes(st)){hit+=w;h.push(st)}});return {pct:Math.round(100*hit/all),hits:h}}
+function bestRule(text){return TYPES.map(t=>({t,...cover(text,t)})).sort((a,b)=>b.pct-a.pct)}
+function markText(text,stems){let h=esc(text);[...new Set(stems)].sort((a,b)=>b.length-a.length).forEach(st=>{const re=new RegExp("("+st.replace(/[.*+?^${}()|[\]\\]/g,"\\$&")+"[\\wäöüß]*)","gi");h=h.replace(re,"<mark>$1</mark>")});return h}
+const meter=(k,v,cls="")=>`<div class="meter"><span class="k">${k}</span><span class="bar ${cls}"><i style="width:${v}%"></i></span><b>${v} %</b></div>`;
+const target=(t,m)=>{if(m&&m.person)return `direkt an ${m.person}`;return t.mode==="person"?`zuständige Person laut Vertrag (${TEAMS[t.team]})`:`Arbeitskorb ${TEAMS[t.team]}`};
+
+/* ---------- Cockpit ---------- */
+const WAIT={af:[
+ {k:"Eskalation",t:"Insolvenzmitteilung Nordlicht Events GmbH",d:"Posteingangsverarbeitung · direkt an Stefan Krause · Dokumenttyp noch im Anlernen",c:[["Warum bei dir","Stefan Krause ist heute abwesend, die Vertretung hat nicht reagiert (Eskalationskette)"],["Frist","Forderungen fristgerecht anmelden"]],mail:6},
+ {k:"Rückfrage",t:"Hoffmann Druck: Zu welchem Vertrag gehört der Widerspruch?",d:"Posteingangsverarbeitung · Schritt „Mensch prüft“ · seit 35 Min. offen",c:[["Vorschlag der KI","Vertrag 3120-1102 – das Schreiben vom 02.10. bezog sich darauf"],["Zweites Anliegen","Adressänderung → Arbeitskorb Stammdaten"]],opt:["3120-1102","3120-0871"],mail:4},
+ {k:"Freigabe",t:"4 neue Kennbegriffe für Vertragsreklamation (Skill-Profil v4)",d:"Prozess „Dokumenttyp anlernen und pflegen“ · Anlern-Agent · Testlauf: Begriffe allein 78 → 84 % richtig",c:[["Begriffe","nicht nachvollziehbar · Gutschrift · falsch berechnet · zu viel berechnet"],["Wirkung","gilt nach Freigabe für alle neuen Mails"]],toast:"Freigegeben – Skill-Profil Vertragsreklamation v4 ist aktiv (Prototyp)"}
+]};
+const RUN={af:[["Posteingangsverarbeitung · Schattenbetrieb","214 Aufträge heute · 198 verteilt · 16 Mensch prüft","p-run","läuft"],["Anlernlauf Insolvenzmitteilung","Dokumenttyp anlernen und pflegen · 40 Beispiele · Schritt 3 von 5","p-run","läuft"],["Einführung ASS","Projekt · Phase 1 Konzept & Datenaufnahme","p-run","läuft"],["Vertragsreklamation Metallbau Krüger","Arbeitskorb Vertragsservice · Frist morgen","p-wait","Frist"]]};
+const ORG={af:[
+ {n:"Posteingang & Auftragssteuerung",c:"#2c4a5e",lead:["MH","Markus Hahn"],dep:"Vertretung: Lisa Koch",ppl:[["LK","Lisa Koch · prüft unsichere Fälle"],["TB","Tim Berger · prüft unsichere Fälle"]],pa:[["Posteingangs-Prozessagent","führt: Posteingangsverarbeitung · Dokumenttyp anlernen"]],ag:["Posteingangs-Agent","Klassifizierungs-Agent","Zuordnungs-Agent","Anlern-Agent"],al:"16 Fälle zur Prüfung"},
+ {n:"Vertragsservice",c:"#2457c5",lead:["JN","Julia Neumann"],dep:"Vertretung: Lars Otto",ppl:[["LO","Lars Otto"],["MS","Mia Schröder"],["TB","Tobias Brandt · Vertragsbetreuung"],["EK","Eva Kaiser"]],pa:[["Vertragsservice-Prozessagent","führt: Reklamation · Ablöse · Kündigung · Versicherungsnachweis"]],ag:["Reklamations-Agent","Vertrags-Agent"],al:"2 Reklamationen erreichen morgen die Frist"},
+ {n:"Forderungsmanagement",c:"#b4232a",lead:["SK","Stefan Krause"],dep:"Vertretung: Nina Albers",ppl:[["NA","Nina Albers"],["OM","Ole Martens"]],pa:[["Forderungs-Prozessagent","führt: Zahlungsklärung · Insolvenzmitteilung"]],ag:["Forderungs-Agent"],al:"1 Insolvenzmitteilung mit hoher Priorität"},
+ {n:"Kundenservice",c:"#147a5c",lead:["AD","Aylin Demir"],dep:"Vertretung: Paul Richter",ppl:[["PR","Paul Richter"],["SL","Sara Lenz"]],pa:[["Service-Prozessagent","führt: Rechnungskopie und allgemeine Anfrage"]],ag:["Antwort-Agent"],al:"1 Antwort wartet auf Freigabe"},
+ {n:"Stammdaten",c:"#7a4fc9",lead:["PV","Peter Vogt"],dep:"Vertretung: Hanna Brandt",ppl:[["HB","Hanna Brandt"]],pa:[["Stammdaten-Prozessagent","führt: Stammdatenänderung übernehmen"]],ag:["Stammdaten-Agent"],ok:"Alles im Plan"}
+]};
+const PSK=[["E-Mails vorbereiten","Entwürfe im Hausstil, Versand nach Freigabe",1],["Tagesbriefing","Morgens: was wartet, was ist überfällig",1],["Wiedervorlagen","in sellify anlegen und nachhalten",1],["Freigaben bündeln","alle offenen Freigaben auf einen Blick",1],["Wochenbericht Posteingang","Menge, Quote, Fehlzuordnungen",0],["Kontakte anlegen","mit Dublettenprüfung",0]];
+const SETUP=[
+ ["Inhaber-System",[["Kunde im CRM des Anbieters","sellify · business//acts → abcfinance (Beispiel)"],["Bezug","Kunde von business//acts"]]],
+ ["Projekte",[["Hauptprojekt","Einführung ASS · Posteingang mit KI"],["Verwaltung","Projekt, Meilensteine und Aufgaben in sellify – Company OS steuert die Arbeit"]]],
+ ["Anschlüsse & Rollen",[["CRM","sellify · Mandant abcfinance (erst Testsystem, dann Produktiv)"],["Eingangskanal (Erweiterung)","Postfächer Service, Verträge, Buchhaltung – direkt (Exchange / Microsoft 365) oder Abholung über sellify, offen"],["Bibliothek","Beispieldokumente je Dokumenttyp aus dem sellify-Dokumentarchiv"],["ERP · weitere Systeme","nicht angeschlossen – bei Bedarf per MCP"]]],
+ ["KI-Anbieter & Haupt-KI",[["Haupt-KI (Pflicht)","nur von uns freigegebene Anbieter wählbar, Verarbeitung in der EU (Annahme)"],["Datenstufe","2 · personenbezogen – Mails enthalten Kundendaten, AVV nötig"],["Budget je Anbieter","bei Erreichen: anhalten und benachrichtigen"]]],
+ ["Abteilungen & Organigramm",[["Verwaltet","Posteingang · Vertragsservice · Forderungsmanagement · Kundenservice · Stammdaten"],["Je Abteilung","Leitung, Vertretung, Mitarbeitende, Agenten; der Arbeitskorb liegt in sellify"]]],
+ ["Branchenpaket",[["Paket","noch keins – Idee: Leasing & Finanzierung"],["Liefert","Dokumenttypen, Prozesse, Agenten und Skills als Vorlage"]]],
+ ["Menschen",[["Mitarbeitende","je Abteilung, verknüpft mit dem sellify-Benutzer (für Zuweisung und Abwesenheit)"]]],
+ ["Prozesse & Projekte",[["Posteingang","Posteingangsverarbeitung, danach ein Folgeprozess je Dokumenttyp"],["Je Schritt","Arbeitsanweisung · Agent und Ersatz-Agent · KI-Profil · Datenstufe"],["Übernommenes","startet als Entwurf, aktiv erst nach Testlauf"]]],
+ ["Dokumenttypen",[["Wo","Skill posteingang-einordnen: Kern + ein Profil je Dokumenttyp"],["Übernahme","Dokumenttypen, Kennbegriffe und Aufgaben aus der heutigen Posteingangsverarbeitung in sellify"],["Schwelle (Erweiterung)","je Dokumenttyp; darunter prüft ein Mensch"]]],
+ ["Übergabewege",[["Je Dokumenttyp","Aufgabe in sellify an einen Arbeitskorb oder an die zuständige Person"],["Abwesenheit","Vertretung, sonst Arbeitskorb"]]],
+ ["Bibliothek & Vorlagenquellen",[["Aus sellify","E-Mail- und Dokumentvorlagen, Beispieldokumente (Lernbeispiele)"]]],
+ ["Agenten & Skills",[["Agentenpool","Posteingangs-, Klassifizierungs-, Zuordnungs-, Anlern-Agent und Fach-Agenten"],["Prozessführung","je Abteilung ein Prozessverantwortlicher Agent"]]],
+ ["Freigaben & Benachrichtigung",[["Außenwirkung","Antworten an Kunden und Stammdatenänderungen nur nach Freigabe"],["Kanäle","App · E-Mail je Person"]]],
+ ["Zugriff",[["Rollen","Leitung Operations · Abteilungsleitung · Mitarbeitende"]]],
+ ["Recht & Datenschutz",[["AVV","abcfinance ↔ Anbieter von Company OS – abzustimmen"],["Agenten dürfen nie","Geld bewegen · Datensätze löschen · Verträge ohne Freigabe ändern"]]],
+ ["KI-Assistent & Übersicht",[["KI-Assistent","aktiv"],["Kennzahlen (Erweiterung)","Mails je Tag · Quote verteilt · Mensch prüft · Fehlzuordnungen · Durchlaufzeit"]]],
+ ["Abschluss",[["Prüfung","Verbindungstest · Schattenbetrieb · Setup-Protokoll"]]]
+];
+let setupStep=0;
+
+/* ---------- Prozesse ---------- */
+const S=(n,dep,ag,ers,fr)=>({n,dep,ag,ers,fr});
+const STC={"aktiv":"p-ok","im Test":"p-run","Entwurf":"p-open"};
+const PROC={af:[
+ {id:"pe",n:"Posteingangsverarbeitung",dep:"Posteingang & Auftragssteuerung",st:"im Test",v:"v2",pa:"Posteingangs-Prozessagent",er:"Markus Hahn",run:"214 Aufträge heute · Schattenbetrieb",note:"Schattenbetrieb: Der Prozess läuft parallel zur heutigen Verarbeitung in sellify. Beide Ergebnisse werden verglichen; verteilt wird noch nach der heutigen Regel. Start durch Ereignis „neue E-Mail“ ist eine Erweiterung.",steps:[S("Mail und Anhänge lesen (auch Scans)","Posteingang","Posteingangs-Agent","–","Auslöser: neue E-Mail im Postfach"),S("Dokumenttyp erkennen, Kennbegriffe gegenprüfen","Posteingang","Klassifizierungs-Agent","–","Skill posteingang-einordnen · Profil je Dokumenttyp"),S("Entscheidung: sicher genug?","Posteingang","Posteingangs-Prozessagent","–","Schwelle je Dokumenttyp · nein → Mensch"),S("Unsichere Fälle prüfen und korrigieren","Posteingang","–","–","Mensch: Team Posteingang · Korrektur = Lernbeispiel"),S("Kontakt und Vertrag in sellify zuordnen","Posteingang","Zuordnungs-Agent","Klassifizierungs-Agent","mehrdeutig → Mensch"),S("Mail am Vertrag ablegen, Folgeprozess starten","Posteingang","Zuordnungs-Agent","–","Übergabeweg je Dokumenttyp")]},
+ {id:"anl",n:"Dokumenttyp anlernen und pflegen",dep:"Posteingang & Auftragssteuerung",st:"aktiv",v:"v1",pa:"Posteingangs-Prozessagent",er:"Markus Hahn",run:"1 Anlernlauf: Insolvenzmitteilung",steps:[S("Beispieldokumente einlesen","Posteingang","Anlern-Agent","–","aus der Bibliothek (Lernbeispiele)"),S("Kennbegriffe, Schwelle und Folgeprozess vorschlagen","Posteingang","Anlern-Agent","–",""),S("Testlauf gegen die Testmenge","Posteingang","Anlern-Agent","–","Treffsicherheit je Dokumenttyp messen"),S("Neue Profil-Version freigeben","Posteingang","–","–","Mensch: Leitung Posteingang und Fachabteilung"),S("Aktivieren, Korrekturen als Beispiele sammeln","Posteingang","Posteingangs-Prozessagent","–","")]},
+ {id:"rek",n:"Vertragsreklamation bearbeiten",dep:"Vertragsservice",st:"aktiv",v:"v1",pa:"Vertragsservice-Prozessagent",er:"Julia Neumann",run:"6 Aufträge offen",steps:[S("Aufgabe in sellify anlegen","Vertragsservice","Zuordnungs-Agent","–","Übergabeweg: Arbeitskorb Vertragsservice"),S("Eingangsbestätigung entwerfen","Vertragsservice","Reklamations-Agent","–","Freigabe vor Versand"),S("Reklamation gegen Abrechnung und Vertrag vorprüfen","Vertragsservice","Reklamations-Agent","–",""),S("Entscheiden","Vertragsservice","–","–","Mensch: Vertragsservice"),S("Antwort an den Kunden","Vertragsservice","Reklamations-Agent","–","Freigabe vor Versand")]},
+ {id:"abl",n:"Ablöseanfrage beantworten",dep:"Vertragsservice",st:"aktiv",v:"v1",pa:"Vertragsservice-Prozessagent",er:"Julia Neumann",run:"1 Auftrag läuft",steps:[S("Aufgabe an die zuständige Vertragsbetreuung","Vertragsservice","Zuordnungs-Agent","–","Übergabeweg: Person laut Vertrag"),S("Ablöseangebot vorbereiten","Vertragsservice","Vertrags-Agent","–",""),S("Berechnung prüfen","Vertragsservice","–","–","Mensch: Vertragsbetreuung"),S("Angebot senden","Vertragsservice","Vertrags-Agent","–","Freigabe vor Versand")]},
+ {id:"kue",n:"Kündigung bearbeiten",dep:"Vertragsservice",st:"aktiv",v:"v1",pa:"Vertragsservice-Prozessagent",er:"Julia Neumann",run:"4 Aufträge offen",steps:[S("Kündigung prüfen, Vertragsende vorschlagen","Vertragsservice","Vertrags-Agent","–",""),S("Vertragsende in sellify setzen","Vertragsservice","–","–","Mensch: Vertragsservice"),S("Kündigungsbestätigung senden","Vertragsservice","Vertrags-Agent","–","Freigabe vor Versand")]},
+ {id:"zah",n:"Zahlungsklärung",dep:"Forderungsmanagement",st:"aktiv",v:"v1",pa:"Forderungs-Prozessagent",er:"Stefan Krause",run:"3 Aufträge offen",steps:[S("Zahlung gegen offene Posten abgleichen","Forderungsmanagement","Forderungs-Agent","–",""),S("Mahnstufe prüfen, ggf. aussetzen","Forderungsmanagement","–","–","Mensch: Forderungsmanagement")]},
+ {id:"sd",n:"Stammdatenänderung übernehmen",dep:"Stammdaten",st:"aktiv",v:"v1",pa:"Stammdaten-Prozessagent",er:"Peter Vogt",run:"2 Aufträge offen",steps:[S("Änderung aus der Mail auslesen","Stammdaten","Stammdaten-Agent","–",""),S("Änderung in sellify übernehmen","Stammdaten","Stammdaten-Agent","–","Freigabe: Stammdaten")]},
+ {id:"kop",n:"Rechnungskopie senden",dep:"Kundenservice",st:"aktiv",v:"v2",pa:"Service-Prozessagent",er:"Aylin Demir",run:"1 Auftrag wartet",steps:[S("Rechnung in sellify heraussuchen","Kundenservice","Antwort-Agent","–",""),S("Antwort mit Anhang entwerfen","Kundenservice","Antwort-Agent","–",""),S("Senden und dokumentieren","Kundenservice","Antwort-Agent","–","Freigabe vor Versand")]},
+ {id:"vn",n:"Versicherungsnachweis ablegen",dep:"Vertragsservice",st:"aktiv",v:"v1",pa:"Vertragsservice-Prozessagent",er:"Julia Neumann",run:"–",steps:[S("Nachweis am Vertrag ablegen","Vertragsservice","Zuordnungs-Agent","–",""),S("Wiedervorlage bei fehlendem Sicherungsschein","Vertragsservice","Vertrags-Agent","–","")]},
+ {id:"ins",n:"Insolvenzmitteilung bearbeiten",dep:"Forderungsmanagement",st:"Entwurf",v:"v1",pa:"Forderungs-Prozessagent",er:"Stefan Krause",run:"–",steps:[S("Leitung Forderungsmanagement informieren","Forderungsmanagement","Forderungs-Agent","–","hohe Priorität"),S("Offene Forderungen zusammenstellen","Forderungsmanagement","Forderungs-Agent","–",""),S("Forderungsanmeldung","Forderungsmanagement","–","–","Mensch: Forderungsmanagement")]}
+]};
+const TPLF=["Posteingang & Dokumente","Vertragsservice","Forderungsmanagement","Kundenservice","Vertrieb","Buchhaltung & Finanzen","Personal","Geschäftsführung"];
+const TPL=[
+ {f:"Posteingang & Dokumente",n:"Posteingangsverarbeitung",d:"Mail lesen → Dokumenttyp erkennen → sicher genug? → Mensch prüft → Kontakt und Vertrag zuordnen → Folgeprozess starten",sk:["postfach-lesen","posteingang-einordnen","vertrag-zuordnen","dokument-ablegen"]},
+ {f:"Posteingang & Dokumente",n:"Dokumenttyp anlernen und pflegen",d:"Beispiele einlesen → Kennbegriffe und Schwelle vorschlagen → Testlauf → Freigabe → aktivieren",sk:["kennbegriffe-vorschlagen","testlauf-auswerten"]},
+ {f:"Posteingang & Dokumente",n:"Anfrage ohne Anliegen klären",d:"Kontakt ermitteln → Rückruf als Aufgabe anlegen → Ergebnis dokumentieren",sk:["vertrag-zuordnen","sellify-aufgabe-anlegen"]},
+ {f:"Vertragsservice",n:"Vertragsreklamation bearbeiten",d:"Aufgabe anlegen → Eingangsbestätigung → vorprüfen → entscheiden → Antwort",sk:["sellify-aufgabe-anlegen","reklamation-vorpruefen","email-erstellung"]},
+ {f:"Vertragsservice",n:"Kündigung bearbeiten",d:"prüfen → Vertragsende setzen → Bestätigung senden",sk:["kuendigung-bearbeiten","email-erstellung"]},
+ {f:"Forderungsmanagement",n:"Zahlungsklärung",d:"Zahlung abgleichen → Mahnstufe prüfen",sk:["zahlung-abgleichen"]},
+ {f:"Forderungsmanagement",n:"Insolvenzmitteilung bearbeiten",d:"Leitung informieren → Forderungen zusammenstellen → anmelden",sk:["zahlung-abgleichen","email-erstellung"]},
+ {f:"Forderungsmanagement",n:"Mahnwesen",d:"offene Posten → Erinnerung → Mahnstufe → Übergabe an Dienstleister",sk:["mahnung-erstellen","email-erstellung"]},
+ {f:"Kundenservice",n:"Rechnungskopie senden",d:"Rechnung heraussuchen → Antwort entwerfen → Freigabe → senden",sk:["rechnungskopie-senden","email-erstellung"]},
+ {f:"Kundenservice",n:"Beschwerde bearbeiten",d:"aufnehmen → Ursache klären → Antwort → nachfassen",sk:["reklamation-vorpruefen","email-erstellung"]},
+ {f:"Vertrieb",n:"Angebote nachfassen",d:"offene Angebote finden → Erinnerung entwerfen → Wiedervorlage",sk:["wiedervorlage","email-erstellung"]},
+ {f:"Buchhaltung & Finanzen",n:"Eingangsrechnung prüfen",d:"Eingang → prüfen → vorkontieren → Freigabe",sk:["rechnung-pruefen"]},
+ {f:"Personal",n:"Abwesenheiten",d:"Antrag → Vertretung prüfen → Freigabe",sk:["termin-vereinbaren"]},
+ {f:"Geschäftsführung",n:"Wochenbericht Posteingang",d:"Kennzahlen sammeln → Bericht → Versand",sk:["bericht-erstellen"]},
+ {f:"Projektvorlagen",n:"Einführung KI-Prozess",d:"Phasen: Konzept & Datenaufnahme → Anbindung → Anlernen (parallel: Testmengen) → Schattenbetrieb & Übernahme · Abnahme je Phase = Meilenstein",sk:["prozess-fuehren"],proj:true}
+];
+const tplSk=n=>(TPL.find(t=>t.n===n)||{sk:[]}).sk;
+const SUG=[
+ {n:"Insolvenzmitteilung bearbeiten",src:"Auswertung Posteingang",why:"rund 40 Fälle, heute ohne Regel",s:"offen"},
+ {n:"Anfrage ohne Anliegen klären",src:"Auswertung Posteingang",why:"Mails ohne erkennbares Anliegen landen heute im Sammelkorb",s:"offen"},
+ {n:"Mahnwesen",src:"Vorlagen Forderungsmanagement",why:"Zahlungsklärungen hängen an Mahnstufen",s:"offen"},
+ {n:"Wochenbericht Posteingang",src:"eigener Prompt",why:"„Jeden Freitag: Menge, Quote, Fehlzuordnungen“",s:"offen"}
+];
+let sugSel=new Set();
+const PROJ={af:[{id:"ass",n:"Einführung ASS · Posteingang mit KI",kind:"Phasen",sys:"sellify",pv:["Mensch","Sandra Weber"],tpl:"Einführung KI-Prozess",flow:"automatisch",ex:true}]};
+const PH=[
+ {id:"p1",n:"Konzept & Datenaufnahme",st:"run",from:"12.10.",to:"06.11.",er:"Sandra Weber",pr:[["Anforderungen aufnehmen (Workshop)","1 von 2"],["Dokumenttypen, Kennbegriffe und Aufgaben aus sellify übernehmen","8 von 8 Typen"]],ms:["Konzept freigegeben","06.11.",false]},
+ {id:"p2",n:"Anbindung sellify & Postfächer",st:"open",from:"09.11.",to:"20.11.",er:"IT abcfinance",pr:[["Anschluss sellify einrichten","0 von 1"],["Eingangskanal Postfächer","0 von 3 Postfächern"]],ms:["Testsystem angebunden","20.11.",false]},
+ {id:"p3",n:"Anlernen je Dokumenttyp",st:"open",par:1,from:"23.11.",to:"11.12.",er:"Markus Hahn",pr:[["Dokumenttyp anlernen und pflegen","0 von 8 Typen"]],ms:["Treffsicherheit je Typ über der Schwelle","11.12.",false]},
+ {id:"p3b",n:"Testmengen vorbereiten",st:"open",par:1,from:"23.11.",to:"04.12.",er:"Fachabteilungen",pr:[["Beispieldokumente je Typ bereitstellen","0 von 8"]],ms:["Testmengen vollständig","04.12.",false]},
+ {id:"p4",n:"Schattenbetrieb & Übernahme",st:"open",from:"14.12.",to:"29.01.",er:"Sandra Weber",pr:[["Posteingangsverarbeitung im Schattenbetrieb","parallel zur heutigen Verarbeitung"],["Übernahme Typ für Typ","0 von 8"]],ms:["Abnahme: ASS übernimmt den Posteingang","29.01.",false]}
+];
+const PHS={done:["p-ok","abgenommen"],run:["p-run","läuft"],open:["p-open","geplant"]};
+
+/* ---------- Aufträge ---------- */
+const JOBS={af:[
+ ["Mail Hoffmann Druck · Ihr Schreiben vom 02.10.","Posteingangsverarbeitung · Schritt „Mensch prüft“ · Sicherheit 71 %","durch Ereignis · Postfach Service","p-wait","Mensch prüft",4],
+ ["Mail Kanzlei Berger & Partner · Insolvenzverfahren","Posteingangsverarbeitung · direkt an Stefan Krause","durch Ereignis · Postfach Service","p-bad","Eskalation",6],
+ ["Mail Elektro Yilmaz · Rechnungskopie","→ Rechnungskopie senden · Antwort wartet auf Freigabe","durch Ereignis · Postfach Service","p-wait","Freigabe",7],
+ ["Mail m.schulz@… · Frage","Posteingangsverarbeitung · kein Anliegen erkannt","durch Ereignis · Postfach Service","p-wait","Mensch prüft",9],
+ ["Mail Metallbau Krüger · Widerspruch zur Abrechnung","→ Vertragsreklamation bearbeiten · Schritt 3 von 5","durch Ereignis · Postfach Verträge","p-run","läuft",1],
+ ["Mail Praxis Dr. Sommer · Vorzeitige Ablösung","→ Ablöseanfrage beantworten · bei Tobias Brandt","durch Ereignis · Postfach Service","p-run","läuft",2],
+ ["Mail Spedition Wolff · Zahlung Rechnung 2026-08812","→ Zahlungsklärung · Schritt 1 von 2","durch Ereignis · Postfach Buchhaltung","p-run","läuft",3],
+ ["Mail Bäckerei Lange · Kündigung","→ Kündigung bearbeiten · Schritt 2 von 3","durch Ereignis · Postfach Verträge","p-run","läuft",5],
+ ["Mail Autohaus Peters · Versicherungsnachweis","→ Versicherungsnachweis ablegen · erledigt","durch Ereignis · Postfach Verträge","p-ok","erledigt",8],
+ ["Anlernlauf Insolvenzmitteilung","Dokumenttyp anlernen und pflegen · Schritt 3 von 5","im Projekt: Einführung ASS","p-run","läuft",0]
+]};
+
+/* ---------- Agenten & Skills ---------- */
+const SKC={"postfach-lesen":["E-Mails und Anhänge aus Postfächern lesen, auch Scans",2,0],"posteingang-einordnen":["Dokumenttyp erkennen · Kern + Profil je Dokumenttyp",2,0],"vertrag-zuordnen":["Kontakt und Vertrag in sellify finden",2,0],"sellify-aufgabe-anlegen":["Aufgabe in sellify anlegen, Person und Organisation verknüpft",2,0],"dokument-ablegen":["Mail und Anhänge am Vertrag ablegen",2,0],"prozess-fuehren":["Prozess führen: Schritte vergeben, prüfen, eskalieren",0,0],"kennbegriffe-vorschlagen":["aus Beispielen Kennbegriffe und Schwellen vorschlagen",1,1],"testlauf-auswerten":["Testmenge einordnen und Treffsicherheit messen",1,0],"reklamation-vorpruefen":["Reklamation gegen Abrechnung und Vertrag vorprüfen",2,0],"email-erstellung":["E-Mails im Hausstil, Versand nach Freigabe",2,1],"kuendigung-bearbeiten":["Kündigung prüfen, Vertragsende vorschlagen",2,1],"abloese-angebot":["Ablöseangebot vorbereiten, Berechnung bestätigt ein Mensch",2,1],"zahlung-abgleichen":["Zahlung gegen offene Posten abgleichen",2,0],"stammdaten-aendern":["Stammdatenänderung vorschlagen und übernehmen",2,1],"rechnungskopie-senden":["Rechnung heraussuchen und Antwort entwerfen",2,1]};
+const AG=[
+ {n:"Posteingangs-Agent",d:"Posteingang & Auftragssteuerung",t:"liest neue Mails und Anhänge aus den Postfächern",sk:["postfach-lesen"],lim:-1,prof:"Schnell & günstig",resp:"Markus Hahn",r:"Mitarbeiter",inn:["Posteingangsverarbeitung"],ver:"v1",p:{lesen:1,anlegen:0,mail:0,loeschen:0}},
+ {n:"Klassifizierungs-Agent",d:"Posteingang & Auftragssteuerung",t:"erkennt Dokumenttyp und Anliegen, prüft gegen die Kennbegriffe",sk:["posteingang-einordnen"],lim:-1,prof:"Gründlich prüfen",resp:"Markus Hahn",r:"Mitarbeiter",inn:["Posteingangsverarbeitung"],ver:"v3",p:{lesen:1,anlegen:0,mail:0,loeschen:0}},
+ {n:"Zuordnungs-Agent",d:"Posteingang & Auftragssteuerung",t:"findet Kontakt und Vertrag, legt Aufgaben an, startet den Folgeprozess",sk:["vertrag-zuordnen","sellify-aufgabe-anlegen","dokument-ablegen"],lim:-1,prof:"Schnell & günstig",resp:"Markus Hahn",r:"Mitarbeiter",inn:["Posteingangsverarbeitung","Vertragsreklamation bearbeiten","Ablöseanfrage beantworten","Versicherungsnachweis ablegen"],ver:"v2",p:{lesen:1,anlegen:1,mail:0,loeschen:0}},
+ {n:"Anlern-Agent",d:"Posteingang & Auftragssteuerung",t:"lernt Dokumenttypen aus Beispielen an und misst die Treffsicherheit",sk:["kennbegriffe-vorschlagen","testlauf-auswerten"],lim:-1,prof:"Gründlich prüfen",resp:"Markus Hahn",r:"Mitarbeiter",inn:["Dokumenttyp anlernen und pflegen"],ver:"v1",p:{lesen:1,anlegen:0,mail:0,loeschen:0}},
+ {n:"Posteingangs-Prozessagent",d:"Posteingang & Auftragssteuerung",t:"führt Posteingangsverarbeitung und Anlernen, entscheidet nach Schwelle",sk:["prozess-fuehren"],lim:-1,prof:"Gründlich prüfen",resp:"Markus Hahn (ergebnisverantwortlich)",r:"Prozessverantwortlich",inn:["Posteingangsverarbeitung","Dokumenttyp anlernen und pflegen"],ver:"v1",p:{lesen:1,anlegen:0,mail:0,loeschen:0}},
+ {n:"Reklamations-Agent",d:"Vertragsservice",t:"prüft Reklamationen vor und entwirft Antworten",sk:["reklamation-vorpruefen","email-erstellung"],lim:-1,prof:"Gründlich prüfen",resp:"Julia Neumann",r:"Mitarbeiter",inn:["Vertragsreklamation bearbeiten"],ver:"v1",p:{lesen:1,anlegen:1,mail:1,loeschen:0}},
+ {n:"Vertrags-Agent",d:"Vertragsservice",t:"Kündigungen, Ablöseangebote, Wiedervorlagen",sk:["kuendigung-bearbeiten","abloese-angebot","email-erstellung"],lim:-1,prof:"Texte",resp:"Julia Neumann",r:"Mitarbeiter",inn:["Ablöseanfrage beantworten","Kündigung bearbeiten","Versicherungsnachweis ablegen"],ver:"v1",p:{lesen:1,anlegen:1,mail:1,loeschen:0}},
+ {n:"Forderungs-Agent",d:"Forderungsmanagement",t:"gleicht Zahlungen ab, bereitet Forderungsanmeldungen vor",sk:["zahlung-abgleichen","email-erstellung"],lim:-1,prof:"Gründlich prüfen",resp:"Stefan Krause",r:"Mitarbeiter",inn:["Zahlungsklärung","Insolvenzmitteilung bearbeiten"],ver:"v1",p:{lesen:1,anlegen:1,mail:0,loeschen:0}},
+ {n:"Stammdaten-Agent",d:"Stammdaten",t:"liest Änderungen aus und übernimmt sie nach Freigabe",sk:["stammdaten-aendern"],lim:-1,prof:"Schnell & günstig",resp:"Peter Vogt",r:"Mitarbeiter",inn:["Stammdatenänderung übernehmen"],ver:"v1",p:{lesen:1,anlegen:1,mail:0,loeschen:0}},
+ {n:"Antwort-Agent",d:"Kundenservice",t:"beantwortet einfache Anfragen, z. B. Rechnungskopien",sk:["rechnungskopie-senden","email-erstellung"],lim:-1,prof:"Texte",resp:"Aylin Demir",r:"Mitarbeiter",inn:["Rechnungskopie senden"],ver:"v2",p:{lesen:1,anlegen:1,mail:1,loeschen:0}}
+];
+const CONN={af:[["CRM","s","#30ABE2","sellify","Mandant „abcfinance“","Kontakt, Vertrag, Aufgabe, Arbeitskorb, Dokument, E-Mail, Projekt","p-ok","verbunden"],["Eingangskanal","✉","#2c4a5e","Postfächer Service · Verträge · Buchhaltung","direkt (Exchange / Microsoft 365) oder Abholung über sellify – offen","neue E-Mail als Auslöser, Anhänge","p-wait","Erweiterung"],["Bibliothek","s","#30ABE2","sellify-Dokumentarchiv","Beispieldokumente je Dokumenttyp","Lernbeispiel, Vorlage","p-ok","verbunden"]]};
+const ROUTES={af:TYPES.map(t=>[t.n,"sellify · "+(t.mode==="person"?(t.id==="ins"?"direkt an die Leitung "+TEAMS[t.team]:"zuständige Person laut Vertrag, sonst Arbeitskorb "+TEAMS[t.team]):"Arbeitskorb "+TEAMS[t.team]),"Skill sellify-aufgabe-anlegen · Folgeprozess „"+t.proc+"“",t.st==="aktiv"?"p-ok":"p-wait",t.st==="aktiv"?"aktiv":t.st]).concat([["Unklar oder unter der Schwelle","sellify · Arbeitskorb Posteingang & Auftragssteuerung","Schritt „Mensch prüft“","p-ok","aktiv"]])};
+
+/* ---------- Mein Tag ---------- */
+const SRC={cw:["◧","Cowork"],cc:["⌘","Claude Code"],mob:["▯","Handy-Chat"],plan:["◷","Geplante Aufgabe"],proc:["↝","Prozess-Auftrag"]};
+const SESS=[
+ {t:"Insolvenzmitteilung Nordlicht Events",src:"proc",l:"wait",as:"Posteingang · Eskalation",st:"Stefan Krause abwesend, Vertretung ohne Reaktion – an dich eskaliert.",nx:"Vorgang öffnen und an das Forderungsmanagement geben",res:"Vorgang im Posteingang",ago:"vor 6 Min.",mail:6},
+ {t:"Hoffmann Druck: Vertrag unklar",src:"proc",l:"wait",as:"Posteingang · Mensch prüft",st:"Sicherheit 71 % unter der Schwelle von 85 %, zwei mögliche Verträge. Seit 35 Min. offen.",nx:"Vertrag wählen und bestätigen",res:"Vorgang im Posteingang",ago:"vor 35 Min.",mail:4},
+ {t:"Kennbegriffe Vertragsreklamation (v4)",src:"plan",l:"wait",as:"Dokumenttyp anlernen und pflegen",st:"Nächtlicher Anlernlauf: 4 neue Kennbegriffe, Testlauf 78 → 84 %.",nx:"Vorschlag lesen und freigeben",res:"Skill-Profil Vertragsreklamation v4 (Entwurf)",ago:"6:10"},
+ {t:"Schattenbetrieb Woche 2 – Auswertung",src:"plan",l:"check",as:"Projekt Einführung ASS",st:"KI richtig in 91 % der Fälle, Begriffsregel allein in 79 % (Beispielwerte).",nx:"Auswertung prüfen",res:"Bericht Schattenbetrieb KW 41",ago:"7:00"},
+ {t:"Tagesbriefing",src:"plan",l:"check",as:"projektübergreifend",st:"Morgenübersicht um 7:30 erstellt.",nx:"Lesen",res:"Morgenübersicht",ago:"7:30"},
+ {t:"Posteingang heute",src:"proc",l:"run",as:"Posteingangsverarbeitung",st:"214 Mails seit 7 Uhr, 198 verteilt, 16 prüft das Team.",nx:"nichts – läuft",res:"–",ago:"gerade eben"},
+ {t:"Anlernlauf Insolvenzmitteilung",src:"proc",l:"run",as:"Dokumenttyp anlernen und pflegen",st:"40 Beispiele eingelesen, Testlauf läuft.",nx:"nichts – läuft",res:"–",ago:"vor 20 Min."},
+ {t:"Arbeitskorb-Zuschnitt Vertragsservice",src:"cw",l:"rest",as:"Projekt Einführung ASS",st:"Entwurf mit drei Körben, keine Rückmeldung.",nx:"weitermachen oder archivieren",res:"Notizen",ago:"vor 6 Tagen"}
+];
+const LANES=[["wait","Wartet auf mich","p-wait"],["check","Fertig – zu prüfen","p-run"],["run","Läuft","p-open"]];
+const CAL=[["09:00","09:30","Jour fixe Posteingang","sellify"],["11:00","12:00","ASS-Konzept mit business//acts","sellify"],["14:00","15:00","Teamrunde Vertragsservice","sellify"]];
+const NOTE=[["Insolvenzmitteilung Nordlicht Events","Eskalation · an dich weitergeleitet"],["Hoffmann Druck","Mensch prüft · seit 35 Min. offen"],["Kennbegriffe Vertragsreklamation","wartet auf deine Freigabe"],["Schattenbetrieb Woche 2","Auswertung fertig – zu prüfen"],["Tagesbriefing","Morgenübersicht erstellt"]];
+
+/* ---------- KI-Assistent ---------- */
+const SCRIPT={
+ "Wie läuft der Posteingang heute?":`Seit 7 Uhr (Beispielwerte):<ul><li>214 Mails aus drei Postfächern</li><li>198 automatisch verteilt, 16 prüft das Team Posteingang</li><li>1 Eskalation: Insolvenzmitteilung Nordlicht Events, liegt bei dir</li><li>Häufigster Typ: Zahlungsklärung (61), dann Vertragsreklamation (38)</li></ul><div class="acts" style="margin-top:6px"><button class="btn sm acc" data-area="jobs">Zu den Aufträgen</button></div>`,
+ "Warum prüft bei Hoffmann Druck ein Mensch?":`Zwei Gründe: Für den Widerspruch liegt die Sicherheit mit 71 % unter der Schwelle von 85 % für Vertragsreklamationen, und zu Hoffmann Druck gibt es zwei Verträge. Mein Vorschlag: Vertrag 3120-1102, weil sich das Schreiben vom 02.10. darauf bezog. Die Adressänderung geht als zweiter Vorgang an die Stammdaten.<div class="acts" style="margin-top:6px"><button class="btn sm acc" data-job="4">Vorgang öffnen</button></div>`,
+ "Lerne den Dokumenttyp Insolvenzmitteilung an":`Der Prozess „Dokumenttyp anlernen und pflegen“ läuft bereits mit 40 Beispielen aus der Bibliothek. Vorschläge bisher: Eröffnungsbeschluss, vorläufige Insolvenz. Das Ergebnis kommt zur Freigabe an Markus Hahn und Stefan Krause; bis dahin prüft bei diesem Typ immer ein Mensch.`,
+ "Was wartet heute auf mich?":`<ul><li>Eskalation: Insolvenzmitteilung Nordlicht Events</li><li>Rückfrage: Hoffmann Druck, welcher Vertrag</li><li>Freigabe: 4 neue Kennbegriffe für Vertragsreklamation</li><li>Zu prüfen: Auswertung Schattenbetrieb Woche 2</li></ul><div class="acts" style="margin-top:6px"><button class="btn sm acc" data-gotag>Zu „Mein Tag“</button></div>`
+};
+
+/* ===== abcfinance · Ansichten für den Kern v2 =====
+   Nutzt die abcfinance-Daten aus ../data.js (dieselben Daten wie die bisherige Fassung)
+   und baut daraus die Seiten nach dem Bodo-Muster. */
+const A={sel:4};
+const ATT={3:"Zahlungsavis_2026-08812.pdf",8:"Police_7781-3310.pdf"};
+const short=n=>n.split(" / ")[0];
+const stChip=m=>({pruefen:K.chip("Mensch prüft","warn",true),freigabe:K.chip("wartet auf Freigabe","info",true),auto:K.chip("verteilt","ok",true),done:K.chip("erledigt","ok",true)}[m.st]);
+const unclear=m=>/nicht eindeutig|möglich/.test(m.vertrag+m.kontakt);
+const pIdx=n=>PROC.af.findIndex(p=>p.n===n);
+const agIdx=n=>AG.findIndex(a=>a.n===n);
+const lv=a=>a.sk.reduce((m,k)=>Math.max(m,(SKC[k]||[0,0])[1]),0);
+const LVN2=["0 · ohne Personendaten","1 · pseudonymisiert","2 · personenbezogen"];
+const procChip=p=>K.chip(p.st,{"aktiv":"ok","im Test":"info","Entwurf":""}[p.st]);
+const mailNum=m=>"V-2026-10-04"+String(m.id).padStart(2,"0");
+const snippet=m=>m.body.split("\n").filter(l=>!/^(sehr geehrte|hallo|guten tag)/i.test(l.trim()))[0]||"";
+function aiBox(m){const t=T(m.type);const R=[[t.n+(/^\d{4}-\d{4}$/.test(m.vertrag)?` zu Vertrag ${m.vertrag}`:unclear(m)&&m.id===4?" zu Vertrag 3120-1102":""),`→ ${target(t,m)} · Folgeprozess „${t.proc}“`]];
+ if(m.also){const a=T(m.also[0]);R.push([a.n,`→ ${target(a)} · Änderung nach Freigabe`])}
+ const done=m.st==="auto"||m.st==="done";
+ return `<div class="k-ai"><div class="t">✦ Vorschlag der KI${R.length>1?` · ${R.length} Vorgänge`:""}</div>${R.map((r,i)=>`<div class="k-air"><span class="n">${i+1}</span><div><b>${esc(r[0])}</b><br><span class="k-lbl">${esc(r[1])}</span></div>${done?`<span class="r">${K.chip("übernommen","ok")}</span>`:`<span class="r">${K.btn("Übernehmen",`data-ok="${m.id}"`,true,true)}</span>`}</div>`).join("")}<div class="why">Warum: ${esc(m.why)}${m.ki<t.thr?` Sicherheit unter der Schwelle von ${t.thr} %, deshalb prüft ein Mensch.`:""}</div></div>`}
+function mailBody(m){const t=T(m.type);const hits=cover(m.body,t).hits.concat(m.also?cover(m.body,T(m.also[0])).hits:[]);
+ return `<div class="abc-from"><span class="k-pa">${K.ini(m.from)}</span><div><b>${esc(m.from)}</b><div class="k-lbl">an Postfach ${m.box} · 12.10.2026, ${m.tm} · ${ATT[m.id]?"1 Anhang":"keine Anhänge"}</div></div></div>
+ <div class="abc-txt">${markText(m.body,hits)}</div>${ATT[m.id]?`<div style="margin-top:10px">${K.chip("📎 "+ATT[m.id])}</div>`:""}`}
+function mailActs(m,sm){return m.st==="pruefen"?K.btn("Anders einordnen",`data-fix="${m.id}"`,false,sm)+" "+K.btn("Bestätigen und weitergeben",`data-ok="${m.id}"`,true,sm):m.st==="freigabe"?K.btn("Antwort ansehen",`data-toast="Antwortentwurf mit Rechnungskopie (Prototyp)"`,false,sm)+" "+K.btn("Antwort freigeben",`data-ok="${m.id}"`,true,sm):K.btn("Einordnung korrigieren",`data-fix="${m.id}"`,false,sm)}
+function einMeters(m){const t=T(m.type),r=bestRule(m.body)[0];return meter("KI · "+short(t.n),m.ki,m.ki<t.thr?"lo":"ki")+(m.also?meter("KI · "+short(T(m.also[0]).n),m.also[1],"ki"):"")+meter("Kennbegriffe (heute)",cover(m.body,t).pct||r.pct)}
+function protokoll(m){const t=T(m.type),low=m.ki<t.thr||t.st!=="aktiv",u=unclear(m);
+ return [["ok","✓",`<b>Posteingangs-Agent</b> hat Mail und Anhänge gelesen`,m.tm],
+  ["ok","✓",`<b>Klassifizierungs-Agent</b> hat ${m.also?"2 Anliegen":"das Anliegen"} erkannt · ${esc(t.n)} ${m.ki} %${m.also?` · ${esc(T(m.also[0]).n)} ${m.also[1]} %`:""} · Kennbegriffe ${cover(m.body,t).pct} %`,m.tm],
+  [low||u?"warn":"ok",low||u?"!":"✓",`<b>Posteingangs-Prozessagent</b> entscheidet: ${low||u?`Mensch prüft – ${t.st!=="aktiv"?"Dokumenttyp im Anlernen":m.ki<t.thr?`unter der Schwelle von ${t.thr} %`:"Vertrag nicht eindeutig"}`:`sicher genug (Schwelle ${t.thr} %)`}`,m.tm],
+  [m.st==="pruefen"?"now":low||u?"ok":"skip",m.st==="pruefen"?"…":low||u?"✓":"–",`<b>Team Posteingang</b> ${m.st==="pruefen"?"prüft – offen":low||u?"hat bestätigt":"– nicht nötig"}`,""],
+  [u&&m.st==="pruefen"?"warn":"ok",u&&m.st==="pruefen"?"!":"✓",`<b>Zuordnungs-Agent</b> · ${esc(m.kontakt)} · Vertrag ${esc(m.vertrag)}`,m.tm],
+  [m.st==="pruefen"?"skip":"ok",m.st==="pruefen"?"–":"✓",`<b>Zuordnungs-Agent</b> ${m.st==="pruefen"?"startet den Folgeprozess nach der Prüfung":`hat „${esc(t.proc)}“ gestartet · ${esc(target(t,m))}`}`,""]]}
+
+/* ---------- Ansichten ---------- */
+const V={};
+V.dashboard=()=>{const nE=WAIT.af.filter(w=>w.k==="Eskalation").length,nP=MAILS.filter(m=>m.st==="pruefen").length,nF=MAILS.filter(m=>m.st==="freigabe").length+WAIT.af.filter(w=>w.k==="Freigabe").length;const pr=PROC.af;
+ return K.dash({hello:`Guten Tag, <em>${ME.n.split(" ")[0]}</em>`,sub:"Montag, 12. Oktober 2026 · Dein Überblick für heute",stand:"Stand heute, 14:47 Uhr · Beispieldaten",groups:[
+  {t:"BRAUCHT AUFMERKSAMKEIT",s:"Was heute hakt · Klick öffnet den Bereich",tiles:[
+   {t:"Eskalationen",k:"Jetzt",n:nE,c:"var(--danger)",d:"Insolvenzmitteilung Nordlicht Events – an dich eskaliert",go:K.go("vorgang",6)},
+   {t:"Mensch prüft",k:"Posteingang",n:nP,c:"#C2650A",d:"Ältester Fall seit 35 Min.: Hoffmann Druck",go:K.go("posteingang")},
+   {t:"Freigaben",k:"Für dich",n:nF,c:"var(--brand)",d:"Kennbegriffe Vertragsreklamation v4 · Antwort Elektro Yilmaz",go:K.go("meinearbeit")},
+   {t:"Fristen",k:"Nächste Tage",kp:[[0,"überfällig"],[2,"morgen"],[5,"diese Woche"]],c:"#C2650A",d:"Reklamation Metallbau Krüger fällig am 13.10.",go:K.go("auftraege")},
+   {t:"Testläufe",k:"Laufend",n:1,c:"var(--info)",d:"Anlernlauf Insolvenzmitteilung · Schritt 3 von 5",go:K.go("dokumenttyp","ins")},
+   {t:"Vorschläge",k:"Prozesse",n:SUG.filter(s=>s.s==="offen").length,c:"var(--ai)",d:"z. B. „Anfrage ohne Anliegen klären“",go:K.go("prozesse","sug")}]},
+  {t:"BESTAND",s:"Wie viel wovon da ist · Klick öffnet die Übersicht",tiles:[
+   {t:"Posteingang heute",n:214,d:"198 verteilt · 91 % richtig im Schattenbetrieb",go:K.go("auftraege")},
+   {t:"Prozesse",n:pr.length,d:`${pr.filter(p=>p.st==="aktiv").length} aktiv · ${pr.filter(p=>p.st==="im Test").length} im Test · ${pr.filter(p=>p.st==="Entwurf").length} Entwurf`,go:K.go("prozesse")},
+   {t:"Dokumenttypen",n:TYPES.length,d:`${TYPES.filter(t=>t.st==="aktiv").length} aktiv · ${TYPES.filter(t=>t.st!=="aktiv").length} im Anlernen`,go:K.go("dokumenttypen")},
+   {t:"Agenten",n:AG.length,d:`in ${ORG.af.length} Abteilungen`,go:K.go("agenten")},
+   {t:"Abteilungen",n:ORG.af.length,d:`${ORG.af.reduce((s,d)=>s+d.ppl.length+1,0)} Menschen`,go:K.go("organigramm")},
+   {t:"Projekte",n:PROJ.af.length,d:"Einführung ASS · Phase 1",go:K.go("projekte")}]}]})+`<div class="k-note">Alle Zahlen sind Beispieldaten.</div>`};
+
+V.meinearbeit=()=>{const L=[["wait","Wartet auf mich"],["check","Zu prüfen"],["run","Läuft"],["rest","Ruhend"]];const cur=K.tab("meinearbeit","wait");const R=SESS.filter(s=>s.l===cur);
+ const goOf=s=>s.mail?K.go("vorgang",s.mail):/Kennbegriffe/.test(s.t)?K.go("dokumenttyp","rek"):/Insolvenz/.test(s.t)?K.go("dokumenttyp","ins"):/Schattenbetrieb/.test(s.t)?K.go("projekt","ass"):/Posteingang/.test(s.t)?K.go("posteingang"):`data-toast="Öffnet „${esc(s.t)}“ (Prototyp)"`;
+ return K.list({title:"Meine Arbeit",chips:[K.chip("Beispieldaten","ex")],view:"meinearbeit",tabs:L.map(([k,l])=>[k,l,SESS.filter(s=>s.l===k).length]),
+  cols:["Quelle","Vorgang","Stand","Jetzt tun","Zuordnung"],rows:R.map(s=>[`<span class="k-lbl">${SRC[s.src][0]} ${SRC[s.src][1]}</span><br><span class="k-lbl">${s.ago}</span>`,`<span class="nm">${esc(s.t)}</span>`,esc(s.st),`<b>${esc(s.nx)}</b>`,K.chip(esc(s.as||"offen"))]),rowGo:i=>goOf(R[i]),
+  note:"Vorgänge aus Prozessen, die auf dich eskaliert sind oder deine Freigabe brauchen, erscheinen hier wie eigene Aufgaben."})};
+
+V.posteingang=()=>{const box=K.tab("pe_box","Alle"),stf=K.tab("pe_st","alle");
+ const boxes=["Alle","Service","Verträge","Buchhaltung"];const SF=[["pruefen","Mensch prüft"],["freigabe","Freigabe"],["auto","Verteilt"],["alle","Alle"]];
+ const inBox=MAILS.filter(m=>box==="Alle"||m.box===box);const L=inBox.filter(m=>stf==="alle"||m.st===stf||(stf==="auto"&&m.st==="done"));
+ if(!L.find(m=>m.id===A.sel)&&L[0])A.sel=L[0].id;const m=MAILS.find(x=>x.id===A.sel)||L[0];
+ const list=`<div class="abc-filter">${SF.map(([k,l])=>`<button class="abc-f" data-tab="pe_st|${k}" aria-pressed="${k===stf}">${l} <small>${inBox.filter(x=>k==="alle"||x.st===k||(k==="auto"&&x.st==="done")).length}</small></button>`).join("")}</div>
+  <div class="scroll">${L.map(x=>{const t=T(x.type);return `<button class="k-it" data-sel="${x.id}" aria-current="${x.id===m?.id}"><div class="a"><b>${esc(x.from)}</b><span class="k-lbl">${x.tm}</span></div><div class="s">${esc(x.subj)}</div><div class="x">${esc(snippet(x))}</div><div class="ch">${K.chip(esc(short(t.n))+(x.also?" + 1":""),"info")}${stChip(x)}</div></button>`}).join("")||'<div class="k-sb k-note">Keine Mails mit diesem Status.</div>'}</div>`;
+ const det=m?`<div class="abc-dh"><div class="abc-row"><h2>${esc(m.subj)}</h2>${stChip(m)}<span class="k-sp"></span>${K.btn("⤢ Vorgang öffnen",K.go("vorgang",m.id),false,true)}</div>
+  <div class="abc-row">${mailActs(m,true)}</div>${aiBox(m)}${mailBody(m)}
+  <div class="k-card" style="padding:12px 14px;display:flex;flex-direction:column;gap:8px"><b>Einordnung</b>${einMeters(m)}${K.kv([["Kontakt",esc(m.kontakt)],["Vertrag",esc(m.vertrag)],["Ziel",esc(target(T(m.type),m))]])}</div></div>`:'<div class="k-sb k-note">Keine Mail ausgewählt.</div>';
+ return {fix:true,html:K.inbox({head:K.pageHead("Posteingang",{chips:[K.chip("Beispieldaten","ex")],actions:K.btn("Jetzt abrufen",'data-toast="Postfächer abgerufen – keine neuen Mails (Prototyp)"')})+`<div class="k-tabs" role="tablist">${boxes.map(b=>`<button class="k-tab" role="tab" aria-selected="${b===box}" data-tab="pe_box|${b}">${b==="Alle"?"Alle Postfächer":"Postfach "+b} <small>${MAILS.filter(x=>b==="Alle"||x.box===b).length}</small></button>`).join("")}</div>`,list,detail:det})}};
+
+V.vorgang=id=>{const m=MAILS.find(x=>x.id===+id)||MAILS[3];const t=T(m.type);const pe=PROC.af[0];const u=unclear(m);
+ const kon=m.kontakt.split(" · ");const fol=PROC.af[pIdx(t.proc)];const sim=MAILS.filter(x=>x.type===m.type&&x.id!==m.id);
+ const chron=[["ok","✉",`Mail im Postfach ${m.box} eingegangen`,m.tm],["ok","✦",`KI-Einordnung: ${esc(t.n)} (${m.ki} %)`,m.tm]].concat(m.st==="pruefen"?[["warn","!","An Team Posteingang zur Prüfung gegeben",m.tm]]:[]).concat(m.id===6?[["warn","↑","Stefan Krause abwesend · Vertretung ohne Reaktion · an Sandra Weber eskaliert","10:52"]]:[]).concat(m.st==="auto"||m.st==="done"?[["ok","→",`Verteilt: ${esc(target(t,m))}`,m.tm]]:[]);
+ const empty=["Wiedervorlagen","Notizen","Antworten"].concat(sim.length?[]:["Ähnliche Fälle"]);
+ return K.detail({title:esc(m.subj),num:mailNum(m),
+  chips:[K.chip("✉ Vorgang"),K.chip(esc(t.n)+(m.also?" + 1":""),"info"),stChip(m),K.chip(`KI ${m.ki} %`,m.ki<t.thr?"warn":"ok"),m.id===6?K.chip("hohe Priorität","bad"):m.st==="pruefen"?K.chip("seit 35 Min.","bad"):""],
+  actions:mailActs(m),
+  cards:[{t:"Einordnung",r:`<span class="k-lbl">Schwelle ${short(t.n)} ${t.thr} %</span>`,b:einMeters(m)+`<span class="k-lbl">${m.also?"Zwei Anliegen erkannt · ":""}Kennbegriffe als Gegenprüfung</span>`},
+   {t:"Zuordnung in sellify",r:u?K.chip("nicht eindeutig","warn"):K.chip("eindeutig","ok"),b:K.kv([["Organisation",`<span class="k-lnk">${esc(kon[0])}</span>`],["Person",kon[1]?`<span class="k-lnk">${esc(kon[1])}</span>`:"–"],["Vertrag",esc(m.vertrag)],["Ziel",esc(target(t,m))]])},
+   {t:"Zuständigkeit",r:K.btn("Übernehmen",'data-toast="Du hast den Vorgang übernommen (Prototyp)"',false,true),b:K.agent(pe.pa,"führt")+(m.st==="pruefen"?K.person("LK","Lisa Koch","prüft jetzt"):m.person?K.person(K.ini(m.person),m.person,"bearbeitet"):K.person("AK","Arbeitskorb "+TEAMS[t.team],"bearbeitet"))+K.person("MH",pe.er,"ergebnisverantwortlich")+`<span class="k-lbl">Prozess ${pe.n} · ${m.st==="pruefen"?"Schritt 4 von 6":"abgeschlossen → "+esc(t.proc)}</span>`}],
+  sections:[
+   {id:"mail",t:"✉ Mail & Anhänge",n:ATT[m.id]?2:1,a:K.btn("In sellify öffnen",'data-toast="Öffnet die Mail in sellify (Prototyp)"',false,true)+K.btn("Antworten",'data-toast="Antwort an den Kunden – Versand nach Freigabe (Prototyp)"',false,true),b:`<div class="abc-mail"><div>${mailBody(m)}</div>${aiBox(m)}</div>`},
+   {id:"prot",t:"↝ Protokoll",n:6,a:`<span class="k-lbl">jeder Schritt mit Ergebnis, Sicherheit und Begründung</span> ${EXT}`,flush:true,b:K.timeline(protokoll(m))},
+   {id:"aufg",t:"☑ Aufgaben",n:fol?fol.steps.length:0,a:`<span class="k-lbl">aus dem Folgeprozess „${esc(t.proc)}“</span>`,flush:true,b:fol?K.table(["Schritt","Wer","Freigabe / Hinweis","Status"],fol.steps.map((s,i)=>[esc(s.n),s.ag==="–"?"Mensch":"✦ "+esc(s.ag),esc(s.fr||"–"),m.st==="pruefen"?K.chip("noch nicht angelegt"):i===0?K.chip("angelegt","ok"):K.chip("geplant")])):""},
+   {id:"chron",t:"◷ Chronik",n:chron.length,flush:true,b:K.timeline(chron)},
+   {id:"aehn",t:"≈ Ähnliche Fälle",n:sim.length,hide:!sim.length,flush:true,b:K.table(["Vorgang","Absender","Status"],sim.map(x=>[`<span class="nm">${esc(x.subj)}</span>`,esc(x.from),stChip(x)]),{rowGo:i=>K.go("vorgang",sim[i].id)})}],
+  empty})};
+
+V.auftraege=()=>{const S=["alle","Mensch prüft","Freigabe","Eskalation","läuft","erledigt"];const cur=K.tab("auftraege","alle");const R=JOBS.af.filter(r=>cur==="alle"||r[4]===cur);
+ const cnt=[["Zahlungsklärung",61],["Vertragsreklamation",38],["Rechnungskopie / Anfrage",34],["Kündigung",27],["Adress- und Stammdaten",22],["Ablöseanfrage",15],["Versicherungsnachweis",9],["Insolvenzmitteilung",1],["unklar",7]];
+ return K.list({title:"Aufträge",chips:[K.chip("Beispieldaten","ex")],actions:K.btn("＋ Neuer Auftrag","data-neu",true),view:"auftraege",tabs:S.map(s=>[s,s==="alle"?"Alle":s,s==="alle"?JOBS.af.length:JOBS.af.filter(r=>r[4]===s).length]),
+  tools:`<span class="k-sp"></span><span class="k-lbl">Heute insgesamt 214 · je Dokumenttyp:</span> ${cnt.slice(0,4).map(([n,c])=>K.chip(`${n} <b>${c}</b>`)).join("")} ${EXT}`,
+  cols:["Auftrag","Prozess · Schritt","Herkunft","Status"],rows:R.map(r=>[`<span class="nm">${esc(r[0])}</span>`,esc(r[1]),K.chip(esc(r[2])),`<span class="pill ${r[3]}">${r[4]}</span>`]),rowGo:i=>R[i][5]?K.go("vorgang",R[i][5]):K.go("dokumenttyp","ins"),
+  note:"Jede Mail ist ein Auftrag im Prozess „Posteingangsverarbeitung“"})};
+
+V.prozesse=id=>{if(id){K.st.tab.prozesse=id;K.st.id=null}const cur=K.tab("prozesse","mine");const P=PROC.af;
+ const agentFor=sk=>AG.find(a=>a.sk.includes(sk));
+ let body;
+ if(cur==="tpl"){const L=TPL.filter(t=>!t.proj);body=`<div class="k-card"><div class="k-lh"><b>${L.length} Prozessvorlagen</b><span class="k-sp"></span>${K.chip("Branchenpaket Leasing & Finanzierung · Idee","ex")}</div>${K.table(["Vorlage","Bereich","Ablauf","Abdeckung durch Agenten",""],L.map(t=>{const gaps=t.sk.filter(k=>!agentFor(k));return [`<b>${esc(t.n)}</b>`,esc(t.f),`<span class="k-lbl">${esc(t.d)}</span>`,gaps.length?`<span class="pill p-wait">Lücke: ${gaps.join(", ")}</span>`:'<span class="pill p-ok">Agenten vorhanden</span>',K.btn("Übernehmen",`data-toast="„${esc(t.n)}“ als Entwurf übernommen – aktiv erst nach Testlauf (Prototyp)"`,false,true)]}))}</div>`}
+ else if(cur==="sug"){body=`<div class="k-card"><div class="k-lh"><b>${SUG.length} Vorschläge</b><span class="k-note">aus der Auswertung des Posteingangs, aus Vorlagen oder eigenem Prompt</span></div>${K.table(["Vorschlag","Quelle","Warum","Status",""],SUG.map((s,i)=>[`<b>${esc(s.n)}</b>`,esc(s.src),esc(s.why),s.s==="offen"?K.chip("offen"):K.chip(s.s,s.s==="übernommen"?"ok":""),s.s==="offen"?K.btn("Übernehmen",`data-sug="${i}|übernommen"`,true,true)+" "+K.btn("Später",`data-sug="${i}|später"`,false,true)+" "+K.btn("Ablehnen",`data-sug="${i}|abgelehnt"`,false,true):""]))}</div>`}
+ else body=`<div class="k-card"><div class="k-lh"><b>${P.length} Prozesse</b><input class="k-search" placeholder="Prozess, Abteilung, Agent suchen …" aria-label="Suchen"></div>${K.table(["Prozess","Abteilung","Schritte","Prozessverantwortlich","Ergebnisverantwortlich","Status","Aufträge"],P.map(p=>[`<span class="nm">${esc(p.n)}</span>`,esc(p.dep),p.steps.length,"✦ "+esc(p.pa),esc(p.er),procChip(p)+` <span class="k-lbl">${p.v}</span>`,`<span class="k-lbl">${esc(p.run)}</span>`]),{rowGo:i=>K.go("prozess",P[i].id)})}</div>`;
+ return K.pageHead("Prozesse",{chips:[K.chip("Beispieldaten","ex")],actions:K.btn("✦ Neu mit KI-Designer",'data-toast="Der Prozess-Designer wird im nächsten Schritt in den Kern übernommen (Prototyp)"',true)})+K.tabs("prozesse",[["mine","Meine Prozesse",P.length],["tpl","Vorlagen",TPL.filter(t=>!t.proj).length],["sug","Vorschläge",SUG.filter(s=>s.s==="offen").length]])+body};
+
+V.prozess=id=>{const p=PROC.af.find(x=>x.id===id)||PROC.af[0];const ags=[...new Set(p.steps.map(s=>s.ag).filter(a=>a!=="–").concat([p.pa]))];const jobs=JOBS.af.filter(r=>r[1].includes(p.n));
+ const isPe=p.id==="pe";
+ return K.detail({title:esc(p.n),num:"P-"+String(PROC.af.indexOf(p)+1).padStart(3,"0"),chips:[K.chip("↝ Prozess"),procChip(p),K.chip(p.v),K.chip(esc(p.dep))],
+  actions:K.btn("Testlauf",'data-toast="Testlauf mit Beispieldaten im Testsystem gestartet (Prototyp)"')+" "+K.btn("Auftrag starten","data-neu")+" "+K.btn("Im Designer öffnen",'data-toast="Der Prozess-Designer wird im nächsten Schritt in den Kern übernommen (Prototyp)"',true),
+  cards:[{t:"Steckbrief",b:K.kv([["Abteilung",`<button class="k-lnk" ${K.go("abteilung",ORG.af.findIndex(d=>d.n===p.dep))}>${esc(p.dep)}</button>`],["Version",p.v],["Schritte",p.steps.length],["Aufträge",esc(p.run)]])},
+   {t:"Verantwortung",b:K.agent(p.pa,"führt den Prozess")+K.person(K.ini(p.er),p.er,"ergebnisverantwortlich")+`<span class="k-lbl">Eskalation über Abteilungsleitung und Vertretung</span>`},
+   isPe?{t:"Heute",r:EXT,b:K.kv([["Aufträge","214"],["automatisch","198"],["Mensch prüft","16"],["richtig","91 % im Schattenbetrieb"]])}:{t:"Hinweis",b:`<span class="k-note">${esc(p.note||"Keine offenen Hinweise.")}</span>`}],
+  sections:[
+   {id:"ablauf",t:"↝ Ablauf",n:p.steps.length,flush:true,a:p.note?`<span class="k-lbl">${esc(p.note)}</span>`:"",b:K.table(["#","Schritt","Agent oder Mensch","Ersatz","Freigabe / Hinweis"],p.steps.map((s,i)=>[i+1,`<b>${esc(s.n)}</b>`,s.ag==="–"?"● Mensch":`<button class="k-lnk" ${K.go("agent",agIdx(s.ag))}>✦ ${esc(s.ag)}</button>`,esc(s.ers||"–"),s.fr?`<span class="pill p-wait">${esc(s.fr)}</span>`:"–"]))},
+   {id:"ag",t:"✦ Agenten",n:ags.length,b:ags.map(a=>`<button class="k-lnk" style="display:block;margin:4px 0" ${K.go("agent",agIdx(a))}>${K.agent(a,a===p.pa?"prozessverantwortlich":"")}</button>`).join("")},
+   {id:"auf",t:"☰ Aufträge",n:jobs.length,hide:!jobs.length,flush:true,b:K.table(["Auftrag","Stand","Status"],jobs.map(r=>[`<span class="nm">${esc(r[0])}</span>`,esc(r[1]),`<span class="pill ${r[3]}">${r[4]}</span>`]),{rowGo:i=>jobs[i][5]?K.go("vorgang",jobs[i][5]):""})},
+   {id:"esk",t:"↑ Eskalation",n:5,flush:true,b:K.timeline([["now","1","<b>Ausführender Agent</b> arbeitet den Schritt ab",""],["now","2",`<b>${esc(p.pa)}</b> wiederholt, nimmt den Ersatz-Agenten, stellt Rückfrage`,""],["now","3",`<b>${esc(p.er)}</b> entscheidet und nimmt ab`,""],["now","4","<b>Abteilungsleitung</b> wenn keine Reaktion",""],["now","5","<b>Vertretung</b> bei Abwesenheit oder Frist",""]])},
+   {id:"ver",t:"◷ Versionen",n:+p.v.slice(1),flush:true,b:K.timeline(Array.from({length:+p.v.slice(1)},(_,i)=>+p.v.slice(1)-i).map(v=>[v===+p.v.slice(1)?"ok":"skip","v"+v,v===+p.v.slice(1)?`<b>Version ${v}</b> · ${esc(p.st)}`:`Version ${v} · abgelöst`,""]))}],
+  empty:["Testläufe","Kommentare"].concat(jobs.length?[]:["Aufträge"])})};
+
+V.projekte=()=>K.list({title:"Projekte",chips:[K.chip("Beispieldaten","ex")],actions:K.btn("＋ Projekt aus Vorlage",'data-toast="Projektvorlage „Einführung KI-Prozess“ (Prototyp)"',true),cols:["Projekt","Art","Verwaltet in","Projektverantwortlich","Aktuelle Phase","Nächster Meilenstein"],
+ rows:PROJ.af.map(p=>[`<span class="nm">${esc(p.n)}</span>`,esc(p.kind),esc(p.sys),esc(p.pv[1]),esc(PH.find(x=>x.st==="run").n),"Konzept freigegeben · 06.11."]),rowGo:i=>K.go("projekt",PROJ.af[i].id),note:"Daten und Termine sind Annahmen"});
+
+V.projekt=id=>{const p=PROJ.af[0];const run=PH.find(x=>x.st==="run");
+ return K.detail({title:esc(p.n),num:"PR-2026-01",chips:[K.chip("▦ Projekt"),K.chip(p.kind),K.chip("läuft","info",true),K.chip("verwaltet in sellify")],actions:K.btn("In sellify öffnen",'data-toast="Öffnet das Projekt in sellify (Prototyp)"')+" "+K.btn("Auftrag im Projekt starten","data-neu",true),
+  cards:[{t:"Steckbrief",b:K.kv([["Vorlage",esc(p.tpl)],["Ablauf","automatisch aus der Vorlage"],["Zeitraum","12.10.2026 – 29.01.2027"]])},{t:"Verantwortung",b:K.person("SW",p.pv[1],"projektverantwortlich")+K.person("MH","Markus Hahn","Anlernen")+K.person("IT","IT abcfinance","Anbindung")},{t:"Fortschritt",r:AN,b:K.kv([["Aktuelle Phase",esc(run.n)],["Meilenstein",esc(run.ms[0])+" · "+run.ms[1]],["Phasen",`1 von ${PH.length} läuft`]])}],
+  sections:[{id:"ph",t:"▦ Phasen",n:PH.length,flush:true,b:K.table(["Phase","Zeitraum","Ergebnisverantwortlich","Ablauf","Status"],PH.map(x=>[`<b>${esc(x.n)}</b>`,`${x.from}–${x.to}`,esc(x.er),x.par?"parallel":"nacheinander",K.chip(PHS[x.st][1],x.st==="run"?"info":x.st==="done"?"ok":"")]))},
+   {id:"ms",t:"◆ Meilensteine",n:PH.length,flush:true,b:K.timeline(PH.map(x=>[x.ms[2]?"ok":x.st==="run"?"now":"skip","◆",`<b>${esc(x.ms[0])}</b> · Abnahme durch ${esc(x.er)}`,x.ms[1]]))},
+   {id:"pr",t:"↝ Prozesse je Phase",n:PH.reduce((s,x)=>s+x.pr.length,0),flush:true,b:K.table(["Phase","Prozess","Stand"],PH.flatMap(x=>x.pr.map(r=>[esc(x.n),`<b>${esc(r[0])}</b>`,esc(r[1])])))},
+   {id:"auf",t:"☰ Aufträge",n:1,flush:true,b:K.table(["Auftrag","Stand","Status"],[[`<span class="nm">Anlernlauf Insolvenzmitteilung</span>`,"Dokumenttyp anlernen und pflegen · Schritt 3 von 5",'<span class="pill p-run">läuft</span>']],{rowGo:()=>K.go("dokumenttyp","ins")})}],
+  empty:["Dokumente","Risiken"]})};
+
+V.organigramm=()=>K.pageHead("Organigramm",{chips:[K.chip("Beispieldaten","ex")],actions:K.btn("＋ Abteilung",'data-toast="Abteilung anlegen – ausblenden statt löschen (Prototyp)"')})+
+ `<div class="k-card abc-orgtop"><span class="big">${ME.ini}</span><div><b style="font-size:16px">${ME.rolle}</b><div class="k-note">${ME.n} · du · ${ME.dep}</div></div><span class="k-sp"></span>${K.agent("Persönlicher KI-Assistent",PSK.filter(x=>x[2]).length+" Fähigkeiten")}</div>
+ <div class="k-org">${ORG.af.map((d,i)=>`<button class="k-card k-dep" style="--c:${d.c}" ${K.go("abteilung",i)}><b style="font-size:15px">${esc(d.n)}</b>${K.person(d.lead[0],d.lead[1],"Leitung")}<span class="k-lbl">${esc(d.dep)} · ${d.ppl.length} Mitarbeitende · ${d.ag.length+d.pa.length} Agenten</span><span class="pill ${d.al?"p-wait":"p-ok"}" style="align-self:flex-start">${esc(d.al||d.ok)}</span></button>`).join("")}</div>`;
+
+V.abteilung=id=>{const d=ORG.af[+id]||ORG.af[0];const P=PROC.af.filter(p=>p.dep===d.n);const short2=d.n.split(" &")[0];const R=ROUTES.af.filter(r=>r[1].includes(short2));const ags=d.pa.map(x=>x[0]).concat(d.ag);
+ return K.detail({title:esc(d.n),num:"Abteilung",chips:[K.chip("⌂ Abteilung"),d.al?K.chip(esc(d.al),"warn",true):K.chip(esc(d.ok),"ok",true)],actions:K.btn("Bearbeiten",'data-toast="Abteilung bearbeiten (Prototyp)"'),
+  cards:[{t:"Leitung",b:K.person(d.lead[0],d.lead[1],"Leitung")+`<span class="k-lbl">${esc(d.dep)}</span>`},{t:"Arbeitskorb in sellify",r:UMD,b:K.kv([["Eingänge",`${R.length} Dokumenttypen`],["Offen","Beispiel: 9"],["Bearbeitung","in sellify"]])},{t:"Besetzung",b:K.kv([["Menschen",d.ppl.length+1],["Agenten",ags.length],["Prozesse",P.length]])}],
+  sections:[{id:"ma",t:"● Mitarbeitende",n:d.ppl.length+1,b:K.person(d.lead[0],d.lead[1],"Leitung")+d.ppl.map(p=>K.person(p[0],p[1])).join("")},
+   {id:"ag",t:"✦ Agenten",n:ags.length,b:ags.map(a=>`<button class="k-lnk" style="display:block;margin:4px 0" ${K.go("agent",agIdx(a))}>${K.agent(a,d.pa.some(x=>x[0]===a)?"prozessverantwortlich":"")}</button>`).join("")},
+   {id:"pr",t:"↝ Prozesse",n:P.length,flush:true,b:K.table(["Prozess","Status","Aufträge"],P.map(p=>[`<span class="nm">${esc(p.n)}</span>`,procChip(p),esc(p.run)]),{rowGo:i=>K.go("prozess",P[i].id)})},
+   {id:"korb",t:"⇥ Eingänge in den Arbeitskorb",n:R.length,hide:!R.length,flush:true,b:K.table(["Dokumenttyp","geht an","Status"],R.map(r=>[`<b>${esc(r[0])}</b>`,esc(r[1]),`<span class="pill ${r[3]}">${esc(r[4])}</span>`]))}],
+  empty:["Kennzahlen","Abwesenheiten"]})};
+
+V.dokumenttypen=()=>K.list({title:"Dokumenttypen",chips:[K.chip("Profile des Skills posteingang-einordnen","ai"),UMD],actions:K.btn("＋ Dokumenttyp anlernen",'data-toast="Neuer Dokumenttyp: Lernbeispiele in die Bibliothek, dann startet „Dokumenttyp anlernen und pflegen“ (Prototyp)"',true),
+ cols:["Dokumenttyp","Kennbegriffe","Lernbeispiele","Treffsicherheit "+EX,"Schwelle","Folgeprozess","Status"],
+ rows:TYPES.map(t=>[`<span class="nm">${esc(t.n)}</span>`,t.terms.length,t.docs,`<div style="min-width:190px">${t.rule?meter("Begriffe",t.rule):'<span class="k-lbl">noch keine Regel</span>'}${meter("KI",t.ki,"ki")}</div>`,t.thr+" %",esc(t.proc),K.chip(t.ver)+" "+K.chip(t.st,t.st==="aktiv"?"ok":"warn")]),rowGo:i=>K.go("dokumenttyp",TYPES[i].id)});
+
+V.dokumenttyp=id=>{const t=T(id)||TYPES[0];const txt=A.test??(MAILS.find(m=>m.type===t.id)?.body||"");const M=MAILS.filter(m=>m.type===t.id);const fol=PROC.af[pIdx(t.proc)];
+ return K.detail({title:esc(t.n),num:"Profil "+t.ver,chips:[K.chip("◆ Dokumenttyp"),K.chip("Skill posteingang-einordnen","ai"),K.chip(t.st,t.st==="aktiv"?"ok":"warn",true)],
+  actions:K.btn("Testlauf",`data-toast="Testlauf gegen ${t.docs} Lernbeispiele gestartet (Prototyp)"`)+" "+K.btn("Neue Version vorschlagen",'data-toast="Entwurf einer neuen Profil-Version – Freigabe durch Leitung Posteingang und Fachabteilung (Prototyp)"',true),
+  cards:[{t:"Treffsicherheit",r:EX,b:(t.rule?meter("Kennbegriffe",t.rule):'<span class="k-lbl">noch keine Begriffsregel</span>')+meter("KI-Agent",t.ki,"ki")+`<span class="k-lbl">gemessen an der Testmenge</span>`},
+   {t:"Ziel & Folgeprozess",b:K.kv([["Ziel",esc(target(t))],["Folgeprozess",fol?`<button class="k-lnk" ${K.go("prozess",fol.id)}>${esc(t.proc)}</button>`:esc(t.proc)],["Team",esc(TEAMS[t.team])]])},
+   {t:"Lernbasis",b:K.kv([["Lernbeispiele",t.docs],["Quelle","sellify-Dokumentarchiv"],["Kennbegriffe",t.terms.length],["Schwelle",t.thr+" %"]])}],
+  sections:[{id:"kb",t:"Kennbegriffe",n:t.terms.length,a:'<span class="k-lbl">heute in sellify gepflegt · Gewicht in Klammern</span>',b:`<div class="abc-terms">${t.terms.map(([d,,w])=>`<span class="abc-term">${esc(d)} <i>×${w}</i></span>`).join("")}</div>`},
+   {id:"vs",t:"✦ Vorschläge der KI",n:t.sug.length,a:EX,b:`<div class="abc-terms">${t.sug.map(([d,c])=>`<button class="abc-term new" data-toast="„${esc(d)}“ zur Freigabe vorgelegt – Teil der nächsten Profil-Version (Prototyp)">＋ ${esc(d)} <i>in ${c} Beispielen</i></button>`).join("")}</div><div class="k-note" style="margin-top:8px">Begriffe, die in vielen Lernbeispielen vorkommen, aber noch fehlen. Übernahme nur nach Freigabe.</div>`},
+   {id:"sw",t:"Schwelle",a:EXT,b:`<div class="abc-row"><input type="range" id="abc-thr" min="50" max="99" value="${t.thr}" data-thr="${t.id}" aria-label="Schwelle" style="flex:1"><b id="abc-thrv" style="width:48px;text-align:right">${t.thr} %</b></div><div class="k-note">Darunter prüft ein Mensch. Höher heißt sicherer, aber mehr Handarbeit.</div>`},
+   {id:"test",t:"Ausprobieren",b:`<textarea class="abc-ta" id="abc-test" aria-label="Testtext">${esc(txt)}</textarea><div id="abc-testout" style="display:flex;flex-direction:column;gap:4px;margin-top:8px">${bestRule(txt).slice(0,4).map(r=>meter(r.t.n,r.pct,r.pct<35?"lo":"")).join("")}</div><div class="k-note" style="margin-top:6px">Live berechnet: Deckungsgrad nach heutigem Prinzip. Die KI-Einschätzung ist im Prototyp nicht live.</div>`},
+   {id:"vg",t:"✉ Vorgänge",n:M.length,hide:!M.length,flush:true,b:K.table(["Vorgang","Absender","Status"],M.map(x=>[`<span class="nm">${esc(x.subj)}</span>`,esc(x.from),stChip(x)]),{rowGo:i=>K.go("vorgang",M[i].id)})},
+   {id:"ver",t:"◷ Versionen",n:+t.ver.slice(1),flush:true,b:K.timeline(Array.from({length:+t.ver.slice(1)},(_,i)=>+t.ver.slice(1)-i).map(v=>[v===+t.ver.slice(1)?"ok":"skip","v"+v,v===+t.ver.slice(1)?`<b>Version ${v}</b> · ${esc(t.st)}`:`Version ${v} · abgelöst`,""]))}],
+  empty:M.length?["Kommentare"]:["Vorgänge","Kommentare"]})};
+
+V.agenten=()=>{const cur=K.tab("agenten","ag");const SK=Object.keys(SKC);
+ const body=cur==="sk"?`<div class="k-card"><div class="k-lh"><b>${SK.length} Skills</b></div>${K.table(["Skill","Beschreibung","Datenstufe","Pflicht-Freigabe","genutzt von"],SK.map(k=>[`<b style="font-family:var(--mono);font-size:12.5px">${k}</b>`,esc(SKC[k][0]),"Stufe "+SKC[k][1],SKC[k][2]?K.chip("ja","warn"):"–",AG.filter(a=>a.sk.includes(k)).map(a=>esc(a.n)).join(", ")||"–"]))}</div>`
+ :`<div class="k-card"><div class="k-lh"><b>${AG.length} Agenten</b></div>${K.table(["Agent","Abteilung","Aufgabe","Skills","Rolle","Version","Datenstufe"],AG.map(a=>[`<span class="nm">✦ ${esc(a.n)}</span>`,esc(a.d),esc(a.t),a.sk.length,K.chip(a.r,a.r==="Mitarbeiter"?"":"info"),a.ver,"Stufe "+lv(a)]),{rowGo:i=>K.go("agent",i)})}</div>`;
+ return K.pageHead("Agenten & Skills",{chips:[K.chip("Beispieldaten","ex")],actions:K.btn("＋ Agent",'data-toast="Agent anlegen und Skills zuordnen (Prototyp)"',true)})+K.tabs("agenten",[["ag","Agenten",AG.length],["sk","Skills",SK.length]])+body};
+
+V.agent=id=>{const a=AG[+id]||AG[0];const P=[["lesen","Daten in sellify lesen"],["anlegen","Datensätze anlegen und ändern"],["mail","E-Mails versenden"]];
+ return K.detail({title:"✦ "+esc(a.n),num:a.ver,chips:[K.chip("Agent"),K.chip(a.r,a.r==="Mitarbeiter"?"":"info"),K.chip("Datenstufe "+lv(a),lv(a)>1?"warn":"")],actions:K.btn("Testlauf",'data-toast="Testlauf im Testsystem gestartet (Prototyp)"')+" "+K.btn("Bearbeiten",'data-toast="Skills und Rechte bearbeiten – neue Version mit Testlauf (Prototyp)"',true),
+  cards:[{t:"Steckbrief",b:K.kv([["Abteilung",esc(a.d)],["Aufgabe",esc(a.t)],["KI-Profil",esc(a.prof)+" (Beispiel)"]])},{t:"Zuständig",b:K.person(K.ini(a.resp),a.resp.replace(/ \(.*\)/,""),"Mensch")+`<span class="k-lbl">Ändert die Heimat-Abteilung den Agenten, bekommen betroffene Prozesse einen Testlauf.</span>`},{t:"Rechte",b:K.kv(P.map(([k,l])=>[l,a.p[k]?K.chip("erlaubt","ok"):K.chip("nicht erlaubt")]).concat([["Löschen",K.chip("nie","bad")]]))}],
+  sections:[{id:"sk",t:"Skills",n:a.sk.length,flush:true,b:K.table(["Skill","Beschreibung","Datenstufe","Pflicht-Freigabe"],a.sk.map(k=>[`<b style="font-family:var(--mono);font-size:12.5px">${k}</b>`,esc(SKC[k][0]),"Stufe "+SKC[k][1],SKC[k][2]?K.chip("ja","warn"):"–"]))},
+   {id:"in",t:"↝ Eingesetzt in",n:a.inn.length,flush:true,b:K.table(["Prozess","Status"],a.inn.map(n=>{const p=PROC.af[pIdx(n)];return [`<span class="nm">${esc(n)}</span>`,p?procChip(p):""]}),{rowGo:i=>{const p=PROC.af[pIdx(a.inn[i])];return p?K.go("prozess",p.id):""}})},
+   {id:"daten",t:"Personenbezogene Daten",b:`<div class="abc-perm"><span>Datenstufe aus den Skills</span><b>${LVN2[lv(a)]}</b></div><div class="abc-perm"><span>Außenwirkung (Senden, Schreiben nach außen)</span>${K.chip("Freigabe nötig","warn")}</div><div class="k-note">Die Datenstufe lässt sich je Agent nur verschärfen, nie lockern.</div>`}],
+  empty:["Testläufe","Kommentare"]})};
+
+const LIB=[["Lernbeispiele","Vertragsreklamationen (600)","sellify · Dokumentarchiv","Profil Vertragsreklamation","freigegeben"],["Lernbeispiele","Zahlungsklärungen (510)","sellify · Dokumentarchiv","Profil Zahlungsklärung","freigegeben"],["Lernbeispiele","Ablöseanfragen (420)","sellify · Dokumentarchiv","Profil Ablöseanfrage","freigegeben"],["Lernbeispiele","Insolvenzmitteilungen (40)","sellify · Dokumentarchiv","Profil Insolvenzmitteilung","im Anlernen"],["Vorlage","Eingangsbestätigung Reklamation","sellify · E-Mail-Vorlage","Vertragsreklamation bearbeiten","aus sellify"],["Vorlage","Kündigungsbestätigung","sellify · Dokumentvorlage","Kündigung bearbeiten","aus sellify"],["Vorlage","Ablöseangebot","sellify · Dokumentvorlage","Ablöseanfrage beantworten","aus sellify"],["Vorlage","Antwort Rechnungskopie","sellify · E-Mail-Vorlage","Rechnungskopie senden","aus sellify"]];
+V.bibliothek=()=>{const cur=K.tab("bibliothek","Alle");const R=LIB.filter(r=>cur==="Alle"||r[0]===cur);
+ return K.list({title:"Bibliothek",chips:[K.chip("Beispieldaten","ex")],view:"bibliothek",tabs:[["Alle","Alle",LIB.length],["Lernbeispiele","Lernbeispiele",LIB.filter(r=>r[0]==="Lernbeispiele").length],["Vorlage","Vorlagen",LIB.filter(r=>r[0]==="Vorlage").length]],
+  cols:["Art","Name","Quelle","Wofür","Stand"],rows:R.map(r=>[`<span class="pill ${r[0]==="Vorlage"?"p-wait":"p-open"}">${r[0]}</span>`,`<b>${esc(r[1])}</b>`,esc(r[2]),esc(r[3]),esc(r[4])]),note:"Lernbeispiele werden nie versendet"})};
+
+V.anschluesse=()=>K.detail({title:"Anschlüsse",chips:[K.chip("⇄ Einrichtung"),K.chip("Beispieldaten","ex")],cards:[],
+ sections:[{id:"an",t:"Anschlüsse",n:CONN.af.length,flush:true,b:K.table(["System","Rolle","Was","Grundaufgaben","Status"],CONN.af.map(c=>[`<b>${esc(c[3])}</b>`,K.chip(c[0]),esc(c[4]),esc(c[5]),c[7]==="Erweiterung"?EXT:`<span class="pill ${c[6]}">${c[7]}</span>`]))},
+  {id:"ue",t:"Übergabewege · Verteilung je Dokumenttyp",n:ROUTES.af.length,a:UMD,flush:true,b:K.table(["Dokumenttyp","geht an","Methode","Status"],ROUTES.af.map(r=>[`<b>${esc(r[0])}</b>`,esc(r[1]),esc(r[2]),`<span class="pill ${r[3]}">${esc(r[4])}</span>`]))},
+  {id:"hin",t:"Hinweis",b:`<div class="k-note">Neue Anschluss-Rolle „Eingangskanal“: Bisher kennt Company OS nur Systeme, in die es schreibt. Für den Posteingang braucht es eine Quelle, die einen Prozess auslöst. Offen ist, ob die Postfächer direkt angebunden werden oder sellify die Mails abholt und meldet.</div>`}]});
+
+V.ki=()=>K.detail({title:"KI & Daten",chips:[K.chip("⚙ Einrichtung"),K.chip("Beispielwerte","ex")],
+ sections:[{id:"haupt",t:"Haupt-KI",b:K.kv([["Haupt-KI","nur von business//acts freigegebene Anbieter wählbar"],["Verarbeitung","in der EU (Annahme)"],["Ausfall","Aufträge pausieren, kein automatischer Wechsel"]])},
+  {id:"anb",t:"Anbieter",n:3,flush:true,b:K.table(["Anbieter","Rolle","Profile","Datenstufe","AVV","Budget im Monat"],[["<b>Claude</b>","Haupt-KI","Steuerung, Gründlich prüfen, Texte","2",K.chip("ja","ok"),"180 € / 250 €"],["<b>Mistral</b>","Zusatz","Schnell & günstig","1",K.chip("ja","ok"),"22 € / 60 €"],["<b>Gemini</b>","Zusatz","Bilder","0",K.chip("ja","ok"),"9 € / 40 €"]])},
+  {id:"prof",t:"KI-Profile",n:4,flush:true,b:K.table(["Profil","Anbieter","Wofür"],[["<b>Gründlich prüfen</b>","Claude","Dokumenttyp erkennen, Reklamation vorprüfen"],["<b>Schnell & günstig</b>","Mistral","Mail lesen, Kontakt zuordnen"],["<b>Texte</b>","Claude","Antworten, Bestätigungen"],["<b>Bilder</b>","Gemini","–"]])},
+  {id:"stufen",t:"Datenstufen",n:3,b:K.kv([["0","ohne Personendaten"],["1","pseudonymisiert – Name, Anschrift, Nummern, Bankdaten werden vor dem Senden entfernt"],["2","personenbezogen – nur mit AVV und passendem Datenstandort"]])+`<div class="k-note" style="margin-top:8px">Harte Regel: Bankverbindungen nie an Zusatz-Anbieter.</div>`}]});
+
+V.setup=()=>K.detail({title:"Setup der Instanz abcfinance",chips:[K.chip("☑ Einrichtung"),K.chip("Beispieldaten","ex")],actions:K.btn("Verbindungstest",'data-toast="Verbindungstest sellify und KI-Anbieter erfolgreich (Prototyp)"',true),
+ sections:SETUP.map((s,i)=>({id:"s"+i,t:`${i+1} · ${esc(s[0])}`,b:K.kv(s[1].map(([l,v])=>[esc(l),esc(v)]))}))});
+
+V.abgleich=()=>{const B={v:["ok","vorhanden"],u:["info","Umdeutung"],e:["warn","Erweiterung"],s:["","bleibt in sellify"]};
+ const R=[["Postfächer überwachen","Anschluss-Rolle „Eingangskanal“ + Prozess-Start durch Ereignis","e",K.go("anschluesse")],["Mail und Anhänge lesen","Posteingangs-Agent mit Skill postfach-lesen","v",K.go("agent",0)],["Dokumenttypen mit Kennbegriffen","Skill posteingang-einordnen: Kern + Profil je Dokumenttyp","u",K.go("dokumenttypen")],["500–600 Beispieldokumente je Typ","Bibliothek, Art „Lernbeispiele“","u",K.go("bibliothek")],["Deckungsgrad und Schwelle","Entscheidung im Prozess + Feld „Schwelle“ im Profil","e",K.go("dokumenttyp","rek")],["Mensch prüft unsichere Fälle","Mensch-Schritt, Eskalationskette, „Meine Arbeit“","v",K.go("meinearbeit")],["Kontakt und Vertrag zuordnen","Zuordnungs-Agent über den Anschluss sellify","v",K.go("vorgang",4)],["Aufgaben je Dokumenttyp","Folgeprozess je Dokumenttyp","v",K.go("prozesse")],["Arbeitskorb oder Person","Übergabewege je Dokumenttyp","u",K.go("anschluesse")],["Antworten nur nach Freigabe","Freigabe bei Außenwirkung","v",K.go("vorgang",7)],["Lernen aus Korrekturen","Prozess „Dokumenttyp anlernen“, Profil-Versionen","u",K.go("prozess","anl")],["Jede Mail nachvollziehbar","Protokoll auf der Vorgangsseite","e",K.go("vorgang",4)],["Mehrere hundert Mails am Tag","Postfach zweigeteilt, Sammelzahlen, Kennzahlen je Prozess","e",K.go("posteingang")],["Schattenbetrieb","Status „im Test“ + Vergleich mit der alten Regel","u",K.go("projekt","ass")],["Sachbearbeitung im Arbeitskorb","sellify","s",K.go("organigramm")]];
+ const n=k=>R.filter(r=>r[2]===k).length;
+ return K.detail({title:"ASS-Abgleich",chips:[K.chip("Einschätzung business//acts","ai")],
+  cards:[{t:"Ergebnis",b:K.kv([["vorhanden",n("v")],["mit Umdeutung",n("u")],["Erweiterung",n("e")],["bleibt in sellify",n("s")]])},{t:"Einschätzung",b:`<span class="k-note">Es geht ohne eigenes Modul. Nötig sind vier allgemein nützliche Erweiterungen: Start durch Ereignis mit Eingangskanal, Schwelle in der Entscheidung, Protokoll je Auftrag, Sammelansicht mit Kennzahlen.</span>`},{t:"Neu in dieser Fassung",b:`<span class="k-note">Aufbau nach dem Bodo-Muster: Menü, Tagesleiste, Übersichten, Detailseiten mit Sprungmarken, zweigeteiltes Postfach. Alle Seiten kommen aus einem gemeinsamen Kern.</span>`}],
+  sections:[{id:"tab",t:"Anforderungen und Bausteine",n:R.length,flush:true,b:K.table(["Anforderung ASS","Baustein in Company OS","Bewertung"],R.map(r=>[`<b>${esc(r[0])}</b>`,esc(r[1]),K.chip(B[r[2]][1],B[r[2]][0])]),{rowGo:i=>R[i][3]})},
+   {id:"sim",t:"Was simuliert ist",b:`<div class="k-note">Sicherheit und Begründung der KI sind feste Beispielwerte. Live berechnet wird nur der Deckungsgrad der Kennbegriffe (Dokumenttyp → Ausprobieren). Alle Namen, Mails und Zahlen sind erfunden.</div>`}]})};
+
+V.profil=()=>K.detail({title:esc(ME.n),num:ME.rolle,chips:[K.chip("Beispielperson","ex")],cards:[{t:"Profil",b:K.kv([["Rolle",ME.rolle],["Unternehmen","abcfinance"],["Vertretung","Markus Hahn"]])},{t:"Benachrichtigungen",b:K.kv([["Eskalationen","sofort"],["Sonst","stündlich gebündelt"]])},{t:"Persönlicher KI-Assistent",b:PSK.filter(x=>x[2]).map(x=>K.agent(x[0])).join("")}],sections:[{id:"ein",t:"Einstellungen",b:'<div class="k-note">Morgenübersicht 7:30 in der App · Ruhezeit 20–7 Uhr, Eskalationen ausgenommen.</div>'}]});
+
+/* ---------- Aktionen ---------- */
+function onClick(b,d){
+ if(d.sel){A.sel=+d.sel;K.refresh();const det=$("#k-det");if(det)det.scrollTop=0;return true}
+ if(d.ok){const m=MAILS.find(x=>x.id===+d.ok);const was=m.st;m.st=was==="freigabe"?"done":"auto";K.refresh();K.toast(was==="freigabe"?"Antwort freigegeben – Versand über sellify (Prototyp: nichts ausgeführt)":`Weitergegeben – ${target(T(m.type),m)} (Prototyp)`);return true}
+ if(d.fix){const m=MAILS.find(x=>x.id===+d.fix);K.modal(`<h2 style="margin:0;font-size:16px">Anders einordnen</h2><div class="k-note">${esc(m.subj)} · ${esc(m.from)}</div>${TYPES.map(t=>`<button class="k-mi" data-pick="${m.id}|${t.id}"><span>${t.id===m.type?"✓ ":""}<b>${esc(t.n)}</b></span><span class="k-lbl">${esc(target(t))}</span></button>`).join("")}<div class="k-note">Die Korrektur wird als Lernbeispiel für das Profil gespeichert.</div>`);return true}
+ if(d.pick){const [id,ty]=d.pick.split("|");const m=MAILS.find(x=>x.id===+id);m.type=ty;m.also=null;m.st="auto";K.modal("");K.refresh();K.toast(`Als ${T(ty).n} weitergegeben · Lernbeispiel gespeichert (Prototyp)`);return true}
+ if(d.sug){const [i,s]=d.sug.split("|");SUG[+i].s=s;K.refresh();K.toast(`„${SUG[+i].n}“: ${s} (Prototyp)`);return true}
+ if(d.neu!==undefined){onNeu();return true}
+ /* Verweise aus den vorbereiteten Antworten des KI-Assistenten */
+ if(d.job){if(innerWidth<900)K.chat(false);K.open("vorgang",d.job);return true}
+ if(d.area==="jobs"){if(innerWidth<900)K.chat(false);K.open("auftraege");return true}
+ if(d.gotag!==undefined){if(innerWidth<900)K.chat(false);K.open("meinearbeit");return true}
+ return false}
+function onNeu(){K.modal(`<h2 style="margin:0;font-size:16px">Neuer Auftrag</h2><label class="k-lbl" for="abc-nj">Was soll passieren?</label><textarea class="abc-ta" id="abc-nj" style="min-height:70px">Alle offenen Ablöseanfragen dieser Woche auf fehlende Angaben prüfen</textarea><div class="k-lbl">Vorschlag des Agenten</div><button class="k-mi" data-toast="Auftrag gestartet (Prototyp)"><span><b>Einzelaufgabe an den Vertrags-Agenten</b><br><span class="k-lbl">Ergebnis als Liste an Julia Neumann · nichts nach außen</span></span><span>→</span></button><button class="k-mi" data-toast="Prozess gestartet (Prototyp)"><span><b>Prozess „Ablöseanfrage beantworten“ ab Schritt 2</b><br><span class="k-lbl">je Anfrage ein Auftrag</span></span><span>→</span></button>`)}
+document.addEventListener("input",e=>{if(e.target.id==="abc-thr"){T(e.target.dataset.thr).thr=+e.target.value;$("#abc-thrv").textContent=e.target.value+" %"}
+ if(e.target.id==="abc-test"){A.test=e.target.value;$("#abc-testout").innerHTML=bestRule(A.test).slice(0,4).map(r=>meter(r.t.n,r.pct,r.pct<35?"lo":"")).join("")}});
+document.addEventListener("dblclick",e=>{const b=e.target.closest("[data-sel]");if(b)K.open("vorgang",b.dataset.sel)});
+
+/* ---------- Start ---------- */
+const nP=()=>MAILS.filter(m=>m.st==="pruefen").length;
+K.start({start:"dashboard",neu:"Neuer Auftrag",onNeu,onClick,fuss:"Company OS",badge:"Entwurf v2 · Bodo-Aufbau · Beispieldaten",
+ mandant:{name:CO.af.name,rolle:ME.rolle,farbe:CO.af.color,ini:"a",user:ME.ini},
+ tagesleiste:()=>`<b>Mo., 12.10.2026</b> <b>14:47</b><span class="sep">·</span><button class="k-tl" ${K.go("meinearbeit")}>Wartet auf dich <span class="k-bdg o">${SESS.filter(s=>s.l==="wait").length}</span></button><span class="sep">·</span><button class="k-tl" ${K.go("posteingang")}>Mensch prüft <span class="k-bdg">${nP()}</span></button><span class="sep wide">·</span><button class="k-tl wide" ${K.go("vorgang",6)}>Eskalation <span class="k-bdg r">1</span></button><span class="sep wide">·</span><span class="wide">Posteingang heute <b>214</b></span>`,
+ menu:[{t:"ARBEITSBEREICH",items:[{v:"dashboard",i:"⌂",l:"Dashboard"},{v:"meinearbeit",i:"☰",l:"Meine Arbeit",n:()=>SESS.filter(s=>s.l==="wait").length},{v:"posteingang",i:"✉",l:"Posteingang",n:nP,also:["vorgang"]},{v:"auftraege",i:"▤",l:"Aufträge",n:()=>JOBS.af.length,g:1}]},
+  {t:"STEUERUNG",items:[{v:"prozesse",i:"↝",l:"Prozesse",also:["prozess"]},{v:"projekte",i:"▦",l:"Projekte",also:["projekt"]},{v:"organigramm",i:"⌗",l:"Organigramm",also:["abteilung"]}]},
+  {t:"WISSEN",items:[{v:"dokumenttypen",i:"◆",l:"Dokumenttypen",also:["dokumenttyp"]},{v:"agenten",i:"✦",l:"Agenten & Skills",also:["agent"]},{v:"bibliothek",i:"▣",l:"Bibliothek"}]},
+  {t:"EINRICHTUNG",items:[{v:"anschluesse",i:"⇄",l:"Anschlüsse"},{v:"ki",i:"⚙",l:"KI & Daten"},{v:"setup",i:"☑",l:"Setup"}]},
+  {t:"KONZEPT",items:[{v:"abgleich",i:"✓",l:"ASS-Abgleich"}]}],
+ views:V,
+ ki:{hallo:`Hallo ${ME.n.split(" ")[0]}. Ich kenne Organigramm, Prozesse und Aufträge von abcfinance und arbeite über den Anschluss an sellify – mit euren Freigaberegeln.`,script:SCRIPT,sonst:"Im Prototyp sind nur die vorbereiteten Fragen hinterlegt."},
+ suche:()=>MAILS.map(m=>[m.subj+" · "+m.from,"Vorgang",K.go("vorgang",m.id)]).concat(PROC.af.map(p=>[p.n,"Prozess",K.go("prozess",p.id)]),AG.map((a,i)=>[a.n,"Agent",K.go("agent",i)]),TYPES.map(t=>[t.n,"Dokumenttyp",K.go("dokumenttyp",t.id)]),ORG.af.map((d,i)=>[d.n,"Abteilung",K.go("abteilung",i)]),PROJ.af.map(p=>[p.n,"Projekt",K.go("projekt",p.id)]))});
+
+</script>
