@@ -60,7 +60,7 @@ V.posteingang=()=>{const box=K.tab("pe_box","Alle"),stf=K.tab("pe_st","alle");
  const inBox=MAILS.filter(m=>box==="Alle"||m.box===box);const L=inBox.filter(m=>stf==="alle"||m.st===stf||(stf==="auto"&&m.st==="done"));
  if(!L.find(m=>m.id===A.sel)&&L[0])A.sel=L[0].id;const m=MAILS.find(x=>x.id===A.sel)||L[0];
  const list=`<div class="abc-filter">${SF.map(([k,l])=>`<button class="abc-f" data-tab="pe_st|${k}" aria-pressed="${k===stf}">${l} <small>${inBox.filter(x=>k==="alle"||x.st===k||(k==="auto"&&x.st==="done")).length}</small></button>`).join("")}</div>
-  <div class="scroll">${L.map(x=>{const t=T(x.type);return `<button class="k-it" data-sel="${x.id}" aria-current="${x.id===m?.id}"><div class="a"><b>${esc(x.from)}</b><span class="k-lbl">${x.tm}</span></div><div class="s">${esc(x.subj)}</div><div class="x">${esc(snippet(x))}</div><div class="ch">${K.chip(esc(short(t.n))+(x.also?" + 1":""),"info")}${stChip(x)}</div></button>`}).join("")||'<div class="k-sb k-note">Keine Mails mit diesem Status.</div>'}</div>`;
+  <div class="scroll">${L.map(x=>{const t=T(x.type);return `<button class="k-it" data-sel="${x.id}" title="Doppelklick öffnet die ganze Mail" aria-current="${x.id===m?.id}"><div class="a"><b>${esc(x.from)}</b><span class="k-lbl">${x.tm}</span></div><div class="s">${esc(x.subj)}</div><div class="x">${esc(snippet(x))}</div><div class="ch">${K.chip(esc(short(t.n))+(x.also?" + 1":""),"info")}${stChip(x)}</div></button>`}).join("")||'<div class="k-sb k-note">Keine Mails mit diesem Status.</div>'}</div>`;
  const det=m?`<div class="abc-dh"><div class="abc-row"><h2>${esc(m.subj)}</h2>${stChip(m)}<span class="k-sp"></span>${K.btn("⤢ Vorgang öffnen",K.go("vorgang",m.id),false,true)}</div>
   <div class="abc-row">${mailActs(m,true)}</div>${aiBox(m)}${mailBody(m)}
   <div class="k-card" style="padding:12px 14px;display:flex;flex-direction:column;gap:8px"><b>Einordnung</b>${einMeters(m)}${K.kv([["Kontakt",esc(m.kontakt)],["Vertrag",esc(m.vertrag)],["Ziel",esc(target(T(m.type),m))]])}</div></div>`:'<div class="k-sb k-note">Keine Mail ausgewählt.</div>';
@@ -201,8 +201,11 @@ V.profil=()=>K.detail({title:esc(ME.n),num:ME.rolle,chips:[K.chip("Beispielperso
 
 /* ---------- Aktionen ---------- */
 function onClick(b,d){
- if(d.sel){A.sel=+d.sel;K.refresh();const det=$("#k-det");if(det)det.scrollTop=0;return true}
- if(d.ok){const m=MAILS.find(x=>x.id===+d.ok);const was=m.st;m.st=was==="freigabe"?"done":"auto";K.refresh();K.toast(was==="freigabe"?"Antwort freigegeben – Versand über sellify (Prototyp: nichts ausgeführt)":`Weitergegeben – ${target(T(m.type),m)} (Prototyp)`);return true}
+ if(d.sel){/* Doppelklick selbst erkennen: der erste Klick zeichnet die Liste neu, daher feuert der Browser kein dblclick */
+  const now=Date.now(),dbl=A.lastSel===+d.sel&&now-(A.lastT||0)<450;A.lastSel=+d.sel;A.lastT=dbl?0:now;
+  if(dbl){const m=MAILS.find(x=>x.id===+d.sel);if(m){window.getSelection&&window.getSelection().removeAllRanges();mailDialog(m)}return true}
+  A.sel=+d.sel;K.refresh();const det=$("#k-det");if(det)det.scrollTop=0;return true}
+ if(d.ok){if(b.closest("#k-modal"))K.modal("");const m=MAILS.find(x=>x.id===+d.ok);const was=m.st;m.st=was==="freigabe"?"done":"auto";K.refresh();K.toast(was==="freigabe"?"Antwort freigegeben – Versand über sellify (Prototyp: nichts ausgeführt)":`Weitergegeben – ${target(T(m.type),m)} (Prototyp)`);return true}
  if(d.fix){const m=MAILS.find(x=>x.id===+d.fix);K.modal(`<h2 style="margin:0;font-size:16px">Anders einordnen</h2><div class="k-note">${esc(m.subj)} · ${esc(m.from)}</div>${TYPES.map(t=>`<button class="k-mi" data-pick="${m.id}|${t.id}"><span>${t.id===m.type?"✓ ":""}<b>${esc(t.n)}</b></span><span class="k-lbl">${esc(target(t))}</span></button>`).join("")}<div class="k-note">Die Korrektur wird als Lernbeispiel für das Profil gespeichert.</div>`);return true}
  if(d.pick){const [id,ty]=d.pick.split("|");const m=MAILS.find(x=>x.id===+id);m.type=ty;m.also=null;m.st="auto";K.modal("");K.refresh();K.toast(`Als ${T(ty).n} weitergegeben · Lernbeispiel gespeichert (Prototyp)`);return true}
  if(d.sug){const [i,s]=d.sug.split("|");SUG[+i].s=s;K.refresh();K.toast(`„${SUG[+i].n}“: ${s} (Prototyp)`);return true}
@@ -215,7 +218,12 @@ function onClick(b,d){
 function onNeu(){K.modal(`<h2 style="margin:0;font-size:16px">Neuer Auftrag</h2><label class="k-lbl" for="abc-nj">Was soll passieren?</label><textarea class="abc-ta" id="abc-nj" style="min-height:70px">Alle offenen Ablöseanfragen dieser Woche auf fehlende Angaben prüfen</textarea><div class="k-lbl">Vorschlag des Agenten</div><button class="k-mi" data-toast="Auftrag gestartet (Prototyp)"><span><b>Einzelaufgabe an den Vertrags-Agenten</b><br><span class="k-lbl">Ergebnis als Liste an Julia Neumann · nichts nach außen</span></span><span>→</span></button><button class="k-mi" data-toast="Prozess gestartet (Prototyp)"><span><b>Prozess „Ablöseanfrage beantworten“ ab Schritt 2</b><br><span class="k-lbl">je Anfrage ein Auftrag</span></span><span>→</span></button>`)}
 document.addEventListener("input",e=>{if(e.target.id==="abc-thr"){T(e.target.dataset.thr).thr=+e.target.value;$("#abc-thrv").textContent=e.target.value+" %"}
  if(e.target.id==="abc-test"){A.test=e.target.value;$("#abc-testout").innerHTML=bestRule(A.test).slice(0,4).map(r=>meter(r.t.n,r.pct,r.pct<35?"lo":"")).join("")}});
-document.addEventListener("dblclick",e=>{const b=e.target.closest("[data-sel]");if(b)K.open("vorgang",b.dataset.sel)});
+/* Doppelklick auf eine Mail im Posteingang: ganze Mail im Dialog */
+function mailDialog(m){A.sel=m.id;K.refresh();
+ K.modal(`<div class="abc-mdlg"><div class="abc-row"><h2 style="margin:0;font-size:17px;flex:1;min-width:0">${esc(m.subj)}</h2><button class="k-ib" data-mclose aria-label="Schließen">×</button></div>
+  <div class="abc-row">${stChip(m)}${K.chip(esc(T(m.type).n)+(m.also?" + 1":""),"info")}${K.chip(mailNum(m))}</div>
+  <div class="abc-mbody">${mailBody(m)}</div>${aiBox(m)}
+  <div class="abc-row"><span class="k-sp"></span>${K.btn("⤢ Vorgang öffnen",K.go("vorgang",m.id))} ${mailActs(m)}</div></div>`)}
 
 /* ---------- Start ---------- */
 const nP=()=>MAILS.filter(m=>m.st==="pruefen").length;
