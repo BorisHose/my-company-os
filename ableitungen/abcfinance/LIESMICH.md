@@ -17,7 +17,7 @@ Die heutige Posteingangsverarbeitung von abcfinance in sellify (Kennbegriffe je 
 | `konfiguration/build.py` | baut die Hauptfassung: `python build.py` |
 | `konfiguration/ass/` | Quelle und Bauskript der ersten Fassung: `python ass/build_ass.py` |
 | `prototyp/company-os-abcfinance-v2.html` | **Fassung v2 (Entwurf):** Aufbau nach dem Bodo-Muster – Menü, Tagesleiste, Übersichten, Detailseiten mit Sprungmarken, zweigeteiltes Postfach |
-| `konfiguration/v2/kern.css`, `kern.js` | **Kern-Entwurf:** allgemeiner Rahmen und Seitentypen ohne Kundendaten – Kandidat für `basis/kern` |
+| `basis/kern/kern.css`, `kern.js` | **Kern** (seit 12.10.2026 in `basis/kern`, gemeinsam mit der allgemeinen Fassung): Rahmen und Seitentypen ohne Kundendaten |
 | `konfiguration/v2/abc-v2.css`, `abc-v2.js` | abcfinance-Ansichten für den Kern; Daten kommen aus `konfiguration/data.js` (dieselben wie Hauptfassung) |
 | `konfiguration/v2/build_v2.py` | baut die Fassung v2: `python v2/build_v2.py` |
 | `konzept/` | Strukturvorschlag (Screenshot und Quelle) |

@@ -164,3 +164,10 @@ button,input,textarea,select{font:inherit;color:inherit}button{cursor:pointer}
  .k-kv{grid-template-columns:100px 1fr}
 }
 @media (prefers-reduced-motion:reduce){*{transition:none!important;scroll-behavior:auto!important}}
+
+/* Mandantenwechsel (nur wenn die Ableitung mehrere Unternehmen hat) */
+button.k-ws.sw{border:0;background:none;width:100%;text-align:left;border-radius:10px;padding:4px 4px 8px;cursor:pointer;font:inherit;color:inherit}
+button.k-ws.sw:hover{background:var(--soft)}
+.k-ws .car{margin-left:auto;color:var(--muted)}
+.k-wsl.sm{width:22px;height:22px;border-radius:6px;font-size:11px;color:#fff}
+.k-mi[aria-current="true"]{background:var(--brand-bg)}

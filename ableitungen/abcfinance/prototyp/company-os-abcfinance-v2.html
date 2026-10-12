@@ -167,6 +167,13 @@ button,input,textarea,select{font:inherit;color:inherit}button{cursor:pointer}
 }
 @media (prefers-reduced-motion:reduce){*{transition:none!important;scroll-behavior:auto!important}}
 
+/* Mandantenwechsel (nur wenn die Ableitung mehrere Unternehmen hat) */
+button.k-ws.sw{border:0;background:none;width:100%;text-align:left;border-radius:10px;padding:4px 4px 8px;cursor:pointer;font:inherit;color:inherit}
+button.k-ws.sw:hover{background:var(--soft)}
+.k-ws .car{margin-left:auto;color:var(--muted)}
+.k-wsl.sm{width:22px;height:22px;border-radius:6px;font-size:11px;color:#fff}
+.k-mi[aria-current="true"]{background:var(--brand-bg)}
+
 /* abcfinance · Ergänzungen zum Kern (Messbalken, Markierungen, Kennzeichen aus den abcfinance-Daten) */
 .meter{display:flex;gap:8px;align-items:center;font-size:12.5px;font-variant-numeric:tabular-nums}
 .meter .k{width:150px;color:var(--muted);flex:none;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
@@ -244,15 +251,21 @@ const K={st:{v:null,id:null,tab:{},q:""},cfg:null,
  shell(){const c=K.cfg,m=c.mandant;
   /* nur in den eigenen Container schreiben – Stile und Skripte der Seite bleiben erhalten */
   const root=document.getElementById("k-root")||document.body.appendChild(Object.assign(document.createElement("div"),{id:"k-root"}));
-  root.innerHTML=`<div class="k-app"><aside class="k-side" id="k-side"><div class="k-ws"><div class="k-wsl" style="background:${m.farbe}">${esc(m.ini)}</div><div><b>${esc(m.name)}</b><small>${esc(m.rolle)}</small></div></div>
+  root.innerHTML=`<div class="k-app"><aside class="k-side" id="k-side">${K.wsHtml()}
    <button class="k-fi" id="k-find"><span>⌕&nbsp; Finden…</span><span class="k-kb">Strg F</span></button><button class="k-neu" id="k-new"><span>＋&nbsp; ${esc(c.neu||"Neu")}</span><span class="k-kb">N</span></button>
    <nav id="k-nav" aria-label="Menü"></nav><div class="k-foot"><span>${esc(c.fuss||"")}</span><span>⇅ Menü anordnen</span></div></aside>
    <div class="k-main"><div class="k-top"><button class="k-ib k-menu" id="k-menu" aria-label="Menü">☰</button><span id="k-tl"></span><span class="sp"></span><button class="k-ib wide" data-hist="-1" aria-label="Zurück">‹</button><button class="k-ki" id="k-kibtn">✦ KI-Assistent</button><button class="k-ib" data-toast="Benachrichtigungen (Prototyp)" aria-label="Benachrichtigungen">🔔</button><button class="k-av" aria-label="Profil" ${K.go("profil")}>${esc(m.user)}</button></div>
    <main class="k-page" id="k-page"></main></div></div>
    <div id="k-modal"></div><div class="k-toast" id="k-toast" hidden></div>
-   <section class="k-card k-chat" id="k-chat" hidden><header><b>✦ KI-Assistent</b>${K.chip(esc(m.name))}<span class="k-sp"></span><button class="k-ib" id="k-chatx" aria-label="Schließen">×</button></header><div class="k-msgs" id="k-msgs"></div><div class="k-chips" id="k-chips"></div><form class="k-comp" id="k-comp"><input id="k-in" placeholder="Frage oder Auftrag …" aria-label="Nachricht"><button class="k-btn p">Senden</button></form></section>
+   <section class="k-card k-chat" id="k-chat" hidden><header><b>✦ KI-Assistent</b><span id="k-chatm">${K.chip(esc(m.name))}</span><span class="k-sp"></span><button class="k-ib" id="k-chatx" aria-label="Schließen">×</button></header><div class="k-msgs" id="k-msgs"></div><div class="k-chips" id="k-chips"></div><form class="k-comp" id="k-comp"><input id="k-in" placeholder="Frage oder Auftrag …" aria-label="Nachricht"><button class="k-btn p">Senden</button></form></section>
    ${c.badge?`<div class="k-badge">${c.badge}</div>`:""}`;
-  document.documentElement.style.setProperty("--brand",m.farbe)},
+  document.documentElement.style.setProperty("--brand",m.brand||m.farbe)},
+ /* Mandant: ein fester (cfg.mandant) oder umschaltbar (cfg.mandanten = {schlüssel:{…}}, Start mit cfg.mstart) */
+ wsHtml(){const m=K.cfg.mandant,sw=!!K.cfg.mandanten;const inner=`<div class="k-wsl" style="background:${m.farbe}">${esc(m.ini)}</div><div><b>${esc(m.name)}</b><small>${esc(m.rolle)}</small></div>`;
+  return sw?`<button class="k-ws sw" id="k-ws" aria-haspopup="true" title="Unternehmen wechseln">${inner}<span class="car">▾</span></button>`:`<div class="k-ws">${inner}</div>`},
+ setM(k){const c=K.cfg;if(!c.mandanten||!c.mandanten[k])return;K.st.m=k;c.mandant=c.mandanten[k];const w=$("#k-side .k-ws");if(w)w.outerHTML=K.wsHtml();
+  $("#k-chatm").innerHTML=K.chip(esc(c.mandant.name));document.documentElement.style.setProperty("--brand",c.mandant.brand||c.mandant.farbe);K.st.tab={};
+  const v=c.views[K.st.v]&&!K.st.id?K.st.v:c.start;K.hist=[];K.st.v=v;K.st.id=null;K.render();$("#k-page").scrollTop=0;if(c.onMandant)c.onMandant(k)},
  nav(){const c=K.cfg;$("#k-nav").innerHTML=c.menu.map(g=>`<div class="k-grp">${g.t}</div>${g.items.map(it=>{const n=it.n?it.n():null;const cur=it.v===K.st.v||(it.also||[]).includes(K.st.v);return `<button class="k-ni" ${K.go(it.v)} aria-current="${cur}"><span class="i">${it.i}</span>${it.l}${n?`<span class="n ${it.g?"g":""}">${n}</span>`:""}</button>`}).join("")}`).join("");
   $("#k-tl").innerHTML=c.tagesleiste()},
  hist:[],
@@ -274,7 +287,7 @@ const K={st:{v:null,id:null,tab:{},q:""},cfg:null,
  /* ---------- Finden ---------- */
  find(){K.modal(`<h2 style="margin:0;font-size:16px">Finden</h2><input class="k-search" id="k-fq" placeholder="Name, Nummer, Begriff …" autofocus><div id="k-fr"></div>`);const i=$("#k-fq");const run=()=>{const q=i.value.trim().toLowerCase();const R=q?K.cfg.suche().filter(x=>x[0].toLowerCase().includes(q)).slice(0,12):[];$("#k-fr").innerHTML=R.map(([n,typ,go])=>`<button class="k-mi" ${go}><span>${esc(n)}</span><span class="k-lbl">${typ}</span></button>`).join("")||`<div class="k-note">${q?"Nichts gefunden.":"Suchbegriff eingeben."}</div>`};i.addEventListener("input",run);run();setTimeout(()=>i.focus(),50)},
  /* ---------- Start und Ereignisse ---------- */
- start(cfg){K.cfg=cfg;K.shell();K.st.v=cfg.start;K.render();
+ start(cfg){K.cfg=cfg;if(cfg.mandanten){K.st.m=cfg.mstart||Object.keys(cfg.mandanten)[0];cfg.mandant=cfg.mandanten[K.st.m]}K.shell();K.st.v=cfg.start;K.render();
   document.addEventListener("click",e=>{const b=e.target.closest("button,[data-go],[data-mclose]");if(!b){K.closePop();return}const d=b.dataset;
    if(d.mclose!==undefined){if(e.target===b)K.modal("");return}
    if(!b.closest("#k-pop")&&!d.empty)K.closePop();
@@ -283,6 +296,8 @@ const K={st:{v:null,id:null,tab:{},q:""},cfg:null,
    if(d.tab){const [v,k]=d.tab.split("|");K.st.tab[v]=k;K.refresh();return}
    if(d.jump){const s=$("#sec-"+d.jump);if(s)s.scrollIntoView({behavior:"smooth",block:"start"});return}
    if(d.empty){K.pop(b,`<b style="padding:4px 8px">Bereiche ohne Einträge</b>${d.empty.split("|").map(n=>`<button class="k-mi" data-toast="Bereich „${esc(n)}“ hinzugefügt – direkt zur Eingabe (Prototyp)"><span>${esc(n)}</span><span>＋</span></button>`).join("")}<div class="k-note" style="padding:4px 8px">Bereich anklicken: wird zur Ansicht hinzugefügt.</div>`);return}
+   if(d.mand){K.closePop();K.setM(d.mand);return}
+   if(b.id==="k-ws"){const M=cfg.mandanten;K.pop(b,`<b style="padding:4px 8px">Unternehmen wechseln</b>${Object.keys(M).map(k=>`<button class="k-mi" data-mand="${k}" aria-current="${k===K.st.m}"><span style="display:flex;gap:8px;align-items:center"><span class="k-wsl sm" style="background:${M[k].farbe}">${esc(M[k].ini)}</span>${esc(M[k].name)}</span><span class="k-lbl">${esc(M[k].kurz||"")}</span></button>`).join("")}`);return}
    if(d.toast){K.toast(d.toast);return}
    if(d.ask){K.ask(d.ask);return}
    if(d.hist){const h=K.hist.pop();if(h){K.st.v=h[0];K.st.id=h[1];K.render()}return}

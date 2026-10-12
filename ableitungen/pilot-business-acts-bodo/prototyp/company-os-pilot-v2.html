@@ -1,0 +1,800 @@
+<title>Company OS Pilot v2</title>
+<style>
+/* ===== Company OS · Kern (Entwurf v2) · Aufbau nach dem Bodo-Muster =====
+   Rahmen: Menü links (Mandant, Finden, Neu, Gruppen) · Tagesleiste oben · Inhaltsbereich
+   Seitentypen: Startseite (Kacheln) · Übersicht (Reiter + Tabelle) · Detailseite (Kopf, Karten, Sprungmarken, Bereiche) · Postfach (zweigeteilt)
+   Die Akzentfarbe kommt vom Mandanten (--brand), alles andere ist für alle Ableitungen gleich. */
+:root{--brand:#2C4A5E;--brand-dark:#1E3545;--brand-bg:#E8EEF2;--brand-line:#d4dfe6;--ai:#B9A37A;--ai-bg:#FBF7EF;--ai-line:#E8DCC3;--ai-ink:#6b5a32;
+ --text:#1f2329;--muted:#6b7280;--faint:#8a909c;--line:#e6e8ec;--soft:#f1f3f5;--bg:#f6f7f9;--surface:#fff;
+ --danger:#B42318;--danger-bg:#FDECEA;--success:#0F7B4E;--success-bg:#E5F5EC;--warn:#8A4B00;--warn-bg:#FFF4E5;--info:#1F5FBF;--info-bg:#EAF1FB;
+ --f:"Segoe UI",system-ui,-apple-system,sans-serif;--mono:ui-monospace,Consolas,monospace}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--brand:#8FB3CC;--brand-dark:#B5CFE0;--brand-bg:#1D2B36;--brand-line:#2E4252;--ai:#C9B48A;--ai-bg:#2A2519;--ai-line:#4A4130;--ai-ink:#E2D3B4;
+ --text:#E7EAEE;--muted:#A3AAB5;--faint:#8A919C;--line:#2B313A;--soft:#232830;--bg:#15191F;--surface:#1C2128;
+ --danger:#FF8F86;--danger-bg:#3A1D1B;--success:#5FD0A0;--success-bg:#143528;--warn:#F2B66B;--warn-bg:#3A2A14;--info:#8DB4FF;--info-bg:#1A2A45;color-scheme:dark}}
+:root[data-theme="dark"]{--brand:#8FB3CC;--brand-dark:#B5CFE0;--brand-bg:#1D2B36;--brand-line:#2E4252;--ai:#C9B48A;--ai-bg:#2A2519;--ai-line:#4A4130;--ai-ink:#E2D3B4;
+ --text:#E7EAEE;--muted:#A3AAB5;--faint:#8A919C;--line:#2B313A;--soft:#232830;--bg:#15191F;--surface:#1C2128;
+ --danger:#FF8F86;--danger-bg:#3A1D1B;--success:#5FD0A0;--success-bg:#143528;--warn:#F2B66B;--warn-bg:#3A2A14;--info:#8DB4FF;--info-bg:#1A2A45;color-scheme:dark}
+*{box-sizing:border-box}[hidden]{display:none!important}
+html,body,#k-root{height:100%}body{margin:0;background:var(--bg);color:var(--text);font-family:var(--f);font-size:14px;line-height:1.45}
+button,input,textarea,select{font:inherit;color:inherit}button{cursor:pointer}
+:focus-visible{outline:2px solid var(--brand);outline-offset:2px}
+.k-app{display:grid;grid-template-columns:248px minmax(0,1fr);height:100%}
+/* Menü */
+.k-side{background:var(--surface);border-right:1px solid var(--line);display:flex;flex-direction:column;padding:12px 14px 8px;gap:6px;overflow:auto;min-height:0}
+.k-ws{display:flex;gap:10px;align-items:center;padding:2px 2px 8px}
+.k-wsl{width:32px;height:32px;border-radius:9px;background:var(--brand);color:var(--surface);font-weight:800;display:grid;place-items:center}
+.k-ws b{display:block;font-size:14.5px}.k-ws small{color:var(--muted);font-size:12px}
+.k-fi,.k-neu{border:1px solid var(--line);border-radius:8px;padding:6px 10px;display:flex;justify-content:space-between;align-items:center;background:var(--bg);color:var(--muted);text-align:left;width:100%}
+.k-neu{border-color:var(--brand);color:var(--brand);background:var(--brand-bg);font-weight:600}
+.k-kb{border:1px solid var(--line);border-radius:5px;font-size:11px;padding:0 5px;color:var(--muted);background:var(--surface)}
+.k-grp{font-size:11px;letter-spacing:.08em;color:var(--faint);margin:10px 4px 2px;font-weight:600}
+.k-ni{display:flex;align-items:center;gap:10px;padding:6px 10px;border-radius:8px;font-size:14px;border:0;background:none;text-align:left;width:100%}
+.k-ni .i{width:18px;text-align:center;color:var(--muted)}
+.k-ni .n{margin-left:auto;background:var(--danger);color:#fff;border-radius:999px;font-size:11px;padding:0 7px;font-weight:700}
+.k-ni .n.g{background:none;color:var(--muted);font-weight:500}
+.k-ni[aria-current="true"]{background:var(--brand-bg);color:var(--brand);font-weight:700}.k-ni[aria-current="true"] .i{color:var(--brand)}
+@media (hover:hover){.k-ni:hover{background:var(--soft)}.k-row:hover td{background:var(--soft)}.k-mi:hover{background:var(--soft)}}
+.k-foot{margin-top:auto;border-top:1px solid var(--line);padding-top:8px;color:var(--muted);font-size:12px;display:flex;justify-content:space-between;white-space:nowrap}
+/* Tagesleiste */
+.k-main{display:flex;flex-direction:column;min-width:0;min-height:0}
+.k-top{margin:12px 18px 0;background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:8px 14px;display:flex;align-items:center;gap:12px;white-space:nowrap;overflow:hidden}
+.k-top .sep{color:var(--line)}.k-top .sp{flex:1}
+.k-tl{border:0;background:none;padding:2px 4px;border-radius:6px;display:inline-flex;align-items:center;gap:6px}
+.k-bdg{background:var(--brand);color:var(--surface);border-radius:999px;font-size:11px;padding:0 7px;font-weight:700}.k-bdg.r{background:var(--danger);color:#fff}.k-bdg.o{background:#C2650A;color:#fff}
+.k-ib{width:30px;height:30px;border:1px solid var(--line);border-radius:8px;display:grid;place-items:center;background:var(--surface);color:var(--muted)}
+.k-ki{border:1px solid var(--ai);background:var(--ai-bg);color:var(--ai-ink);border-radius:8px;padding:4px 11px;font-weight:600}
+.k-av{width:30px;height:30px;border-radius:50%;background:var(--brand);color:var(--surface);display:grid;place-items:center;font-weight:700;font-size:12px;border:0}
+.k-menu{display:none}
+/* Inhaltsbereich */
+.k-page{flex:1;min-height:0;overflow:auto;padding:12px 18px 90px;display:flex;flex-direction:column;gap:12px;scroll-padding-top:70px}
+.k-page>*{flex-shrink:0}
+.k-page.fix>.k-split{flex-shrink:1}
+.k-page.fix{overflow:hidden;padding-bottom:12px}
+.k-card{background:var(--surface);border:1px solid var(--line);border-radius:12px}
+.k-ph{padding:12px 18px;display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.k-ph h1{font-size:18px;margin:0;font-weight:700}
+.k-num{color:var(--muted)}
+.k-sp{flex:1}
+.k-chip{border:1px solid var(--line);border-radius:999px;padding:1px 10px;font-size:12.5px;display:inline-flex;align-items:center;gap:5px;white-space:nowrap;background:var(--surface)}
+.k-chip.info{background:var(--info-bg);border-color:transparent;color:var(--info);font-weight:600}
+.k-chip.warn{background:var(--warn-bg);border-color:transparent;color:var(--warn);font-weight:600}
+.k-chip.ok{background:var(--success-bg);border-color:transparent;color:var(--success);font-weight:600}
+.k-chip.bad{background:var(--danger);border-color:var(--danger);color:#fff;font-weight:700}
+.k-chip.ai{background:var(--ai-bg);border-color:var(--ai-line);color:var(--ai-ink);font-weight:600}
+.k-chip.ex{border-style:dashed;color:var(--muted);font-size:11.5px}
+.k-chip .d{width:7px;height:7px;border-radius:50%;background:currentColor}
+.k-btn{border:1px solid var(--line);background:var(--surface);border-radius:8px;padding:6px 12px;font-weight:600;white-space:nowrap}
+.k-btn.p{background:var(--brand);border-color:var(--brand);color:var(--surface)}
+.k-btn.sm{padding:3px 10px;font-size:13px}
+.k-btn:disabled{opacity:.45;cursor:default}
+.k-lbl{font-size:12px;color:var(--muted)}
+.k-note{font-size:12.5px;color:var(--muted)}
+.k-lnk{color:var(--brand);text-decoration:underline;text-decoration-color:var(--brand-line);text-underline-offset:3px;border:0;background:none;padding:0;text-align:left;font:inherit}
+.k-sect{font-size:11.5px;letter-spacing:.08em;color:var(--muted);font-weight:700;margin:6px 2px -2px;display:flex;gap:10px}
+.k-sect span{font-weight:400;letter-spacing:0}
+/* Startseite */
+.k-hello{padding:20px 24px;display:flex;align-items:center;gap:16px;background:linear-gradient(90deg,var(--surface),var(--brand-bg))}
+.k-hello h1{margin:0;font-size:24px}.k-hello h1 em{font-style:normal;color:var(--brand)}
+.k-tiles{display:grid;gap:12px;grid-template-columns:repeat(auto-fill,minmax(260px,1fr))}
+.k-tile{border-left:4px solid var(--c,var(--brand));padding:14px 16px;display:flex;flex-direction:column;gap:8px;text-align:left;width:100%}
+.k-tile h3{margin:0;font-size:14px;font-weight:600;display:flex;gap:8px;align-items:baseline}.k-tile h3 small{font-weight:600;color:var(--muted)}
+.k-tile .big{font-size:26px;font-weight:700;font-variant-numeric:tabular-nums;color:var(--c,var(--text))}
+.k-tile .kp{display:flex;gap:26px}.k-tile .kp div{display:flex;flex-direction:column}
+/* Übersicht */
+.k-tabs{display:flex;gap:18px;border-bottom:1px solid var(--line);padding:0 2px;flex-wrap:wrap}
+.k-tab{border:0;background:none;padding:8px 0;border-bottom:2px solid transparent;color:var(--muted);font-weight:600;display:inline-flex;gap:6px;align-items:center}
+.k-tab small{font-size:11px;color:var(--faint);font-weight:600}
+.k-tab[aria-selected="true"]{color:var(--text);border-bottom-color:var(--brand)}
+.k-lh{padding:12px 16px 8px;display:flex;gap:10px;align-items:center;flex-wrap:wrap}
+.k-search{flex:1;min-width:200px;border:1px solid var(--line);border-radius:8px;padding:6px 10px;background:var(--bg)}
+.k-tw{overflow-x:auto}
+.k-t{width:100%;border-collapse:collapse;font-size:13.5px}
+.k-t th{text-align:left;font-size:12.5px;color:var(--muted);font-weight:600;padding:8px 12px;border-bottom:1px solid var(--line);white-space:nowrap}
+.k-t td{padding:9px 12px;border-bottom:1px solid var(--line);vertical-align:top}
+.k-t tr:last-child td{border-bottom:0}
+.k-row{cursor:pointer}
+.k-t .nm{font-weight:600;color:var(--brand)}
+.k-pg{display:flex;justify-content:space-between;padding:8px 16px 12px;color:var(--muted);font-size:12.5px}
+/* Detailseite */
+.k-sum{display:grid;gap:12px;grid-template-columns:repeat(auto-fit,minmax(260px,1fr))}
+.k-sc{padding:14px 18px;display:flex;flex-direction:column;gap:9px;min-width:0}
+.k-sc h2{font-size:15px;margin:0;display:flex;justify-content:space-between;align-items:center;gap:8px}
+.k-kv{display:grid;grid-template-columns:120px 1fr;gap:5px 10px;font-size:13.5px}.k-kv .k{color:var(--muted)}
+.k-jump{position:sticky;top:0;z-index:5;background:var(--brand-bg);border:1px solid var(--brand-line);border-radius:12px;padding:5px;display:flex;align-items:center;gap:2px;overflow-x:auto;box-shadow:0 6px 14px -12px rgba(0,0,0,.35)}
+.k-jm{border:0;background:none;padding:5px 11px;border-radius:8px;font-weight:600;color:var(--brand);display:flex;gap:7px;align-items:center;white-space:nowrap}
+.k-jm small{background:var(--surface);border-radius:999px;font-size:11.5px;padding:0 7px;color:var(--muted)}
+.k-jm[aria-current="true"]{background:var(--brand);color:var(--surface)}.k-jm[aria-current="true"] small{background:rgba(255,255,255,.25);color:var(--surface)}
+.k-jm.off{color:var(--faint);font-weight:500}
+.k-vs{width:1px;height:22px;background:var(--brand-line);margin:0 4px;flex:none}
+.k-sec{scroll-margin-top:64px}
+.k-sh{display:flex;align-items:center;gap:10px;padding:11px 18px;border-bottom:1px solid var(--line);flex-wrap:wrap}
+.k-sh h3{margin:0;font-size:15.5px}.k-sh .c{background:var(--soft);border-radius:999px;font-size:12px;padding:0 8px}
+.k-sb{padding:12px 18px}
+.k-sb.flush{padding:0}
+.k-pop{position:fixed;z-index:40;background:var(--surface);border:1px solid var(--line);border-radius:12px;box-shadow:0 14px 34px rgba(0,0,0,.18);padding:10px;width:280px;display:flex;flex-direction:column;gap:2px}
+.k-mi{border:0;background:none;display:flex;justify-content:space-between;padding:6px 8px;border-radius:7px;text-align:left}
+/* KI-Vorschlag */
+.k-ai{background:var(--ai-bg);border:1px solid var(--ai-line);border-radius:10px;padding:12px 14px;display:flex;flex-direction:column;gap:10px}
+.k-ai .t{font-weight:700;color:var(--ai-ink)}
+.k-ai .why{font-size:12.5px;color:var(--ai-ink);border-top:1px dashed var(--ai-line);padding-top:8px}
+.k-air{display:flex;gap:10px;align-items:flex-start;font-size:13.5px}.k-air .n{width:20px;height:20px;border-radius:50%;background:var(--ai);color:#fff;font-size:11px;font-weight:700;display:grid;place-items:center;flex:none}
+.k-air .r{margin-left:auto}
+/* Zeitleiste */
+.k-tli{display:flex;gap:12px;align-items:flex-start;padding:9px 18px;border-bottom:1px solid var(--soft);font-size:13.5px}
+.k-tli:last-child{border-bottom:0}
+.k-st{width:22px;height:22px;border-radius:50%;display:grid;place-items:center;font-size:11px;font-weight:700;flex:none}
+.k-st.ok{background:var(--success-bg);color:var(--success)}.k-st.warn{background:var(--warn-bg);color:var(--warn)}.k-st.now{background:var(--info-bg);color:var(--info)}.k-st.skip{background:var(--soft);color:var(--faint)}
+.k-tli .tm{margin-left:auto;color:var(--faint);font-size:12.5px;white-space:nowrap}
+/* Personen und Agenten */
+.k-pp{display:flex;align-items:center;gap:9px;font-size:13.5px}
+.k-pa{width:26px;height:26px;border-radius:50%;background:#5b7385;color:#fff;font-size:10.5px;display:grid;place-items:center;font-weight:700;flex:none}
+.k-ag{width:26px;height:26px;border-radius:7px;background:var(--ai-bg);border:1px solid var(--ai);color:var(--ai-ink);display:grid;place-items:center;font-size:12px;flex:none}
+.k-role{margin-left:auto;font-size:11.5px;color:var(--muted);background:var(--soft);border-radius:6px;padding:1px 7px;white-space:nowrap}
+/* Postfach zweigeteilt */
+.k-split{flex:1;min-height:0;display:grid;grid-template-columns:minmax(320px,.95fr) minmax(0,1.3fr);gap:12px}
+.k-pane{min-height:0;display:flex;flex-direction:column;overflow:hidden}
+.k-pane .scroll{flex:1;min-height:0;overflow:auto;overscroll-behavior:contain}
+.k-it{display:block;width:100%;text-align:left;border:0;border-bottom:1px solid var(--line);background:none;padding:10px 14px;border-left:3px solid transparent}
+.k-it[aria-current="true"]{background:var(--brand-bg);border-left-color:var(--brand)}
+.k-it .a{display:flex;justify-content:space-between;gap:8px}.k-it .a b{font-weight:600}
+.k-it .s{font-weight:600;font-size:13.5px;margin-top:2px}.k-it .x{color:var(--muted);font-size:12.5px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.k-it .ch{display:flex;gap:6px;margin-top:6px;flex-wrap:wrap}
+/* Organigramm */
+.k-org{display:grid;gap:12px;grid-template-columns:repeat(auto-fill,minmax(250px,1fr))}
+.k-dep{border-top:4px solid var(--c);padding:14px 16px;display:flex;flex-direction:column;gap:9px;text-align:left;width:100%}
+/* Modal, Hinweis, Chat */
+.k-modal{position:fixed;inset:0;background:rgba(10,14,28,.45);display:flex;align-items:center;justify-content:center;padding:16px;z-index:50}
+.k-modal .k-card{width:min(560px,100%);max-height:90%;overflow:auto;padding:16px 18px;display:flex;flex-direction:column;gap:10px}
+.k-toast{position:fixed;left:50%;bottom:18px;transform:translateX(-50%);background:var(--text);color:var(--bg);padding:9px 15px;border-radius:9px;font-size:13px;z-index:60}
+.k-chat{position:fixed;right:18px;bottom:18px;width:400px;height:min(600px,calc(100% - 110px));z-index:45;display:flex;flex-direction:column;overflow:hidden;box-shadow:0 18px 48px rgba(10,14,28,.22)}
+.k-chat header{display:flex;align-items:center;gap:8px;padding:12px 14px;border-bottom:1px solid var(--line)}
+.k-msgs{flex:1;overflow:auto;padding:12px 14px;display:flex;flex-direction:column;gap:8px}
+.k-msg{max-width:92%;padding:8px 11px;border-radius:11px;font-size:13px}.k-msg.me{align-self:flex-end;background:var(--brand);color:var(--surface)}.k-msg.ai{align-self:flex-start;background:var(--soft)}
+.k-msg ul{margin:4px 0 0;padding-left:18px}
+.k-chips{display:flex;gap:6px;flex-wrap:wrap;padding:0 14px 8px}.k-chips button{border:1px solid var(--line);background:var(--surface);border-radius:999px;padding:3px 10px;font-size:12px}
+.k-comp{display:flex;gap:8px;padding:8px 14px 14px}.k-comp input{flex:1;min-width:0;border:1px solid var(--line);border-radius:8px;padding:6px 10px;background:var(--bg)}
+.k-badge{position:fixed;right:18px;bottom:14px;background:var(--text);color:var(--bg);border-radius:10px;padding:6px 12px;font-size:12px;z-index:30;white-space:nowrap}
+@media (max-width:900px){
+ .k-app{grid-template-columns:1fr}
+ .k-side{position:fixed;inset:0 auto 0 0;width:270px;z-index:48;transform:translateX(-105%);transition:transform .2s}
+ .k-side.open{transform:none;box-shadow:0 0 0 100vmax rgba(10,14,28,.4)}
+ .k-menu{display:grid}.k-top{margin:10px 12px 0}.k-top .wide{display:none}
+ .k-page{padding:10px 12px 90px}
+ .k-split{grid-template-columns:1fr;grid-template-rows:minmax(0,38%) minmax(0,1fr)}
+ .k-chat{inset:0;width:auto;height:auto;border-radius:0}
+ .k-badge{right:12px;bottom:auto;top:auto;display:none}
+ .k-kv{grid-template-columns:100px 1fr}
+}
+@media (prefers-reduced-motion:reduce){*{transition:none!important;scroll-behavior:auto!important}}
+
+/* Mandantenwechsel (nur wenn die Ableitung mehrere Unternehmen hat) */
+button.k-ws.sw{border:0;background:none;width:100%;text-align:left;border-radius:10px;padding:4px 4px 8px;cursor:pointer;font:inherit;color:inherit}
+button.k-ws.sw:hover{background:var(--soft)}
+.k-ws .car{margin-left:auto;color:var(--muted)}
+.k-wsl.sm{width:22px;height:22px;border-radius:6px;font-size:11px;color:#fff}
+.k-mi[aria-current="true"]{background:var(--brand-bg)}
+
+/* Pilot business//acts + Bodo Solutions · Ergänzungen zum Kern */
+.pill{font-size:11.5px;font-weight:600;padding:1px 8px;border-radius:999px;white-space:nowrap;display:inline-block}
+.p-wait{background:var(--warn-bg);color:var(--warn)}.p-run{background:var(--info-bg);color:var(--info)}.p-ok{background:var(--success-bg);color:var(--success)}.p-open{background:var(--soft);color:var(--muted)}.p-bad{background:var(--danger-bg);color:var(--danger)}
+.abc-row{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+.abc-ta{width:100%;min-height:110px;border:1px solid var(--line);border-radius:8px;padding:8px 10px;background:var(--bg);color:var(--text);resize:vertical;line-height:1.5;font:inherit}
+.abc-orgtop{display:flex;gap:16px;align-items:center;padding:14px 18px;border-top:4px solid var(--brand);flex-wrap:wrap}
+.abc-orgtop .big{width:56px;height:56px;border-radius:50%;background:var(--brand);color:var(--surface);display:grid;place-items:center;font-weight:700;font-size:19px}
+.k-msg .btn{border:1px solid var(--line);background:var(--surface);color:var(--text);border-radius:8px;padding:3px 10px;font-weight:600;font-size:12.5px;margin-top:6px}
+.k-msg .btn.acc{background:var(--brand);border-color:var(--brand);color:#fff}
+.k-msg ul{margin:6px 0;padding-left:18px}
+.k-dep .pill{white-space:normal}
+.pv-co{display:inline-flex;align-items:center;gap:6px;font-size:12.5px;white-space:nowrap}
+.pv-co::before{content:"";width:9px;height:9px;border-radius:3px;background:var(--c)}
+.pv-wait{padding:12px 16px;border-bottom:1px solid var(--line);display:flex;flex-direction:column;gap:8px}
+.pv-wait:last-child{border-bottom:0}
+.pv-mono{font-family:var(--mono);font-size:12.5px}
+a.k-btn{text-decoration:none;display:inline-flex;align-items:center}
+a.k-lnk{cursor:pointer}
+a.k-btn:not(.p){color:var(--text)}
+.pv-n,a.k-lnk{white-space:nowrap}
+</style>
+<div id="k-root"></div>
+<script>
+/* ===== Company OS · Kern (Entwurf v2) =====
+   Allgemeiner Rahmen und Seitentypen. Enthält keine Kundendaten.
+   Eine Ableitung ruft K.start(cfg) mit Mandant, Menü, Tagesleiste, Ansichten und KI-Assistent auf. */
+const $=s=>document.querySelector(s);
+const esc=s=>String(s??"").replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+const K={st:{v:null,id:null,tab:{},q:""},cfg:null,
+ /* ---------- Bausteine ---------- */
+ chip:(t,tone="",dot=false)=>`<span class="k-chip ${tone}">${dot?'<span class="d"></span>':""}${t}</span>`,
+ btn:(t,attr="",p=false,sm=false)=>`<button class="k-btn${p?" p":""}${sm?" sm":""}" ${attr}>${t}</button>`,
+ kv:rows=>`<div class="k-kv">${rows.map(([k,v])=>`<span class="k">${k}</span><span>${v}</span>`).join("")}</div>`,
+ person:(ini,n,role="")=>`<div class="k-pp"><span class="k-pa">${esc(ini)}</span>${esc(n)}${role?`<span class="k-role">${esc(role)}</span>`:""}</div>`,
+ agent:(n,role="")=>`<div class="k-pp"><span class="k-ag" aria-hidden="true">✦</span>${esc(n)}${role?`<span class="k-role">${esc(role)}</span>`:""}</div>`,
+ go:(v,id)=>`data-go="${v}${id!=null?"|"+id:""}"`,
+ ini:n=>String(n).split(/[\s·]+/).filter(Boolean).slice(0,2).map(w=>w[0]).join("").toUpperCase(),
+ table(cols,rows,{rowGo,empty="Keine Einträge."}={}){
+  if(!rows.length)return `<div class="k-sb k-note">${empty}</div>`;
+  return `<div class="k-tw"><table class="k-t"><thead><tr>${cols.map(c=>`<th>${c}</th>`).join("")}</tr></thead><tbody>${rows.map((r,i)=>{const g=rowGo&&rowGo(i);return `<tr ${g?`class="k-row" ${g}`:""}>${r.map(c=>`<td>${c}</td>`).join("")}</tr>`}).join("")}</tbody></table></div>`},
+ tabs(view,items){const cur=K.st.tab[view]??items[0][0];return `<div class="k-tabs" role="tablist">${items.map(([k,l,n])=>`<button class="k-tab" role="tab" aria-selected="${k===cur}" data-tab="${view}|${k}">${l}${n!=null?` <small>${n}</small>`:""}</button>`).join("")}</div>`},
+ tab:(view,def)=>K.st.tab[view]??def,
+ timeline:items=>items.map(([st,sym,html,tm])=>`<div class="k-tli"><span class="k-st ${st}">${sym}</span><div>${html}</div>${tm?`<span class="tm">${tm}</span>`:""}</div>`).join(""),
+ /* ---------- Seitentypen ---------- */
+ pageHead:(title,{chips=[],actions=""}={})=>`<div class="k-card k-ph"><h1>${title}</h1>${chips.join("")}<span class="k-sp"></span>${actions}</div>`,
+ dash({hello,sub,stand,groups}){return `<div class="k-card k-hello"><div><h1>${hello}</h1><div class="k-note">${sub}</div></div><span class="k-sp"></span><span class="k-lbl">${stand}</span></div>
+  ${groups.map(g=>`<div class="k-sect">${g.t}<span>${g.s||""}</span></div><div class="k-tiles">${g.tiles.map(t=>`<button class="k-card k-tile" style="--c:${t.c||"var(--brand)"}" ${t.go||""}><h3>${t.t}<small>${t.k||""}</small></h3>${t.kp?`<div class="kp">${t.kp.map(([n,l])=>`<div><span class="big">${n}</span><span class="k-lbl">${l}</span></div>`).join("")}</div>`:`<span class="big">${t.n}</span>`}<span class="k-note">${t.d||""}</span></button>`).join("")}</div>`).join("")}`},
+ list({title,chips=[],actions="",view,tabs,tools="",cols,rows,rowGo,note,count}){
+  return `${K.pageHead(title,{chips,actions})}${tabs?K.tabs(view,tabs):""}<div class="k-card"><div class="k-lh"><b>${count??rows.length} ${esc(title.replace(/^Übersicht\s*/,""))}</b>${tools}</div>${K.table(cols,rows,{rowGo})}<div class="k-pg"><span>1–${rows.length} von ${count??rows.length}</span><span>${note||""}</span></div></div>`},
+ detail({title,num,chips=[],actions="",cards=[],sections=[],empty=[]}){
+  const S=sections.filter(s=>!s.hide);
+  return `<div class="k-card k-ph"><h1>${title}</h1>${num?`<span class="k-num">· ${num}</span>`:""}${chips.join("")}<span class="k-sp"></span>${actions}</div>
+  ${cards.length?`<div class="k-sum">${cards.map(c=>`<div class="k-card k-sc"><h2>${c.t}${c.r?`<span>${c.r}</span>`:""}</h2>${c.b}</div>`).join("")}</div>`:""}
+  <nav class="k-jump" aria-label="Sprungmarken">${S.map((s,i)=>`<button class="k-jm" data-jump="${s.id}" aria-current="${i===0}">${s.t}${s.n!=null?` <small>${s.n}</small>`:""}</button>`).join("")}${empty.length?`<span class="k-vs"></span><button class="k-jm off" data-empty="${esc(empty.join("|"))}">Ohne Einträge <small>${empty.length}</small></button>`:""}<span class="k-sp"></span><button class="k-jm" data-toast="Reihenfolge der Bereiche anpassen (Prototyp)" title="Bereiche anordnen">⇅</button></nav>
+  ${S.map(s=>`<section class="k-card k-sec" id="sec-${s.id}"><div class="k-sh"><h3>${s.t}</h3>${s.n!=null?`<span class="c">${s.n}</span>`:""}<span class="k-sp"></span>${s.a||""}</div><div class="k-sb ${s.flush?"flush":""}">${s.b}</div></section>`).join("")}`},
+ inbox({head,tabs,list,detail}){return `${head}${tabs||""}<div class="k-split"><div class="k-card k-pane" aria-label="Liste">${list}</div><div class="k-card k-pane" aria-label="Detail"><div class="scroll" id="k-det">${detail}</div></div></div>`},
+ /* ---------- Rahmen ---------- */
+ shell(){const c=K.cfg,m=c.mandant;
+  /* nur in den eigenen Container schreiben – Stile und Skripte der Seite bleiben erhalten */
+  const root=document.getElementById("k-root")||document.body.appendChild(Object.assign(document.createElement("div"),{id:"k-root"}));
+  root.innerHTML=`<div class="k-app"><aside class="k-side" id="k-side">${K.wsHtml()}
+   <button class="k-fi" id="k-find"><span>⌕&nbsp; Finden…</span><span class="k-kb">Strg F</span></button><button class="k-neu" id="k-new"><span>＋&nbsp; ${esc(c.neu||"Neu")}</span><span class="k-kb">N</span></button>
+   <nav id="k-nav" aria-label="Menü"></nav><div class="k-foot"><span>${esc(c.fuss||"")}</span><span>⇅ Menü anordnen</span></div></aside>
+   <div class="k-main"><div class="k-top"><button class="k-ib k-menu" id="k-menu" aria-label="Menü">☰</button><span id="k-tl"></span><span class="sp"></span><button class="k-ib wide" data-hist="-1" aria-label="Zurück">‹</button><button class="k-ki" id="k-kibtn">✦ KI-Assistent</button><button class="k-ib" data-toast="Benachrichtigungen (Prototyp)" aria-label="Benachrichtigungen">🔔</button><button class="k-av" aria-label="Profil" ${K.go("profil")}>${esc(m.user)}</button></div>
+   <main class="k-page" id="k-page"></main></div></div>
+   <div id="k-modal"></div><div class="k-toast" id="k-toast" hidden></div>
+   <section class="k-card k-chat" id="k-chat" hidden><header><b>✦ KI-Assistent</b><span id="k-chatm">${K.chip(esc(m.name))}</span><span class="k-sp"></span><button class="k-ib" id="k-chatx" aria-label="Schließen">×</button></header><div class="k-msgs" id="k-msgs"></div><div class="k-chips" id="k-chips"></div><form class="k-comp" id="k-comp"><input id="k-in" placeholder="Frage oder Auftrag …" aria-label="Nachricht"><button class="k-btn p">Senden</button></form></section>
+   ${c.badge?`<div class="k-badge">${c.badge}</div>`:""}`;
+  document.documentElement.style.setProperty("--brand",m.brand||m.farbe)},
+ /* Mandant: ein fester (cfg.mandant) oder umschaltbar (cfg.mandanten = {schlüssel:{…}}, Start mit cfg.mstart) */
+ wsHtml(){const m=K.cfg.mandant,sw=!!K.cfg.mandanten;const inner=`<div class="k-wsl" style="background:${m.farbe}">${esc(m.ini)}</div><div><b>${esc(m.name)}</b><small>${esc(m.rolle)}</small></div>`;
+  return sw?`<button class="k-ws sw" id="k-ws" aria-haspopup="true" title="Unternehmen wechseln">${inner}<span class="car">▾</span></button>`:`<div class="k-ws">${inner}</div>`},
+ setM(k){const c=K.cfg;if(!c.mandanten||!c.mandanten[k])return;K.st.m=k;c.mandant=c.mandanten[k];const w=$("#k-side .k-ws");if(w)w.outerHTML=K.wsHtml();
+  $("#k-chatm").innerHTML=K.chip(esc(c.mandant.name));document.documentElement.style.setProperty("--brand",c.mandant.brand||c.mandant.farbe);K.st.tab={};
+  const v=c.views[K.st.v]&&!K.st.id?K.st.v:c.start;K.hist=[];K.st.v=v;K.st.id=null;K.render();$("#k-page").scrollTop=0;if(c.onMandant)c.onMandant(k)},
+ nav(){const c=K.cfg;$("#k-nav").innerHTML=c.menu.map(g=>`<div class="k-grp">${g.t}</div>${g.items.map(it=>{const n=it.n?it.n():null;const cur=it.v===K.st.v||(it.also||[]).includes(K.st.v);return `<button class="k-ni" ${K.go(it.v)} aria-current="${cur}"><span class="i">${it.i}</span>${it.l}${n?`<span class="n ${it.g?"g":""}">${n}</span>`:""}</button>`}).join("")}`).join("");
+  $("#k-tl").innerHTML=c.tagesleiste()},
+ hist:[],
+ open(v,id,{keep=false}={}){if(!keep&&K.st.v)K.hist.push([K.st.v,K.st.id]);K.st.v=v;K.st.id=id??null;K.render();if(!keep)$("#k-page").scrollTop=0;$("#k-side").classList.remove("open")},
+ render(){const c=K.cfg,f=c.views[K.st.v]||c.views[c.start];const r=f(K.st.id);const pg=$("#k-page");pg.classList.toggle("fix",!!(r&&r.fix));pg.innerHTML=typeof r==="string"?r:r.html;K.nav();K.spy();if(r&&r.after)r.after()},
+ refresh(){const pg=$("#k-page"),s=pg.scrollTop,d=$("#k-det"),ds=d?d.scrollTop:0,l=document.querySelector(".k-pane .scroll"),ls=l?l.scrollTop:0;K.render();pg.scrollTop=s;const d2=$("#k-det");if(d2)d2.scrollTop=ds;const l2=document.querySelector(".k-pane .scroll");if(l2)l2.scrollTop=ls},
+ spy(){const pg=$("#k-page"),secs=[...pg.querySelectorAll(".k-sec")];if(!secs.length)return;
+  const upd=()=>{let cur=secs[0].id;const top=pg.getBoundingClientRect().top+80;secs.forEach(s=>{if(s.getBoundingClientRect().top<=top)cur=s.id});pg.querySelectorAll(".k-jm[data-jump]").forEach(b=>b.setAttribute("aria-current","sec-"+b.dataset.jump===cur))};
+  pg.onscroll=upd;upd()},
+ toast(t){const e=$("#k-toast");e.textContent=t;e.hidden=false;clearTimeout(K.toast.t);K.toast.t=setTimeout(()=>e.hidden=true,2800)},
+ modal(html){$("#k-modal").innerHTML=html?`<div class="k-modal" data-mclose><div class="k-card" role="dialog" aria-modal="true">${html}</div></div>`:""},
+ pop(anchor,html){K.closePop();const r=anchor.getBoundingClientRect();const p=document.createElement("div");p.className="k-pop";p.id="k-pop";p.innerHTML=html;document.body.appendChild(p);p.style.top=(r.bottom+6)+"px";p.style.left=Math.max(8,Math.min(innerWidth-290,r.left))+"px"},
+ closePop(){const p=$("#k-pop");if(p)p.remove()},
+ /* ---------- KI-Assistent ---------- */
+ chat(open){const c=$("#k-chat");c.hidden=!open;if(open&&!$("#k-msgs").innerHTML){K.ai(K.cfg.ki.hallo)}$("#k-chips").innerHTML=Object.keys(K.cfg.ki.script).map(k=>`<button data-ask="${esc(k)}">${esc(k)}</button>`).join("")},
+ me(t){$("#k-msgs").insertAdjacentHTML("beforeend",`<div class="k-msg me">${esc(t)}</div>`)},
+ ai(h){$("#k-msgs").insertAdjacentHTML("beforeend",`<div class="k-msg ai">${h}</div>`);$("#k-msgs").scrollTop=1e6},
+ ask(t){K.me(t);setTimeout(()=>K.ai(K.cfg.ki.script[t]||K.cfg.ki.sonst),300)},
+ /* ---------- Finden ---------- */
+ find(){K.modal(`<h2 style="margin:0;font-size:16px">Finden</h2><input class="k-search" id="k-fq" placeholder="Name, Nummer, Begriff …" autofocus><div id="k-fr"></div>`);const i=$("#k-fq");const run=()=>{const q=i.value.trim().toLowerCase();const R=q?K.cfg.suche().filter(x=>x[0].toLowerCase().includes(q)).slice(0,12):[];$("#k-fr").innerHTML=R.map(([n,typ,go])=>`<button class="k-mi" ${go}><span>${esc(n)}</span><span class="k-lbl">${typ}</span></button>`).join("")||`<div class="k-note">${q?"Nichts gefunden.":"Suchbegriff eingeben."}</div>`};i.addEventListener("input",run);run();setTimeout(()=>i.focus(),50)},
+ /* ---------- Start und Ereignisse ---------- */
+ start(cfg){K.cfg=cfg;if(cfg.mandanten){K.st.m=cfg.mstart||Object.keys(cfg.mandanten)[0];cfg.mandant=cfg.mandanten[K.st.m]}K.shell();K.st.v=cfg.start;K.render();
+  document.addEventListener("click",e=>{const b=e.target.closest("button,[data-go],[data-mclose]");if(!b){K.closePop();return}const d=b.dataset;
+   if(d.mclose!==undefined){if(e.target===b)K.modal("");return}
+   if(!b.closest("#k-pop")&&!d.empty)K.closePop();
+   if(cfg.onClick&&cfg.onClick(b,d,e)===true)return;
+   if(d.go){const [v,id]=d.go.split("|");K.modal("");K.closePop();if(innerWidth<900)K.chat(false);K.open(v,id);return}
+   if(d.tab){const [v,k]=d.tab.split("|");K.st.tab[v]=k;K.refresh();return}
+   if(d.jump){const s=$("#sec-"+d.jump);if(s)s.scrollIntoView({behavior:"smooth",block:"start"});return}
+   if(d.empty){K.pop(b,`<b style="padding:4px 8px">Bereiche ohne Einträge</b>${d.empty.split("|").map(n=>`<button class="k-mi" data-toast="Bereich „${esc(n)}“ hinzugefügt – direkt zur Eingabe (Prototyp)"><span>${esc(n)}</span><span>＋</span></button>`).join("")}<div class="k-note" style="padding:4px 8px">Bereich anklicken: wird zur Ansicht hinzugefügt.</div>`);return}
+   if(d.mand){K.closePop();K.setM(d.mand);return}
+   if(b.id==="k-ws"){const M=cfg.mandanten;K.pop(b,`<b style="padding:4px 8px">Unternehmen wechseln</b>${Object.keys(M).map(k=>`<button class="k-mi" data-mand="${k}" aria-current="${k===K.st.m}"><span style="display:flex;gap:8px;align-items:center"><span class="k-wsl sm" style="background:${M[k].farbe}">${esc(M[k].ini)}</span>${esc(M[k].name)}</span><span class="k-lbl">${esc(M[k].kurz||"")}</span></button>`).join("")}`);return}
+   if(d.toast){K.toast(d.toast);return}
+   if(d.ask){K.ask(d.ask);return}
+   if(d.hist){const h=K.hist.pop();if(h){K.st.v=h[0];K.st.id=h[1];K.render()}return}
+   if(b.id==="k-find"){K.find();return}
+   if(b.id==="k-new"){cfg.neu&&cfg.onNeu?cfg.onNeu():K.toast("Neu (Prototyp)");return}
+   if(b.id==="k-kibtn"){K.chat($("#k-chat").hidden);return}
+   if(b.id==="k-chatx"){K.chat(false);return}
+   if(b.id==="k-menu"){$("#k-side").classList.toggle("open");return}
+  });
+  document.addEventListener("keydown",e=>{const tag=(e.target.tagName||"");if(e.key==="Escape"){K.modal("");K.closePop();$("#k-side").classList.remove("open");return}
+   if(/INPUT|TEXTAREA/.test(tag))return;if((e.ctrlKey||e.metaKey)&&e.key.toLowerCase()==="f"){e.preventDefault();K.find()}else if(e.key.toLowerCase()==="n"&&!e.ctrlKey&&!e.metaKey&&cfg.onNeu){cfg.onNeu()}});
+  $("#k-comp").addEventListener("submit",e=>{e.preventDefault();const v=$("#k-in").value.trim();if(!v)return;$("#k-in").value="";K.ask(v)});
+ }
+};
+
+/* Bisherige Pilotdaten (Bodo Solutions · business//acts) aus basis/company-os-prototyp.html, Stand Commit vor Kern v2 (11.10.2026).
+   Einmalig übernommen, damit die neue Fassung nicht mehr von der alten Datei abhängt. Teils echte Bodo-Daten – nur intern. */
+const CO={
+ all:{name:"Übersicht",color:"#5d6579",sys:"alle Unternehmen"},
+ bs:{name:"Bodo Solutions",color:"#1f3a5f",sys:"Bodo · Organisation „Bodo Solutions“"},
+ ba:{name:"business//acts",color:"#30ABE2",sys:"sellify · business//acts"}
+};
+const AREAS=[["tag","☀","Mein Tag"],["cockpit","◎","Cockpit"],["proj","▦","Projekte"],["proc","↝","Prozesse"],["jobs","☰","Aufträge"]];
+let state={co:"all",area:"tag",dayTab:"heute",showRest:false,projTab:"mine",pjTab:"list",setTab:"profil",procSel:null,procView:"list",tplF:"Branchenpaket Mieterverein",projSel:null,phaseSel:"p2",desMode:"proc",desStage:0,desPrompt:"",showNo:false,orgCo:null};
+let assistStage=0;
+
+/* ---------- Daten ---------- */
+const WAIT={
+ bs:[
+  {k:"Freigabe",t:"14 recherchierte Leads nach Bodo übertragen",d:"Prozess Lead-Gewinnung · Schritt 4 · Recherche-Agent",c:[["Zielsystem","Bodo · Bodo Solutions"],["Aktion","14 Organisationen (Kontakttyp Mieterverein, Interessent) anlegen"],["Prüfung","Dublettenprüfung: 2 bereits vorhanden, werden nicht angelegt"]]},
+  {k:"Change Request",t:"AG-114 Prozessübergabe an Inkasso bewerten",d:"Einführung · Mieterverein Hagen",c:[["Frage","Kostenpflichtig ja/nein? Angebotsbezug? Wertigkeit?"],["Hinweis","In Bodo noch ohne Beschreibung"]]}
+ ],
+ ba:[
+  {k:"Rückfrage",t:"Welche Preisliste gilt für das Angebot Jinsheng Federn?",d:"Vertrieb sellify · Angebots-Agent",c:[["Optionen","Standard 2026 · Projektpreise · Rückfrage an Boris"]]}
+ ]
+};
+const RUN={
+ bs:[["50 Leads Mietervereine NRW","Prozess Lead-Gewinnung · ◆ Lead-Prozessagent · Schritt 2 von 4","p-run","läuft"],["Entwicklungsprojekt Inkasso-Schnittstelle","Projekt · Phase 2 Konzept & Mockup · Meilenstein 29.10.","p-run","läuft"],["Einführung Mieterverein Hagen","Projekt · Aufgabenpakete aus Bodo","p-run","läuft"],["Bitfarm-Dokumentenmigration (AG-87)","überfällig seit 18.09.","p-bad","Eskalation"]],
+ ba:[["Company OS einführen","Projekt · Setup-Pakete","p-run","läuft"],["Angebot sellify Integration Kit","Prozess Angebot erstellen · wartet auf Rückfrage","p-wait","wartet"]]
+};
+const ORG={
+ bs:[
+  {n:"Vertrieb",c:"#1f3a5f",lead:["BH","Boris Hose"],dep:"Vertretung: offen",ppl:[["VI","Vertriebsinnendienst"]],pa:[["Lead-Prozessagent","führt: Lead-Gewinnung"],["Vertriebs-Prozessagent","führt: Vertrieb · Lead bis Abschluss"]],ag:["Recherche-Agent","Aufbereitungs-Agent","Vertriebsassistent Bodo","Produktinformations-Agent","Angebots-Agent"],al:"2 Freigaben warten"},
+  {n:"Einführung",c:"#147a5c",lead:["BH","Boris Hose"],dep:"Vertretung: Dominik Koppe",ppl:[["DK","Dominik Koppe · unterstützt"],["PL","Projektleitung"]],pa:[["Anforderungs-Prozessagent","führt: Anforderung aufnehmen und bewerten"]],ag:["Lösungs-Agent","Einführungs-Agent","Einrichtungs-Agent","Datenübernahme-Agent","Vorlagen-Agent"],al:"3 Aufgaben überfällig im Pilot"},
+  {n:"Kundenservice",c:"#6a4fb3",lead:["KS","Leitung offen"],dep:"Vertretung: offen",ppl:[["SU","Support"]],pa:[["Service-Prozessagent","führt: Betrieb · Anfrage bis Rückmeldung"]],ag:["Annahme-Agent","Ticket-Agent"],ok:"Alles im Plan"},
+  {n:"Produktentwicklung",c:"#8a5a12",lead:["DK","Dominik Koppe"],dep:"Vertretung: offen",ppl:[["EN","Entwicklung"]],pa:[["Projekt-Agent Entwicklung","projektverantwortlich: Entwicklungsprojekt Inkasso-Schnittstelle"]],ag:["Ticket-Agent · unterstützt"],ok:"Nimmt Tickets aus dem Betrieb entgegen"}
+ ],
+ ba:[
+  {n:"Vertrieb sellify",c:"#30ABE2",lead:["BH","Boris Hose"],dep:"Vertretung: offen",ppl:[["VT","Vertrieb"]],pa:[["Angebots-Prozessagent","führt: Angebot erstellen"]],ag:["Vertriebsassistent sellify","Angebots-Agent","Video-Agent"],al:"1 Rückfrage offen"},
+  {n:"Beratung & Projekte",c:"#2457c5",lead:["PL","Leitung offen"],dep:"Vertretung: offen",ppl:[["BE","Berater:in"]],pa:[["Onboarding-Prozessagent","führt: Onboarding sellify-Kunde (Entwurf)"]],ag:["Onboarding-Agent sellify","Einrichtungs-Agent","Lösungs-Agent · unterstützt"],ok:"Company OS einführen läuft"}
+ ]
+};
+const GF={bs:{dep:"Vertretung: Dominik Koppe (Beispiel)"},ba:{dep:"Vertretung: offen"}};
+const PSK=[["E-Mails vorbereiten","Entwürfe in deinem Stil, Versand nach Freigabe",1],["Tagesbriefing","Morgens: was wartet, was ist überfällig",1],["Termine & Wiedervorlagen","in Bodo bzw. sellify anlegen und nachhalten",1],["Freigaben bündeln","alle offenen Freigaben auf einen Blick",1],["Angebote erstellen","nach Vorlage aus der Bibliothek",0],["Kontakte anlegen","mit Dublettenprüfung",0],["Tickets anlegen","Feature Requests und Issues ohne Dubletten",0],["Produktinformationen","Produktblätter im Hausstil",0],["Präsentationen","Foliensätze vorbereiten",0]];
+const B="https://bodo-app.com/o/k57bshnkdpahzs3fv4hvq6wz1s8aq2pm/aufgaben/";
+const PKG=[
+ {n:"Datenübernahme",c:"#147a5c",v:"Dominik Koppe",b:"Boris Hose",due:"31.10.",ag:"Datenübernahme-Agent",st:["p-bad","1 überfällig"],t:[["AG-1","Aktuelle Daten aus MIV Hagen Datenbank holen","p-ok","erledigt","",""],["AG-2","MIV Hagen Datenbank in Bodo importieren und als Dev Convex zur Verfügung stellen","p-ok","erledigt","02.08.","Dominik Koppe"],["AG-90","Migration von „Hinweisen“ am Kontakt","p-ok","erledigt","","Dominik Koppe"],["AG-81","Sachbearbeiter Klärung – welche User sind aktiv","p-ok","erledigt","",""],["AG-87","Bitfarm Dokumenten Migration","p-bad","in Bearbeitung · überfällig","18.09.","Dominik Koppe"],["AG-82","Lastschrift Oktober simulieren","p-open","offen","",""]]},
+ {n:"Setup definieren",c:"#2457c5",v:"Boris Hose",b:"Dominik Koppe",due:"07.11.",ag:"Einrichtungs-Agent",st:["p-bad","1 überfällig"],t:[["AG-183","Nummernkreis-Übergabe MIV Hagen – Kontakt vs. Vertrag","p-bad","in Bearbeitung · überfällig","01.10.","Dominik Koppe"],["AG-85","Suchvorlagen & Listenexport (pdf / xlsx)","p-open","offen","",""],["AG-86","Auswertungen","p-open","offen","",""],["AG-84","Artikel zu Gewerbetarif bündeln","p-open","offen","","Dominik Koppe"],["AG-83","2 Jahre Kündigungsfrist an Verträgen festhalten","p-open","offen","",""]]},
+ {n:"Anforderungen & Change Requests",c:"#c8641a",v:"Boris Hose",b:"Dominik Koppe",due:"14.11.",ag:"◆ Anforderungs-Prozessagent",st:["p-wait","Bewertung offen"],t:[["AG-114","Prozessübergabe an Inkasso durchdenken und definieren","p-bad","in Bearbeitung · überfällig","17.09.","Boris Hose"],["AG-88","Meldungen an den Landesverband","p-open","offen","",""]],ev:true},
+ {n:"Dokumentvorlagen",c:"#6a4fb3",v:"offen",b:"–",due:"–",ag:"Vorlagen-Agent",st:["p-open","nicht geplant"],t:[]},
+ {n:"Benutzerschulung",c:"#8a5a12",v:"offen",b:"–",due:"–",ag:"Einführungs-Agent",st:["p-open","nicht geplant"],t:[]},
+ {n:"Übergabe Dev → Produktiv",c:"#14213d",v:"Boris Hose",b:"Dominik Koppe",due:"–",ag:"Einrichtungs-Agent",st:["p-wait","blockiert"],t:[],block:"KI-Zugang im Vereinssystem fehlt (Angabe zur Rechtsberatung)"},
+ {n:"Projektsteuerung & Abstimmung",c:"#5d6579",v:"Boris Hose",b:"Dominik Koppe",due:"laufend",ag:"Persönlicher KI-Assistent",st:["p-run","laufend"],t:[["AG-100","Terminaufzeichnungen 8.9.26 mit Dominik teilen","p-ok","erledigt","08.09.","Boris Hose"],["AG-101","Neue Teams Termin Einladung für 15.09. rausschicken","p-ok","erledigt","25.09.","Boris Hose"]]}
+];
+const BO="https://bodo-app.com/o/k57bshnkdpahzs3fv4hvq6wz1s8aq2pm/";
+const BLINK=[["MIV Hagen Migration",BO+"projekte/js7jm4cbk99fwprsngazz7a0ad8bbzjk"],["Bodo - Einführung bei MIV Hagen",BO+"projekte/js7yhx046fsx5nnmnvt8y4vbgs8fvj9g"],["K-0037",BO+"parties/kh7ayp3a941n1ft1fewvgkfq0d8ewt1x"]];
+const HAGEN={stand:"11.10.2026",kunde:["Mietervereine Hagen","K-0037",BO+"parties/kh7ayp3a941n1ft1fewvgkfq0d8ewt1x"],kontakte:[["Kirsten Horn","Verwaltungsleitung",BO+"parties/kh7e8yxee73en3rf3tqt23bw0x8fdyna"],["Stefan Wintersohle","Rechtsanwalt",BO+"parties/kh74gnthgmgb2t8aafbnk6nbb18fg2tt"]],
+ proj:[["MIV Hagen Migration","15 Aufgaben",BO+"projekte/js7jm4cbk99fwprsngazz7a0ad8bbzjk"],["Bodo - Einführung bei MIV Hagen","Projekttyp Bodo-Einführung, noch ohne Aufgaben",BO+"projekte/js7yhx046fsx5nnmnvt8y4vbgs8fvj9g"]],
+ hot:[["AG-114","Prozessübergabe an Inkasso durchdenken und definieren","Boris Hose","17.09.","Feature Request · Priorität hoch · noch ohne Beschreibung","◆ Anforderungs-Prozessagent: Beschreibung als Entwurf schreiben, Kosten und Angebotsbezug bewerten, dir zur Freigabe vorlegen"],
+      ["AG-87","Bitfarm Dokumenten Migration","Dominik Koppe","18.09.","Priorität hoch","Persönlicher KI-Assistent: Stand bei Dominik Koppe erfragen, neue Frist vorschlagen und in Bodo eintragen"],
+      ["AG-183","Nummernkreis-Übergabe MIV Hagen – Kontakt vs. Vertrag","Dominik Koppe","01.10.","Priorität normal","Einrichtungs-Agent: Entscheidungsvorlage Kontaktnummer vs. Vertragsnummer vorbereiten"]]};
+
+const ids={"AG-1":"v17dzd7w2rggdesxn66rgq2jtx8bacj2","AG-2":"v174y97xq72pdxdc362ektx3vh8ba467","AG-90":"v17b95pxpdah39anm9qy3sv4358dvrzn","AG-81":"v17bj8k7h28trdzcwn6yf87wah8dv1je","AG-87":"v175czw98stjcjyt5xndca5md58dttx3","AG-82":"v17dbfm3k52qhqq1v80effp6c98dt9b3","AG-183":"v171x32ex93v601cy043bg4jrh8f5cr5","AG-85":"v17dc3692tjz6sq9vbf2jb64398dvskq","AG-86":"v179gzs5xkhew5z8xg90n9h5118dt9dj","AG-84":"v174q7b50z7h4ew1vy951j1e358dt55h","AG-83":"v178x48779ebjtma439j8xkzmh8dtv52","AG-114":"v17142s34zjy8zfv767y7txvyh8e4h99","AG-88":"v178dd7062hngs4t5x5224yyvn8dvzq7","AG-100":"v1732ppjyxhgtpbh266dym6f7n8e1f7t","AG-101":"v17ehsaezwnsncj11v5mc659ph8e1f5r"};
+const VT=[["Leads recherchieren","Recherche-Agent · Mensch: Vertrieb","→ Bodo: Kontakte"],["Erstkontakt & Bedarf","Vertriebsassistent","→ Bodo: Chance, Termin"],["Demo vorbereiten","Produktinfo-Agent","→ Bodo: Demo-Organisation"],["Angebot","Angebots-Agent","→ Bodo: Dokument, E-Mail"],["Abschluss","Vertriebsassistent","startet Einführung"]];
+const BT=[["Anfrage annehmen","Annahme-Agent","→ Chronik"],["Einordnen","Annahme-Agent","Dublettenprüfung"],["Lösen oder Ticket","Ticket-Agent · Mensch: Support","→ Bodo: Ticket"],["Rückmeldung","Annahme-Agent","→ E-Mail mit Signatur"]];
+const SETUP=[
+ ["Inhaber-System",[["Kunde im eigenen CRM","Bodo · Bodo Solutions → Mietervereine Hagen (K-0037)"],["Bezug","Kunde von Bodo Solutions"]]],
+ ["Projekte",[["Hauptprojekt","Bodo - Einführung bei MIV Hagen (Name in Bodo)"],["Weitere Projekte","MIV Hagen Migration"],["Verwaltung","Projekte, Meilensteine und Aufgaben bleiben in Bodo – Company OS zeigt sie an und steuert die Arbeit"]]],
+ ["Anschlüsse & Rollen",[["CRM","Bodo · Dev-System Mieterverein Hagen e.V. (Einrichtung), Produktivsystem wird später festgelegt"],["Entwicklung","Bodo (Feature Request / Issue)"],["Bibliothek","Cloud-Ordner (OneDrive/SharePoint oder Google Drive)"],["ERP · weitere Systeme","nicht angeschlossen – bei Bedarf per MCP"],["KI-Zugang im Kundensystem","fehlt – Angabe zur Rechtsberatung nachholen"]]],
+ ["KI-Anbieter & Haupt-KI",[["Haupt-KI (Pflicht)","Claude – nur von uns freigegebene Anbieter wählbar"],["Weitere Anbieter","registrieren, nur mit bestätigter AVV"],["KI-Profile","zunächst alle auf die Haupt-KI, später verfeinern"],["Datenstufe je Anbieter","0 ohne Personendaten · 1 pseudonymisiert · 2 personenbezogen"],["Budget je Anbieter","bei Erreichen: anhalten und benachrichtigen"]]],
+ ["Abteilungen & Organigramm",[["Verwaltet","Vorstand · Verwaltung · Rechtsberatung · Buchhaltung"],["Je Abteilung","eine Leitung, eine Vertretung, Mitarbeitende, Agenten"]]],
+ ["Branchenpaket",[["Paket","Mieterverein"],["Liefert","Organigramm-Vorlage, Vorschlagsliste mit Prozessen und Projektvorlagen, Standard-Agenten und Skills"]]],
+ ["Menschen",[["Mitarbeitende","je Abteilung, verknüpft mit Bodo-Benutzer"]]],
+ ["Prozesse & Projekte",[["Vorschlagsliste","aus dem Branchenpaket: Prozesse und Projektvorlagen – direkt übernehmen, anpassen, ablehnen oder später"],["Je Schritt","Arbeitsanweisung · Agent und Ersatz-Agent · KI-Profil · Datenstufe"],["Je Prozess","Prozessverantwortlicher Agent · ergebnisverantwortlicher Mensch"],["Übernommenes","startet als Entwurf, aktiv erst nach Testlauf"]]],
+ ["Übergabewege",[["Entwicklungsaufträge","→ Bodo, Methode: Skill bodo-ticket-anlegen"],["Auftrag nach Abschluss an ERP","kein ERP angeschlossen"],["Abweichung je Projekt","möglich"]]],
+ ["Bibliothek & Vorlagenquellen",[["Aus dem Kundensystem","Bodo: E-Mail- und Dokumentvorlagen (über den Anschluss)"],["Cloud-Ordner","OneDrive/SharePoint oder Google Drive – kein lokaler Ordner"]]],
+ ["Agenten & Skills",[["Agentenpool","Annahme-Agent · Termin-Agent · Beitrags-Agent · Prüf-Agent"],["Prozessführung","je Prozess ein Prozessverantwortlicher Agent (Standard-Skill „Prozess führen“)"],["Regel","Agenten werden beim Entwerfen fest eingesetzt – keine Ausleihe zur Laufzeit"]]],
+ ["Freigaben & Benachrichtigung",[["Außenwirkung","Freigabe nötig, im Auftrag aufhebbar"],["Ruhezeit","20–7 Uhr"],["Kanäle","App · E-Mail je Person · Handy (Mobil-Projekt)"]]],
+ ["Zugriff",[["Rollen","Vorstand · Abteilungsleitung · Mitarbeitende"]]],
+ ["Recht & Datenschutz",[["AVV Kunde ↔ Anbieter von Company OS","bestätigt"],["Regeln","je Regel: hart (keine Hintertür) oder übersteuerbar durch eine festgelegte Rolle, protokolliert"],["Agenten dürfen nie","Rechtsberatung erteilen · Geld bewegen"]]],
+ ["KI-Assistent & Übersicht",[["KI-Assistent (Company-Chat)","aktiv, je Unternehmen"],["Mein Tag","Morgenübersicht und Tagesabschluss je Person einstellbar"],["Kennzahlen","überfällige Pakete · wartende Freigaben · Prozesse aktiv/im Test · KI-Kosten"]]],
+ ["Abschluss",[["Prüfung","Verbindungstest Anschlüsse und KI-Anbieter · Probelauf · Setup-Protokoll in der Kundenakte"]]]
+];
+let setupStep=0;
+const S=(n,dep,ag,ers,fr)=>({n,dep,ag,ers,fr});
+const STC={"aktiv":"p-ok","im Test":"p-run","Entwurf":"p-open"};
+const PROC={
+ bs:[
+  {id:"lead",n:"Lead-Gewinnung",dep:"Vertrieb",st:"aktiv",v:"v3",pa:"Lead-Prozessagent",er:"Boris Hose",run:"1 Auftrag läuft",note:"Der Aufbereitungs-Agent wurde in seiner Heimat-Abteilung geändert (v2 → v3). Testlauf nötig, bevor dieser Prozess die neue Version übernimmt – bis dahin arbeitet er mit v2.",steps:[S("Leads ermitteln","Vertrieb","Recherche-Agent","Vertriebsassistent Bodo",""),S("Leads aufbereiten","Vertrieb","Aufbereitungs-Agent","Recherche-Agent",""),S("Dubletten prüfen","Vertrieb","Recherche-Agent","–",""),S("Ins CRM übergeben","Vertrieb","Recherche-Agent","Vertriebsassistent Bodo","Freigabe: Leitung Vertrieb")]},
+  {id:"vt",n:"Vertrieb · vom Lead zum Abschluss",dep:"Vertrieb",st:"aktiv",v:"v2",pa:"Vertriebs-Prozessagent",er:"Boris Hose",run:"kein Auftrag aktiv",steps:[S("Leads recherchieren","Vertrieb","Recherche-Agent","Vertriebsassistent Bodo","Mensch: Vertriebsinnendienst"),S("Erstkontakt & Bedarf","Vertrieb","Vertriebsassistent Bodo","–",""),S("Demo vorbereiten","Vertrieb","Produktinformations-Agent","–",""),S("Angebot","Vertrieb","Angebots-Agent","–","Freigabe vor Versand"),S("Abschluss","Vertrieb","Vertriebsassistent Bodo","–","startet Projekt „Einführung“")]},
+  {id:"bt",n:"Betrieb · Anfrage bis Rückmeldung",dep:"Kundenservice",st:"aktiv",v:"v2",pa:"Service-Prozessagent",er:"Support",run:"1 Auftrag läuft",steps:[S("Anfrage annehmen","Kundenservice","Annahme-Agent","–",""),S("Einordnen","Kundenservice","Annahme-Agent","–","Dublettenprüfung"),S("Lösen oder Ticket","Kundenservice","Ticket-Agent","–","Mensch: Support"),S("Rückmeldung","Kundenservice","Annahme-Agent","–","E-Mail mit Signatur")]},
+  {id:"anf",n:"Anforderung → Lösung → Angebot",dep:"Einführung",st:"im Test",v:"v2",pa:"Anforderungs-Prozessagent",er:"Boris Hose",run:"Testlauf im Dev-System",note:"Ablauf neu (v2): Lösungs-Agent erstellt Konzept, klickbaren Prototyp, Lösungsdokument, Angebot und Kundenunterlagen; nach dem Auftrag programmiert der Entwicklungs-Agent, sichert die Qualität und dokumentiert für den Kunden und im Quellcode. Testlauf nötig.",steps:[S("Anforderungen des Kunden übernehmen, auf Vorhandenes prüfen","Einführung","Einführungs-Agent","–","Dublettenprüfung"),S("Lösungsidee einsprechen","Einführung","–","–","Mensch: Consultant"),S("Konzept und klickbarer Prototyp","Einführung","Lösungs-Agent","–",""),S("Abgleich: Anforderungen und Lösungsidee vollständig abgedeckt?","Einführung","Lösungs-Agent","Anforderungs-Prozessagent","Lücken zurück an Consultant"),S("Lösungsdokument: Ausgangslage, Lösung, Nutzen","Einführung","Lösungs-Agent","–",""),S("Aufwand schätzen","Entwicklung","–","–","Mensch: Entwicklung"),S("Angebot und Kundenunterlagen","Einführung","Lösungs-Agent","Angebots-Agent",""),S("Paket prüfen, an den Kunden senden","Einführung","–","–","Freigabe: Consultant"),S("Freigabe und Auftrag","Einführung","–","–","Mensch: Kunde"),S("Ticket anlegen, Umsetzung programmieren","Entwicklung","Entwicklungs-Agent","–","Übergabeweg: Bodo-Ticket, ohne Zuständigen"),S("Testen und Qualität sichern","Entwicklung","Entwicklungs-Agent","Ticket-Agent","Testlauf im Dev-System"),S("Dokumentation für den Kunden und im Quellcode","Entwicklung","Lösungs-Agent","–",""),S("Geprüften Stand zur Abnahme senden","Einführung","–","–","Freigabe: Consultant, Abnahme: Kunde")]}
+ ],
+ ba:[
+  {id:"ang",n:"Angebot erstellen",dep:"Vertrieb sellify",st:"aktiv",v:"v2",pa:"Angebots-Prozessagent",er:"Boris Hose",run:"1 Auftrag wartet",steps:[S("Bedarf aufnehmen","Vertrieb sellify","Vertriebsassistent sellify","–",""),S("Angebot aus Vorlage entwerfen","Vertrieb sellify","Angebots-Agent","–",""),S("Freigabe","Vertrieb sellify","–","–","Boris Hose"),S("Versand & Wiedervorlage","Vertrieb sellify","Angebots-Agent","Vertriebsassistent sellify","")]},
+  {id:"anfba",n:"Anforderung → Lösung → Angebot",dep:"Beratung & Projekte",st:"Entwurf",v:"v1",pa:"Anforderungs-Prozessagent",er:"Boris Hose",run:"–",steps:[S("Anforderungen des Kunden übernehmen, auf Vorhandenes prüfen","Beratung & Projekte","Einführungs-Agent","–","Dublettenprüfung"),S("Lösungsidee einsprechen","Beratung & Projekte","–","–","Mensch: Berater:in"),S("Konzept und klickbarer Prototyp","Beratung & Projekte","Lösungs-Agent","–",""),S("Abgleich: Anforderungen und Lösungsidee vollständig abgedeckt?","Beratung & Projekte","Lösungs-Agent","Anforderungs-Prozessagent","Lücken zurück an Berater:in"),S("Lösungsdokument: Ausgangslage, Lösung, Nutzen","Beratung & Projekte","Lösungs-Agent","–",""),S("Aufwand schätzen","Entwicklung","–","–","Mensch: Entwicklung"),S("Angebot und Kundenunterlagen","Beratung & Projekte","Lösungs-Agent","Angebots-Agent",""),S("Paket prüfen, an den Kunden senden","Beratung & Projekte","–","–","Freigabe: Berater:in"),S("Freigabe und Auftrag","Beratung & Projekte","–","–","Mensch: Kunde"),S("Ticket anlegen, Umsetzung programmieren","Entwicklung","Entwicklungs-Agent","–","Übergabeweg: GitLab-Issue, ohne Zuständigen"),S("Testen und Qualität sichern","Entwicklung","Entwicklungs-Agent","Ticket-Agent","Testlauf im Dev-System"),S("Dokumentation für den Kunden und im Quellcode","Entwicklung","Lösungs-Agent","–",""),S("Geprüften Stand zur Abnahme senden","Beratung & Projekte","–","–","Freigabe: Berater:in, Abnahme: Kunde")]},
+  {id:"onb",n:"Onboarding sellify-Kunde",dep:"Beratung & Projekte",st:"Entwurf",v:"v1",pa:"Onboarding-Prozessagent",er:"Leitung offen",run:"–",steps:[S("Kickoff vorbereiten","Beratung & Projekte","Onboarding-Agent sellify","–",""),S("Mandant einrichten","Beratung & Projekte","Einrichtungs-Agent","–","Freigabe: Berater:in")]}
+ ]
+};
+const TPLF=["Branchenpaket Mieterverein","Vertrieb","Marketing","Kundenservice","Buchhaltung & Finanzen","Personal","Geschäftsführung","Beratung & Entwicklung"];
+const TPL=[
+ {f:"Branchenpaket Mieterverein",n:"Neuaufnahme Mitglied",d:"Antrag prüfen → Mitglied anlegen → Begrüßung senden",sk:["antrag-pruefen","kontakt-anlegen","email-erstellung"]},
+ {f:"Branchenpaket Mieterverein",n:"Betriebskostenabrechnung vorprüfen",d:"Unterlagen anfordern → prüfen → Prüfbericht zur Freigabe",sk:["betriebskosten-pruefen","email-erstellung"]},
+ {f:"Branchenpaket Mieterverein",n:"Beratungstermin",d:"Anliegen aufnehmen → Termin vereinbaren → erinnern",sk:["termin-vereinbaren","email-erstellung"]},
+ {f:"Branchenpaket Mieterverein",n:"Kündigung und Rückgewinnung",d:"Kündigungsgrund erkennen → Rückgewinnung anbieten → Wiedervorlage",sk:["kuendigung-auswerten","email-erstellung"]},
+ {f:"Vertrieb",n:"Lead-Gewinnung",d:"ermitteln → aufbereiten → Dubletten prüfen → ins CRM übergeben",sk:["lead-recherche","lead-aufbereiten","kontakt-anlegen"]},
+ {f:"Vertrieb",n:"Angebot erstellen",d:"Bedarf → Entwurf aus Vorlage → Freigabe → Versand → Wiedervorlage",sk:["bodo-angebot","email-erstellung"]},
+ {f:"Vertrieb",n:"Angebote nachfassen",d:"offene Angebote finden → Erinnerung entwerfen → Wiedervorlage",sk:["wiedervorlage","email-erstellung"]},
+ {f:"Marketing",n:"Newsletter / Kampagne",d:"Thema → Text → Freigabe → Versand → Auswertung",sk:["texte-schreiben","email-erstellung"]},
+ {f:"Marketing",n:"Infomaterial auf Anfrage",d:"Anfrage erkennen → Material aus der Bibliothek → Versand",sk:["bibliothek-versand","email-erstellung"]},
+ {f:"Marketing",n:"Social-Media-Beitrag",d:"Thema → Text und Bild → Freigabe",sk:["texte-schreiben","bild-erstellen"]},
+ {f:"Kundenservice",n:"Anfrage einordnen und beantworten",d:"Eingang → einordnen → Antwortentwurf → Freigabe → senden → dokumentieren",sk:["anfrage-einordnen","email-erstellung"]},
+ {f:"Kundenservice",n:"Beschwerde bearbeiten",d:"aufnehmen → Ursache klären → Antwort → nachfassen",sk:["anfrage-einordnen","email-erstellung"]},
+ {f:"Kundenservice",n:"Termin vereinbaren und erinnern",d:"Wunschtermin → Kalender → Erinnerung",sk:["termin-vereinbaren"]},
+ {f:"Buchhaltung & Finanzen",n:"Eingangsrechnung prüfen",d:"Eingang → prüfen → vorkontieren → Freigabe",sk:["rechnung-pruefen"]},
+ {f:"Buchhaltung & Finanzen",n:"Mahnwesen",d:"offene Posten → Erinnerung → Mahnstufe → Inkasso-Übergabe",sk:["mahnung-erstellen","email-erstellung"]},
+ {f:"Buchhaltung & Finanzen",n:"Rechnung stellen",d:"Leistung erfassen → Rechnung → Versand",sk:["rechnung-erstellen"]},
+ {f:"Personal",n:"Bewerbungen vorsortieren",d:"Eingang → Kriterien prüfen → Vorschlag an die Leitung (Datenstufe beachten)",sk:["bewerbung-sichten"]},
+ {f:"Personal",n:"Onboarding",d:"Zugänge → Unterlagen → Einarbeitungsplan",sk:["onboarding-planen","email-erstellung"]},
+ {f:"Personal",n:"Abwesenheiten",d:"Antrag → Vertretung prüfen → Freigabe",sk:["termin-vereinbaren"]},
+ {f:"Geschäftsführung",n:"Wochenbericht",d:"Kennzahlen sammeln → Bericht → Versand",sk:["bericht-erstellen"]},
+ {f:"Geschäftsführung",n:"Besprechung vorbereiten und protokollieren",d:"Agenda → Unterlagen → Protokoll → Aufgaben",sk:["protokoll-schreiben","email-erstellung"]},
+ {f:"Beratung & Entwicklung",n:"Anforderung → Lösung → Angebot",d:"Anforderungen übernehmen → Lösungsidee einsprechen → Konzept und klickbarer Prototyp → Abdeckung prüfen → Lösungsdokument → Angebot und Kundenunterlagen → Freigabe → Ticket nach Auftrag",sk:["anforderung-konzipieren","prototyp-erstellen","loesungsdokument","bodo-angebot","bodo-ticket-anlegen"]},
+ {f:"Projektvorlagen",n:"Entwicklungsprojekt",d:"Phasen: Anforderungsanalyse & Spezifikation → Konzept & Mockup → Umsetzung (parallel: Testfälle vorbereiten) → Qualitätssicherung · Abnahme je Phase = Meilenstein",sk:["prozess-fuehren"],proj:true},
+ {f:"Projektvorlagen",n:"Einführung Bodo beim Mieterverein",d:"Aufgabenpakete ohne feste Reihenfolge: Datenübernahme, Setup, Vorlagen, Schulung, Übergabe Dev → Produktiv",sk:["bodo-einfuehrung-anlegen","bodo-ersteinrichtung"],proj:true}
+];
+const tplSk=n=>(TPL.find(t=>t.n===n)||{sk:[]}).sk;
+const SUG=[
+ {n:"Neuaufnahme Mitglied",src:"Branchenpaket Mieterverein",why:"häufigster Vorgang im Verein",s:"offen"},
+ {n:"Betriebskostenabrechnung vorprüfen",src:"Branchenpaket Mieterverein",why:"hoher Zeitaufwand je Fall",s:"offen"},
+ {n:"Beratungstermin",src:"Branchenpaket Mieterverein",why:"viele Rückfragen per Telefon",s:"offen"},
+ {n:"Kündigung und Rückgewinnung",src:"Branchenpaket Mieterverein",why:"Kündigungsgründe werden heute nicht ausgewertet",s:"offen"},
+ {n:"Angebote nachfassen",src:"Gespräch mit dem KI-Assistenten",why:"„Wir vergessen oft nachzufassen.“",s:"offen"},
+ {n:"Infomaterial auf Anfrage",src:"Gespräch mit dem KI-Assistenten",why:"Material liegt in der Bibliothek bereit",s:"offen"},
+ {n:"Wochenbericht",src:"eigener Prompt",why:"„Jeden Freitag ein Überblick für die Geschäftsführung“",s:"offen"}
+];
+let sugSel=new Set();
+const PROJ={
+ bs:[{id:"hagen",n:"Einführung Mieterverein Hagen",kind:"Aufgabenpakete",sys:"Bodo",pv:["Mensch","Boris Hose"],tpl:"Einführung Bodo beim Mieterverein",flow:"manuell"},
+     {id:"dev",n:"Entwicklungsprojekt Inkasso-Schnittstelle",kind:"Phasen",sys:"Bodo",pv:["KI-Agent","Projekt-Agent Entwicklung"],tpl:"Entwicklungsprojekt",flow:"automatisch",ex:true}],
+ ba:[{id:"cos",n:"Company OS einführen",kind:"Aufgabenpakete",sys:"sellify",pv:["Mensch","Boris Hose"],tpl:"–",flow:"manuell"}]
+};
+const PH=[
+ {id:"p1",n:"Anforderungsanalyse & Spezifikation",st:"done",from:"01.10.",to:"15.10.",er:"Boris Hose",pr:[["Anforderung → Lösung → Angebot","12 von 12 Läufen"],["Spezifikation erstellen","1 von 1"]],ms:["Spezifikation abgenommen","15.10.",true]},
+ {id:"p2",n:"Konzept & Mockup",st:"run",from:"16.10.",to:"29.10.",er:"Boris Hose",pr:[["Umsetzungskonzept erstellen","1 von 1"],["Klickbares Mockup erstellen und abstimmen","1 von 2 · Feedbackrunde 2 läuft"]],ms:["Konzept und Mockup vom Kunden freigegeben","29.10.",false]},
+ {id:"p3",n:"Umsetzung",st:"open",par:1,from:"30.10.",to:"10.12.",er:"Leitung Produktentwicklung",pr:[["Entwicklungsticket umsetzen","0 von 22 Tickets"]],ms:["Alle Tickets erledigt, Stand im Testsystem","10.12.",false]},
+ {id:"p3b",n:"Testfälle vorbereiten",st:"open",par:1,from:"30.10.",to:"03.12.",er:"Boris Hose",pr:[["Testfall aus echtem Prozess ableiten","0 von 15 Testfällen"]],ms:["Testfälle mit dem Kunden abgestimmt","03.12.",false]},
+ {id:"p4",n:"Qualitätssicherung",st:"open",from:"11.12.",to:"19.12.",er:"Boris Hose",pr:[["Echten Prozess gegen die Entwicklung verproben","0 von 15"],["Fehler melden → Ticket in der Umsetzung","bei Bedarf"]],ms:["Kundenabnahme – danach Übergabe Dev → Produktiv","19.12.",false]}
+];
+const PHS={done:["p-ok","abgenommen"],run:["p-run","läuft"],open:["p-open","geplant"]};
+const JOBS={
+ bs:[["50 Leads Mietervereine NRW bis 31.10.","Prozess Lead-Gewinnung · ◆ Lead-Prozessagent · Schritt 2 von 4","intern · ohne Projekt","p-run","läuft"],
+     ["Mockup – Feedbackrunde 2","Prozess Klickbares Mockup abstimmen · Phase 2","im Projekt: Entwicklungsprojekt Inkasso-Schnittstelle","p-wait","wartet auf Kunde"],
+     ["Anforderung AG-114 bewerten","Prozess Anforderung → Lösung → Angebot · ◆ Anforderungs-Prozessagent","im Projekt: Einführung Mieterverein Hagen","p-bad","Eskalation"],
+     ["AG-87 nachhalten: neue Frist mit Dominik Koppe klären","Einzelaufgabe · Persönlicher KI-Assistent","im Projekt: Einführung Mieterverein Hagen","p-wait","wartet auf Antwort"],
+     ["Entscheidungsvorlage AG-183 Nummernkreis","Einzelaufgabe · Einrichtungs-Agent","im Projekt: Einführung Mieterverein Hagen","p-run","läuft"],
+     ["Kundenwunsch → Ticket → Rückmeldung","Prozess Betrieb · Schritt 3 von 4","intern · ohne Projekt","p-run","läuft"]],
+ ba:[["Angebot sellify Integration Kit","Prozess Angebot erstellen · ◆ Angebots-Prozessagent · wartet auf Rückfrage","intern · ohne Projekt","p-wait","wartet"],
+     ["Setup-Paket „Kundensystem anbinden“","manuell im Projekt ausgelöst","im Projekt: Company OS einführen","p-run","läuft"]]
+};
+const SKC={"code-umsetzen":["Anforderung im Quellcode umsetzen",0,0],"tests-schreiben":["Tests schreiben und ausführen",0,0],"code-dokumentieren":["Dokumentation im Quellcode",0,0],"anforderung-konzipieren":["Anforderungen strukturieren und Lösungskonzept schreiben",1,0],"prototyp-erstellen":["klickbaren Prototyp (Mock-up) bauen",0,0],"loesungsdokument":["Dokument Ausgangslage, Lösung, Nutzen im Hausstil",1,0],"kontakt-anlegen":["Kontakte anlegen mit Dublettenprüfung",2,1],"bodo-angebot":["Angebot als PDF im Bodo-Stil",1,1],"email-erstellung":["E-Mails im Stil des Absenders",1,1],"bodo-ersteinrichtung":["Bodo-Mandant Bereich für Bereich einrichten",0,1],"bodo-einfuehrung-anlegen":["Einführungsprojekt anlegen",0,1],"bodo-ticket-anlegen":["Feature Requests und Issues ohne Dubletten",0,1],"feature-request-screenshot":["Entwurfs-Screenshots zeichnen",0,0],"bodo-video":["Szenenvideos für Bodo",0,0],"sellify-video":["Szenenvideos für sellify",0,0],"bodo-produktinformation":["Produktblatt im Hausstil",0,0],"lead-recherche":["Leads recherchieren",0,0],"lead-aufbereiten":["Leads aufbereiten und bewerten",1,0],"anfrage-einordnen":["Anfragen einordnen",1,0],"termin-vereinbaren":["Termine vereinbaren und erinnern",1,0],"prozess-fuehren":["Prozess führen: Schritte vergeben, prüfen, eskalieren",0,0]};
+const AG=[
+ {n:"Recherche-Agent",d:"Vertrieb",t:"Leads recherchieren, Dubletten prüfen",sk:["kontakt-anlegen","lead-recherche"],lim:-1,prof:"Schnell & günstig",resp:"Leitung Vertrieb",r:"Mitarbeiter",inn:["Lead-Gewinnung","Vertrieb · Lead bis Abschluss"],ver:"v4",p:{lesen:1,anlegen:1,mail:0,loeschen:0}},
+ {n:"Aufbereitungs-Agent",d:"Vertrieb",t:"Leads aufbereiten und bewerten",sk:["lead-aufbereiten"],lim:-1,prof:"Texte",resp:"Leitung Vertrieb",r:"Mitarbeiter",inn:["Lead-Gewinnung"],ver:"v3 · geändert",p:{lesen:1,anlegen:0,mail:0,loeschen:0}},
+ {n:"Lead-Prozessagent",d:"Vertrieb",t:"führt den Prozess Lead-Gewinnung",sk:["prozess-fuehren"],lim:-1,prof:"Gründlich prüfen",resp:"Boris Hose (ergebnisverantwortlich)",r:"Prozessverantwortlich",inn:["Lead-Gewinnung"],ver:"v1",p:{lesen:1,anlegen:0,mail:0,loeschen:0}},
+ {n:"Angebots-Agent",d:"Vertrieb",t:"Angebote nach Vorlage",sk:["bodo-angebot","email-erstellung"],lim:-1,prof:"Texte",resp:"Leitung Vertrieb",r:"Mitarbeiter",inn:["Vertrieb · Lead bis Abschluss","Angebot erstellen"],ver:"v2",p:{lesen:1,anlegen:1,mail:1,loeschen:0}},
+ {n:"Annahme-Agent",d:"Kundenservice",t:"Anfragen annehmen und einordnen",sk:["anfrage-einordnen","email-erstellung"],lim:-1,prof:"Schnell & günstig",resp:"Support",r:"Mitarbeiter",inn:["Betrieb · Anfrage bis Rückmeldung"],ver:"v2",p:{lesen:1,anlegen:1,mail:1,loeschen:0}},
+ {n:"Einrichtungs-Agent",d:"Einführung",t:"Kataloge Bereich für Bereich einrichten",sk:["bodo-ersteinrichtung"],lim:0,prof:"Gründlich prüfen",resp:"Projektleitung",r:"Mitarbeiter",inn:["Onboarding sellify-Kunde"],ver:"v1",p:{lesen:1,anlegen:1,mail:0,loeschen:0}},
+ {n:"Einführungs-Agent",d:"Einführung",t:"Einführungsprojekt anlegen, Anforderungen aufnehmen",sk:["bodo-einfuehrung-anlegen","termin-vereinbaren"],lim:-1,prof:"Schnell & günstig",resp:"Projektleitung",r:"Mitarbeiter",inn:["Anforderung aufnehmen und bewerten"],ver:"v2",p:{lesen:1,anlegen:1,mail:0,loeschen:0}},
+ {n:"Lösungs-Agent",d:"Einführung",t:"Konzept, klickbarer Prototyp, Lösungsdokument, Angebot und Kundenunterlagen aus Anforderungen und Lösungsidee",sk:["anforderung-konzipieren","prototyp-erstellen","loesungsdokument","bodo-angebot"],lim:-1,prof:"Gründlich prüfen",resp:"Boris Hose (ergebnisverantwortlich)",r:"Mitarbeiter",inn:["Anforderung → Lösung → Angebot"],ver:"v1",p:{lesen:1,anlegen:1,mail:0,loeschen:0}},
+ {n:"Entwicklungs-Agent",d:"Produktentwicklung",t:"setzt freigegebene Anforderungen um, testet und dokumentiert im Quellcode",sk:["code-umsetzen","tests-schreiben","code-dokumentieren"],lim:-1,prof:"Gründlich prüfen",resp:"Leitung Produktentwicklung",r:"Mitarbeiter",inn:["Anforderung → Lösung → Angebot"],ver:"v1",p:{lesen:1,anlegen:1,mail:0,loeschen:0}},
+ {n:"Ticket-Agent",d:"Kundenservice / Produktentwicklung",t:"Tickets ohne Dubletten, mit Screenshot",sk:["bodo-ticket-anlegen","feature-request-screenshot"],lim:-1,prof:"Gründlich prüfen",resp:"Support",r:"Mitarbeiter",inn:["Betrieb · Anfrage bis Rückmeldung","Anforderung aufnehmen und bewerten"],ver:"v3",p:{lesen:1,anlegen:1,mail:0,loeschen:0}},
+ {n:"Projekt-Agent Entwicklung",d:"Produktentwicklung",t:"projektverantwortlich für das Entwicklungsprojekt Inkasso-Schnittstelle",sk:["prozess-fuehren"],lim:-1,prof:"Gründlich prüfen",resp:"Abnahmen: ergebnisverantwortliche Menschen je Phase",r:"Projektverantwortlich",inn:["Entwicklungsprojekt Inkasso-Schnittstelle"],ver:"v1",p:{lesen:1,anlegen:1,mail:0,loeschen:0}},
+ {n:"Video-Agent",d:"Vertrieb",t:"Szenenvideos",sk:["bodo-video","sellify-video"],lim:0,prof:"Bilder",resp:"Leitung Vertrieb",r:"Mitarbeiter",inn:[],ver:"v1",p:{lesen:1,anlegen:0,mail:0,loeschen:0}}
+];
+const CONN={
+ bs:[["CRM","B","#1f3a5f","Bodo","Organisation „Bodo Solutions“","Kontakt, Aufgabe, Termin, Dokument, E-Mail, Projekt, Meilenstein, Katalog","p-ok","verbunden"],["Entwicklung","B","#1f3a5f","Bodo","Aufgabentyp Feature Request / Issue","Entwicklungsauftrag","p-ok","verbunden"],["Bibliothek","☁","#2457c5","OneDrive","Ordner Vertrieb/Material","Material, Vorlage","p-ok","verbunden"]],
+ ba:[["CRM","s","#30ABE2","sellify","Mandant „business//acts“","Kontakt, Aufgabe, Termin, Dokument, E-Mail, Projekt","p-ok","verbunden"],["Entwicklung","G","#c8641a","GitLab","Projekt noch festzulegen (Vorschlag Florian)","Entwicklungsauftrag","p-wait","einzurichten"],["Bibliothek","☁","#2457c5","OneDrive","Ordner Vertrieb/Material","Material, Vorlage","p-ok","verbunden"]]
+};
+const ROUTES={
+ bs:[["Entwicklungsaufträge","Bodo · Feature Request / Issue","Skill bodo-ticket-anlegen","p-ok","aktiv"],["Auftrag nach Abschluss an ERP","kein ERP angeschlossen","–","p-open","vorgesehen"],["Daten an weiteres Prozess- und Datensystem","noch kein System angeschlossen","–","p-open","vorgesehen"]],
+ ba:[["Entwicklungsaufträge","GitLab · Issue","Skill gitlab-issue-anlegen (neu)","p-wait","einzurichten"],["Auftrag nach Abschluss an ERP","kein ERP angeschlossen","–","p-open","vorgesehen"],["Daten an weiteres Prozess- und Datensystem","noch kein System angeschlossen","–","p-open","vorgesehen"]]
+};
+const SRC={cw:["◧","Cowork"],cc:["⌘","Claude Code"],mob:["▯","Handy-Chat"],plan:["◷","Geplante Aufgabe"]};
+const SESS=[
+ {t:"Namensfindung & Arbeitstitel",src:"cw",l:"wait",as:"Produkt Company OS · business//acts",st:"Vorschläge für Methode und Arbeitstitel liegen vor.",nx:"Kombination auswählen, z. B. „Steuern statt Machen“ + „Projekt 2T“",res:"Antwort im Chat",ago:"vor 12 Min."},
+ {t:"Bodo-Ticket AG-114 beschreiben",src:"mob",l:"wait",as:null,ask:["Einführung Mieterverein Hagen","projektübergreifend"],st:"Ticket-Entwurf fertig, Dublettenprüfung ohne Treffer.",nx:"Entwurf lesen und freigeben",res:"Ticket-Entwurf (noch nicht angelegt)",ago:"vor 40 Min."},
+ {t:"Elevator Pitch – Kostenfolie",src:"cw",l:"check",as:"Produkt Company OS · business//acts",st:"Folie 5 neu: Delegation an die KI, 9.660 € Ersparnis als Highlight.",nx:"Folie ansehen und freigeben",res:"Präsentation „Elevator Pitch“ · 7 Folien",ago:"vor 25 Min."},
+ {t:"Umsetzungskonzept",src:"cw",l:"check",as:"Produkt Company OS · business//acts",st:"Alle 9 Abschnitte gefüllt, Architektur und Referenzen ergänzt.",nx:"Lesen, direkt bearbeiten oder kommentieren",res:"Dokument „Company OS – Umsetzungskonzept“",ago:"gestern"},
+ {t:"Tagesbriefing",src:"plan",l:"check",as:"projektübergreifend",st:"Morgenübersicht um 7:30 erstellt.",nx:"Lesen",res:"Morgenübersicht",ago:"7:30"},
+ {t:"Prototyp – Mein Tag",src:"cw",l:"run",as:"Produkt Company OS · business//acts",st:"Bereich „Mein Tag“ wird gebaut.",nx:"nichts – läuft",res:"–",ago:"gerade eben"},
+ {t:"Repository my-company-os aufsetzen",src:"cc",l:"run",as:"Produkt Company OS · business//acts",st:"Grundgerüst angelegt, Tests laufen.",nx:"nichts – läuft",res:"–",ago:"vor 8 Min."},
+ {t:"Homepage Bodo – Konzept",src:"cw",l:"rest",as:"Bodo Solutions",st:"Konzept zur Freigabe vorgelegt, keine Rückmeldung.",nx:"weitermachen oder archivieren",res:"Konzeptseite",ago:"vor 9 Tagen"},
+ {t:"Jinsheng Federn – Prozessaufnahme",src:"cw",l:"rest",as:"business//acts · Kundenprojekt",st:"Handlungsfelder notiert.",nx:"weitermachen oder archivieren",res:"Notizen",ago:"vor 5 Tagen"},
+ {t:"sellify-Video Storyboard",src:"cw",l:"rest",as:"business//acts",st:"Storyboard-Entwurf mit 6 Szenen.",nx:"weitermachen oder archivieren",res:"Storyboard",ago:"vor 12 Tagen"}
+];
+const LANES=[["wait","Wartet auf mich","p-wait"],["check","Fertig – zu prüfen","p-run"],["run","Läuft","p-open"]];
+const CAL=[["09:00","09:30","Jour fixe Entwicklung","Bodo"],["11:00","12:00","Abstimmung Mieterverein Hagen","Bodo"],["14:00","15:00","Demo Company OS für Interessent","sellify"]];
+const NOTE=[["Elevator Pitch – Kostenfolie","fertig – zu prüfen"],["Bodo-Ticket AG-114 beschreiben","wartet auf deine Freigabe"],["Namensfindung & Arbeitstitel","wartet auf deine Entscheidung"],["Prozess Lead-Gewinnung","Testlauf nötig (Agent geändert)"],["Tagesbriefing","Morgenübersicht erstellt"]];
+const SCRIPT={
+ "Wie steht die Einführung in Hagen?":`Stand aus Bodo (11.10.2026), Projekt MIV Hagen Migration: <ul><li>15 Aufgaben: 6 erledigt, 3 in Bearbeitung, 6 offen</li><li>Überfällig: AG-114 Inkasso (fällig 17.09., Boris Hose), AG-87 Dokumentenmigration (18.09., Dominik Koppe), AG-183 Nummernkreis (01.10., Dominik Koppe)</li><li>Blocker: KI-Zugang im Vereinssystem fehlt</li><li>Ohne Aufgaben: Dokumentvorlagen, Schulung</li></ul>Soll ich die drei überfälligen Punkte den Verantwortlichen melden?`,
+ "Lege einen Feature Request für Inkasso an":`Ich habe vorher nach vergleichbaren Tickets gesucht: keins gefunden. Entwurf:<div class="prev"><b>Feature Request · Bodo Solutions</b><span><b>Ziel:</b> Übergabe offener Forderungen an ein Inkassobüro</span><span><b>Zuständig:</b> niemand (Entwicklung übernimmt selbst)</span><span><b>Tags:</b> UX</span><span><b>Bewertung:</b> kostenpflichtig? – bitte entscheiden</span></div><div class="acts" style="margin-top:6px"><button class="btn sm acc" data-toast="Ticket angelegt (Prototyp: nichts ausgeführt)">Freigeben & anlegen</button><button class="btn sm">Ändern</button></div>`,
+ "Entwirf einen Prozess für die Lead-Gewinnung":`Ich habe einen Entwurf im Designer vorbereitet: 5 Schritte, Agenten aus dem Pool mit Begründung, eine Lücke (kein Agent mit Skill „lead-bewertung“). Prozessverantwortlich: Lead-Prozessagent, ergebnisverantwortlich: du (Vorschlag).<div class="acts" style="margin-top:6px"><button class="btn sm acc" data-ptabgo="des" data-desgo="1">Im Designer öffnen</button></div>`,
+ "Schlag mir weitere Prozesse vor":`Aus deinem Organigramm und dem Branchenpaket kämen dazu infrage:<ul><li>Mahnwesen bis Inkasso-Übergabe (Buchhaltung)</li><li>Beschwerde bearbeiten (Kundenservice)</li></ul>Soll ich beide auf die Vorschlagsliste setzen?`,
+ "Was wartet heute auf mich?":`Über beide Unternehmen und deine KI-Sitzungen:<ul><li>Sitzungen: „Namensfindung“ wartet auf deine Entscheidung, Bodo-Ticket AG-114 auf Freigabe</li><li>Bodo Solutions: Freigabe 14 Leads · Bewertung AG-114</li><li>business//acts: Rückfrage Preisliste Jinsheng Federn</li></ul><div class="acts" style="margin-top:6px"><button class="btn sm acc" data-gotag>Zu „Mein Tag“</button></div>`
+};
+/* Daten per MCP gelesen am 12.10.2026 (nur lesend).
+   Bodo: Organisation „Bodo Solutions“ – echte Daten, nur intern.
+   sellify: per MCP erreichbares System – enthält überwiegend Test- und Demodaten (Einschätzung), deshalb als Testdaten gekennzeichnet. */
+const STAND="12.10.2026";
+const BOU="https://bodo-app.com/o/k57bshnkdpahzs3fv4hvq6wz1s8aq2pm/";
+const BS_COUNT={vertraege:1,benutzer:4,organisationen:32,personen:122};
+/* Projekte in Bodo Solutions: [id, Name, Status, aktive Aufgaben, Aufgaben gesamt, Verantwortlich, Beschreibung] */
+const BS_PROJ=[
+ ["js7jm4cbk99fwprsngazz7a0ad8bbzjk","MIV Hagen Migration","Aktiv",9,15,"Boris Hose · Dominik Koppe","Datenmigration Mieterverein Hagen"],
+ ["js7yhx046fsx5nnmnvt8y4vbgs8fvj9g","Bodo - Einführung bei MIV Hagen","Aktiv",0,0,"Boris Hose","Projekttyp Bodo-Einführung bei einem Mieterverein"],
+ ["js7h1kf6qf6qcnbvnhhemfhe898ftt8f","Bergischer Mieterring Migration","Aktiv",0,0,"Boris Hose","Datenmigration Bergischer Mieterring e. V., Altsystem MIV4Windows"],
+ ["js7r0kw04b897qmn1d2z6mrt898fttvq","Bodo - Einführung bei Bergischer Mieterring","Aktiv",0,0,"Boris Hose","Projekttyp Bodo-Einführung bei einem Mieterverein"],
+ ["js7sg54p3q8az3dd85waf7t6nd8cp26s","Produktentwicklung - Optimierung","Aktiv",33,160,"Boris Hose · Dominik Koppe","Ablauf Produktentwicklung, Standardtyp Issue"],
+ ["js7p0hmmxhzz8g25wkjzef8mnx8b9hv5","Produktentwicklung - Visionär","Aktiv",20,58,"Dominik Koppe","Steuerung der Software-Entwicklung"],
+ ["js7zgtgj521anexm11ekb8nh558bgejq","Firmengründung","Aktiv",8,16,"Boris Hose · Dominik Koppe","vertraulich"],
+ ["js7n00a2d8dnmy985wrt9kmpfd8et60z","MIV Software","Aktiv",0,2,"–",""],
+ ["js7qhmn2gpeccyrvjv4xcdyv098cncfb","Produktentwicklung - Prozessanforderung","Abgeschlossen",0,10,"Dominik Koppe",""]];
+/* Meine Arbeit (Boris Hose): [Eimer, Art, Nummer, Titel, fällig, Bezug, Status, Priorität, id] */
+const BS_ARBEIT=[
+ ["overdue","aufgabe","AG-128","MMV: Auftragsdatenverarbeitung – Dokumente erneuern","15.09.","–","Offen","high","v17czpyje2vwee31dkscgbn0gs8ebp1m"],
+ ["overdue","aufgabe","AG-114","Prozessübergabe an Inkasso durchdenken und definieren","17.09.","MIV Hagen Migration","In Bearbeitung","high","v17142s34zjy8zfv767y7txvyh8e4h99"],
+ ["overdue","aufgabe","AG-122","Landing Page für Andreas und Steffi fertigstellen","18.09.","–","Offen","normal","v17672y3kg08g1ejf7rqrcm5hs8e6c1q"],
+ ["overdue","aufgabe","AG-126","Marc anrufen und Bodo vorstellen (Heizungsbau)","18.09.","–","Offen","normal","v173trkgzgqm4bc4mkeg2997vx8e8d7f"],
+ ["overdue","aufgabe","AG-160","Kooperation nachfassen","24.09.","Oliver Winkelmann","Offen","high","v17e33pd1s0s5reck8k7tbbthh8ef5xg"],
+ ["overdue","aufgabe","AG-103","DEMO Instanz für Michael Nöthen bereitstellen","28.09.","Michael Nöthen","In Bearbeitung","high","v17djwze60djdzzdx4srec1sjh8e33hr"],
+ ["overdue","aufgabe","AG-195","Datenschutzvereinbarung für Datenimport aus MIV Hamburg in Demosystem einholen","30.09.","Mieter helfen Mietern Hamburg","Offen","high","v17d93ttmhwtrawfd6jrec28d98fc8yx"],
+ ["overdue","aufgabe","AG-196","Datenschutzvereinbarung an Frau Bastheim senden","01.10.","Berit Bastheim","Offen","normal","v17104zjh146srzc7w9dafp7qs8fcxb3"],
+ ["overdue","aufgabe","AG-172","Entwicklungsroadmap für sellify bei secunet als HTML designen","02.10.","–","Offen","high","v17872dyg25r4ra7qyt25782ks8ercrb"],
+ ["overdue","aufgabe","AG-223","E-Mail-Bestätigung Dokumentenübernahme und Zusatzfunktionen an Herrn Wintersohle","04.10.","Stefan Wintersohle","Offen","normal","v1773eb44ygabn34m0x9nn25n98fkp0w"],
+ ["overdue","aufgabe","AG-194","Kaspers (Bergisch Gladbach) nachfassen – IT-Veränderungen besprechen","05.10.","Kaspers GmbH","Offen","normal","v1735t4b3tzx9zjf1mjb1cmk898fcxwz"],
+ ["overdue","aufgabe","AG-216","Herrn van den Abbeele anrufen und weiteres Vorgehen nachfassen","05.10.","DMB Wuppertal","Offen","normal","v176cmnv80dvf1p2st205nb2y98fhe3c"],
+ ["overdue","aufgabe","AG-221","Entscheidungsvorlage KI-Belegerkennung & sellify AI Integration Kit nachtelefonieren","05.10.","Manuel Hager","Offen","high","v17fh93eekqz7hh1t82z3hndh18fgy07"],
+ ["overdue","aufgabe","AG-213","Bodo „diktieren“ beim Mieterverein vorstellen","06.10.","–","Offen","normal","v177s446j43n63nr5qdc77hfh58ffm0w"],
+ ["overdue","aufgabe","AG-217","Nachfassen und Demo-Installation besprechen","06.10.","Jens Kapitza","Offen","normal","v178vqj2d99wy6y9bchbxvvxn18fhpkz"],
+ ["overdue","aufgabe","AG-234","Otten + Freckmann: Website-Interesse an sellify nachfassen – mit Bodo ansprechen","06.10.","Otten + Freckmann GmbH","Offen","high","v1713d89yere2kygcmxd0rd4rs8fj6sd"],
+ ["overdue","aufgabe","AG-290","Ticket für den Aufruf aus der Chronik spezifizieren","08.10.","Produktentwicklung - Optimierung","Backlog","normal","v1720fgb53wqm2y59yb34vkw8x8fx41e"],
+ ["overdue","aufgabe","AG-239","Vali (Arbex) Informationsmaterial schicken","09.10.","Arbex","Offen","normal","v1704p3d4415damw0na5sfbq2n8fkwsm"],
+ ["overdue","termin","","Anforderungsanalyse (verpasst)","06.10. 10:00","Maria Pantelopulu","Termin","normal",""],
+ ["overdue","termin","","sellify Produktiv Update (verpasst)","09.10. 14:30","Marco Quade","Termin","normal",""],
+ ["today","termin","","Anforderungsanalyse und GoLive-Absprache","12.10. 10:00","Dominik Koppe","Termin","normal",""],
+ ["tomorrow","aufgabe","AG-270","Nachfassen: Martin Herden – Lemm Werbeagentur GmbH","13.10.","Martin Herden","Offen","normal","v175jyk2qv47m37a68j5td51f98fs7xj"],
+ ["thisWeek","aufgabe","AG-288","AVV mit Hetzner auch für business//acts","14.10.","–","Offen","normal","v1784cn78kffpby7s8yshjkezn8fvdeh"],
+ ["thisWeek","termin","","Bodo Erstpräsentation – GEWA","15.10. 15:00","GEWA Projektmanagement","Termin","normal",""],
+ ["thisWeek","aufgabe","AG-155","Besuch in Waiblingen planen","15.10.","Kennenlernen und Supportzusage","Offen","normal","v1712n58b6bbt13fx9y066xjyh8efcxx"],
+ ["thisWeek","aufgabe","AG-236","Thomas Wang auf Kooperation beim Vertrieb von sellify an Industrieversicherungsmakler ansprechen","16.10.","Thomas Wang","Offen","normal","v1760c38x9f3byktvwy80epn258fj4tv"]];
+const BS_EIMER={overdue:21,today:1,tomorrow:1,thisWeek:4};
+/* Verkaufschancen Bodo Solutions: [Nummer, Titel, Organisation, Phase, Wahrscheinlichkeit, einmalig €, jährlich €, Status, id] */
+const BS_CHANCEN=[
+ ["CH-2026-0016","Bodo-Einführung – Eggerbauer","Eggerbauer Bauprojektierung","Anbahnung",20,0,6000,"open","k97n149zzmp2qjp077rzgkmkms8fxqqv"],
+ ["CH-2026-0015","Bodo Einführung – AMONOVA","AMONOVA GmbH","Anbahnung",20,3000,3000,"open","k97z1rkbzn3qhphtqen73jkv3h8fwyr2"],
+ ["CH-2026-0014","Bodo-Einführung Bergischer Mieterring","Bergischer Mieterring e. V.","Anbahnung",20,0,5985,"open","k97n4nbxkv0f01zhdetzzazr5h8fv3np"],
+ ["CH-2026-0013","Bodo Einführung – GEWA","GEWA Projektmanagement","Anbahnung",20,0,4200,"open","k97gtvg4k7vvk322rh3kv4n7js8fvrzq"],
+ ["CH-2026-0012","Bodo Einführung – Lemm Werbeagentur","Lemm Werbeagentur GmbH","Anbahnung",20,0,24000,"open","k97g3xvwkt5d9xzkh3arxtxsph8fsmp9"],
+ ["CH-2026-0011","Bodo Einführung – Kaspers","Kaspers GmbH","Anbahnung",20,0,0,"open","k97zaqp7b4efxy83135mnfhvad8fj90r"],
+ ["CH-2026-0010","Bodo Einführung – Otten + Freckmann","Otten + Freckmann GmbH","Anbahnung",20,0,0,"open","k97hmqxrwmqrs6jxdkhgyq9qxx8fkpvr"],
+ ["CH-2026-0009","Bodo Einführung – Mieterbund Darmstadt","Mieterbund Darmstadt Region Südhessen","Anbahnung",20,0,18112.5,"open","k97tqkbvdgsapgqp9ev01sp36d8fk0zn"],
+ ["CH-2026-0008","Bodo Einführung – Haus & Grund Göppingen","Haus & Grund Göppingen","Anbahnung",20,0,6500,"open","k97ny0z1g8nqse67mg3vvjm7958fa6yw"],
+ ["CH-2026-0007","Mieterverein Hagen – Bitfarm-Archivübernahme + Komfortfunktionen","Mietervereine Hagen","Angebot",90,15750,0,"open","k97psqxtfja9mntc59ce3b0nw98f10f0"],
+ ["CH-2026-0006","Bodo Einführung – DMB Mieterverein Waiblingen","DMB Mieterverein Waiblingen","Testphase",40,0,6772.5,"open","k97jxbvam4q466xsk2ndq5f9pd8ef6vt"],
+ ["CH-2026-0005","CRM mit Spendenverwaltung – Albert Schweitzer Stiftung","Albert Schweitzer Stiftung","Anbahnung",20,0,0,"open","k97vft5teqf6a8j8h1fag4e1g98ecz7t"],
+ ["CH-2026-0004","Bodo Einführung – Berliner MieterGemeinschaft","Berliner MieterGemeinschaft e. V.","Anbahnung",20,0,39000,"open","k97yswepjnfz80zwy8hn2bt4r18e6kta"],
+ ["CH-2026-0003","Bodo Einführung – Mieterschutzverein Groß-Duisburg","Mieterschutzverein Groß-Duisburg e. V.","Testphase",40,0,700,"open","k97r16ca5dsq94fttydxtp1f358e6jzy"],
+ ["CH-2026-0002","Bodo Einführung – Mieter helfen Mietern Hamburg","Mieter helfen Mietern Hamburg","Testphase",40,0,25000,"open","k97prddr43rxnze2xb6fag339h8e7eeh"],
+ ["CH-2026-0001","Bodo für den Maklervertrieb","BKP Leasing und Factoring OHG","Anbahnung",20,0,12000,"lost","k97ke09tbar69wcsrys4sqvavd8e4vmv"]];
+/* MIV Hagen Migration – Aufgaben: [Nummer, Titel, Status, fällig, id] */
+const BS_HAGEN=[
+ ["AG-1","Aktuelle Daten aus MIV Hagen Datenbank holen","Erledigt","","v17dzd7w2rggdesxn66rgq2jtx8bacj2"],
+ ["AG-2","MIV Hagen Datenbank in Bodo importieren und als Dev Convex zur Verfügung stellen","Erledigt","02.08.","v174y97xq72pdxdc362ektx3vh8ba467"],
+ ["AG-81","Sachbearbeiter Klärung – welche User sind aktiv","Erledigt","","v17bj8k7h28trdzcwn6yf87wah8dv1je"],
+ ["AG-90","Migration von „Hinweisen“ am Kontakt","Erledigt","","v17b95pxpdah39anm9qy3sv4358dvrzn"],
+ ["AG-100","Terminaufzeichnungen 8.9.26 teilen","Erledigt","08.09.","v1732ppjyxhgtpbh266dym6f7n8e1f7t"],
+ ["AG-101","Neue Teams-Termin-Einladung für 15.09. rausschicken","Erledigt","25.09.","v17ehsaezwnsncj11v5mc659ph8e1f5r"],
+ ["AG-114","Prozessübergabe an Inkasso durchdenken und definieren","In Bearbeitung","17.09.","v17142s34zjy8zfv767y7txvyh8e4h99"],
+ ["AG-87","Bitfarm Dokumenten Migration","In Bearbeitung","18.09.","v175czw98stjcjyt5xndca5md58dttx3"],
+ ["AG-183","Nummernkreis-Übergabe MIV Hagen – Kontakt vs. Vertrag","In Bearbeitung","01.10.","v171x32ex93v601cy043bg4jrh8f5cr5"],
+ ["AG-82","Lastschrift Oktober simulieren","Offen","","v17dbfm3k52qhqq1v80effp6c98dt9b3"],
+ ["AG-83","2 Jahre Kündigungsfrist an Verträgen festhalten","Offen","","v178x48779ebjtma439j8xkzmh8dtv52"],
+ ["AG-84","Artikel zu Gewerbetarif bündeln","Offen","","v174q7b50z7h4ew1vy951j1e358dt55h"],
+ ["AG-85","Suchvorlagen & Listenexport (pdf / xlsx)","Offen","","v17dc3692tjz6sq9vbf2jb64398dvskq"],
+ ["AG-86","Auswertungen","Offen","","v179gzs5xkhew5z8xg90n9h5118dt9dj"],
+ ["AG-88","Meldungen an den Landesverband","Offen","","v178dd7062hngs4t5x5224yyvn8dvzq7"]];
+/* sellify (per MCP) – Testdaten */
+const SF_COUNT={chancenOffen:118,projekteOffen:38,aufgabenMeine:28};
+const SF_CHANCEN=[["10396","Testchance ANLE","–","Angebotserstellung",50,1000],["10098","Ausschreibung Servicevertrag – Fischer Maschinenbau e.K.","Fischer Maschinenbau e.K.","Angebotserstellung",0,9079],["10350","TEST – Chance per MCP","1. FC Köln GmbH & Co. KGaA","–",0,1000],["10243","Softwarelizenzen 2026 – Roth Logistik GmbH","Roth Logistik GmbH","Bedarfsanalyse",0,261834.08],["10234","Rahmenvertrag Ersatzteile – Busch Energietechnik KG","Busch Energietechnik KG","Zusage",0,277048],["10224","Neue Steuerungstechnik – Neumann Handel SE","Neumann Handel SE","Verhandlung",0,326372.53],["10229","Modernisierung Fertigungslinie – Richter Antriebstechnik e.K.","Richter Antriebstechnik e.K.","Bedarfsanalyse",0,56161.91],["10220","Ausbau Standort – Lehmann Bau e.K.","Lehmann Bau e.K.","Angebotserstellung",0,113271.94]];
+const SF_PROJ=[["10109","Produktentwicklung - Optimierung","Intern","Aktiv"],["10046","Prozessoptimierung Angebotswesen 2026","Intern","Aktiv"],["10053","Website-Relaunch 2026","Marketingprojekt","Aktiv"],["10049","Einführung Ticketsystem 2026","Verwaltung","In Planung"],["10060","Vertriebsschulung Q3 2026","Veranstaltung","Aktiv"],["10202","Ausschreibung #1","Veranstaltung","In Planung"]];
+const SF_AUFG=[["02.10.","Angebotspräsentation – Walter Consulting SE","Walter Consulting SE",true],["03.10.","Vertragsverhandlung – Engel Anlagenbau GmbH","Engel Anlagenbau GmbH",true],["06.10.","Angebot nachfassen (REST-Test)","Arnold Logistik UG",true],["06.10.","Angebotspräsentation – Günther Elektrotechnik SE","Günther Elektrotechnik SE",true],["08.10.","Kick-off – Walter & Weiß GmbH & Co. KG","Walter & Weiß GmbH & Co. KG",true],["11.10.","Abstimmung Lieferplan – Heinrich Antriebstechnik GmbH","Heinrich Antriebstechnik GmbH",true],["13.10.","Messebesuch – Möller Maschinenbau GmbH & Co. KG","Möller Maschinenbau GmbH & Co. KG",false],["16.10.","Angebotspräsentation – Simon Antriebstechnik e.K.","Simon Antriebstechnik e.K.",false]];
+
+/* ===== Company OS · allgemeine Fassung v2 (Pilot business//acts + Bodo Solutions) =====
+   Ansichten für den Kern. Daten: pilot-alt.js (bisheriger Pilot) + pilot-mcp.js (per MCP gelesen am 12.10.2026).
+   Kennzeichnung: echte Bodo-Daten · sellify-Testdaten · Beispieldaten · Einschätzung. */
+const MK=()=>K.st.m, ALL=()=>K.st.m==="all", CK=()=>ALL()?["bs","ba"]:[K.st.m];
+const ECHT=K.chip("Bodo · echte Daten · Stand "+STAND,"info"), TEST=K.chip("sellify · Testdaten","ex"), BSP=K.chip("Beispieldaten","ex"), EIN=K.chip("Einschätzung","ai"), INTERN=K.chip("nur intern","warn");
+const coChip=k=>`<span class="pv-co" style="--c:${CO[k].color}">${esc(CO[k].name)}</span>`;
+const ext=(url,t)=>`<a class="k-lnk" href="${url}" target="_blank" rel="noopener">${t} ↗</a>`;
+const eur=n=>n?n.toLocaleString("de-DE",{maximumFractionDigits:0})+" €":"–";
+const agIdx=n=>AG.findIndex(a=>a.n===n.replace(/^◆ /,""));
+const lv=a=>a.sk.reduce((m,k)=>Math.max(m,(SKC[k]||[0,0])[1]),0);
+const procChip=p=>K.chip(p.st,{"aktiv":"ok","im Test":"info","Entwurf":""}[p.st]);
+const allP=()=>CK().flatMap(k=>PROC[k].map(p=>Object.assign({co:k},p)));
+const findP=id=>{for(const k of ["bs","ba"]){const p=PROC[k].find(x=>x.id===id);if(p)return Object.assign({co:k},p)}return null};
+/* Bodo „Meine Arbeit“ mit Bezug business//acts – Zuordnung ist Claudes Einschätzung anhand der Titel */
+const BA_TAG=["AG-172","AG-221","AG-234","AG-236","AG-288"];
+const arbeit=()=>{const k=MK();return k==="ba"?BS_ARBEIT.filter(r=>BA_TAG.includes(r[2])):BS_ARBEIT};
+const EIM=[["overdue","Überfällig"],["today","Heute"],["tomorrow","Morgen"],["thisWeek","Diese Woche"]];
+const prio=p=>p==="high"?K.chip("hoch","warn"):"";
+const stAG=s=>K.chip(s,{"Erledigt":"ok","In Bearbeitung":"info","Offen":"","Backlog":"","Termin":""}[s]??"");
+const nr=r=>r[8]?ext(B+r[8],r[2]):r[1]==="termin"?"◷ Termin":"";
+const chOpen=()=>BS_CHANCEN.filter(c=>c[7]==="open");
+const wait=()=>CK().flatMap(k=>WAIT[k].map(w=>Object.assign({co:k},w)));
+const jobs=()=>CK().flatMap(k=>JOBS[k].map(j=>j.concat([k])));
+const projOf=()=>CK().flatMap(k=>PROJ[k].map(p=>Object.assign({co:k},p)));
+const today=()=>BS_ARBEIT.filter(r=>r[0]==="today");
+
+const V={};
+/* ---------- Dashboard ---------- */
+V.dashboard=()=>{const k=MK();const ov=arbeit().filter(r=>r[0]==="overdue").length;const W=wait();const sw=SESS.filter(s=>s.l==="wait").length;
+ const hagenLate=BS_HAGEN.filter(t=>t[2]!=="Erledigt"&&t[3]).length;
+ const att=[];
+ if(k!=="ba")att.push({t:"Überfällig in Bodo",k:"Meine Arbeit",n:ov,c:"var(--danger)",d:"Älteste: AG-128 MMV Auftragsdatenverarbeitung (15.09.)",go:K.go("meinearbeit")});
+ else att.push({t:"Bodo-Aufgaben mit Bezug business//acts",k:"überfällig",n:ov,c:"var(--danger)",d:"z. B. AG-172 Roadmap sellify für secunet · Zuordnung: Einschätzung",go:K.go("meinearbeit")});
+ att.push({t:"Fristen",k:"Nächste Tage",kp:k==="ba"?[[ov,"überfällig"],[0,"morgen"],[arbeit().filter(r=>r[0]==="thisWeek").length,"diese Woche"]]:EIM.slice(1).map(([e,l])=>[BS_ARBEIT.filter(r=>r[0]===e).length,l.toLowerCase()]),c:"#C2650A",d:k==="ba"?"AG-288 AVV Hetzner (14.10.) · AG-236 Thomas Wang (16.10.)":"Heute 10:00 Anforderungsanalyse und GoLive-Absprache",go:K.go("meinearbeit")});
+ att.push({t:"Freigaben & Rückfragen",k:"Für dich",n:W.length,c:"var(--brand)",d:W.map(w=>w.t).slice(0,2).join(" · "),go:K.go("meinearbeit","frei")});
+ if(k!=="ba")att.push({t:"MIV Hagen Migration",k:"Projekt",kp:[[BS_HAGEN.filter(t=>t[2]==="In Bearbeitung").length,"in Bearbeitung"],[hagenLate,"mit Frist offen"]],c:"#C2650A",d:"AG-114 Inkasso · AG-87 Bitfarm · AG-183 Nummernkreis",go:K.go("projekt","hagen")});
+ att.push({t:"KI-Sitzungen",k:"warten auf dich",n:sw,c:"var(--ai)",d:SESS.filter(s=>s.l==="wait").map(s=>s.t).join(" · "),go:K.go("meinearbeit","sess")});
+ if(k!=="bs")att.push({t:"Vorschläge",k:"Prozesse",n:SUG.filter(s=>s.s==="offen").length,c:"var(--ai)",d:"z. B. „Angebote nachfassen“",go:K.go("prozesse","sug")});
+ const P=allP();const bst=[];
+ if(k!=="ba"){const ch=chOpen();bst.push({t:"Verkaufschancen Bodo",n:ch.length,d:`${eur(ch.reduce((s,c)=>s+c[6],0))} jährlich · ${eur(ch.reduce((s,c)=>s+c[5],0))} einmalig`,go:K.go("chancen")});
+  bst.push({t:"Projekte in Bodo",n:BS_PROJ.filter(p=>p[2]==="Aktiv").length,d:`aktiv · ${BS_PROJ.reduce((s,p)=>s+p[3],0)} offene Aufgaben`,go:K.go("projekte")})}
+ if(k!=="bs"){bst.push({t:"Chancen sellify",n:SF_COUNT.chancenOffen,d:"offen · Testdaten aus dem per MCP erreichbaren sellify",go:K.go("chancen")});
+  bst.push({t:"Projekte sellify",n:SF_COUNT.projekteOffen,d:"offen · Testdaten",go:K.go("projekte")})}
+ bst.push({t:"Prozesse",n:P.length,d:`${P.filter(p=>p.st==="aktiv").length} aktiv · ${P.filter(p=>p.st==="im Test").length} im Test · ${P.filter(p=>p.st==="Entwurf").length} Entwurf`,go:K.go("prozesse")});
+ bst.push({t:"Agenten",n:AG.length,d:`${Object.keys(SKC).length} Skills im Pool`,go:K.go("agenten")});
+ bst.push({t:"Abteilungen",n:CK().reduce((s,c)=>s+ORG[c].length,0),d:CK().map(c=>CO[c].name+" "+ORG[c].length).join(" · "),go:K.go("organigramm")});
+ if(k!=="ba")bst.push({t:"Kontakte in Bodo",kp:[[BS_COUNT.organisationen,"Organisationen"],[BS_COUNT.personen,"Personen"]],d:"Organisation „Bodo Solutions“",go:K.go("anschluesse")});
+ return K.dash({hello:"Guten Tag, <em>Boris</em>",sub:`Montag, 12. Oktober 2026 · ${ALL()?"Überblick über beide Unternehmen":esc(CO[k].name)}`,stand:"Bodo per MCP gelesen am "+STAND,groups:[
+  {t:"BRAUCHT AUFMERKSAMKEIT",s:"Was heute hakt · Klick öffnet den Bereich",tiles:att},{t:"BESTAND",s:"Wie viel wovon da ist",tiles:bst}]})+
+  `<div class="k-note">Kennzeichnung: Zahlen aus Bodo sind echt (Stand ${STAND}, nur intern). sellify-Zahlen stammen aus dem per MCP erreichbaren System – nach Claudes Einschätzung Test- und Demodaten. Prozesse, Agenten und Aufträge sind Beispieldaten aus dem bisherigen Prototyp.</div>`};
+
+/* ---------- Meine Arbeit ---------- */
+V.meinearbeit=id=>{if(id){K.st.tab.meinearbeit=id;K.st.id=null}const k=MK();const A=arbeit();const W=wait();
+ const T=EIM.map(([e,l])=>[e,l,A.filter(r=>r[0]===e).length]).concat([["frei","Freigaben",W.length],["sess","KI-Sitzungen",SESS.length]]).concat(k!=="bs"?[["sf","sellify",SF_AUFG.length]]:[]);
+ const cur=K.tab("meinearbeit","overdue");let body;
+ if(cur==="frei")body=`<div class="k-card"><div class="k-lh"><b>${W.length} Freigaben und Rückfragen</b>${BSP}</div>${W.map((w,i)=>`<div class="pv-wait"><div class="abc-row">${K.chip(esc(w.k),w.k==="Freigabe"?"warn":"info")}${ALL()?coChip(w.co):""}<b>${esc(w.t)}</b></div><div class="k-lbl">${esc(w.d)}</div>${K.kv(w.c.map(([a,b])=>[esc(a),esc(b)]))}<div class="abc-row">${w.k==="Freigabe"?K.btn("Freigeben",`data-toast="Freigegeben – der Agent legt die Datensätze an (Prototyp, nichts wird ausgeführt)"`,true,true)+K.btn("Ablehnen",'data-toast="Abgelehnt (Prototyp)"',false,true):K.btn("Beantworten",'data-toast="Antwort an den Agenten (Prototyp)"',true,true)}</div></div>`).join("")||'<div class="k-sb k-note">Nichts offen.</div>'}</div>`;
+ else if(cur==="sess"){const L=[["wait","wartet"],["check","zu prüfen"],["run","läuft"],["rest","ruht"]];body=`<div class="k-card"><div class="k-lh"><b>${SESS.length} KI-Sitzungen</b>${BSP}<span class="k-note">aus Cowork, Claude Code, Handy und geplanten Aufgaben</span></div>${K.table(["Quelle","Sitzung","Stand","Jetzt tun","Status"],SESS.map(s=>[`<span class="k-lbl">${SRC[s.src][0]} ${SRC[s.src][1]}<br>${s.ago}</span>`,`<span class="nm">${esc(s.t)}</span><br><span class="k-lbl">${esc(s.as||"Zuordnung offen")}</span>`,esc(s.st),`<b>${esc(s.nx)}</b>`,K.chip(L.find(x=>x[0]===s.l)[1],s.l==="wait"?"warn":s.l==="check"?"info":"")]))}</div>`}
+ else if(cur==="sf")body=`<div class="k-card"><div class="k-lh"><b>${SF_AUFG.length} von ${SF_COUNT.aufgabenMeine} Aufgaben in sellify</b>${TEST}</div>${K.table(["fällig","Aufgabe","Organisation","Stand"],SF_AUFG.map(r=>[r[0],`<b>${esc(r[1])}</b>`,esc(r[2]),r[3]?K.chip("überfällig","warn"):K.chip("offen")]))}<div class="k-pg"><span>Testdaten aus dem per MCP erreichbaren sellify</span><span>Echtes business//acts-sellify: Anbindung offen</span></div></div>`;
+ else{const R=A.filter(r=>r[0]===cur);body=`<div class="k-card"><div class="k-lh"><b>${R.length} ${esc(EIM.find(e=>e[0]===cur)[1])}</b>${ECHT}${k==="ba"?EIN:""}</div>${K.table(["Nr.","Titel","fällig","Bezug","Status",""],R.map(r=>[nr(r),`<span class="nm">${esc(r[3])}</span>`,esc(r[4]),esc(r[5]),stAG(r[6]),prio(r[7])]),{empty:"Nichts in diesem Eimer."})}<div class="k-pg"><span>Boris Hose · Bodo „Meine Arbeit“${k==="ba"?" · gefiltert auf Bezug business//acts (Einschätzung nach Titel)":""}</span><span>${cur==="overdue"&&k!=="ba"?`Bodo zählt ${BS_EIMER.overdue} überfällige Einträge, ${R.length} sind im Prototyp übernommen · `:""}Nr. öffnet die Aufgabe in Bodo</span></div></div>`}
+ return K.pageHead("Meine Arbeit",{chips:[k==="ba"?TEST:ECHT,INTERN],actions:K.btn("✦ Tagesbriefing",'data-ask="Was ist heute wichtig?"')})+K.tabs("meinearbeit",T)+body};
+
+/* ---------- Chancen ---------- */
+V.chancen=()=>{const k=MK();const out=[];
+ if(k!=="ba"){const ph=["Alle","Anbahnung","Testphase","Angebot","verloren"];const cur=K.tab("chancen","Alle");const R=BS_CHANCEN.filter(c=>cur==="Alle"||(cur==="verloren"?c[7]==="lost":c[3]===cur&&c[7]==="open"));
+  out.push(K.tabs("chancen",ph.map(p=>[p,p,p==="Alle"?BS_CHANCEN.length:p==="verloren"?BS_CHANCEN.filter(c=>c[7]==="lost").length:BS_CHANCEN.filter(c=>c[3]===p&&c[7]==="open").length]))+
+  `<div class="k-card"><div class="k-lh"><b>${R.length} Chancen Bodo Solutions</b>${ECHT}<span class="k-sp"></span><span class="k-lbl">offen: ${eur(chOpen().reduce((s,c)=>s+c[6],0))} jährlich · gewichtet ${eur(chOpen().reduce((s,c)=>s+(c[5]+c[6])*c[4]/100,0))}</span></div>${K.table(["Nr.","Chance","Organisation","Phase","Wahrsch.","einmalig","jährlich"],R.map(c=>[`<span class="k-lbl pv-n">${c[0]}</span>`,`<span class="nm">${esc(c[1])}</span>`,esc(c[2]),K.chip(c[7]==="lost"?"verloren":c[3],c[3]==="Angebot"?"ok":c[3]==="Testphase"?"info":c[7]==="lost"?"bad":""),c[4]+" %",`<span class="pv-n">${eur(c[5])}</span>`,`<span class="pv-n">${eur(c[6])}</span>`]),{rowGo:i=>K.go("chance",R[i][0])})}</div>`)}
+ if(k!=="bs")out.push(`<div class="k-card"><div class="k-lh"><b>${SF_CHANCEN.length} von ${SF_COUNT.chancenOffen} offenen Chancen in sellify</b>${TEST}</div>${K.table(["Nr.","Chance","Organisation","Phase","einmalig"],SF_CHANCEN.map(c=>[`<span class="k-lbl">${c[0]}</span>`,`<b>${esc(c[1])}</b>`,esc(c[2]),K.chip(esc(c[3])),`<span class="pv-n">${eur(c[5])}</span>`]))}<div class="k-pg"><span>Test- und Demodaten (Einschätzung)</span><span>Echte business//acts-Chancen: Anbindung offen</span></div></div>`);
+ return K.pageHead("Chancen",{chips:[k==="ba"?TEST:ECHT,INTERN],actions:K.btn("＋ Chance",'data-toast="Chance anlegen – Entwurf zur Freigabe, nichts wird in Bodo geschrieben (Prototyp)"',true)})+out.join("")};
+V.chance=id=>{const c=BS_CHANCEN.find(x=>x[0]===id)||BS_CHANCEN[0];const T=BS_ARBEIT.filter(r=>c[2].split(" ")[0].length>3&&(r[3]+r[5]).includes(c[2].split(" ")[0]));
+ return K.detail({title:esc(c[1]),num:c[0],chips:[K.chip("◇ Chance"),K.chip(c[7]==="lost"?"verloren":c[3],c[7]==="lost"?"bad":"info"),ECHT],actions:K.btn("In Bodo öffnen",'data-toast="Öffnet die Chance in Bodo (Link-Pfad im Prototyp noch nicht geprüft)"')+" "+K.btn("✦ Nachfassen vorbereiten",'data-toast="Der Vertriebsassistent entwirft eine Nachfass-Mail – Versand nur nach Freigabe (Prototyp)"',true),
+  cards:[{t:"Steckbrief",b:K.kv([["Organisation",esc(c[2])],["Phase",esc(c[3])],["Wahrscheinlichkeit",c[4]+" %"]])},{t:"Wert",b:K.kv([["einmalig",eur(c[5])],["jährlich",eur(c[6])],["gewichtet",eur((c[5]+c[6])*c[4]/100)]])},{t:"Prozess",b:K.agent("Vertriebs-Prozessagent","führt: Vertrieb · Lead bis Abschluss")+`<span class="k-lbl">Zuordnung zum Prozess ist Beispiel</span>`}],
+  sections:[{id:"auf",t:"☑ Aufgaben in Bodo",n:T.length,hide:!T.length,flush:true,b:K.table(["Nr.","Titel","fällig","Status"],T.map(r=>[nr(r),esc(r[3]),esc(r[4]),stAG(r[6])]))},
+   {id:"nx",t:"✦ Nächster Schritt",a:EIN,b:`<div class="k-note">${c[3]==="Anbahnung"?"Erstkontakt nachhalten und Demo-Termin anbieten.":c[3]==="Testphase"?"Testphase auswerten, Rückmeldung einholen, Angebot vorbereiten.":"Angebot nachfassen, offene Punkte klären."} Vorschlag des Vertriebsassistenten, nicht aus Bodo.</div>`}],
+  empty:["Dokumente","Chronik"].concat(T.length?[]:["Aufgaben in Bodo"])})};
+
+/* ---------- Aufträge ---------- */
+V.auftraege=()=>{const J=jobs();const S=["alle","läuft","wartet","Eskalation"];const cur=K.tab("auftraege","alle");const R=J.filter(r=>cur==="alle"||r[4].startsWith(cur==="wartet"?"wartet":cur));
+ return K.list({title:"Aufträge",chips:[BSP],actions:K.btn("＋ Neuer Auftrag","data-neu",true),view:"auftraege",tabs:S.map(s=>[s,s==="alle"?"Alle":s,s==="alle"?J.length:J.filter(r=>r[4].startsWith(s)).length]),
+  cols:["Auftrag","Prozess · Schritt","Herkunft","Status"].concat(ALL()?["Unternehmen"]:[]),rows:R.map(r=>[`<span class="nm">${esc(r[0])}</span>`,esc(r[1]),K.chip(esc(r[2])),`<span class="pill ${r[3]}">${esc(r[4])}</span>`].concat(ALL()?[coChip(r[5])]:[])),
+  rowGo:i=>{const r=R[i];return /Hagen/.test(r[2])?K.go("projekt","hagen"):/Inkasso-Schnittstelle/.test(r[2])?K.go("projekt","dev"):/Company OS/.test(r[2])?K.go("projekt","cos"):/Lead/.test(r[1])?K.go("prozess","lead"):/Angebot/.test(r[1])?K.go("prozess","ang"):/Betrieb/.test(r[1])?K.go("prozess","bt"):""},
+  note:"Ein Auftrag ist ein Lauf eines Prozesses oder eine Einzelaufgabe an einen Agenten."})};
+
+/* ---------- Prozesse ---------- */
+V.prozesse=id=>{if(id){K.st.tab.prozesse=id;K.st.id=null}const cur=K.tab("prozesse","mine");const P=allP();const agentFor=sk=>AG.find(a=>a.sk.includes(sk));let body;
+ if(cur==="tpl"){const L=TPL;body=`<div class="k-card"><div class="k-lh"><b>${L.length} Vorlagen</b>${BSP}</div>${K.table(["Vorlage","Bereich","Ablauf","Abdeckung durch Agenten",""],L.map(t=>{const gaps=t.sk.filter(k=>!agentFor(k));return [`<b>${esc(t.n)}</b>`,esc(t.f),`<span class="k-lbl">${esc(t.d)}</span>`,gaps.length?`<span class="pill p-wait">Lücke: ${gaps.join(", ")}</span>`:'<span class="pill p-ok">Agenten vorhanden</span>',K.btn("Übernehmen",`data-toast="„${esc(t.n)}“ als Entwurf übernommen – aktiv erst nach Testlauf (Prototyp)"`,false,true)]}))}</div>`}
+ else if(cur==="sug")body=`<div class="k-card"><div class="k-lh"><b>${SUG.length} Vorschläge</b>${BSP}</div>${K.table(["Vorschlag","Quelle","Warum","Status",""],SUG.map((s,i)=>[`<b>${esc(s.n)}</b>`,esc(s.src),esc(s.why),K.chip(s.s,s.s==="übernommen"?"ok":""),s.s==="offen"?K.btn("Übernehmen",`data-sug="${i}|übernommen"`,true,true)+" "+K.btn("Später",`data-sug="${i}|später"`,false,true):""]))}</div>`;
+ else body=`<div class="k-card"><div class="k-lh"><b>${P.length} Prozesse</b></div>${K.table(["Prozess","Abteilung","Schritte","Prozessverantwortlich","Ergebnisverantwortlich","Status","Aufträge"].concat(ALL()?["Unternehmen"]:[]),P.map(p=>[`<span class="nm">${esc(p.n)}</span>`,esc(p.dep),p.steps.length,"✦ "+esc(p.pa),esc(p.er),procChip(p)+` <span class="k-lbl">${p.v}</span>`,`<span class="k-lbl">${esc(p.run)}</span>`].concat(ALL()?[coChip(p.co)]:[])),{rowGo:i=>K.go("prozess",P[i].id)})}</div>`;
+ return K.pageHead("Prozesse",{chips:[BSP],actions:K.btn("✦ Neu mit KI-Designer",'data-ask="Entwirf einen Prozess für die Lead-Gewinnung"',true)})+K.tabs("prozesse",[["mine","Prozesse",P.length],["tpl","Vorlagen",TPL.length],["sug","Vorschläge",SUG.filter(s=>s.s==="offen").length]])+body};
+V.prozess=id=>{const p=findP(id)||allP()[0];const ags=[...new Set(p.steps.map(s=>s.ag).filter(a=>a!=="–").concat([p.pa]))];const J=JOBS[p.co].filter(r=>r[1].includes(p.n.split(" ·")[0]));const vn=+p.v.slice(1);
+ const agL=a=>agIdx(a)>=0?`<button class="k-lnk" ${K.go("agent",agIdx(a))}>✦ ${esc(a)}</button>`:"✦ "+esc(a);
+ return K.detail({title:esc(p.n),num:p.v,chips:[K.chip("↝ Prozess"),procChip(p),coChip(p.co),BSP],
+  actions:K.btn("Testlauf",'data-toast="Testlauf im Testsystem gestartet (Prototyp)"')+" "+K.btn("Auftrag starten","data-neu")+" "+K.btn("Im Designer öffnen",'data-toast="Prozess-Designer (Prototyp)"',true),
+  cards:[{t:"Steckbrief",b:K.kv([["Unternehmen",esc(CO[p.co].name)],["Abteilung",esc(p.dep)],["Schritte",p.steps.length],["Aufträge",esc(p.run)]])},
+   {t:"Verantwortung",b:K.agent(p.pa,"führt den Prozess")+K.person(K.ini(p.er),p.er,"ergebnisverantwortlich")},
+   {t:"Hinweis",b:`<span class="k-note">${esc(p.note||"Keine offenen Hinweise.")}</span>`}],
+  sections:[{id:"ablauf",t:"↝ Ablauf",n:p.steps.length,flush:true,b:K.table(["#","Schritt","Agent oder Mensch","Ersatz","Freigabe / Hinweis"],p.steps.map((s,i)=>[i+1,`<b>${esc(s.n)}</b>`,s.ag==="–"?"● Mensch":agL(s.ag),esc(s.ers||"–"),s.fr?`<span class="pill p-wait">${esc(s.fr)}</span>`:"–"]))},
+   {id:"ag",t:"✦ Agenten",n:ags.length,b:ags.map(a=>`<div style="margin:4px 0">${agL(a)}${a===p.pa?' <span class="k-lbl">prozessverantwortlich</span>':""}</div>`).join("")},
+   {id:"auf",t:"☰ Aufträge",n:J.length,hide:!J.length,flush:true,b:K.table(["Auftrag","Stand","Status"],J.map(r=>[`<span class="nm">${esc(r[0])}</span>`,esc(r[1]),`<span class="pill ${r[3]}">${esc(r[4])}</span>`]))},
+   {id:"ver",t:"◷ Versionen",n:vn,flush:true,b:K.timeline(Array.from({length:vn},(_,i)=>vn-i).map(v=>[v===vn?"ok":"skip","v"+v,v===vn?`<b>Version ${v}</b> · ${esc(p.st)}`:`Version ${v} · abgelöst`,""]))}],
+  empty:["Testläufe","Kommentare"].concat(J.length?[]:["Aufträge"])})};
+
+/* ---------- Projekte ---------- */
+const BSP_ID={"js7jm4cbk99fwprsngazz7a0ad8bbzjk":"hagen"};
+V.projekte=()=>{const k=MK();const cur=K.tab("projekte","cos");const C=projOf();const out=[];
+ const tabs=[["cos","Gesteuert in Company OS",C.length]].concat(k!=="ba"?[["bodo","In Bodo",BS_PROJ.length]]:[]).concat(k!=="bs"?[["sf","In sellify",SF_PROJ.length]]:[]);
+ const c2=tabs.find(t=>t[0]===cur)?cur:"cos";
+ if(c2==="cos")out.push(`<div class="k-card"><div class="k-lh"><b>${C.length} Projekte</b>${BSP}</div>${K.table(["Projekt","Art","Verwaltet in","Projektverantwortlich","Ablauf"].concat(ALL()?["Unternehmen"]:[]),C.map(p=>[`<span class="nm">${esc(p.n)}</span>`,esc(p.kind),esc(p.sys),(p.pv[0]==="KI-Agent"?"✦ ":"")+esc(p.pv[1]),esc(p.flow)].concat(ALL()?[coChip(p.co)]:[])),{rowGo:i=>K.go("projekt",C[i].id)})}</div>`);
+ if(c2==="bodo")out.push(`<div class="k-card"><div class="k-lh"><b>${BS_PROJ.length} Projekte in Bodo Solutions</b>${ECHT}</div>${K.table(["Projekt","Status","Aufgaben aktiv / gesamt","Verantwortlich","Beschreibung",""],BS_PROJ.map(p=>[`<span class="nm">${esc(p[1])}</span>`,K.chip(p[2],p[2]==="Aktiv"?"info":"ok"),`${p[3]} / ${p[4]}`,esc(p[5]),`<span class="k-lbl">${esc(p[6])}</span>`,ext(BOU+"projekte/"+p[0],"Bodo")]),{rowGo:i=>BSP_ID[BS_PROJ[i][0]]?K.go("projekt",BSP_ID[BS_PROJ[i][0]]):K.go("projekt","b:"+BS_PROJ[i][0])})}</div>`);
+ if(c2==="sf")out.push(`<div class="k-card"><div class="k-lh"><b>${SF_PROJ.length} von ${SF_COUNT.projekteOffen} Projekten in sellify</b>${TEST}</div>${K.table(["Nr.","Projekt","Art","Status"],SF_PROJ.map(p=>[`<span class="k-lbl">${p[0]}</span>`,`<b>${esc(p[1])}</b>`,esc(p[2]),K.chip(esc(p[3]))]))}</div>`);
+ return K.pageHead("Projekte",{chips:[INTERN],actions:K.btn("＋ Projekt aus Vorlage",'data-toast="Projektvorlage wählen (Prototyp)"',true)})+K.tabs("projekte",tabs)+out.join("")+`<div class="k-note">Company OS verwaltet Projekte nicht selbst: Projekte, Meilensteine und Aufgaben bleiben im CRM (Bodo bzw. sellify). Company OS zeigt sie an und steuert die Arbeit der Agenten.</div>`};
+V.projekt=id=>{
+ if(String(id).startsWith("b:")){const p=BS_PROJ.find(x=>x[0]===id.slice(2))||BS_PROJ[0];
+  return K.detail({title:esc(p[1]),num:"Projekt in Bodo",chips:[K.chip("▦ Projekt"),K.chip(p[2],"info"),ECHT],actions:`<a class="k-btn p" href="${BOU+"projekte/"+p[0]}" target="_blank" rel="noopener">In Bodo öffnen ↗</a>`,
+   cards:[{t:"Steckbrief",b:K.kv([["Status",esc(p[2])],["Beschreibung",esc(p[6]||"–")]])},{t:"Aufgaben",b:K.kv([["aktiv",p[3]],["gesamt",p[4]],["erledigt",p[4]-p[3]]])},{t:"Verantwortlich",b:p[5].split(" · ").map(n=>n==="–"?'<span class="k-lbl">nicht gesetzt</span>':K.person(K.ini(n),n)).join("")}],
+   sections:[{id:"st",t:"Steuerung in Company OS",b:`<div class="k-note">Für dieses Projekt ist in Company OS noch keine Steuerung angelegt. Möglich: Projektvorlage zuordnen (Aufgabenpakete oder Phasen), Agenten je Paket einsetzen, Fristen überwachen lassen.</div>`}],empty:["Aufgabenpakete","Phasen","Aufträge"]})}
+ if(id==="hagen"){const pk=PKG;const nOpen=BS_HAGEN.filter(t=>t[2]!=="Erledigt").length;const late=BS_HAGEN.filter(t=>t[2]!=="Erledigt"&&t[3]);
+  return K.detail({title:"Einführung Mieterverein Hagen",num:"Kunde "+HAGEN.kunde[1],chips:[K.chip("▦ Projekt"),K.chip("Aufgabenpakete"),K.chip("läuft","info",true),ECHT,K.chip("nur Dev-System","warn")],
+   actions:`<a class="k-btn" href="${HAGEN.kunde[2]}" target="_blank" rel="noopener">Kunde in Bodo ↗</a> `+K.btn("✦ Stand zusammenfassen",'data-ask="Wie steht MIV Hagen?"',true),
+   cards:[{t:"Kunde",b:K.kv([["Organisation",ext(HAGEN.kunde[2],esc(HAGEN.kunde[0]))],...HAGEN.kontakte.map(c=>[esc(c[1]),ext(c[2],esc(c[0]))])])},
+    {t:"Projekte in Bodo",b:HAGEN.proj.map(p=>`<div style="margin:3px 0">${ext(p[2],esc(p[0]))}<br><span class="k-lbl">${esc(p[1])}</span></div>`).join("")},
+    {t:"Aufgaben in Bodo",b:K.kv([["gesamt",BS_HAGEN.length],["erledigt",BS_HAGEN.length-nOpen],["in Bearbeitung",BS_HAGEN.filter(t=>t[2]==="In Bearbeitung").length],["offen",BS_HAGEN.filter(t=>t[2]==="Offen").length]])}],
+   sections:[{id:"hot",t:"! Brennpunkte",n:late.length,a:'<span class="k-lbl">Frist überschritten · Vorschlag je Agent ist Beispiel</span>',flush:true,b:K.table(["Nr.","Aufgabe","fällig","Status","Vorschlag"],late.map(t=>{const h=HAGEN.hot.find(x=>x[0]===t[0]);return [ext(B+t[4],t[0]),`<b>${esc(t[1])}</b>`,t[3],K.chip(t[2]+" · überfällig","bad"),`<span class="k-lbl">${esc(h?h[5]:"–")}</span>`]}))},
+    {id:"pk",t:"▦ Aufgabenpakete",n:pk.length,a:BSP,flush:true,b:K.table(["Paket","verantwortlich","Agent","fällig","Stand","Aufgaben"],pk.map(x=>[`<b>${esc(x.n)}</b>`,esc(x.v),"✦ "+esc(x.ag.replace(/^◆ /,"")),esc(x.due),`<span class="pill ${x.st[0]}">${esc(x.st[1])}</span>${x.block?`<br><span class="k-lbl">${esc(x.block)}</span>`:""}`,x.t.length]))},
+    {id:"auf",t:"☑ Aufgaben in Bodo",n:BS_HAGEN.length,a:ECHT,flush:true,b:K.table(["Nr.","Aufgabe","Status","fällig"],BS_HAGEN.map(t=>[ext(B+t[4],t[0]),esc(t[1]),stAG(t[2]),esc(t[3]||"–")]))},
+    {id:"reg",t:"Regel",b:`<div class="k-note">Beim Mieterverein Hagen arbeiten Agenten nur im Dev-System. Im Produktivsystem wird nichts ausgeführt. Der KI-Zugang im Vereinssystem fehlt noch (Angabe zur Rechtsberatung).</div>`}],
+   empty:["Dokumente","Risiken"]})}
+ if(id==="dev"){const run=PH.find(x=>x.st==="run");
+  return K.detail({title:"Entwicklungsprojekt Inkasso-Schnittstelle",num:"Phasen",chips:[K.chip("▦ Projekt"),K.chip("Phasen"),K.chip("läuft","info",true),BSP],actions:K.btn("Auftrag im Projekt starten","data-neu",true),
+   cards:[{t:"Steckbrief",b:K.kv([["Vorlage","Entwicklungsprojekt"],["Ablauf","automatisch aus der Vorlage"],["Verwaltet in","Bodo"]])},{t:"Verantwortung",b:K.agent("Projekt-Agent Entwicklung","projektverantwortlich")+K.person("BH","Boris Hose","Abnahmen")},{t:"Fortschritt",b:K.kv([["Aktuelle Phase",esc(run.n)],["Meilenstein",esc(run.ms[0])+" · "+run.ms[1]]])}],
+   sections:[{id:"ph",t:"▦ Phasen",n:PH.length,flush:true,b:K.table(["Phase","Zeitraum","Ergebnisverantwortlich","Ablauf","Status"],PH.map(x=>[`<b>${esc(x.n)}</b>`,`${x.from}–${x.to}`,esc(x.er),x.par?"parallel":"nacheinander",`<span class="pill ${PHS[x.st][0]}">${PHS[x.st][1]}</span>`]))},
+    {id:"ms",t:"◆ Meilensteine",n:PH.length,flush:true,b:K.timeline(PH.map(x=>[x.ms[2]?"ok":x.st==="run"?"now":"skip","◆",`<b>${esc(x.ms[0])}</b> · Abnahme durch ${esc(x.er)}`,x.ms[1]]))},
+    {id:"pr",t:"↝ Prozesse je Phase",n:PH.reduce((s,x)=>s+x.pr.length,0),flush:true,b:K.table(["Phase","Prozess","Stand"],PH.flatMap(x=>x.pr.map(r=>[esc(x.n),`<b>${esc(r[0])}</b>`,esc(r[1])])))}],
+   empty:["Dokumente","Risiken"]})}
+ const p=projOf().find(x=>x.id===id)||PROJ.ba[0];
+ return K.detail({title:esc(p.n),num:"Aufgabenpakete",chips:[K.chip("▦ Projekt"),K.chip("läuft","info",true),coChip("ba"),BSP],actions:K.btn("Setup ansehen",K.go("setup"),true),
+  cards:[{t:"Steckbrief",b:K.kv([["Verwaltet in","sellify"],["Vorlage","–"],["Ablauf","manuell"]])},{t:"Verantwortung",b:K.person("BH","Boris Hose","projektverantwortlich")},{t:"Aufträge",b:K.kv(JOBS.ba.filter(j=>/Company OS/.test(j[2])).map(j=>[esc(j[0]),`<span class="pill ${j[3]}">${j[4]}</span>`]))}],
+  sections:[{id:"pk",t:"▦ Setup-Pakete",n:SETUP.length,flush:true,b:K.table(["#","Paket","Inhalt"],SETUP.map((s,i)=>[i+1,`<b>${esc(s[0])}</b>`,`<span class="k-lbl">${esc(s[1].map(x=>x[0]).join(" · "))}</span>`]))}],
+  empty:["Dokumente","Risiken","Meilensteine"]})};
+
+/* ---------- Organigramm ---------- */
+V.organigramm=()=>K.pageHead("Organigramm",{chips:[BSP],actions:K.btn("＋ Abteilung",'data-toast="Abteilung anlegen – ausblenden statt löschen (Prototyp)"')})+
+ `<div class="k-card abc-orgtop"><span class="big">BH</span><div><b style="font-size:16px">Geschäftsführung</b><div class="k-note">Boris Hose · du${ALL()?"":" · "+esc(GF[MK()].dep)}</div></div><span class="k-sp"></span>${K.agent("Persönlicher KI-Assistent",PSK.filter(x=>x[2]).length+" Fähigkeiten")}</div>`+
+ CK().map(k=>`${ALL()?`<div class="k-sect">${esc(CO[k].name.toUpperCase())}<span>${ORG[k].length} Abteilungen</span></div>`:""}<div class="k-org">${ORG[k].map((d,i)=>`<button class="k-card k-dep" style="--c:${d.c}" ${K.go("abteilung",k+":"+i)}><b style="font-size:15px">${esc(d.n)}</b>${K.person(d.lead[0],d.lead[1],"Leitung")}<span class="k-lbl">${esc(d.dep)} · ${d.ppl.length} Rollen · ${d.ag.length+d.pa.length} Agenten</span><span class="pill ${d.al?"p-wait":"p-ok"}" style="align-self:flex-start">${esc(d.al||d.ok)}</span></button>`).join("")}</div>`).join("");
+V.abteilung=id=>{const [k,i]=String(id||"bs:0").split(":");const d=(ORG[k]||ORG.bs)[+i]||ORG.bs[0];const P=PROC[k].filter(p=>p.dep===d.n);const ags=d.pa.map(x=>x[0]).concat(d.ag);
+ return K.detail({title:esc(d.n),num:CO[k].name,chips:[K.chip("⌂ Abteilung"),d.al?K.chip(esc(d.al),"warn",true):K.chip(esc(d.ok),"ok",true),BSP],actions:K.btn("Bearbeiten",'data-toast="Abteilung bearbeiten (Prototyp)"'),
+  cards:[{t:"Leitung",b:K.person(d.lead[0],d.lead[1],"Leitung")+`<span class="k-lbl">${esc(d.dep)}</span>`},{t:"Besetzung",b:K.kv([["Rollen",d.ppl.length+1],["Agenten",ags.length],["Prozesse",P.length]])},{t:"Unternehmen",b:coChip(k)}],
+  sections:[{id:"ma",t:"● Menschen und Rollen",n:d.ppl.length+1,b:K.person(d.lead[0],d.lead[1],"Leitung")+d.ppl.map(p=>K.person(p[0],p[1])).join("")},
+   {id:"ag",t:"✦ Agenten",n:ags.length,b:ags.map(a=>`<div style="margin:4px 0">${agIdx(a)>=0?`<button class="k-lnk" ${K.go("agent",agIdx(a))}>${K.agent(a)}</button>`:K.agent(a)}${d.pa.find(x=>x[0]===a)?`<span class="k-lbl"> ${esc(d.pa.find(x=>x[0]===a)[1])}</span>`:""}</div>`).join("")},
+   {id:"pr",t:"↝ Prozesse",n:P.length,hide:!P.length,flush:true,b:K.table(["Prozess","Status","Aufträge"],P.map(p=>[`<span class="nm">${esc(p.n)}</span>`,procChip(p),esc(p.run)]),{rowGo:j=>K.go("prozess",P[j].id)})}],
+  empty:["Kennzahlen","Abwesenheiten"].concat(P.length?[]:["Prozesse"])})};
+
+/* ---------- Agenten ---------- */
+V.agenten=()=>{const cur=K.tab("agenten","ag");const SK=Object.keys(SKC);
+ const body=cur==="sk"?`<div class="k-card"><div class="k-lh"><b>${SK.length} Skills</b></div>${K.table(["Skill","Beschreibung","Datenstufe","Pflicht-Freigabe","genutzt von"],SK.map(k=>[`<b class="pv-mono">${k}</b>`,esc(SKC[k][0]),"Stufe "+SKC[k][1],SKC[k][2]?K.chip("ja","warn"):"–",AG.filter(a=>a.sk.includes(k)).map(a=>esc(a.n)).join(", ")||"–"]))}</div>`
+ :`<div class="k-card"><div class="k-lh"><b>${AG.length} Agenten</b><span class="k-note">ein gemeinsamer Pool für beide Unternehmen</span></div>${K.table(["Agent","Abteilung","Aufgabe","Skills","Rolle","Version","Datenstufe"],AG.map(a=>[`<span class="nm">✦ ${esc(a.n)}</span>`,esc(a.d),esc(a.t),a.sk.length,K.chip(a.r,a.r==="Mitarbeiter"?"":"info"),esc(a.ver),"Stufe "+lv(a)]),{rowGo:i=>K.go("agent",i)})}</div>`;
+ return K.pageHead("Agenten & Skills",{chips:[BSP],actions:K.btn("＋ Agent",'data-toast="Agent anlegen und Skills zuordnen (Prototyp)"',true)})+K.tabs("agenten",[["ag","Agenten",AG.length],["sk","Skills",SK.length]])+body};
+V.agent=id=>{const a=AG[+id]||AG[0];const R=[["lesen","Daten im CRM lesen"],["anlegen","Datensätze anlegen und ändern"],["mail","E-Mails versenden"]];const P=allP().filter(p=>a.inn.includes(p.n));
+ return K.detail({title:"✦ "+esc(a.n),num:a.ver,chips:[K.chip("Agent"),K.chip(a.r,a.r==="Mitarbeiter"?"":"info"),K.chip("Datenstufe "+lv(a),lv(a)>1?"warn":""),BSP],actions:K.btn("Testlauf",'data-toast="Testlauf im Testsystem gestartet (Prototyp)"')+" "+K.btn("Bearbeiten",'data-toast="Skills und Rechte bearbeiten – neue Version mit Testlauf (Prototyp)"',true),
+  cards:[{t:"Steckbrief",b:K.kv([["Abteilung",esc(a.d)],["Aufgabe",esc(a.t)],["KI-Profil",esc(a.prof)]])},{t:"Zuständig",b:K.person(K.ini(a.resp),a.resp.replace(/ \(.*\)/,""),"Mensch")},{t:"Rechte",b:K.kv(R.map(([k,l])=>[l,a.p[k]?K.chip("erlaubt","ok"):K.chip("nicht erlaubt")]).concat([["Löschen",K.chip("nie","bad")]]))}],
+  sections:[{id:"sk",t:"Skills",n:a.sk.length,flush:true,b:K.table(["Skill","Beschreibung","Datenstufe","Pflicht-Freigabe"],a.sk.map(k=>[`<b class="pv-mono">${k}</b>`,esc((SKC[k]||["–"])[0]),"Stufe "+(SKC[k]||[0,0])[1],(SKC[k]||[])[2]?K.chip("ja","warn"):"–"]))},
+   {id:"in",t:"↝ Eingesetzt in",n:a.inn.length,hide:!a.inn.length,flush:true,b:K.table(["Prozess oder Projekt","Unternehmen"],a.inn.map(n=>{const p=P.find(x=>x.n===n)||allP().find(x=>x.n===n);return [`<span class="nm">${esc(n)}</span>`,p?coChip(p.co):"–"]}),{rowGo:i=>{const p=findPByName(a.inn[i]);return p?K.go("prozess",p.id):""}})}],
+  empty:["Testläufe","Kommentare"].concat(a.inn.length?[]:["Eingesetzt in"])})};
+const findPByName=n=>{for(const k of ["bs","ba"]){const p=PROC[k].find(x=>x.n===n);if(p)return p}return null};
+
+/* ---------- Bibliothek, Anschlüsse, KI, Setup, Profil ---------- */
+const LIB=[["Material","Bodo Produktinformation","OneDrive · Vertrieb/Material","Vertrieb Bodo","bs"],["Material","sellify Produktinformation","OneDrive · Vertrieb/Material","Vertrieb sellify","ba"],["Vorlage","Angebot im Bodo-Stil","Bodo · Dokumentvorlage","Angebot erstellen","bs"],["Vorlage","Datenschutzvereinbarung (AVV)","OneDrive · Recht","Einführung, Datenimport","bs"],["Vorlage","Angebot sellify","sellify · Dokumentvorlage","Angebot erstellen","ba"],["Vorlage","Nachfass-Mail","Bodo · E-Mail-Vorlage","Vertrieb · Lead bis Abschluss","bs"],["Wissen","Branchenpaket Mieterverein","Company OS","Vorlagen, Agenten, Organigramm","bs"]];
+V.bibliothek=()=>{const R=LIB.filter(r=>CK().includes(r[4]));
+ return K.list({title:"Bibliothek",chips:[BSP],cols:["Art","Name","Quelle","Wofür"].concat(ALL()?["Unternehmen"]:[]),rows:R.map(r=>[`<span class="pill ${r[0]==="Vorlage"?"p-wait":"p-open"}">${r[0]}</span>`,`<b>${esc(r[1])}</b>`,esc(r[2]),esc(r[3])].concat(ALL()?[coChip(r[4])]:[])),note:"Vorlagen kommen aus dem CRM, Material aus dem Cloud-Ordner"})};
+V.anschluesse=()=>K.detail({title:"Anschlüsse",chips:[K.chip("⇄ Einrichtung"),BSP],
+ cards:CK().map(k=>({t:CO[k].name,b:K.kv([["System",esc(CO[k].sys)],["per MCP",k==="bs"?K.chip("verbunden · echte Daten","ok"):K.chip("verbunden · nur Testsystem","warn")],["Stand",k==="bs"?`${BS_COUNT.organisationen} Organisationen · ${BS_COUNT.personen} Personen · ${BS_COUNT.benutzer} Benutzer`:"Echtes business//acts-sellify: offen"]])})),
+ sections:[{id:"an",t:"Anschlüsse",n:CK().reduce((s,k)=>s+CONN[k].length,0),flush:true,b:K.table(["System","Rolle","Was","Grundaufgaben","Status"].concat(ALL()?["Unternehmen"]:[]),CK().flatMap(k=>CONN[k].map(c=>[`<b>${esc(c[3])}</b>`,K.chip(c[0]),esc(c[4]),esc(c[5]),`<span class="pill ${c[6]}">${c[7]}</span>`].concat(ALL()?[coChip(k)]:[]))))},
+  {id:"ue",t:"Übergabewege",n:CK().reduce((s,k)=>s+ROUTES[k].length,0),flush:true,b:K.table(["Was","geht an","Methode","Status"].concat(ALL()?["Unternehmen"]:[]),CK().flatMap(k=>ROUTES[k].map(r=>[`<b>${esc(r[0])}</b>`,esc(r[1]),esc(r[2]),`<span class="pill ${r[3]}">${esc(r[4])}</span>`].concat(ALL()?[coChip(k)]:[]))))}]});
+V.ki=()=>K.detail({title:"KI & Daten",chips:[K.chip("⚙ Einrichtung"),BSP],
+ sections:[{id:"haupt",t:"Haupt-KI",b:K.kv([["Haupt-KI","Claude – nur von business//acts freigegebene Anbieter wählbar"],["Weitere Anbieter","nur mit bestätigter AVV"],["Ausfall","Aufträge pausieren, kein automatischer Wechsel"]])},
+  {id:"stufen",t:"Datenstufen",n:3,b:K.kv([["0","ohne Personendaten"],["1","pseudonymisiert"],["2","personenbezogen – nur mit AVV und passendem Datenstandort"]])},
+  {id:"regeln",t:"Harte Regeln",b:K.kv([["Agenten dürfen nie","Rechtsberatung erteilen · Geld bewegen · löschen"],["Außenwirkung","Senden und Schreiben nach außen nur nach Freigabe"],["Mieterverein Hagen","nur Dev-System, nie Produktivsystem"]])}]});
+V.setup=()=>K.detail({title:"Setup einer Kundeninstanz",num:"Beispiel Mieterverein Hagen",chips:[K.chip("☑ Einrichtung"),BSP],actions:K.btn("Verbindungstest",'data-toast="Verbindungstest (Prototyp)"',true),
+ sections:SETUP.map((s,i)=>({id:"s"+i,t:`${i+1} · ${esc(s[0])}`,b:K.kv(s[1].map(([l,v])=>[esc(l),esc(v)]))}))});
+V.profil=()=>K.detail({title:"Boris Hose",num:"Geschäftsführung",chips:[K.chip("du")],cards:[{t:"Unternehmen",b:coChip("bs")+" "+coChip("ba")},{t:"Benachrichtigungen",b:K.kv([["Eskalationen","sofort"],["Sonst","stündlich gebündelt"],["Ruhezeit","20–7 Uhr"]])},{t:"Persönlicher KI-Assistent",b:PSK.filter(x=>x[2]).map(x=>K.agent(x[0])).join("")}],sections:[{id:"ein",t:"Einstellungen",b:'<div class="k-note">Morgenübersicht 7:30 in der App · Tagesabschluss 18:00.</div>'}]});
+
+/* ---------- KI-Assistent (vorbereitete Antworten aus den Daten) ---------- */
+const KI={
+ "Was ist heute wichtig?":()=>{const A=arbeit();return `Aus Bodo (Stand ${STAND}):<ul><li>Heute: ${today().map(r=>esc(r[3])+" "+r[4].split(" ")[1]).join(", ")||"keine Termine"}</li><li>Überfällig: ${A.filter(r=>r[0]==="overdue").length}, davon mit hoher Priorität ${A.filter(r=>r[0]==="overdue"&&r[7]==="high").length} – z. B. ${A.filter(r=>r[0]==="overdue"&&r[7]==="high").slice(0,3).map(r=>r[2]+" "+esc(r[3])).join("; ")}</li><li>Freigaben und Rückfragen: ${wait().length}</li></ul><span class="k-lbl">Reihenfolge der Vorschläge ist meine Einschätzung.</span><br><button class="btn acc" data-go="meinearbeit">Zu „Meine Arbeit“</button>`},
+ "Wie steht MIV Hagen?":()=>{const L=BS_HAGEN.filter(t=>t[2]!=="Erledigt"&&t[3]);return `Projekt MIV Hagen Migration in Bodo (Stand ${STAND}): ${BS_HAGEN.length} Aufgaben, ${BS_HAGEN.filter(t=>t[2]==="Erledigt").length} erledigt, ${BS_HAGEN.filter(t=>t[2]==="In Bearbeitung").length} in Bearbeitung, ${BS_HAGEN.filter(t=>t[2]==="Offen").length} offen.<ul>${L.map(t=>`<li>${t[0]} ${esc(t[1])} – fällig ${t[3]}</li>`).join("")}</ul>Blocker: KI-Zugang im Vereinssystem fehlt. Gearbeitet wird nur im Dev-System.<br><button class="btn acc" data-go="projekt|hagen">Projekt öffnen</button>`},
+ "Welche Chancen sind am wertvollsten?":()=>{const C=chOpen().slice().sort((a,b)=>(b[5]+b[6])*b[4]-(a[5]+a[6])*a[4]).slice(0,4);return `Offene Chancen Bodo Solutions, sortiert nach gewichtetem Wert (Wert × Wahrscheinlichkeit):<ul>${C.map(c=>`<li>${esc(c[1])} – ${c[3]}, ${c[4]} %, gewichtet ${eur((c[5]+c[6])*c[4]/100)}</li>`).join("")}</ul><span class="k-lbl">Gewichtung ist eine einfache Rechnung, keine Prognose.</span><br><button class="btn acc" data-go="chancen">Chancen öffnen</button>`},
+ "Was hängt an business//acts?":()=>`In Bodo liegen bei dir ${BS_ARBEIT.filter(r=>BA_TAG.includes(r[2])).length} Aufgaben, die nach meiner Einschätzung zu business//acts gehören (sellify-Vertrieb, AVV):<ul>${BS_ARBEIT.filter(r=>BA_TAG.includes(r[2])).map(r=>`<li>${r[2]} ${esc(r[3])} – ${r[4]}</li>`).join("")}</ul>Das per MCP erreichbare sellify enthält nur Testdaten. Für echte business//acts-Zahlen fehlt die Anbindung an euer produktives sellify.`,
+ "Entwirf einen Prozess für die Lead-Gewinnung":()=>`Entwurf im Designer: 5 Schritte, Agenten aus dem Pool, eine Lücke (kein Agent mit Skill „lead-bewertung“). Prozessverantwortlich: Lead-Prozessagent, ergebnisverantwortlich: du (Vorschlag).<br><button class="btn acc" data-go="prozess|lead">Bestehenden Prozess ansehen</button>`};
+/* Antworten werden beim Fragen aus den aktuellen Daten gebaut */
+const SCRIPT2={};Object.keys(KI).forEach(k=>Object.defineProperty(SCRIPT2,k,{enumerable:true,get:KI[k]}));
+
+/* ---------- Aktionen ---------- */
+function onClick(b,d){
+ if(d.sug){const [i,s]=d.sug.split("|");SUG[+i].s=s;K.toast(`„${SUG[+i].n}“: ${s} (Prototyp)`);K.refresh();return true}
+ if(d.neu!==undefined){onNeu();return true}
+ return false}
+function onNeu(){K.modal(`<h2 style="margin:0;font-size:16px">Neuer Auftrag</h2><label class="k-lbl" for="pv-nj">Was soll passieren?</label><textarea class="abc-ta" id="pv-nj" style="min-height:70px">Alle überfälligen Nachfass-Aufgaben aus Bodo durchgehen und je Kontakt eine Mail entwerfen</textarea><div class="k-lbl">Vorschlag des Agenten</div><button class="k-mi" data-toast="Auftrag gestartet – Entwürfe kommen zur Freigabe (Prototyp)"><span><b>Einzelaufgabe an den Vertriebsassistenten</b><br><span class="k-lbl">Entwürfe zur Freigabe an dich · nichts wird gesendet</span></span><span>→</span></button><button class="k-mi" data-toast="Prozess gestartet (Prototyp)"><span><b>Prozess „Angebote nachfassen“</b><br><span class="k-lbl">aus den Vorlagen · startet als Entwurf</span></span><span>→</span></button>`)}
+
+/* ---------- Start ---------- */
+const nOver=()=>arbeit().filter(r=>r[0]==="overdue").length;
+K.start({start:"dashboard",neu:"Neuer Auftrag",onNeu,onClick,fuss:"Company OS",badge:"Entwurf v2 · Pilot · echte Bodo-Daten · nur intern",
+ mandanten:{all:{name:"Alle Unternehmen",kurz:"Übersicht",rolle:"Geschäftsführung",farbe:CO.all.color,ini:"∑",user:"BH"},
+  bs:{name:"Bodo Solutions",kurz:"Bodo",rolle:"Geschäftsführung",farbe:CO.bs.color,ini:"B",user:"BH"},
+  ba:{name:"business//acts",kurz:"sellify",rolle:"Geschäftsführung",farbe:CO.ba.color,brand:"#1F7FAE",ini:"//",user:"BH"}},mstart:"all",
+ tagesleiste:()=>`<b>Mo., 12.10.2026</b><span class="sep">·</span><button class="k-tl" ${K.go("meinearbeit","overdue")}>Überfällig <span class="k-bdg r">${nOver()}</span></button><span class="sep">·</span><button class="k-tl" ${K.go("meinearbeit","frei")}>Freigaben <span class="k-bdg o">${wait().length}</span></button>${MK()!=="ba"?`<span class="sep wide">·</span><button class="k-tl wide" ${K.go("meinearbeit","today")}>Heute 10:00 Anforderungsanalyse</button>`:""}<span class="sep wide">·</span><span class="wide k-lbl">Bodo · Stand ${STAND}</span>`,
+ menu:[{t:"ARBEITSBEREICH",items:[{v:"dashboard",i:"⌂",l:"Dashboard"},{v:"meinearbeit",i:"☰",l:"Meine Arbeit",n:nOver},{v:"auftraege",i:"▤",l:"Aufträge",n:()=>jobs().length,g:1}]},
+  {t:"VERTRIEB",items:[{v:"chancen",i:"◇",l:"Chancen",also:["chance"],n:()=>MK()==="ba"?null:chOpen().length,g:1}]},
+  {t:"STEUERUNG",items:[{v:"prozesse",i:"↝",l:"Prozesse",also:["prozess"]},{v:"projekte",i:"▦",l:"Projekte",also:["projekt"]},{v:"organigramm",i:"⌗",l:"Organigramm",also:["abteilung"]}]},
+  {t:"WISSEN",items:[{v:"agenten",i:"✦",l:"Agenten & Skills",also:["agent"]},{v:"bibliothek",i:"▣",l:"Bibliothek"}]},
+  {t:"EINRICHTUNG",items:[{v:"anschluesse",i:"⇄",l:"Anschlüsse"},{v:"ki",i:"⚙",l:"KI & Daten"},{v:"setup",i:"☑",l:"Setup"}]}],
+ views:V,
+ ki:{hallo:"Hallo Boris. Ich kenne Organigramm, Prozesse und Aufträge von Bodo Solutions und business//acts und lese Bodo über den Anschluss – nur lesend, Schreiben nur nach deiner Freigabe.",script:SCRIPT2,sonst:"Im Prototyp sind nur die vorbereiteten Fragen hinterlegt."},
+ suche:()=>BS_ARBEIT.filter(r=>r[2]).map(r=>[r[2]+" "+r[3],"Aufgabe Bodo",K.go("meinearbeit",r[0])]).concat(BS_CHANCEN.map(c=>[c[1],"Chance",K.go("chance",c[0])]),BS_PROJ.map(p=>[p[1],"Projekt Bodo",BSP_ID[p[0]]?K.go("projekt",BSP_ID[p[0]]):K.go("projekt","b:"+p[0])]),allP().map(p=>[p.n,"Prozess",K.go("prozess",p.id)]),AG.map((a,i)=>[a.n,"Agent",K.go("agent",i)]),["bs","ba"].flatMap(k=>ORG[k].map((d,i)=>[d.n+" · "+CO[k].name,"Abteilung",K.go("abteilung",k+":"+i)])))});
+
+</script>
