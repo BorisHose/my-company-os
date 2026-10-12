@@ -318,11 +318,22 @@ a.btn{text-decoration:none;color:var(--ink);display:inline-flex;align-items:cent
 .sw{display:inline-block;width:10px;height:10px;border-radius:3px;margin-right:5px;vertical-align:-1px}
 </style>
 <style>
-/* Posteingang: Liste mit fester Höhe, scrollt in sich; Kopfzeile bleibt stehen */
-.inbox{padding:0 4px 6px;height:min(420px,52vh);overflow-y:auto;position:relative;overscroll-behavior:contain;gap:0}
+/* Posteingang: oben die Liste (feste Höhe, einklappbar, scrollt in sich), darunter der Detailbereich mit eigener Scrollleiste; die Seite selbst scrollt hier nicht */
+#view.fix{overflow:hidden;display:flex;flex-direction:column;padding-bottom:16px}
+.ein{display:flex;flex-direction:column;gap:14px;flex:1;min-height:0}
+.inwrap{flex:none;display:flex;flex-direction:column;background:var(--surface);border:1px solid var(--line);border-radius:12px;overflow:hidden}
+.inbar{display:flex;align-items:center;gap:10px;padding:9px 12px 9px 16px;border-bottom:1px solid var(--line);flex-wrap:wrap}
+.inbar h2{font-size:15px;margin:0}
+.inwrap.zu .inbar{border-bottom:0}
+.inbar .cur{flex:1;min-width:0;font-size:13px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.inbar .cur b{font-weight:700}
+.inbox{height:min(420px,52vh);overflow-y:auto;position:relative;overscroll-behavior:contain;padding:0 4px 6px}
 .inbox .mail.head{position:sticky;top:0;z-index:1;background:var(--surface);border-bottom:1px solid var(--line)}
 .inbox .mail.head+.mail{border-top:0}
+@media (max-width:700px){.inbox{height:38vh}}
+.detail{flex:1;min-height:0;overflow-y:auto;overscroll-behavior:contain;padding:0 2px 84px 0}
 </style>
+
 <div class="app" id="app">
   <div class="demo"><b>Konzept-Prototyp für abcfinance</b><span>ASS · Auftragssteuerung mit KI · alle Namen, Mails und Zahlen sind Beispieldaten · keine fertige Software</span></div>
   <aside id="side">
@@ -442,10 +453,10 @@ const AREAS=[["cockpit","◎","Cockpit"],["eingang","✉","Posteingang"],["proze
 const state={area:"cockpit",mail:4,type:"rek",test:MAILS[3].body};
 function nav(){$("#areas").innerHTML=AREAS.map(([k,i,l])=>{const c=k==="eingang"?MAILS.filter(m=>m.st==="pruefen").length:0;return `<button data-area="${k}" aria-current="${state.area===k}"><span class="ic">${i}</span>${l}${c?`<span class="cnt">${c}</span>`:""}</button>`}).join("")}
 /* Neu zeichnen, ohne dass Posteingang-Liste und Seite an den Anfang springen */
-function keepRender(){const ib=$("#inbox"),vs=$("#view").scrollTop,ls=ib?ib.scrollTop:0;render();$("#view").scrollTop=vs;const nb=$("#inbox");if(nb)nb.scrollTop=ls}
+function keepRender(newMail){const ib=$("#inbox"),dt=$("#detail"),vs=$("#view").scrollTop,ls=ib?ib.scrollTop:0,ds=dt?dt.scrollTop:0;render();$("#view").scrollTop=vs;const nb=$("#inbox");if(nb)nb.scrollTop=ls;const nd=$("#detail");if(nd&&!newMail)nd.scrollTop=ds}
 function selIntoView(){const ib=$("#inbox"),el=ib&&ib.querySelector('.mail[aria-current="true"]');if(el)ib.scrollTop=Math.max(0,el.offsetTop-ib.clientHeight/2+el.offsetHeight/2)}
 function go(a){state.area=a;$("#side").classList.remove("open");render();$("#view").scrollTop=0}
-function render(){nav();const a=AREAS.find(x=>x[0]===state.area);$("#crumb").textContent="abcfinance · ASS";$("#title").textContent=a[2];$("#view").innerHTML=V[state.area]()}
+function render(){nav();const a=AREAS.find(x=>x[0]===state.area);$("#crumb").textContent="abcfinance · ASS";$("#title").textContent=a[2];$("#view").classList.toggle("fix",state.area==="eingang");$("#view").innerHTML=V[state.area]()}
 
 /* ---------- Ansichten ---------- */
 const V={};
@@ -467,11 +478,15 @@ return `<div class="stack">
 </div></div>`};
 
 V.eingang=()=>{const m=MAILS.find(x=>x.id===state.mail)||MAILS[0];const t=T(m.type);const r=cover(m.body,t);const ranked=bestRule(m.body);const s=STL[m.st];
-return `<div class="stack"><div class="card inbox" id="inbox" aria-label="Posteingang">
+const open=state.inOpen!==false,idx=MAILS.indexOf(m),nP=MAILS.filter(x=>x.st==="pruefen").length;
+return `<div class="ein"><section class="inwrap ${open?"":"zu"}" aria-label="Posteingang"><div class="inbar"><h2>Posteingang</h2><span class="sub">${MAILS.length} Mails · ${nP} Mensch prüft</span>
+${open?'<span style="flex:1"></span>':`<span class="cur">Ausgewählt: <b>${esc(m.from)}</b> · ${esc(m.subj)} · ${m.tm}</span><button class="btn sm" data-instep="-1" aria-label="Vorherige Mail" ${idx?"":"disabled"}>‹</button><button class="btn sm" data-instep="1" aria-label="Nächste Mail" ${idx<MAILS.length-1?"":"disabled"}>›</button>`}
+<button class="btn sm" data-intog aria-expanded="${open}">${open?"▴ Einklappen":"▾ Ausklappen"}</button></div>
+${open?`<div class="inbox" id="inbox">
 <div class="mail head" style="font-size:11.5px;color:var(--muted);font-weight:600;pointer-events:none"><span>Zeit</span><span>Absender · Betreff</span><span class="hide-s">Dokumenttyp</span><span class="hide-s">Ziel</span><span>Status</span></div>
 ${MAILS.map(x=>{const tt=T(x.type),st=STL[x.st];return `<button class="mail" data-mail="${x.id}" aria-current="${x.id===m.id}"><span class="tm2">${x.tm}<br>${x.box}</span><span><b>${esc(x.from)}</b><small>${esc(x.subj)}</small></span><span class="hide-s"><b>${tt.n}${x.also?" + 1":""}</b><small>KI ${x.ki} %</small></span><span class="hide-s"><small style="white-space:normal">${esc(target(tt,x))}</small></span><span class="pill ${st[0]}">${st[1]}</span></button>`}).join("")}
-</div>
-<div class="split">
+</div>`:""}</section>
+<div class="detail" id="detail"><div class="split">
  <div class="card"><h2>${esc(m.subj)} <span class="pill ${s[0]}">${s[1]}</span></h2><div class="meta"><span>Postfach ${m.box}</span><span>${m.tm} Uhr</span><span>${esc(m.from)}</span>${EX}</div>
   <div class="doc">${markText(m.body,r.hits.concat(m.also?cover(m.body,T(m.also[0])).hits:[]))}</div>
   <div class="sub">Markiert: Kennbegriffe aus der heutigen Begriffsliste, die im Text vorkommen.</div>
@@ -486,7 +501,7 @@ ${MAILS.map(x=>{const tt=T(x.type),st=STL[x.st];return `<button class="mail" dat
   <div class="acts">${m.st==="pruefen"?`<button class="btn pri" data-ok="${m.id}">Bestätigen und verteilen</button><button class="btn" data-fix="${m.id}">Korrigieren</button>`:m.st==="freigabe"?`<button class="btn pri" data-ok="${m.id}">Antwort freigeben</button><button class="btn" data-fix="${m.id}">Ändern</button>`:`<button class="btn" data-fix="${m.id}">Einordnung korrigieren</button><span class="sub">in sellify: Aufgaben angelegt, Mail am Vertrag abgelegt</span>`}</div>
   <div class="sub">Jede Korrektur wird als Lernbeispiel für den Dokumenttyp gespeichert. ${AN}</div>
  </div>
-</div></div>`};
+</div></div></div>`};
 
 V.prozess=()=>{const N=(t,a,c="")=>`<div class="node ${c}"><b>${t}</b><span class="sub">${a}</span></div>`;const L='<span class="ln" aria-hidden="true"></span>';
 const STEPS=[["1","Postfächer überwachen","Posteingangs-Agent","–","nein"],["2","Mail und Anhänge lesen (auch Scans)","Posteingangs-Agent","–","nein"],["3","Dokumenttyp erkennen, Kennbegriffe gegenprüfen","Klassifizierungs-Agent","–","nein"],["4","Unter Schwelle oder unklar: prüfen","Mensch · Team Posteingang","Korrektur wird Lernbeispiel","–"],["5","Kontakt und Vertrag zuordnen","Zuordnungs-Agent","liest Kontakte und Verträge","nein"],["6","Aufgaben nach Dokumenttyp anlegen, Mail ablegen","Zuordnungs-Agent","legt Aufgaben an, legt Dokument am Vertrag ab","nein"],["7","Verteilen: Arbeitskorb oder Person","Verteil-Agent","setzt Zuständigkeit, beachtet Abwesenheit","nein"],["8","Antwort an Kunden vorbereiten (wo vorgesehen)","Antwort-Agent","Entwurf am Vorgang","ja, immer"]];
@@ -564,7 +579,9 @@ return `<div class="stack">
 /* ---------- Aktionen ---------- */
 document.addEventListener("click",e=>{const b=e.target.closest("button");if(!b)return;const d=b.dataset;
  if(d.area){go(d.area);return}
- if(d.mail){state.mail=+d.mail;if(state.area==="eingang")keepRender();else{go("eingang");selIntoView()}return}
+ if(b.hasAttribute("data-intog")){state.inOpen=state.inOpen===false;keepRender();if(state.inOpen)selIntoView();return}
+ if(d.instep){const i=MAILS.findIndex(x=>x.id===state.mail)+(+d.instep);if(MAILS[i]){state.mail=MAILS[i].id;keepRender(true)}return}
+ if(d.mail){state.mail=+d.mail;if(state.area==="eingang")keepRender(true);else{go("eingang");selIntoView()}return}
  if(d.type){state.type=d.type;render();return}
  if(d.sample){state.test=MAILS.find(m=>m.id===+d.sample).body;render();return}
  if(d.sug){b.classList.remove("new");b.classList.add("hit");b.disabled=true;toast(`„${d.sug}“ zur Freigabe an die Fachverantwortung gegeben`);return}
