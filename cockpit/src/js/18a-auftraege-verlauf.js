@@ -1,7 +1,7 @@
 // ===== Aufträge & Verlauf: ein Dialog über alle Abteilungen (Etappe 1) =====
 // Zuordnung eines Auftrags: Agent (direkt, aus dem Ablauf oder keiner = „Claude – frei“), Abteilung (beim Anlegen gemerkt, sonst aktuelle Platzierung des Agenten)
 function jobAgent(j){if(!j)return null;const byId=id=>id?AG.find(x=>x.id===id)||null:null;
-  if(j.art==="agent"&&j.aid)return byId(j.aid);
+  if((j.art==="agent"||j.art==="abteilung")&&j.aid)return byId(j.aid);if(j.art==="abteilung")return null;
   if(j.f&&!j.f.frei&&Array.isArray(j.path)){const c=curN(j),a=(c&&c.a)||(j.f.N.find(n=>n.type==="task"&&n.a)||{}).a;if(a)return a}
   return byId(j.aid)}
 const jobOrg=j=>j.org||(ORGS()[0]||{}).id;
@@ -15,7 +15,7 @@ function AVS(){const s=UI.av=UI.av||{};s.tab=s.tab||"offen";s.st=s.st||"alle";s.
 function avSel(o){const s=AVS();if(!s.sel[o])s.sel[o]={d:null,ax:[]};return s.sel[o]}
 function avOpen(opt){opt=opt||{};const s=AVS();if(opt.org)s.org=opt.org;const S=avSel(s.org);
   if(opt.d){S.d=[...opt.d];S.ax=[]}
-  if(opt.only){S.d=[PL(opt.only,s.org).abt||"_none"];S.ax=AG.filter(x=>x.id!==opt.only.id).map(x=>x.id).concat(["_frei"])}
+  if(opt.only){S.d=[PL(opt.only,s.org).abt||"_none"];S.ax=AG.filter(x=>x.id!==opt.only.id).map(x=>x.id).concat(["_frei","_tl"])}
   if(opt.tab)s.tab=opt.tab;AVN=50;saveUI();AVOPEN=true;avRender()}
 function avClose(){AVOPEN=false;const d=$("#avdlg");if(d)d.remove()}
 function avRefresh(){if(AVOPEN&&$("#avdlg"))avRender(true)}
@@ -26,7 +26,7 @@ function avFenster(){const t=new Date();t.setHours(0,0,0,0);const mo=new Date(t)
 const AVZ=[["heute","Heute"],["woche","Diese Woche"],["monat","Dieser Monat"],["letzter","Letzter Monat"],["aelter","Älter"]];
 const inFenster=(d,w)=>(!w[0]||d>=w[0])&&(!w[1]||d<w[1]);
 
-function avZeilen(o){const R=AU.filter(j=>jobOrg(j)===o).map(j=>{const a=jobAgent(j);return {j,a,abt:jobAbt(j,a)||"_none",ak:a?a.id:"_frei",end:isEnd(j),d:isEnd(j)?doneAt(j):null}});
+function avZeilen(o){const R=AU.filter(j=>jobOrg(j)===o).map(j=>{const a=jobAgent(j);return {j,a,abt:jobAbt(j,a)||"_none",ak:a?a.id:j.art==="abteilung"?"_tl":"_frei",end:isEnd(j),d:isEnd(j)?doneAt(j):null}});
   if(AVARCH)AVARCH.filter(x=>x.org===o&&!R.some(r=>r.j.id===x.id)).forEach(x=>{const a=x.aid?AG.find(y=>y.id===x.aid)||null:null;R.push({j:x,a,abt:x.abt||(a&&PL(a,o).abt)||"_none",ak:a?a.id:"_frei",end:true,d:new Date(x.fertig),arch:true})});
   return R}
 async function avArchivLaden(){if(AVARCH||AVLOAD||!DB)return;AVLOAD=true;try{const L=await Store.list("archiv");AVARCH=L.flatMap(a=>(a.items||[]).map(x=>({...x,org:x.org||a.org})))}catch(e){AVARCH=[];toast("Archiv nicht lesbar")}AVLOAD=false;avRefresh()}
@@ -40,7 +40,7 @@ function avRender(keep){const s=AVS(),o=s.org,S=avSel(o),O=orgById(o)||{},F=avFe
   const D=deptsOf(o).map(d=>({id:d.id,n:d.n}));if(RT.some(r=>r.abt==="_none")||AG.some(a=>inOrg(a,o)&&!PL(a,o).abt))D.push({id:"_none",n:"Ohne Abteilung"});
   const dOn=k=>S.d===null||S.d.includes(k);
   const tree=D.map(d=>{const A=AG.filter(a=>inOrg(a,o)&&(PL(a,o).abt||"_none")===d.id).map(a=>({k:a.id,n:a.n}));
-      RT.filter(r=>r.abt===d.id&&!A.some(x=>x.k===r.ak)).forEach(r=>{if(!A.some(x=>x.k===r.ak))A.push({k:r.ak,n:r.a?r.a.n:"Claude – frei"})});
+      RT.filter(r=>r.abt===d.id&&!A.some(x=>x.k===r.ak)).forEach(r=>{if(!A.some(x=>x.k===r.ak))A.push({k:r.ak,n:r.a?r.a.n:r.ak==="_tl"?"✦ KI-Teamleiter (wählt noch)":"Claude – frei"})});
       const n=RT.filter(r=>r.abt===d.id).length;
       return `<label class="dl"><input type="checkbox" data-avd="${d.id}" ${dOn(d.id)?"checked":""}> ${esc(d.n)}<span class="n">${n}</span></label>`+
         A.map(a=>`<label class="al"><input type="checkbox" data-ava="${a.k}" data-avad="${d.id}" ${dOn(d.id)&&!S.ax.includes(a.k)?"checked":""}> ${esc(a.n)}<span class="n">${RT.filter(r=>r.abt===d.id&&r.ak===a.k).length}</span></label>`).join("")}).join("");
@@ -55,7 +55,7 @@ function avRender(keep){const s=AVS(),o=s.org,S=avSel(o),O=orgById(o)||{},F=avFe
     bar2=`<div class="seg2">${AVZ.map(([k,l])=>`<button data-avz="${k}" class="${s.zeit===k?"on":""}">${l}${k==="aelter"&&!AVARCH?"":`<span class="c">${RE.filter(r=>inFenster(r.d,F[k])).length}</span>`}</button>`).join("")}</div>
       <label class="cb" style="margin:0"><input type="checkbox" id="avabg" ${s.abg?"checked":""}> Abgebrochene zeigen</label>`}
   // Tabelle
-  const agc=r=>r.a?`<div class="avag">${av(usr(r.a.owner),24,1)}<span>${esc(r.a.n)}</span></div>`:`<div class="avag"><span class="avfr">✦</span><span>Claude – frei</span></div>`;
+  const agc=r=>r.a?`<div class="avag">${av(usr(r.a.owner),24,1)}<span>${esc(r.a.n)}</span></div>`:`<div class="avag"><span class="avfr">✦</span><span>${r.ak==="_tl"?"KI-Teamleiter":"Claude – frei"}</span></div>`;
   const dn=r=>{const d=dept(r.abt);return d?d.n:"Ohne Abteilung"};
   const ttl=r=>`<td class="t"><b>${esc(r.j.t||"–")}</b><small>${esc(dn(r))}</small></td>`;
   let rows,head;

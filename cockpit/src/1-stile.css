@@ -335,3 +335,7 @@ fieldset:disabled .ic,fieldset:disabled .ownadd,fieldset:disabled [data-r],field
 .avside summary{list-style:none;cursor:default;display:flex;align-items:baseline;gap:8px}.avside summary::-webkit-details-marker{display:none}.avside .avsn{display:none;color:var(--mut);font-size:12.5px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;min-width:0}.avside summary h4{margin:0 0 8px}
 @media(max-width:860px){.avside summary{cursor:pointer}.avside summary h4{margin:0}.avside summary h4::after{content:" ▾"}.avside[open] summary{margin-bottom:8px}.avside:not([open]) .avsn{display:block}}
 .avt .kst.wait{color:#b54708}.avt .kst.run{color:var(--acc)}.avt .kst.ok{color:#067647}.avt .kst.no{color:#b42318}.avt .kst.part{color:#b54708}
+/* v52: Abteilung beauftragen als Hauptweg, ▶ am Agenten dezent */
+.oact{flex-wrap:wrap}.oact .btn.p{flex:1}
+.oag .oplay{width:24px;height:24px;font-size:10px;background:#fff;color:var(--acc);border:1px solid var(--line);opacity:.5}.oag:hover .oplay,.oag .oplay:focus-visible{opacity:1;border-color:var(--acc)}.oag .oplay:hover{background:var(--accbg)}
+@media(hover:none){.oag .oplay{opacity:.85}}

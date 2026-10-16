@@ -337,6 +337,10 @@ fieldset:disabled .ic,fieldset:disabled .ownadd,fieldset:disabled [data-r],field
 .avside summary{list-style:none;cursor:default;display:flex;align-items:baseline;gap:8px}.avside summary::-webkit-details-marker{display:none}.avside .avsn{display:none;color:var(--mut);font-size:12.5px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;min-width:0}.avside summary h4{margin:0 0 8px}
 @media(max-width:860px){.avside summary{cursor:pointer}.avside summary h4{margin:0}.avside summary h4::after{content:" ▾"}.avside[open] summary{margin-bottom:8px}.avside:not([open]) .avsn{display:block}}
 .avt .kst.wait{color:#b54708}.avt .kst.run{color:var(--acc)}.avt .kst.ok{color:#067647}.avt .kst.no{color:#b42318}.avt .kst.part{color:#b54708}
+/* v52: Abteilung beauftragen als Hauptweg, ▶ am Agenten dezent */
+.oact{flex-wrap:wrap}.oact .btn.p{flex:1}
+.oag .oplay{width:24px;height:24px;font-size:10px;background:#fff;color:var(--acc);border:1px solid var(--line);opacity:.5}.oag:hover .oplay,.oag .oplay:focus-visible{opacity:1;border-color:var(--acc)}.oag .oplay:hover{background:var(--accbg)}
+@media(hover:none){.oag .oplay{opacity:.85}}
 
 </style>
 <header>
@@ -677,7 +681,7 @@ function org(){
   const dz=(abt,team,L,empty)=>`<div class="odz" data-dz-abt="${abt}" data-dz-team="${team}">${L.map(card).join("")||(empty?`<div class="hint" style="margin:0;padding:4px 2px">${empty}</div>`:"")}</div>`;
   const col=d=>{const L=A.filter(a=>ab(a)===d.id),T=teamsOf(d),direct=L.filter(a=>!T.some(t=>t.id===tm(a)));
     return `<div class="odept"><div class="odh"><b>${esc(d.n)}</b><span class="cnt">${L.length} Agent${L.length===1?"":"en"}</span>${oe?`<button class="ic" data-dren="${d.id}" title="Abteilung umbenennen">✎</button><button class="ic" data-ddel="${d.id}" title="Abteilung löschen">🗑</button>`:""}</div>
-     <div class="odb">${oe?"":`<div class="oact"><button class="btn sm" data-oav="${d.id}" title="Aufträge dieser Abteilung">🕘 Verlauf</button></div>`}${lead("d",d.id,d.lead,"Leitung")}
+     <div class="odb">${oe?"":`<div class="oact"><button class="btn sm p" data-oabt="${d.id}" title="Auftrag an die Abteilung – der KI-Teamleiter wählt den passenden Agenten">▶ Abteilung beauftragen</button><button class="btn sm" data-oav="${d.id}" title="Aufträge dieser Abteilung">🕘 Verlauf</button></div>`}${lead("d",d.id,d.lead,"Leitung")}
       ${T.map(t=>{const TL=L.filter(a=>tm(a)===t.id);return `<div class="oteam"><div class="oth"><span>Team ${esc(t.n)}</span><span class="cnt">${TL.length}</span>${oe?`<button class="ic" data-tren="${d.id}|${t.id}" title="Team umbenennen">✎</button><button class="ic" data-tdel="${d.id}|${t.id}" title="Team löschen">🗑</button>`:""}</div>
         ${lead("t",d.id+"|"+t.id,t.lead,"Teamleitung")}${dz(d.id,t.id,TL,oe?"Agenten hierher ziehen":"–")}</div>`}).join("")}
       ${T.length&&(direct.length||oe)?`<div class="odlab">Direkt in der Abteilung</div>`:""}${dz(d.id,"",direct,oe?"Agenten hierher ziehen":(T.length?"":"–"))}
@@ -699,6 +703,7 @@ function org(){
   if(!oe){document.querySelectorAll("[data-goa]").forEach(e=>e.onclick=ev=>{if(ev.target.closest("[data-play]"))return;goAgent(e.dataset.goa)});
     document.querySelectorAll("[data-play]").forEach(b=>b.onclick=ev=>{ev.stopPropagation();startModal(null,{art:"agent",aid:b.dataset.play,org:OC})});
     document.querySelectorAll("[data-orun]").forEach(b=>b.onclick=ev=>{ev.stopPropagation();const a=AG.find(x=>x.id===b.dataset.orun);if(a)avOpen({org:OC,only:a,tab:"offen"})});
+    document.querySelectorAll("[data-oabt]").forEach(b=>b.onclick=()=>startModal(null,{art:"abteilung",abt:b.dataset.oabt,org:OC}));
     document.querySelectorAll("[data-oav]").forEach(b=>b.onclick=()=>avOpen({org:OC,d:[b.dataset.oav]}));
     const oav=$("#orgav");if(oav)oav.onclick=()=>avOpen({org:OC});
     document.querySelectorAll("[data-gos]").forEach(e=>e.onclick=ev=>{ev.stopPropagation();const [ai,si]=e.dataset.gos.split("|");goSkill(ai,si)})}
@@ -1353,13 +1358,15 @@ function startModal(f,keep){if(!keep)PEND=[];keep=keep||{};
   const SKL=art==="agent"?(ag?ag.s.map(id=>sk(id)).filter(Boolean).filter(x=>!["vorschlag","entwurf"].includes(srcOf(x))):[]):skOrg(O);
   const skc=SKL.some(x=>x.id===keep.sk)?keep.sk:"";
   const s=f.N.find(n=>n.type==="start");
-  const ART=[["frei","Freie Aufgabe","Eine Aufgabe an Claude – ohne Prozess, optional mit einem bestimmten Skill"],["agent","Agent beauftragen","Ein Agent übernimmt die Aufgabe mit seinem Ziel, seinen Regeln und Skills – ohne Prozess"],["ablauf","Ablauf starten","Ein Prozess mit festen Schritten, Entscheidungen und Freigaben"]];
+  const DPO=deptsOf(O.id),abt=art==="abteilung"?(DPO.find(d=>d.id===keep.abt)||DPO[0]||null):null,ABA=abt?AG.filter(a=>inOrg(a,O)&&PL(a,O.id).abt===abt.id):[];
+  const ART=[["frei","Freie Aufgabe","Eine Aufgabe an Claude – ohne Prozess, optional mit einem bestimmten Skill"],["abteilung","Abteilung beauftragen","Der KI-Teamleiter der Abteilung wählt den passenden Agenten und erledigt die Aufgabe mit ihm"],["agent","Agent beauftragen","Ein Agent übernimmt die Aufgabe mit seinem Ziel, seinen Regeln und Skills – ohne Prozess"],["ablauf","Ablauf starten","Ein Prozess mit festen Schritten, Entscheidungen und Freigaben"]];
   $("#modal").innerHTML=`<div class="modal"><div class="box"><div class="bhead"><h3>Neuer KI-Auftrag</h3><button class="ic" id="mclose" style="font-size:18px">✕</button></div>
    <div class="field" style="margin-top:10px"><label>Organisation</label><div class="seg" id="jorg" style="margin:0">${ORGS().map(o=>`<button data-o="${o.id}" class="${o===O?'on':''}">${esc(o.kurz||o.n)}</button>`).join("")}</div></div>
    <div class="field"><label>Art des Auftrags</label><div class="seg" id="jart" style="margin:0">${ART.map(([k,l,t])=>`<button data-a="${k}" class="${k===art?'on':''}" title="${esc(t)}">${l}</button>`).join("")}</div><div class="hint">${esc(ART.find(x=>x[0]===art)[2])}</div></div>
    ${art==="ablauf"?`<div class="field"><label>Ablauf</label><select id="jf">${PK.map(([p,l])=>{const L=FLO.filter(x=>x.p===p);return L.length?`<optgroup label="${esc(l)}">${L.map(x=>`<option value="${x.id}" ${x===f?'selected':''}>${esc(x.n)}</option>`).join("")}</optgroup>`:""}).join("")}</select>${f.goal?`<div class="hint">${esc(f.goal)}</div>`:""}${s?"":'<div class="warnbox">Dieser Ablauf hat noch keinen Start-Knoten – unter „Abläufe“ ergänzen.</div>'}</div>`:""}
    ${art==="agent"?`<div class="field"><label>Agent</label>${AGO.length?`<select id="jag">${AGO.map(a=>`<option value="${a.id}" ${a===ag?'selected':''}>${esc(a.n)}</option>`).join("")}</select>${ag&&ag.r?`<div class="hint">${esc(ag.r)}</div>`:""}`:'<div class="warnbox">In dieser Organisation ist noch kein Agent platziert.</div>'}</div>`:""}
-   ${art!=="ablauf"?`<div class="field"><label for="jskq">Skill</label><div class="cbx" id="jskbox"><input type="text" id="jskq" role="combobox" aria-expanded="false" aria-autocomplete="list" autocomplete="off" placeholder="🔍 Skill suchen oder auswählen …" value="${esc(skc&&sk(skc)?sk(skc).n:(art==="agent"?"Agent entscheidet selbst":"Claude wählt selbst"))}"><span class="cbx-car" aria-hidden="true">▾</span><div class="cbx-list" id="jsklist" role="listbox" hidden></div></div><input type="hidden" id="jsk" value="${esc(skc)}"><div class="hint">${art==="agent"?"Nur Skills dieses Agenten.":"Nur Skills, die für "+esc(O.kurz||O.n)+" gelten und im Konto aktiv sind (keine Entwürfe oder Vorschläge)."}${skc&&sk(skc)&&sk(skc).d?"<br>"+esc(sk(skc).d):""}</div></div>`:""}
+   ${art==="abteilung"?`<div class="field"><label>Abteilung</label>${DPO.length?`<select id="jabt">${DPO.map(d=>`<option value="${d.id}" ${d===abt?'selected':''}>${esc(d.n)}</option>`).join("")}</select><div class="hint">✦ Der KI-Teamleiter wählt aus: ${ABA.length?ABA.map(a=>esc(a.n)).join(", "):"– in dieser Abteilung ist noch kein Agent –"}</div>`:'<div class="warnbox">Diese Organisation hat noch keine Abteilungen.</div>'}</div>`:""}
+   ${art!=="ablauf"&&art!=="abteilung"?`<div class="field"><label for="jskq">Skill</label><div class="cbx" id="jskbox"><input type="text" id="jskq" role="combobox" aria-expanded="false" aria-autocomplete="list" autocomplete="off" placeholder="🔍 Skill suchen oder auswählen …" value="${esc(skc&&sk(skc)?sk(skc).n:(art==="agent"?"Agent entscheidet selbst":"Claude wählt selbst"))}"><span class="cbx-car" aria-hidden="true">▾</span><div class="cbx-list" id="jsklist" role="listbox" hidden></div></div><input type="hidden" id="jsk" value="${esc(skc)}"><div class="hint">${art==="agent"?"Nur Skills dieses Agenten.":"Nur Skills, die für "+esc(O.kurz||O.n)+" gelten und im Konto aktiv sind (keine Entwürfe oder Vorschläge)."}${skc&&sk(skc)&&sk(skc).d?"<br>"+esc(sk(skc).d):""}</div></div>`:""}
    <div class="field"><label>Kurzbezeichnung</label><input type="text" id="jt" placeholder="Kurzbezeichnung des Auftrags, z. B. „Angebot Muster AG“" value="${esc(keep.t||"")}"></div>
    <div class="field"><label>${esc(art==="ablauf"?(f.start||"Eingabe"):"Aufgabe")}</label><textarea id="ji" placeholder="Alles, was Claude für den Auftrag wissen muss (Kunde, Mandant, Unterlagen, Links). Screenshots einfach hier einfügen (Strg+V) oder hineinziehen.">${esc(keep.i||"")}</textarea>
      <div class="anhbar"><div class="anhrow" id="janh"></div><label class="btn sm" style="cursor:pointer">📎 Bild anhängen<input type="file" id="jfile" accept="image/*" multiple style="display:none"></label></div></div>
@@ -1373,10 +1380,11 @@ function startModal(f,keep){if(!keep)PEND=[];keep=keep||{};
   ji.addEventListener("dragover",e=>{e.preventDefault();ji.classList.add("drop")});ji.addEventListener("dragleave",()=>ji.classList.remove("drop"));
   ji.addEventListener("drop",e=>{e.preventDefault();ji.classList.remove("drop");[...(e.dataTransfer.files||[])].forEach(f=>addPend(f))});
   $("#jfile").onchange=e=>{[...e.target.files].forEach(f=>addPend(f));e.target.value=""};
-  const K=o=>({art,org:O.id,aid:ag&&ag.id,sk:$("#jsk")?$("#jsk").value:"",t:$("#jt").value,i:$("#ji").value,tempo:$("#jtempo").value,vorab:$("#jvorab").checked,ki:$("#jki")?$("#jki").checked:true,...o});
+  const K=o=>({art,org:O.id,aid:ag&&ag.id,abt:abt&&abt.id,sk:$("#jsk")?$("#jsk").value:"",t:$("#jt").value,i:$("#ji").value,tempo:$("#jtempo").value,vorab:$("#jvorab").checked,ki:$("#jki")?$("#jki").checked:true,...o});
   document.querySelectorAll("#jorg [data-o]").forEach(b=>b.onclick=()=>startModal(art==="ablauf"?f:null,K({org:b.dataset.o,sk:"",aid:null})));
   document.querySelectorAll("#jart [data-a]").forEach(b=>b.onclick=()=>startModal(null,K({art:b.dataset.a,sk:""})));
   const jf=$("#jf");if(jf)jf.onchange=e=>startModal(FL.find(x=>x.id===e.target.value),K());
+  const jab=$("#jabt");if(jab)jab.onchange=e=>startModal(null,K({abt:e.target.value}));
   const jag=$("#jag");if(jag)jag.onchange=e=>startModal(null,K({aid:e.target.value,sk:""}));
   {const jsk=$("#jsk"),q=$("#jskq"),L=$("#jsklist");if(jsk&&q){
     const none=art==="agent"?"Agent entscheidet selbst":"Claude wählt selbst",lab=()=>jsk.value&&sk(jsk.value)?sk(jsk.value).n:none;
@@ -1399,11 +1407,11 @@ function startModal(f,keep){if(!keep)PEND=[];keep=keep||{};
       else if(e.key==="Tab"){if(openState)close()}};
     q.onblur=()=>setTimeout(()=>{if(document.activeElement!==q&&openState)close()},120);
     draw()}}
-  $("#go").onclick=async()=>{if(GOBUSY)return;if(!s)return toast("Der Ablauf braucht einen Start-Knoten");if(art==="agent"&&!ag)return toast("Bitte einen Agenten wählen");
+  $("#go").onclick=async()=>{if(GOBUSY)return;if(!s)return toast("Der Ablauf braucht einen Start-Knoten");if(art==="agent"&&!ag)return toast("Bitte einen Agenten wählen");if(art==="abteilung"&&!abt)return toast("Bitte eine Abteilung wählen");if(art==="abteilung"&&!ABA.length)return toast("In dieser Abteilung ist noch kein Agent – bitte zuerst einen platzieren");
     GOBUSY=true;let n;try{n=await nextJobNo()}finally{GOBUSY=false}const e=f.E.find(e=>e.f===s.id),nx=e&&nodeOf(f,e.t);
     const ki=art!=="ablauf"||$("#jki").checked,skv=$("#jsk")?$("#jsk").value:"";
-    const j={id:"A-"+n,f,fid:f.id,art,org:O.id,t:$("#jt").value||(art==="agent"?ag.n:art==="frei"?(skv&&sk(skv)?sk(skv).n:"Freie Aufgabe"):"Neuer Auftrag"),in:$("#ji").value,path:ki?[s.id]:[s.id].concat(nx?[nx.id]:[]),st:"run",log:ki?[[now(),"KI-Auftrag angelegt von Boris"+(art==="agent"?" – an "+ag.n:art==="frei"?" – freie Aufgabe":"")]]:[[now(),"Auftrag gestartet von Boris"],[now(),nx?nlabel(nx)+" – beginnt":"–"]]};
-    if(art==="agent")j.aid=ag.id;if(skv)j.sk=skv;
+    const j={id:"A-"+n,f,fid:f.id,art,org:O.id,t:$("#jt").value||(art==="agent"?ag.n:art==="abteilung"?"Auftrag an "+abt.n:art==="frei"?(skv&&sk(skv)?sk(skv).n:"Freie Aufgabe"):"Neuer Auftrag"),in:$("#ji").value,path:ki?[s.id]:[s.id].concat(nx?[nx.id]:[]),st:"run",log:ki?[[now(),"KI-Auftrag angelegt von Boris"+(art==="agent"?" – an "+ag.n:art==="abteilung"?" – an Abteilung "+abt.n+" (KI-Teamleiter)":art==="frei"?" – freie Aufgabe":"")]]:[[now(),"Auftrag gestartet von Boris"],[now(),nx?nlabel(nx)+" – beginnt":"–"]]};
+    if(art==="agent")j.aid=ag.id;if(art==="abteilung")j.abt=abt.id;if(skv&&art!=="abteilung")j.sk=skv;
     if(ki){j.ki=1;j.tempo=$("#jtempo").value;if($("#jvorab").checked)j.vorab=1}
     if(PEND.length){j.anh=PEND.map(a=>({aid:a.aid,name:a.name,w:a.w,h:a.h,n:Math.ceil(a.data.length/CHUNK),kb:Math.round(a.data.length*.75/1024)}));PEND.forEach(a=>ANHDATA.set(a.aid,a.data));PEND=[]}jobPlatz(j);AU.unshift(j);close();show("jobs");if(ki)kiStart(j,"starten");else{anhSave(j).catch(()=>{});toast("Auftrag gestartet")}};
 }
@@ -1447,7 +1455,9 @@ function kiPoll(){clearInterval(KITMR);KITMR=setInterval(()=>{if($("#jobs").clas
 function kiContext(j){const f=j.f,L=[];if(!f)return "";const cur=j.path[j.path.length-1],c=nodeOf(f,cur);
   L.push("KONTEXT AUS COMPANY OS (aktuell – nicht erneut aus der Datenbank lesen):");
   const JO=j.org&&orgById(j.org),JA=j.aid&&AG.find(a=>a.id===j.aid),JS=j.sk&&sk(j.sk);
-  if(f.frei)L.push(j.art==="agent"&&JA?"AGENT BEAUFTRAGT – kein Prozess: Handle als Agent „"+JA.n+"“ (Angaben unten) und erledige die Aufgabe direkt."+(JS?"":" Passenden Skill des Agenten selbst wählen.")+" Freigaben vor Außenwirkung wie immer. Den einen Schritt des Systemablaufs nur zum Fortschreiben von path nutzen.":"FREIE AUFGABE – kein Prozess: die Eingabe direkt erledigen (Frage beantworten, recherchieren oder eine einzelne Aktion)."+(JS?"":" Passenden Skill aus dem Konto selbst wählen.")+" Freigaben vor Außenwirkung wie immer.");
+  const JD=j.art==="abteilung"&&j.abt&&dept(j.abt),DA=JD?AG.filter(a=>inOrg(a,JO||j.org)&&PL(a,JO?JO.id:j.org).abt===JD.id):[];
+  if(f.frei&&JD)L.push(JA?"ABTEILUNG BEAUFTRAGT – Abteilung „"+JD.n+"“: Der KI-Teamleiter hat „"+JA.n+"“ ("+JA.id+") gewählt. Handle weiter als dieser Agent (Angaben unten) und erledige die Aufgabe direkt; Freigaben vor Außenwirkung wie immer.":"ABTEILUNG BEAUFTRAGT – kein Prozess, Abteilung „"+JD.n+"“: Du bist zuerst KI-TEAMLEITER dieser Abteilung. Wähle aus den Agenten unten den EINEN, dessen Ziel, Regeln und Skills am besten zur Aufgabe passen. Im Start-Schreibvorgang zusätzlich aid = ID des gewählten Agenten und einen log-Eintrag „Teamleiter: an <Agentenname>“ mitschreiben, dann als dieser Agent handeln und die Aufgabe erledigen; Freigaben vor Außenwirkung wie immer. Passt keiner oder ist die Wahl unklar: nicht raten, sondern Rückfrage (q, kind „Rückfrage“, from „KI-Teamleiter“) mit den 2–3 passendsten Agenten als Antwortoptionen. Agenten dieser Abteilung: "+(DA.map(a=>a.n+" ("+a.id+")").join(", ")||"keine")+".");
+  else if(f.frei)L.push(j.art==="agent"&&JA?"AGENT BEAUFTRAGT – kein Prozess: Handle als Agent „"+JA.n+"“ (Angaben unten) und erledige die Aufgabe direkt."+(JS?"":" Passenden Skill des Agenten selbst wählen.")+" Freigaben vor Außenwirkung wie immer. Den einen Schritt des Systemablaufs nur zum Fortschreiben von path nutzen.":"FREIE AUFGABE – kein Prozess: die Eingabe direkt erledigen (Frage beantworten, recherchieren oder eine einzelne Aktion)."+(JS?"":" Passenden Skill aus dem Konto selbst wählen.")+" Freigaben vor Außenwirkung wie immer.");
   if(JS)L.push("SKILL VERWENDEN: „"+JS.n+"“ – im Konto: "+(KS(JS).join(", ")||"nur im Cockpit, kein Konto-Skill")+(JS.d?" · "+JS.d:""));
   if(JO)L.push("Organisation des Auftrags: "+JO.n+(JO.prod?" (Produkt "+PN[JO.prod]+")":""));
   L.push("Auftrag "+j.id+": "+(j.t||"")+(j.in?"\nEingabe von Boris: "+j.in:""));
@@ -1455,7 +1465,7 @@ function kiContext(j){const f=j.f,L=[];if(!f)return "";const cur=j.path[j.path.l
   L.push("Ablauf „"+f.n+"“ ("+f.id+"), Schritte: "+order.map(n=>n.id+" "+n.type+(n.type==="task"?" ["+(n.a?.n||(n.free?"Claude – frei, kein fester Agent: direkt mit Boris' Vorgaben handeln":"?"))+(n.sk?" · SKILL VERWENDEN: "+skLbl(n)+" ("+(sk(n.sk)?(KS(sk(n.sk)).join(", ")||"nur im Cockpit, kein Konto-Skill"):n.sk)+")"+(skOk(n)?"":" – Achtung: Skill ist dem Agenten nicht mehr zugeordnet"):"")+": "+(n.t||"–")+(n.o?" → "+n.o:"")+"]":n.label?" ["+n.label+"]":"")).join(" | "));
   L.push("Verbindungen: "+f.E.map(e=>e.f+">"+e.t+(e.l?" ("+e.l+")":"")+(e.back?" ↩":"")).join(", "));
   L.push("Aktueller Knoten: "+(c?c.id+" "+nlabel(c):cur)+" · path bisher: "+j.path.join(","));
-  const A=[...new Set(f.N.filter(n=>n.type==="task"&&n.a).map(n=>n.a).concat(JA?[JA]:[]))];
+  const A=[...new Set(f.N.filter(n=>n.type==="task"&&n.a).map(n=>n.a).concat(JA?[JA]:[],JA?[]:DA))];
   A.forEach(a=>L.push("Agent „"+a.n+"“ ("+a.id+", Produkt "+PN[a.p]+"): Ziel: "+(a.r||"–")+(a.own&&a.own.length?" · Regeln: "+a.own.join("; "):"")+" · Skills: "+a.s.map(id=>sk(id)?sk(id).n+" ["+(KS(sk(id)).join(", ")||"nur Cockpit")+"]":id).join(", ")+(a.mcp&&a.mcp.length?" · Systeme: "+a.mcp.join(", "):"")));
   if((j.anh||[]).length)L.push("ANHÄNGE – "+j.anh.length+" Bild(er) von Boris, gehören zum Auftrag und sind für die Aufgabe maßgeblich: "+j.anh.map((a,i)=>"Bild "+(i+1)+" „"+a.name+"“ ("+a.w+"×"+a.h+"): Sammlung anhaenge, Dokumente "+Array.from({length:a.n},(_,k)=>a.aid+"_"+k).join(", ")).join(" | ")+". So lesen: die Dokumente mit ArtifactData get (out_dir) holen, Feld data in Reihenfolge i aneinanderhängen, Base64 zu einer .jpg-Datei dekodieren und mit Read ansehen.");
   if(GLOBAL.length)L.push("Allgemeine Vorgaben: "+GLOBAL.join("; "));
@@ -1516,7 +1526,7 @@ function jobSteps(j){const L=[];
   else if(j.st==="run")L.push(["In Arbeit …","now"],["Abschließen","todo"]);
   else L.push([j.ok==="nein"?"Nicht abgeschlossen":"Abgeschlossen",j.ok==="nein"?"bad":"done"]);
   return L}
-function jobWho(j){let a=null;if(j.art==="agent"&&j.aid)a=AG.find(x=>x.id===j.aid);else if(j.f&&!j.f.frei){const c=curN(j);a=c&&c.a||(j.f.N.find(n=>n.type==="task"&&n.a)||{}).a||null}
+function jobWho(j){let a=null;if((j.art==="agent"||j.art==="abteilung")&&j.aid)a=AG.find(x=>x.id===j.aid);else if(j.art==="abteilung")return {n:"✦ KI-Teamleiter",u:null,sub:"Abteilung "+((dept(j.abt)||{}).n||"")};else if(j.f&&!j.f.frei){const c=curN(j);a=c&&c.a||(j.f.N.find(n=>n.type==="task"&&n.a)||{}).a||null}
   return a?{n:a.n,u:usr(a.owner),sub:"digitaler Mitarbeiter"}:{n:"Claude – frei",u:null,sub:"freie Aufgabe"}}
 function jobCard(j){const W=jobWho(j),comp=!KOPEN.has(j.id),[oc,ot]=okTxt(j),neu=KINEW.has(j.id);
   const stTxt=isEnd(j)?`<span class="kst ${oc}">${doneTxt(j)}</span>`:j.st==="wait"?'<span class="kst wait">wartet auf dich</span>':'<span class="kst run"><i class="pulse"></i>läuft</span>';
@@ -1717,7 +1727,7 @@ async function boot(){
 // ===== Aufträge & Verlauf: ein Dialog über alle Abteilungen (Etappe 1) =====
 // Zuordnung eines Auftrags: Agent (direkt, aus dem Ablauf oder keiner = „Claude – frei“), Abteilung (beim Anlegen gemerkt, sonst aktuelle Platzierung des Agenten)
 function jobAgent(j){if(!j)return null;const byId=id=>id?AG.find(x=>x.id===id)||null:null;
-  if(j.art==="agent"&&j.aid)return byId(j.aid);
+  if((j.art==="agent"||j.art==="abteilung")&&j.aid)return byId(j.aid);if(j.art==="abteilung")return null;
   if(j.f&&!j.f.frei&&Array.isArray(j.path)){const c=curN(j),a=(c&&c.a)||(j.f.N.find(n=>n.type==="task"&&n.a)||{}).a;if(a)return a}
   return byId(j.aid)}
 const jobOrg=j=>j.org||(ORGS()[0]||{}).id;
@@ -1731,7 +1741,7 @@ function AVS(){const s=UI.av=UI.av||{};s.tab=s.tab||"offen";s.st=s.st||"alle";s.
 function avSel(o){const s=AVS();if(!s.sel[o])s.sel[o]={d:null,ax:[]};return s.sel[o]}
 function avOpen(opt){opt=opt||{};const s=AVS();if(opt.org)s.org=opt.org;const S=avSel(s.org);
   if(opt.d){S.d=[...opt.d];S.ax=[]}
-  if(opt.only){S.d=[PL(opt.only,s.org).abt||"_none"];S.ax=AG.filter(x=>x.id!==opt.only.id).map(x=>x.id).concat(["_frei"])}
+  if(opt.only){S.d=[PL(opt.only,s.org).abt||"_none"];S.ax=AG.filter(x=>x.id!==opt.only.id).map(x=>x.id).concat(["_frei","_tl"])}
   if(opt.tab)s.tab=opt.tab;AVN=50;saveUI();AVOPEN=true;avRender()}
 function avClose(){AVOPEN=false;const d=$("#avdlg");if(d)d.remove()}
 function avRefresh(){if(AVOPEN&&$("#avdlg"))avRender(true)}
@@ -1742,7 +1752,7 @@ function avFenster(){const t=new Date();t.setHours(0,0,0,0);const mo=new Date(t)
 const AVZ=[["heute","Heute"],["woche","Diese Woche"],["monat","Dieser Monat"],["letzter","Letzter Monat"],["aelter","Älter"]];
 const inFenster=(d,w)=>(!w[0]||d>=w[0])&&(!w[1]||d<w[1]);
 
-function avZeilen(o){const R=AU.filter(j=>jobOrg(j)===o).map(j=>{const a=jobAgent(j);return {j,a,abt:jobAbt(j,a)||"_none",ak:a?a.id:"_frei",end:isEnd(j),d:isEnd(j)?doneAt(j):null}});
+function avZeilen(o){const R=AU.filter(j=>jobOrg(j)===o).map(j=>{const a=jobAgent(j);return {j,a,abt:jobAbt(j,a)||"_none",ak:a?a.id:j.art==="abteilung"?"_tl":"_frei",end:isEnd(j),d:isEnd(j)?doneAt(j):null}});
   if(AVARCH)AVARCH.filter(x=>x.org===o&&!R.some(r=>r.j.id===x.id)).forEach(x=>{const a=x.aid?AG.find(y=>y.id===x.aid)||null:null;R.push({j:x,a,abt:x.abt||(a&&PL(a,o).abt)||"_none",ak:a?a.id:"_frei",end:true,d:new Date(x.fertig),arch:true})});
   return R}
 async function avArchivLaden(){if(AVARCH||AVLOAD||!DB)return;AVLOAD=true;try{const L=await Store.list("archiv");AVARCH=L.flatMap(a=>(a.items||[]).map(x=>({...x,org:x.org||a.org})))}catch(e){AVARCH=[];toast("Archiv nicht lesbar")}AVLOAD=false;avRefresh()}
@@ -1756,7 +1766,7 @@ function avRender(keep){const s=AVS(),o=s.org,S=avSel(o),O=orgById(o)||{},F=avFe
   const D=deptsOf(o).map(d=>({id:d.id,n:d.n}));if(RT.some(r=>r.abt==="_none")||AG.some(a=>inOrg(a,o)&&!PL(a,o).abt))D.push({id:"_none",n:"Ohne Abteilung"});
   const dOn=k=>S.d===null||S.d.includes(k);
   const tree=D.map(d=>{const A=AG.filter(a=>inOrg(a,o)&&(PL(a,o).abt||"_none")===d.id).map(a=>({k:a.id,n:a.n}));
-      RT.filter(r=>r.abt===d.id&&!A.some(x=>x.k===r.ak)).forEach(r=>{if(!A.some(x=>x.k===r.ak))A.push({k:r.ak,n:r.a?r.a.n:"Claude – frei"})});
+      RT.filter(r=>r.abt===d.id&&!A.some(x=>x.k===r.ak)).forEach(r=>{if(!A.some(x=>x.k===r.ak))A.push({k:r.ak,n:r.a?r.a.n:r.ak==="_tl"?"✦ KI-Teamleiter (wählt noch)":"Claude – frei"})});
       const n=RT.filter(r=>r.abt===d.id).length;
       return `<label class="dl"><input type="checkbox" data-avd="${d.id}" ${dOn(d.id)?"checked":""}> ${esc(d.n)}<span class="n">${n}</span></label>`+
         A.map(a=>`<label class="al"><input type="checkbox" data-ava="${a.k}" data-avad="${d.id}" ${dOn(d.id)&&!S.ax.includes(a.k)?"checked":""}> ${esc(a.n)}<span class="n">${RT.filter(r=>r.abt===d.id&&r.ak===a.k).length}</span></label>`).join("")}).join("");
@@ -1771,7 +1781,7 @@ function avRender(keep){const s=AVS(),o=s.org,S=avSel(o),O=orgById(o)||{},F=avFe
     bar2=`<div class="seg2">${AVZ.map(([k,l])=>`<button data-avz="${k}" class="${s.zeit===k?"on":""}">${l}${k==="aelter"&&!AVARCH?"":`<span class="c">${RE.filter(r=>inFenster(r.d,F[k])).length}</span>`}</button>`).join("")}</div>
       <label class="cb" style="margin:0"><input type="checkbox" id="avabg" ${s.abg?"checked":""}> Abgebrochene zeigen</label>`}
   // Tabelle
-  const agc=r=>r.a?`<div class="avag">${av(usr(r.a.owner),24,1)}<span>${esc(r.a.n)}</span></div>`:`<div class="avag"><span class="avfr">✦</span><span>Claude – frei</span></div>`;
+  const agc=r=>r.a?`<div class="avag">${av(usr(r.a.owner),24,1)}<span>${esc(r.a.n)}</span></div>`:`<div class="avag"><span class="avfr">✦</span><span>${r.ak==="_tl"?"KI-Teamleiter":"Claude – frei"}</span></div>`;
   const dn=r=>{const d=dept(r.abt);return d?d.n:"Ohne Abteilung"};
   const ttl=r=>`<td class="t"><b>${esc(r.j.t||"–")}</b><small>${esc(dn(r))}</small></td>`;
   let rows,head;

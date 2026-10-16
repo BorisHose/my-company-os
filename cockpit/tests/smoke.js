@@ -16,7 +16,7 @@ data.jobs.push(
   { id: 'A-150', t: 'Alter Auftrag', art: 'frei', org: 'og-bodo', fid: data.jobs[0].fid, st: 'done', ok: 'ja', ki: 1, fertig: tage(200), sum: 'Alt.', erg: [{ t: 'X', url: 'https://example.org/x', vorschau: 'lang' }], log: [], path: [] });
 const mock = `<script>window.__W=[];window.__C=[];const D=${JSON.stringify(data).replace(/</g, '\\u003c')};
 const S={};S["meta/config"]=D.meta;["skills","agents","flows","jobs","users","depts"].forEach(c=>(D[c]||[]).forEach(x=>{S[c+"/"+x.id]=JSON.parse(JSON.stringify(x))}));window.__S=S;
-const mcp={callTool:async(s,tool,inp)=>{__C.push(tool);if(tool==="list_triggers")return {payload:{data:[]}};return {payload:{}}}};
+const mcp={callTool:async(s,tool,inp)=>{__C.push(tool);(window.__CI=window.__CI||[]).push(inp);if(tool==="list_triggers")return {payload:{data:[]}};return {payload:{}}}};
 const smp=async()=>({text:""});smp.json=async()=>({});
 const OPS={"==":(a,b)=>a===b,"!=":(a,b)=>a!==b,"<":(a,b)=>a<b,"<=":(a,b)=>a<=b,">":(a,b)=>a>b,">=":(a,b)=>a>=b,"in":(a,b)=>b.includes(a),"not-in":(a,b)=>!b.includes(a)};
 const L=new Set(),LS={};window.__L=L;window.__LS=LS;
@@ -67,6 +67,17 @@ const check = (name, ok, info = '') => { CHECKS.push({ name, ok }); console.log(
   const vb = await p.evaluate(() => ({ art: (document.querySelector('#jart .on') || {}).dataset?.a, ag: (document.querySelector('#jag') || {}).value, first: document.querySelector('.oag [data-play]').dataset.play }));
   check('▶ öffnet „Neuer KI-Auftrag“ mit diesem Agenten vorbelegt', vb.art === 'agent' && vb.ag === vb.first, JSON.stringify(vb));
   await p.evaluate(() => { document.getElementById('modal').innerHTML = '' });
+  // ----- Abteilung beauftragen (KI-Teamleiter wählt den Agenten) -----
+  check('Organigramm: „▶ Abteilung beauftragen“ je Abteilung', (await p.$$('[data-oabt]')).length === (await p.$$('[data-oav]')).length && (await p.$$('[data-oabt]')).length > 0);
+  const dab = await p.$eval('[data-oabt]', e => e.dataset.oabt);
+  await p.click(`[data-oabt="${dab}"]`); await p.waitForTimeout(300);
+  const vm = await p.evaluate(() => ({ art: (document.querySelector('#jart .on') || {}).dataset?.a, abt: (document.querySelector('#jabt') || {}).value, skill: !!document.querySelector('#jskq'), hint: (document.querySelector('#jabt + .hint') || {}).textContent || '' }));
+  check('Fenster vorbelegt: Art Abteilung, diese Abteilung, kein Skill-Feld, Agentenliste', vm.art === 'abteilung' && vm.abt === dab && !vm.skill && /KI-Teamleiter wählt aus: \S/.test(vm.hint), JSON.stringify(vm));
+  if (SHOT) await p.screenshot({ path: SHOT + '/e1-abteilung.png' });
+  await p.fill('#modal #ji', 'Bitte Angebot für Herrn Beispiel vorbereiten'); await p.click('#modal #go'); await p.waitForTimeout(1200);
+  const ja = await p.evaluate(d => { const j = AU.find(x => x.art === 'abteilung'); const t = (window.__CI || []).filter(x => x && x.text).map(x => x.text).pop() || ''; return { id: j && j.id, abt: j && j.abt, aid: j && j.aid, who: j && jobWho(j).n, ctx: t.includes('ABTEILUNG BEAUFTRAGT') && t.includes('KI-TEAMLEITER'), d }; }, dab);
+  check('Auftrag an Abteilung: abt gesetzt, noch kein Agent, Kontext für den Teamleiter', ja.id && ja.abt === ja.d && !ja.aid && ja.who === '✦ KI-Teamleiter' && ja.ctx, JSON.stringify(ja));
+  await p.evaluate(() => show('org'));
   await p.click('#orgav'); await p.waitForTimeout(300);
   check('Dialog öffnet mit Tab Offen', !!(await p.$('#avdlg .avbox')) && await p.$eval('[data-avt="offen"]', e => e.classList.contains('on')));
   const offen = await p.$$eval('#avdlg tbody tr[data-avj]', r => r.map(x => x.dataset.avj));
@@ -129,7 +140,7 @@ const check = (name, ok, info = '') => { CHECKS.push({ name, ok }); console.log(
   await p.fill('#modal #ji', 'Testauftrag aus dem Smoke-Test'); await p.click('#modal #go'); await p.waitForTimeout(1500);
   const tst = await p.evaluate(() => (document.querySelector('.toast') || {}).textContent || '');
   const neu = await p.evaluate(() => { const k = Object.keys(window.__S).filter(k => /^jobs\/A-2\d\d$/.test(k)).sort().pop(); return { k, j: window.__S[k], fired: __C.includes('fire_trigger') }; });
-  check('Neuer KI-Auftrag: Nummer vom Zähler, Protokoll 2, Claude angestoßen', neu.k === 'jobs/A-208' && neu.j.pv === 2 && neu.fired, JSON.stringify([neu.k, neu.j && neu.j.pv, neu.fired, tst]));
+  check('Neuer KI-Auftrag: Nummer vom Zähler, Protokoll 2, Claude angestoßen', +neu.k.slice(7) > 207 && neu.j.pv === 2 && neu.fired, JSON.stringify([neu.k, neu.j && neu.j.pv, neu.fired, tst]));
   check('keine Laufzeitfehler', errs.length === 0, errs.slice(0, 3).join(' | '));
   await b.close();
   fs.unlinkSync(tmp);

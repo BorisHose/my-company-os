@@ -1,5 +1,13 @@
 # Änderungen – Cockpit
 
+## 52 · 16.10.2026 · Abteilung beauftragen (Entscheidung Boris: vorgezogen)
+- Organigramm: „▶ Abteilung beauftragen“ an jeder Abteilung als Hauptweg; ▶ am einzelnen Agenten bleibt, aber dezent.
+- „Neuer KI-Auftrag“: neue Art „Abteilung beauftragen“ mit Abteilungswahl; zeigt, aus welchen Agenten der KI-Teamleiter wählt.
+- Der KI-Teamleiter (in der Claude-Sitzung) wählt genau einen passenden Agenten, schreibt ihn in den Auftrag (`aid`, Verlauf „Teamleiter: an …“) und arbeitet als dieser Agent weiter; bei unklarer Wahl Rückfrage mit Agenten als Antworten.
+- Bis zur Wahl erscheint der Auftrag als „✦ KI-Teamleiter“ (Kachel und Dialog „Aufträge & Verlauf“).
+- Anweisungstext beider geplanten Aufgaben um „ABTEILUNG BEAUFTRAGT“ ergänzt.
+- Smoke-Test: 46 Prüfungen.
+
 ## 51 · 16.10.2026 · Etappe 1 „Direkt beauftragen und Verlauf“
 - Organigramm: ▶ an jeder Agenten-Kachel öffnet „Neuer KI-Auftrag“ mit diesem Agenten vorbelegt.
 - Agenten-Kachel zeigt nur „● n läuft“, wenn gerade Aufträge laufen (Klick zeigt diese Aufträge).
