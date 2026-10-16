@@ -86,6 +86,6 @@ function startModal(f,keep){if(!keep)PEND=[];keep=keep||{};
     const j={id:"A-"+n,f,fid:f.id,art,org:O.id,t:$("#jt").value||(art==="agent"?ag.n:art==="frei"?(skv&&sk(skv)?sk(skv).n:"Freie Aufgabe"):"Neuer Auftrag"),in:$("#ji").value,path:ki?[s.id]:[s.id].concat(nx?[nx.id]:[]),st:"run",log:ki?[[now(),"KI-Auftrag angelegt von Boris"+(art==="agent"?" – an "+ag.n:art==="frei"?" – freie Aufgabe":"")]]:[[now(),"Auftrag gestartet von Boris"],[now(),nx?nlabel(nx)+" – beginnt":"–"]]};
     if(art==="agent")j.aid=ag.id;if(skv)j.sk=skv;
     if(ki){j.ki=1;j.tempo=$("#jtempo").value;if($("#jvorab").checked)j.vorab=1}
-    if(PEND.length){j.anh=PEND.map(a=>({aid:a.aid,name:a.name,w:a.w,h:a.h,n:Math.ceil(a.data.length/CHUNK),kb:Math.round(a.data.length*.75/1024)}));PEND.forEach(a=>ANHDATA.set(a.aid,a.data));PEND=[]}AU.unshift(j);close();show("jobs");if(ki)kiStart(j,"starten");else{anhSave(j).catch(()=>{});toast("Auftrag gestartet")}};
+    if(PEND.length){j.anh=PEND.map(a=>({aid:a.aid,name:a.name,w:a.w,h:a.h,n:Math.ceil(a.data.length/CHUNK),kb:Math.round(a.data.length*.75/1024)}));PEND.forEach(a=>ANHDATA.set(a.aid,a.data));PEND=[]}jobPlatz(j);AU.unshift(j);close();show("jobs");if(ki)kiStart(j,"starten");else{anhSave(j).catch(()=>{});toast("Auftrag gestartet")}};
 }
 const curN=j=>nodeOf(j.f,j.path[j.path.length-1]);

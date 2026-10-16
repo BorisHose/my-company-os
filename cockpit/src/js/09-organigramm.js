@@ -3,21 +3,21 @@ let OC="",LOS="";
 function org(){
   const oe=isEd("org");$("#org").classList.toggle("editing",oe);
   if(!orgById(OC))OC=ORGS()[0].id;const O=orgById(OC);
-  $("#orged").innerHTML=oe?`<span class="hint" style="text-transform:none;letter-spacing:0;font-weight:400;margin:0 10px 0 0">Agenten ziehen · Abteilungen, Teams und Organisationen anlegen</span>`+edBtns(1):`<button class="btn sm ebtn" id="orgedit" title="Agenten verschieben, Abteilungen, Teams und Organisationen anlegen">✎ Bearbeiten</button>`;
+  $("#orged").innerHTML=oe?`<span class="hint" style="text-transform:none;letter-spacing:0;font-weight:400;margin:0 10px 0 0">Agenten ziehen · Abteilungen, Teams und Organisationen anlegen</span>`+edBtns(1):`<button class="btn sm" id="orgav" title="Offene und erledigte Aufträge aller Abteilungen">🕘 Aufträge &amp; Verlauf</button> <button class="btn sm ebtn" id="orgedit" title="Agenten verschieben, Abteilungen, Teams und Organisationen anlegen">✎ Bearbeiten</button>`;
   $("#oseg").innerHTML=ORGS().map(o=>`<button data-oc="${o.id}" class="${o.id===OC?'on':''}" title="${esc(o.n+(o.desc?" – "+o.desc:"")+(o.prod?"\nProdukt: "+PN[o.prod]:""))}">${esc(o.kurz||o.n)}</button>`).join("")+(oe?`<button class="add" id="onew" title="Neue Organisation (Unternehmen) mit eigenem Organigramm">+ Organisation</button>`:"");
   document.querySelectorAll("[data-oc]").forEach(b=>b.onclick=()=>{OC=b.dataset.oc;org()});$("#oskills").onchange=org;
   $("#ohint").textContent=O.n+(O.prod?" · Produkt "+PN[O.prod]+" – zeigt "+PN[O.prod]+"-Agenten und produktunabhängige":" · ohne Produkt – zeigt nur produktunabhängige Agenten");
   const showS=$("#oskills").checked,A=AG.filter(a=>inOrg(a,OC)),D=deptsOf(OC),known=new Set(D.map(d=>d.id));
   const gf=usr(O.gf),ab=a=>PL(a,OC).abt,tm=a=>PL(a,OC).team;
-  const card=a=>{const ow=usr(a.owner);return `<div class="oag p-${a.p}" data-oa="${a.id}" ${oe?'draggable="true" title="Ziehen = in andere Abteilung oder anderes Team"':''}><div class="oh" ${oe?'':`data-goa="${a.id}" title="Agent „${esc(a.n)}“ öffnen"`}>${av(ow,50,1)}<div><b>${esc(a.n)}</b><small>${PN[a.p]}${ow?" · "+esc(ow.n):" · Verantwortlich offen"}</small></div></div>
-      ${showS?`<div class="oskl">${a.s.map(id=>sk(id)).filter(Boolean).map(s=>`<span ${oe?'':`data-gos="${a.id}|${s.id}"`} title="${oe?"":"Skill in der Bibliothek zeigen · "}${esc(KS(s).join(", "))}">${esc(s.n)}</span>`).join("")||'<span style="background:#eef0f4;color:var(--mut)">keine Skills</span>'}</div>`:""}</div>`};
+  const card=a=>{const ow=usr(a.owner);return `<div class="oag p-${a.p}" data-oa="${a.id}" ${oe?'draggable="true" title="Ziehen = in andere Abteilung oder anderes Team"':''}><div class="oh" ${oe?'':`data-goa="${a.id}" title="Agent „${esc(a.n)}“ öffnen"`}>${av(ow,50,1)}<div><b>${esc(a.n)}</b><small>${PN[a.p]}${ow?" · "+esc(ow.n):" · Verantwortlich offen"}</small></div>${oe?"":`<button class="oplay" data-play="${a.id}" title="Auftrag direkt an „${esc(a.n)}“ geben" aria-label="Auftrag an ${esc(a.n)}">▶</button>`}</div>
+      ${showS?`<div class="oskl">${a.s.map(id=>sk(id)).filter(Boolean).map(s=>`<span ${oe?'':`data-gos="${a.id}|${s.id}"`} title="${oe?"":"Skill in der Bibliothek zeigen · "}${esc(KS(s).join(", "))}">${esc(s.n)}</span>`).join("")||'<span style="background:#eef0f4;color:var(--mut)">keine Skills</span>'}</div>`:""}${!oe&&runCnt(a.id)?`<button class="orun" data-orun="${a.id}" title="Laufende Aufträge dieses Agenten zeigen">● ${runCnt(a.id)} läuft</button>`:""}</div>`};
   const uopts=v=>{const M=US.filter(x=>(x.aktiv!==false&&(x.orgs||[]).includes(OC))||x.id===v),L=M.length?M:US.filter(x=>x.aktiv!==false||x.id===v);return `<option value="">– offen –</option>`+L.map(x=>`<option value="${x.id}" ${x.id===v?'selected':''}>${esc(x.n)}</option>`).join("")};
   const lead=(kind,id,uidv,label)=>{const u=usr(uidv);if(oe)return `<div class="olead">${av(u,26)}<span>${label}:</span><select data-lead="${kind}" data-lid="${id}">${uopts(uidv)}</select></div>`;
     return `<div class="olead">${av(u,26)}<span>${label}: <b>${u?esc(u.n):"offen"}</b></span></div>`};
   const dz=(abt,team,L,empty)=>`<div class="odz" data-dz-abt="${abt}" data-dz-team="${team}">${L.map(card).join("")||(empty?`<div class="hint" style="margin:0;padding:4px 2px">${empty}</div>`:"")}</div>`;
   const col=d=>{const L=A.filter(a=>ab(a)===d.id),T=teamsOf(d),direct=L.filter(a=>!T.some(t=>t.id===tm(a)));
     return `<div class="odept"><div class="odh"><b>${esc(d.n)}</b><span class="cnt">${L.length} Agent${L.length===1?"":"en"}</span>${oe?`<button class="ic" data-dren="${d.id}" title="Abteilung umbenennen">✎</button><button class="ic" data-ddel="${d.id}" title="Abteilung löschen">🗑</button>`:""}</div>
-     <div class="odb">${lead("d",d.id,d.lead,"Leitung")}
+     <div class="odb">${oe?"":`<div class="oact"><button class="btn sm" data-oav="${d.id}" title="Aufträge dieser Abteilung">🕘 Verlauf</button></div>`}${lead("d",d.id,d.lead,"Leitung")}
       ${T.map(t=>{const TL=L.filter(a=>tm(a)===t.id);return `<div class="oteam"><div class="oth"><span>Team ${esc(t.n)}</span><span class="cnt">${TL.length}</span>${oe?`<button class="ic" data-tren="${d.id}|${t.id}" title="Team umbenennen">✎</button><button class="ic" data-tdel="${d.id}|${t.id}" title="Team löschen">🗑</button>`:""}</div>
         ${lead("t",d.id+"|"+t.id,t.lead,"Teamleitung")}${dz(d.id,t.id,TL,oe?"Agenten hierher ziehen":"–")}</div>`}).join("")}
       ${T.length&&(direct.length||oe)?`<div class="odlab">Direkt in der Abteilung</div>`:""}${dz(d.id,"",direct,oe?"Agenten hierher ziehen":(T.length?"":"–"))}
@@ -36,7 +36,11 @@ function org(){
   const ob=$("#orgedit");if(ob)ob.onclick=()=>{if(startEdit("org",null,null,["meta/config",...DP.map(d=>"depts/"+d.id),...AG.map(a=>"agents/"+a.id),...US.map(u=>"users/"+u.id)],false,["depts"]))org()};
   bindEd($("#orged"),()=>org());
   document.querySelectorAll("[data-oa]").forEach(e=>{e.ondragstart=ev=>{if(oe)ev.dataTransfer.setData("ag",e.dataset.oa)}});
-  if(!oe){document.querySelectorAll("[data-goa]").forEach(e=>e.onclick=()=>goAgent(e.dataset.goa));
+  if(!oe){document.querySelectorAll("[data-goa]").forEach(e=>e.onclick=ev=>{if(ev.target.closest("[data-play]"))return;goAgent(e.dataset.goa)});
+    document.querySelectorAll("[data-play]").forEach(b=>b.onclick=ev=>{ev.stopPropagation();startModal(null,{art:"agent",aid:b.dataset.play,org:OC})});
+    document.querySelectorAll("[data-orun]").forEach(b=>b.onclick=ev=>{ev.stopPropagation();const a=AG.find(x=>x.id===b.dataset.orun);if(a)avOpen({org:OC,only:a,tab:"offen"})});
+    document.querySelectorAll("[data-oav]").forEach(b=>b.onclick=()=>avOpen({org:OC,d:[b.dataset.oav]}));
+    const oav=$("#orgav");if(oav)oav.onclick=()=>avOpen({org:OC});
     document.querySelectorAll("[data-gos]").forEach(e=>e.onclick=ev=>{ev.stopPropagation();const [ai,si]=e.dataset.gos.split("|");goSkill(ai,si)})}
   if(!oe)return;
   document.querySelectorAll(".odz").forEach(z=>{z.ondragover=e=>{e.preventDefault();e.stopPropagation();z.classList.add("over")};z.ondragleave=e=>{if(!z.contains(e.relatedTarget))z.classList.remove("over")};

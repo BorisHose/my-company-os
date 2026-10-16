@@ -306,3 +306,32 @@ fieldset:disabled .ic,fieldset:disabled .ownadd,fieldset:disabled [data-r],field
 #org:not(.editing) [data-gos]{cursor:pointer}#org:not(.editing) [data-gos]:hover{background:var(--acc);color:#fff}
 @keyframes hit{0%,100%{box-shadow:0 0 0 0 transparent}30%,70%{box-shadow:0 0 0 4px #f5b70a}}.hit{animation:hit 1.1s 2}.oskl span{font-size:11px;background:var(--accbg);color:var(--navy);border-radius:10px;padding:1px 7px}
 .toast{position:fixed;bottom:18px;left:50%;transform:translateX(-50%);background:var(--navy);color:#fff;padding:8px 14px;border-radius:8px;font-size:13px;z-index:50}
+/* Etappe 1: Organigramm-Aktionen und Dialog „Aufträge & Verlauf“ */
+.oplay{margin-left:auto;flex:none;width:30px;height:30px;border-radius:50%;border:0;background:var(--acc);color:#fff;font-size:12px;cursor:pointer;display:grid;place-items:center;padding:0 0 0 2px}.oplay:hover{background:#1d4ed8}.oplay:focus-visible{outline:2px solid var(--acc);outline-offset:2px}
+.orun{display:inline-flex;gap:5px;align-items:center;margin-top:7px;font-size:12px;font-weight:600;color:var(--acc);background:var(--accbg);border:0;border-radius:10px;padding:3px 10px;cursor:pointer}
+.oact{display:flex;gap:6px}
+#avdlg .modal{z-index:29;padding:28px 16px}
+.avbox{background:#fff;border-radius:12px;width:100%;max-width:1240px;padding:18px;display:flex;flex-direction:column;gap:12px;min-width:0}
+.avhead{display:flex;align-items:center;gap:8px;min-width:0}.avhead h3{margin:0;font-size:17px;white-space:nowrap}.avhead .sub{color:var(--mut);font-size:13.5px;flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.avgrid{display:grid;grid-template-columns:250px minmax(0,1fr);gap:14px;align-items:start}
+.avside{border:1px solid var(--line);border-radius:10px;padding:12px;background:#fafbfc;min-width:0}
+.avside h4{margin:0 0 8px;font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--mut)}
+.avtree label{display:flex;align-items:flex-start;gap:7px;font-size:13px;padding:4px 0;cursor:pointer;line-height:1.3}.avtree label input{margin-top:2px}.avtree label .n{margin-left:auto;color:var(--mut);font-size:12px;padding-left:6px}
+.avtree .dl{font-weight:600}.avtree .al{padding-left:20px}.avall{margin-top:8px;font-size:13px}
+.avmain{min-width:0;display:flex;flex-direction:column;gap:10px}
+.avbar{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+.seg2{display:inline-flex;flex-wrap:wrap;border:1px solid var(--line);border-radius:8px;overflow:hidden;background:#fff}.seg2 button{border:0;background:#fff;padding:6px 10px;font-size:13px;cursor:pointer;color:var(--ink);font-family:inherit}.seg2 button+button{border-left:1px solid var(--line)}.seg2 button.on{background:var(--navy);color:#fff}.seg2 .c{opacity:.75;margin-left:5px;font-size:12px}.seg2.full{display:flex}.seg2.full button{flex:1}
+.avq{flex:1;min-width:150px;max-width:340px}
+.avtw{border:1px solid var(--line);border-radius:10px;overflow:auto;max-height:calc(100vh - 260px)}
+.avt{width:100%;border-collapse:collapse;font-size:13px}.avt th{position:sticky;top:0;background:#f7f9fc;text-align:left;font-size:11px;letter-spacing:.06em;text-transform:uppercase;color:var(--mut);padding:8px 10px;white-space:nowrap;z-index:1}.avt td{padding:9px 10px;border-top:1px solid var(--line);vertical-align:middle}
+.avt tr.cl{cursor:pointer}.avt tr.cl:hover td{background:#f5f8ff}.avt tr.arch td{color:#475467}
+.avt .t b{display:block;font-weight:600}.avt .t small{color:var(--mut)}.avt .nr{white-space:nowrap;color:#475467}.avt .sm{font-size:12.5px;color:#475467}.avt .ac{text-align:right;white-space:nowrap}
+.avag{display:flex;align-items:center;gap:7px}.avag .av .kib{display:none}.avfr{width:24px;height:24px;border-radius:50%;background:var(--viobg);color:var(--vio);display:grid;place-items:center;font-size:12px;flex:none}
+.avfoot{display:flex;justify-content:space-between;align-items:center;gap:8px;padding:8px 10px;border-top:1px solid var(--line);font-size:13px;color:var(--mut);position:sticky;bottom:0;background:#fff}
+.avempty{color:var(--mut);text-align:center;padding:24px 10px!important}
+@media(max-width:860px){.avgrid{grid-template-columns:1fr}.avt .hm{display:none}.avtw{max-height:none}.avq{max-width:none}}
+.avt td{text-align:left}.avt td:first-child,.avt td.nr{white-space:nowrap}.avt .btn.p{color:#fff}.avt a{color:var(--acc);text-decoration:none;font-weight:600}.avt a:hover{text-decoration:underline}
+.avall .lnk,.avside .lnk{border:0;background:none;color:var(--acc);cursor:pointer;padding:0;font:inherit;font-size:13px}
+.avside summary{list-style:none;cursor:default;display:flex;align-items:baseline;gap:8px}.avside summary::-webkit-details-marker{display:none}.avside .avsn{display:none;color:var(--mut);font-size:12.5px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;min-width:0}.avside summary h4{margin:0 0 8px}
+@media(max-width:860px){.avside summary{cursor:pointer}.avside summary h4{margin:0}.avside summary h4::after{content:" ▾"}.avside[open] summary{margin-bottom:8px}.avside:not([open]) .avsn{display:block}}
+.avt .kst.wait{color:#b54708}.avt .kst.run{color:var(--acc)}.avt .kst.ok{color:#067647}.avt .kst.no{color:#b42318}.avt .kst.part{color:#b54708}

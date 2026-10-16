@@ -308,6 +308,36 @@ fieldset:disabled .ic,fieldset:disabled .ownadd,fieldset:disabled [data-r],field
 #org:not(.editing) [data-gos]{cursor:pointer}#org:not(.editing) [data-gos]:hover{background:var(--acc);color:#fff}
 @keyframes hit{0%,100%{box-shadow:0 0 0 0 transparent}30%,70%{box-shadow:0 0 0 4px #f5b70a}}.hit{animation:hit 1.1s 2}.oskl span{font-size:11px;background:var(--accbg);color:var(--navy);border-radius:10px;padding:1px 7px}
 .toast{position:fixed;bottom:18px;left:50%;transform:translateX(-50%);background:var(--navy);color:#fff;padding:8px 14px;border-radius:8px;font-size:13px;z-index:50}
+/* Etappe 1: Organigramm-Aktionen und Dialog „Aufträge & Verlauf“ */
+.oplay{margin-left:auto;flex:none;width:30px;height:30px;border-radius:50%;border:0;background:var(--acc);color:#fff;font-size:12px;cursor:pointer;display:grid;place-items:center;padding:0 0 0 2px}.oplay:hover{background:#1d4ed8}.oplay:focus-visible{outline:2px solid var(--acc);outline-offset:2px}
+.orun{display:inline-flex;gap:5px;align-items:center;margin-top:7px;font-size:12px;font-weight:600;color:var(--acc);background:var(--accbg);border:0;border-radius:10px;padding:3px 10px;cursor:pointer}
+.oact{display:flex;gap:6px}
+#avdlg .modal{z-index:29;padding:28px 16px}
+.avbox{background:#fff;border-radius:12px;width:100%;max-width:1240px;padding:18px;display:flex;flex-direction:column;gap:12px;min-width:0}
+.avhead{display:flex;align-items:center;gap:8px;min-width:0}.avhead h3{margin:0;font-size:17px;white-space:nowrap}.avhead .sub{color:var(--mut);font-size:13.5px;flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.avgrid{display:grid;grid-template-columns:250px minmax(0,1fr);gap:14px;align-items:start}
+.avside{border:1px solid var(--line);border-radius:10px;padding:12px;background:#fafbfc;min-width:0}
+.avside h4{margin:0 0 8px;font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--mut)}
+.avtree label{display:flex;align-items:flex-start;gap:7px;font-size:13px;padding:4px 0;cursor:pointer;line-height:1.3}.avtree label input{margin-top:2px}.avtree label .n{margin-left:auto;color:var(--mut);font-size:12px;padding-left:6px}
+.avtree .dl{font-weight:600}.avtree .al{padding-left:20px}.avall{margin-top:8px;font-size:13px}
+.avmain{min-width:0;display:flex;flex-direction:column;gap:10px}
+.avbar{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+.seg2{display:inline-flex;flex-wrap:wrap;border:1px solid var(--line);border-radius:8px;overflow:hidden;background:#fff}.seg2 button{border:0;background:#fff;padding:6px 10px;font-size:13px;cursor:pointer;color:var(--ink);font-family:inherit}.seg2 button+button{border-left:1px solid var(--line)}.seg2 button.on{background:var(--navy);color:#fff}.seg2 .c{opacity:.75;margin-left:5px;font-size:12px}.seg2.full{display:flex}.seg2.full button{flex:1}
+.avq{flex:1;min-width:150px;max-width:340px}
+.avtw{border:1px solid var(--line);border-radius:10px;overflow:auto;max-height:calc(100vh - 260px)}
+.avt{width:100%;border-collapse:collapse;font-size:13px}.avt th{position:sticky;top:0;background:#f7f9fc;text-align:left;font-size:11px;letter-spacing:.06em;text-transform:uppercase;color:var(--mut);padding:8px 10px;white-space:nowrap;z-index:1}.avt td{padding:9px 10px;border-top:1px solid var(--line);vertical-align:middle}
+.avt tr.cl{cursor:pointer}.avt tr.cl:hover td{background:#f5f8ff}.avt tr.arch td{color:#475467}
+.avt .t b{display:block;font-weight:600}.avt .t small{color:var(--mut)}.avt .nr{white-space:nowrap;color:#475467}.avt .sm{font-size:12.5px;color:#475467}.avt .ac{text-align:right;white-space:nowrap}
+.avag{display:flex;align-items:center;gap:7px}.avag .av .kib{display:none}.avfr{width:24px;height:24px;border-radius:50%;background:var(--viobg);color:var(--vio);display:grid;place-items:center;font-size:12px;flex:none}
+.avfoot{display:flex;justify-content:space-between;align-items:center;gap:8px;padding:8px 10px;border-top:1px solid var(--line);font-size:13px;color:var(--mut);position:sticky;bottom:0;background:#fff}
+.avempty{color:var(--mut);text-align:center;padding:24px 10px!important}
+@media(max-width:860px){.avgrid{grid-template-columns:1fr}.avt .hm{display:none}.avtw{max-height:none}.avq{max-width:none}}
+.avt td{text-align:left}.avt td:first-child,.avt td.nr{white-space:nowrap}.avt .btn.p{color:#fff}.avt a{color:var(--acc);text-decoration:none;font-weight:600}.avt a:hover{text-decoration:underline}
+.avall .lnk,.avside .lnk{border:0;background:none;color:var(--acc);cursor:pointer;padding:0;font:inherit;font-size:13px}
+.avside summary{list-style:none;cursor:default;display:flex;align-items:baseline;gap:8px}.avside summary::-webkit-details-marker{display:none}.avside .avsn{display:none;color:var(--mut);font-size:12.5px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;min-width:0}.avside summary h4{margin:0 0 8px}
+@media(max-width:860px){.avside summary{cursor:pointer}.avside summary h4{margin:0}.avside summary h4::after{content:" ▾"}.avside[open] summary{margin-bottom:8px}.avside:not([open]) .avsn{display:block}}
+.avt .kst.wait{color:#b54708}.avt .kst.run{color:var(--acc)}.avt .kst.ok{color:#067647}.avt .kst.no{color:#b42318}.avt .kst.part{color:#b54708}
+
 </style>
 <header>
   <h1>My Company OS</h1><span class="tag" id="save">Lädt …</span>
@@ -431,7 +461,7 @@ function bindEd(root,after){(root||document).querySelectorAll("[data-esave]").fo
 // ===== Oberflächen-Zustand (nur in diesem Browser) =====
 const UI=(()=>{try{return JSON.parse(localStorage.getItem("cos-ui")||"{}")}catch(e){return {}}})();
 const EOPEN=new Set(UI.eopen||["basis","skills"]);let LIBON=UI.lib!==false;
-function saveUI(){try{localStorage.setItem("cos-ui",JSON.stringify({eopen:[...EOPEN],lib:LIBON,agw:UI.agw,libw:UI.libw,kidone:UI.kidone,kiold:UI.kiold,pw:UI.pw}))}catch(e){}}
+function saveUI(){try{localStorage.setItem("cos-ui",JSON.stringify({eopen:[...EOPEN],lib:LIBON,agw:UI.agw,libw:UI.libw,kidone:UI.kidone,kiold:UI.kiold,pw:UI.pw,av:UI.av}))}catch(e){}}
 function setLib(on){on=false;LIBON=on;$("#build").classList.toggle("nolib",!on);const b=$("#libtg");if(b)b.textContent=on?"Bibliothek ausblenden ▸":"◂ Bibliothek einblenden";saveUI()}
 // ===== Benutzer (Menschen) =====
 let US=[],ucur=-1,UOLD=false;
@@ -633,21 +663,21 @@ let OC="",LOS="";
 function org(){
   const oe=isEd("org");$("#org").classList.toggle("editing",oe);
   if(!orgById(OC))OC=ORGS()[0].id;const O=orgById(OC);
-  $("#orged").innerHTML=oe?`<span class="hint" style="text-transform:none;letter-spacing:0;font-weight:400;margin:0 10px 0 0">Agenten ziehen · Abteilungen, Teams und Organisationen anlegen</span>`+edBtns(1):`<button class="btn sm ebtn" id="orgedit" title="Agenten verschieben, Abteilungen, Teams und Organisationen anlegen">✎ Bearbeiten</button>`;
+  $("#orged").innerHTML=oe?`<span class="hint" style="text-transform:none;letter-spacing:0;font-weight:400;margin:0 10px 0 0">Agenten ziehen · Abteilungen, Teams und Organisationen anlegen</span>`+edBtns(1):`<button class="btn sm" id="orgav" title="Offene und erledigte Aufträge aller Abteilungen">🕘 Aufträge &amp; Verlauf</button> <button class="btn sm ebtn" id="orgedit" title="Agenten verschieben, Abteilungen, Teams und Organisationen anlegen">✎ Bearbeiten</button>`;
   $("#oseg").innerHTML=ORGS().map(o=>`<button data-oc="${o.id}" class="${o.id===OC?'on':''}" title="${esc(o.n+(o.desc?" – "+o.desc:"")+(o.prod?"\nProdukt: "+PN[o.prod]:""))}">${esc(o.kurz||o.n)}</button>`).join("")+(oe?`<button class="add" id="onew" title="Neue Organisation (Unternehmen) mit eigenem Organigramm">+ Organisation</button>`:"");
   document.querySelectorAll("[data-oc]").forEach(b=>b.onclick=()=>{OC=b.dataset.oc;org()});$("#oskills").onchange=org;
   $("#ohint").textContent=O.n+(O.prod?" · Produkt "+PN[O.prod]+" – zeigt "+PN[O.prod]+"-Agenten und produktunabhängige":" · ohne Produkt – zeigt nur produktunabhängige Agenten");
   const showS=$("#oskills").checked,A=AG.filter(a=>inOrg(a,OC)),D=deptsOf(OC),known=new Set(D.map(d=>d.id));
   const gf=usr(O.gf),ab=a=>PL(a,OC).abt,tm=a=>PL(a,OC).team;
-  const card=a=>{const ow=usr(a.owner);return `<div class="oag p-${a.p}" data-oa="${a.id}" ${oe?'draggable="true" title="Ziehen = in andere Abteilung oder anderes Team"':''}><div class="oh" ${oe?'':`data-goa="${a.id}" title="Agent „${esc(a.n)}“ öffnen"`}>${av(ow,50,1)}<div><b>${esc(a.n)}</b><small>${PN[a.p]}${ow?" · "+esc(ow.n):" · Verantwortlich offen"}</small></div></div>
-      ${showS?`<div class="oskl">${a.s.map(id=>sk(id)).filter(Boolean).map(s=>`<span ${oe?'':`data-gos="${a.id}|${s.id}"`} title="${oe?"":"Skill in der Bibliothek zeigen · "}${esc(KS(s).join(", "))}">${esc(s.n)}</span>`).join("")||'<span style="background:#eef0f4;color:var(--mut)">keine Skills</span>'}</div>`:""}</div>`};
+  const card=a=>{const ow=usr(a.owner);return `<div class="oag p-${a.p}" data-oa="${a.id}" ${oe?'draggable="true" title="Ziehen = in andere Abteilung oder anderes Team"':''}><div class="oh" ${oe?'':`data-goa="${a.id}" title="Agent „${esc(a.n)}“ öffnen"`}>${av(ow,50,1)}<div><b>${esc(a.n)}</b><small>${PN[a.p]}${ow?" · "+esc(ow.n):" · Verantwortlich offen"}</small></div>${oe?"":`<button class="oplay" data-play="${a.id}" title="Auftrag direkt an „${esc(a.n)}“ geben" aria-label="Auftrag an ${esc(a.n)}">▶</button>`}</div>
+      ${showS?`<div class="oskl">${a.s.map(id=>sk(id)).filter(Boolean).map(s=>`<span ${oe?'':`data-gos="${a.id}|${s.id}"`} title="${oe?"":"Skill in der Bibliothek zeigen · "}${esc(KS(s).join(", "))}">${esc(s.n)}</span>`).join("")||'<span style="background:#eef0f4;color:var(--mut)">keine Skills</span>'}</div>`:""}${!oe&&runCnt(a.id)?`<button class="orun" data-orun="${a.id}" title="Laufende Aufträge dieses Agenten zeigen">● ${runCnt(a.id)} läuft</button>`:""}</div>`};
   const uopts=v=>{const M=US.filter(x=>(x.aktiv!==false&&(x.orgs||[]).includes(OC))||x.id===v),L=M.length?M:US.filter(x=>x.aktiv!==false||x.id===v);return `<option value="">– offen –</option>`+L.map(x=>`<option value="${x.id}" ${x.id===v?'selected':''}>${esc(x.n)}</option>`).join("")};
   const lead=(kind,id,uidv,label)=>{const u=usr(uidv);if(oe)return `<div class="olead">${av(u,26)}<span>${label}:</span><select data-lead="${kind}" data-lid="${id}">${uopts(uidv)}</select></div>`;
     return `<div class="olead">${av(u,26)}<span>${label}: <b>${u?esc(u.n):"offen"}</b></span></div>`};
   const dz=(abt,team,L,empty)=>`<div class="odz" data-dz-abt="${abt}" data-dz-team="${team}">${L.map(card).join("")||(empty?`<div class="hint" style="margin:0;padding:4px 2px">${empty}</div>`:"")}</div>`;
   const col=d=>{const L=A.filter(a=>ab(a)===d.id),T=teamsOf(d),direct=L.filter(a=>!T.some(t=>t.id===tm(a)));
     return `<div class="odept"><div class="odh"><b>${esc(d.n)}</b><span class="cnt">${L.length} Agent${L.length===1?"":"en"}</span>${oe?`<button class="ic" data-dren="${d.id}" title="Abteilung umbenennen">✎</button><button class="ic" data-ddel="${d.id}" title="Abteilung löschen">🗑</button>`:""}</div>
-     <div class="odb">${lead("d",d.id,d.lead,"Leitung")}
+     <div class="odb">${oe?"":`<div class="oact"><button class="btn sm" data-oav="${d.id}" title="Aufträge dieser Abteilung">🕘 Verlauf</button></div>`}${lead("d",d.id,d.lead,"Leitung")}
       ${T.map(t=>{const TL=L.filter(a=>tm(a)===t.id);return `<div class="oteam"><div class="oth"><span>Team ${esc(t.n)}</span><span class="cnt">${TL.length}</span>${oe?`<button class="ic" data-tren="${d.id}|${t.id}" title="Team umbenennen">✎</button><button class="ic" data-tdel="${d.id}|${t.id}" title="Team löschen">🗑</button>`:""}</div>
         ${lead("t",d.id+"|"+t.id,t.lead,"Teamleitung")}${dz(d.id,t.id,TL,oe?"Agenten hierher ziehen":"–")}</div>`}).join("")}
       ${T.length&&(direct.length||oe)?`<div class="odlab">Direkt in der Abteilung</div>`:""}${dz(d.id,"",direct,oe?"Agenten hierher ziehen":(T.length?"":"–"))}
@@ -666,7 +696,11 @@ function org(){
   const ob=$("#orgedit");if(ob)ob.onclick=()=>{if(startEdit("org",null,null,["meta/config",...DP.map(d=>"depts/"+d.id),...AG.map(a=>"agents/"+a.id),...US.map(u=>"users/"+u.id)],false,["depts"]))org()};
   bindEd($("#orged"),()=>org());
   document.querySelectorAll("[data-oa]").forEach(e=>{e.ondragstart=ev=>{if(oe)ev.dataTransfer.setData("ag",e.dataset.oa)}});
-  if(!oe){document.querySelectorAll("[data-goa]").forEach(e=>e.onclick=()=>goAgent(e.dataset.goa));
+  if(!oe){document.querySelectorAll("[data-goa]").forEach(e=>e.onclick=ev=>{if(ev.target.closest("[data-play]"))return;goAgent(e.dataset.goa)});
+    document.querySelectorAll("[data-play]").forEach(b=>b.onclick=ev=>{ev.stopPropagation();startModal(null,{art:"agent",aid:b.dataset.play,org:OC})});
+    document.querySelectorAll("[data-orun]").forEach(b=>b.onclick=ev=>{ev.stopPropagation();const a=AG.find(x=>x.id===b.dataset.orun);if(a)avOpen({org:OC,only:a,tab:"offen"})});
+    document.querySelectorAll("[data-oav]").forEach(b=>b.onclick=()=>avOpen({org:OC,d:[b.dataset.oav]}));
+    const oav=$("#orgav");if(oav)oav.onclick=()=>avOpen({org:OC});
     document.querySelectorAll("[data-gos]").forEach(e=>e.onclick=ev=>{ev.stopPropagation();const [ai,si]=e.dataset.gos.split("|");goSkill(ai,si)})}
   if(!oe)return;
   document.querySelectorAll(".odz").forEach(z=>{z.ondragover=e=>{e.preventDefault();e.stopPropagation();z.classList.add("over")};z.ondragleave=e=>{if(!z.contains(e.relatedTarget))z.classList.remove("over")};
@@ -1371,7 +1405,7 @@ function startModal(f,keep){if(!keep)PEND=[];keep=keep||{};
     const j={id:"A-"+n,f,fid:f.id,art,org:O.id,t:$("#jt").value||(art==="agent"?ag.n:art==="frei"?(skv&&sk(skv)?sk(skv).n:"Freie Aufgabe"):"Neuer Auftrag"),in:$("#ji").value,path:ki?[s.id]:[s.id].concat(nx?[nx.id]:[]),st:"run",log:ki?[[now(),"KI-Auftrag angelegt von Boris"+(art==="agent"?" – an "+ag.n:art==="frei"?" – freie Aufgabe":"")]]:[[now(),"Auftrag gestartet von Boris"],[now(),nx?nlabel(nx)+" – beginnt":"–"]]};
     if(art==="agent")j.aid=ag.id;if(skv)j.sk=skv;
     if(ki){j.ki=1;j.tempo=$("#jtempo").value;if($("#jvorab").checked)j.vorab=1}
-    if(PEND.length){j.anh=PEND.map(a=>({aid:a.aid,name:a.name,w:a.w,h:a.h,n:Math.ceil(a.data.length/CHUNK),kb:Math.round(a.data.length*.75/1024)}));PEND.forEach(a=>ANHDATA.set(a.aid,a.data));PEND=[]}AU.unshift(j);close();show("jobs");if(ki)kiStart(j,"starten");else{anhSave(j).catch(()=>{});toast("Auftrag gestartet")}};
+    if(PEND.length){j.anh=PEND.map(a=>({aid:a.aid,name:a.name,w:a.w,h:a.h,n:Math.ceil(a.data.length/CHUNK),kb:Math.round(a.data.length*.75/1024)}));PEND.forEach(a=>ANHDATA.set(a.aid,a.data));PEND=[]}jobPlatz(j);AU.unshift(j);close();show("jobs");if(ki)kiStart(j,"starten");else{anhSave(j).catch(()=>{});toast("Auftrag gestartet")}};
 }
 const curN=j=>nodeOf(j.f,j.path[j.path.length-1]);
 // ===== KI-Aufträge: Ausführung durch Claude über die geplante Aufgabe „Company OS – KI-Auftrag ausführen“ (Abo, keine API) =====
@@ -1384,8 +1418,8 @@ let KISUB=null,KICT=null,KICL=0;function kiCheckSoon(){if(KICT)return;const w=Ma
 function kiApply(docs,quiet){/* docs: einfache Objekte aus Store */const M=new Map(AU.map(j=>[j.id,j])),before=new Map(AU.map(j=>[j.id,j.st+"|"+((j.log||[]).length)]));const IDS=new Set(docs.map(o=>(o||{}).id));const gone=AU.filter(j=>j.ki&&j!==KIEDIT&&!IDS.has(j.id)&&LAST.has("jobs/"+j.id));if(gone.length){AU=AU.filter(j=>!gone.includes(j));gone.forEach(j=>{LAST.delete("jobs/"+j.id);kiGone(j)})}docs.forEach(o0=>{const o=plain(o0);const j=M.get(o.id);if(j&&j===KIEDIT)return;if(j&&!j.ki&&!o.ki)return;if(j){Object.keys(j).forEach(k=>{if(k!=="f")delete j[k]});Object.assign(j,o);j.f=FL.find(f=>f.id===j.fid)}else{o.f=FL.find(f=>f.id===o.fid);AU.unshift(o)}LAST.set("jobs/"+o.id,jobSer(M.get(o.id)||o))});
   KIAT=new Date();const ch=AU.filter(j=>j.ki&&before.has(j.id)&&before.get(j.id)!==j.st+"|"+((j.log||[]).length)&&before.get(j.id).split("|")[0]!==j.st);
   ch.forEach(j=>{KINEW.add(j.id)});if(ch.length){const j=ch[0];toast(j.id+" „"+j.t+"“: "+(j.st==="cancel"?"✕ abgebrochen":j.st==="done"?(j.ok==="nein"?"✗ nicht erledigt":j.ok==="teilweise"?"◐ teilweise erledigt":"✓ erledigt"):j.st==="wait"?"⏸ wartet auf dich":"läuft")+(ch.length>1?" (+"+(ch.length-1)+" weitere)":""))}
-  waitCnt();if(!$("#jobs").classList.contains("hide")&&!$("#modal").innerHTML)jobs();if(!quiet&&!ch.length)toast("Stand geladen")}
-let KIEDIT=null;
+  waitCnt();if(!$("#jobs").classList.contains("hide")&&!$("#modal").innerHTML)jobs();avRefresh();{const sig=AG.map(a=>runCnt(a.id)).join(",");if(sig!==ORGRUN){ORGRUN=sig;if(!$("#org").classList.contains("hide")&&!isEd("org"))org()}}if(!quiet&&!ch.length)toast("Stand geladen")}
+let KIEDIT=null,ORGRUN="";
 const KINEW=new Set();
 const okTxt=j=>j.st==="cancel"?["no","✕ Abgebrochen"]:j.st==="done"?(j.ok==="nein"?["no","✗ Nicht erledigt"]:j.ok==="teilweise"?["part","◐ Teilweise erledigt"]:["ok","✓ Erledigt"]):j.st==="wait"?["wait","⏸ Wartet auf dich"]:["run","▶ Läuft"];
 async function kiAnswer(j,a){await kiFresh(j);const Q=j.q||{};j.ans=[...(j.ans||[]),{q:Q.text||"",a,at:new Date().toISOString()}];j.log.push([now(),"Boris: "+a,1]);delete j.q;kiStart(j,"fortsetzen",{a,q:Q.text,kind:Q.kind,from:Q.from})}
@@ -1679,6 +1713,111 @@ async function boot(){
     if(!SK.length)emptyState("Noch keine Skills","Bitte Claude, die Startdaten einzuspielen – danach erscheinen hier deine Skills.");
   }catch(e){setSave("err","Laden fehlgeschlagen");emptyState("Laden fehlgeschlagen","Seite neu laden. Wenn es wieder passiert, Claude Bescheid geben.")}
 }
+
+// ===== Aufträge & Verlauf: ein Dialog über alle Abteilungen (Etappe 1) =====
+// Zuordnung eines Auftrags: Agent (direkt, aus dem Ablauf oder keiner = „Claude – frei“), Abteilung (beim Anlegen gemerkt, sonst aktuelle Platzierung des Agenten)
+function jobAgent(j){if(!j)return null;const byId=id=>id?AG.find(x=>x.id===id)||null:null;
+  if(j.art==="agent"&&j.aid)return byId(j.aid);
+  if(j.f&&!j.f.frei&&Array.isArray(j.path)){const c=curN(j),a=(c&&c.a)||(j.f.N.find(n=>n.type==="task"&&n.a)||{}).a;if(a)return a}
+  return byId(j.aid)}
+const jobOrg=j=>j.org||(ORGS()[0]||{}).id;
+function jobAbt(j,a){if(j.abt)return j.abt;const p=a?PL(a,jobOrg(j)):{};return p.abt||""}
+function jobPlatz(j){const a=jobAgent(j);if(!a)return;const p=PL(a,jobOrg(j));if(p.abt)j.abt=p.abt;if(p.team)j.team=p.team}
+const runCnt=aid=>AU.filter(j=>j.st==="run"&&(jobAgent(j)||{}).id===aid).length;
+
+const AVSIDE=()=>window.innerWidth>860||!!(UI.av&&UI.av.side);
+let AVOPEN=false,AVN=50,AVARCH=null,AVLOAD=false;
+function AVS(){const s=UI.av=UI.av||{};s.tab=s.tab||"offen";s.st=s.st||"alle";s.zeit=s.zeit||"heute";s.sel=s.sel||{};if(!orgById(s.org))s.org=OC||(ORGS()[0]||{}).id;return s}
+function avSel(o){const s=AVS();if(!s.sel[o])s.sel[o]={d:null,ax:[]};return s.sel[o]}
+function avOpen(opt){opt=opt||{};const s=AVS();if(opt.org)s.org=opt.org;const S=avSel(s.org);
+  if(opt.d){S.d=[...opt.d];S.ax=[]}
+  if(opt.only){S.d=[PL(opt.only,s.org).abt||"_none"];S.ax=AG.filter(x=>x.id!==opt.only.id).map(x=>x.id).concat(["_frei"])}
+  if(opt.tab)s.tab=opt.tab;AVN=50;saveUI();AVOPEN=true;avRender()}
+function avClose(){AVOPEN=false;const d=$("#avdlg");if(d)d.remove()}
+function avRefresh(){if(AVOPEN&&$("#avdlg"))avRender(true)}
+
+// Zeitfenster der Erledigt-Ansicht (Heute · Diese Woche · Dieser Monat · Letzter Monat · Älter)
+function avFenster(){const t=new Date();t.setHours(0,0,0,0);const mo=new Date(t);mo.setDate(t.getDate()-((t.getDay()+6)%7));const m1=new Date(t.getFullYear(),t.getMonth(),1),lm=new Date(t.getFullYear(),t.getMonth()-1,1);
+  return {heute:[t,null],woche:[mo,null],monat:[m1,null],letzter:[lm,m1],aelter:[null,lm]}}
+const AVZ=[["heute","Heute"],["woche","Diese Woche"],["monat","Dieser Monat"],["letzter","Letzter Monat"],["aelter","Älter"]];
+const inFenster=(d,w)=>(!w[0]||d>=w[0])&&(!w[1]||d<w[1]);
+
+function avZeilen(o){const R=AU.filter(j=>jobOrg(j)===o).map(j=>{const a=jobAgent(j);return {j,a,abt:jobAbt(j,a)||"_none",ak:a?a.id:"_frei",end:isEnd(j),d:isEnd(j)?doneAt(j):null}});
+  if(AVARCH)AVARCH.filter(x=>x.org===o&&!R.some(r=>r.j.id===x.id)).forEach(x=>{const a=x.aid?AG.find(y=>y.id===x.aid)||null:null;R.push({j:x,a,abt:x.abt||(a&&PL(a,o).abt)||"_none",ak:a?a.id:"_frei",end:true,d:new Date(x.fertig),arch:true})});
+  return R}
+async function avArchivLaden(){if(AVARCH||AVLOAD||!DB)return;AVLOAD=true;try{const L=await Store.list("archiv");AVARCH=L.flatMap(a=>(a.items||[]).map(x=>({...x,org:x.org||a.org})))}catch(e){AVARCH=[];toast("Archiv nicht lesbar")}AVLOAD=false;avRefresh()}
+
+function avRender(keep){const s=AVS(),o=s.org,S=avSel(o),O=orgById(o)||{},F=avFenster();
+  const q=(s.q||"").trim().toLowerCase(),R0=avZeilen(o).filter(r=>!q||[r.j.id,r.j.t,r.j.in,r.a&&r.a.n].some(v=>String(v||"").toLowerCase().includes(q)));
+  const inTab=r=>s.tab==="offen"?!r.end:(r.end&&(s.abg||r.j.st!=="cancel")&&inFenster(r.d,F[s.zeit]));
+  const inSel=r=>(S.d===null||S.d.includes(r.abt))&&!S.ax.includes(r.ak);
+  const RT=R0.filter(inTab),R=RT.filter(inSel);
+  // linke Seite: Abteilungen mit ihren Agenten, Zahlen = Aufträge in der aktuellen Ansicht (ohne Auswahl)
+  const D=deptsOf(o).map(d=>({id:d.id,n:d.n}));if(RT.some(r=>r.abt==="_none")||AG.some(a=>inOrg(a,o)&&!PL(a,o).abt))D.push({id:"_none",n:"Ohne Abteilung"});
+  const dOn=k=>S.d===null||S.d.includes(k);
+  const tree=D.map(d=>{const A=AG.filter(a=>inOrg(a,o)&&(PL(a,o).abt||"_none")===d.id).map(a=>({k:a.id,n:a.n}));
+      RT.filter(r=>r.abt===d.id&&!A.some(x=>x.k===r.ak)).forEach(r=>{if(!A.some(x=>x.k===r.ak))A.push({k:r.ak,n:r.a?r.a.n:"Claude – frei"})});
+      const n=RT.filter(r=>r.abt===d.id).length;
+      return `<label class="dl"><input type="checkbox" data-avd="${d.id}" ${dOn(d.id)?"checked":""}> ${esc(d.n)}<span class="n">${n}</span></label>`+
+        A.map(a=>`<label class="al"><input type="checkbox" data-ava="${a.k}" data-avad="${d.id}" ${dOn(d.id)&&!S.ax.includes(a.k)?"checked":""}> ${esc(a.n)}<span class="n">${RT.filter(r=>r.abt===d.id&&r.ak===a.k).length}</span></label>`).join("")}).join("");
+  const selN=S.d===null?"alle Abteilungen":D.filter(d=>S.d.includes(d.id)).map(d=>d.n).join(", ")||"keine Abteilung gewählt";
+  // Leisten
+  const RO=R0.filter(r=>!r.end&&inSel(r)),cnt=st=>RO.filter(r=>st==="alle"||r.j.st===st).length;
+  const tabs=`<div class="seg2"><button data-avt="offen" class="${s.tab==="offen"?"on":""}">Offen<span class="c">${R0.filter(r=>!r.end&&inSel(r)).length}</span></button><button data-avt="erledigt" class="${s.tab==="erledigt"?"on":""}">Erledigt</button></div>`;
+  let bar2="";
+  if(s.tab==="offen"){const L=[["alle","Alle"],["run","Läuft"],["wait","Wartet auf dich"]].concat(cnt("inbox")?[["inbox","Gesammelt"]]:[]);
+    bar2=`<div class="seg2">${L.map(([k,l])=>`<button data-avs="${k}" class="${s.st===k?"on":""}">${l}${k==="alle"?"":`<span class="c">${cnt(k)}</span>`}</button>`).join("")}</div>`}
+  else{const RE=R0.filter(r=>r.end&&(s.abg||r.j.st!=="cancel")&&inSel(r));
+    bar2=`<div class="seg2">${AVZ.map(([k,l])=>`<button data-avz="${k}" class="${s.zeit===k?"on":""}">${l}${k==="aelter"&&!AVARCH?"":`<span class="c">${RE.filter(r=>inFenster(r.d,F[k])).length}</span>`}</button>`).join("")}</div>
+      <label class="cb" style="margin:0"><input type="checkbox" id="avabg" ${s.abg?"checked":""}> Abgebrochene zeigen</label>`}
+  // Tabelle
+  const agc=r=>r.a?`<div class="avag">${av(usr(r.a.owner),24,1)}<span>${esc(r.a.n)}</span></div>`:`<div class="avag"><span class="avfr">✦</span><span>Claude – frei</span></div>`;
+  const dn=r=>{const d=dept(r.abt);return d?d.n:"Ohne Abteilung"};
+  const ttl=r=>`<td class="t"><b>${esc(r.j.t||"–")}</b><small>${esc(dn(r))}</small></td>`;
+  let rows,head;
+  if(s.tab==="offen"){rows=R.filter(r=>s.st==="alle"||r.j.st===s.st).sort((a,b)=>(a.j.st==="wait"?0:1)-(b.j.st==="wait"?0:1)||(+String(b.j.id).slice(2)||0)-(+String(a.j.id).slice(2)||0));
+    head=`<th>Status</th><th>Nr.</th><th>Auftrag · Abteilung</th><th class="hm">Agent</th><th class="hm">Stand</th><th></th>`;
+    rows=rows.map(r=>{const j=r.j,L=(j.log||[]).filter(x=>x&&!LOGSKIP.test(x[1]||"")),last=L[L.length-1];
+      const st=j.st==="wait"?'<span class="kst wait">■ wartet auf dich</span>':j.st==="inbox"?'<span class="kst">📥 gesammelt</span>':'<span class="kst run">● läuft</span>';
+      const stand=j.st==="wait"?esc(j.q?(j.q.kind==="Rückfrage"?"Rückfrage":"Zur Freigabe")+(j.q.from&&j.q.from!=="Company OS"?" · "+j.q.from:""):"Wartet auf dich"):j.st==="run"?esc([j.fired?"seit "+new Date(j.fired).toLocaleTimeString("de-DE",{hour:"2-digit",minute:"2-digit"}):"",last?last[1]:""].filter(Boolean).join(" · ")):"";
+      const act=j.st==="wait"?`<button class="btn sm p" data-avres="${j.id}">Prüfen &amp; freigeben</button>`:"";
+      return `<tr class="cl" data-avj="${j.id}"><td>${st}</td><td class="nr">${esc(j.id)}</td>${ttl(r)}<td class="hm">${agc(r)}</td><td class="hm sm">${stand}</td><td class="ac">${act}</td></tr>`})}
+  else{const all=R.sort((a,b)=>b.d-a.d);rows=all.slice(0,AVN);
+    head=`<th>Erledigt</th><th>Nr.</th><th>Auftrag · Abteilung</th><th class="hm">Agent</th><th>Status</th><th class="hm">Ergebnis</th>`;
+    const tot=all.length;
+    rows=rows.map(r=>{const j=r.j,[c,l]=okTxt(j),e=(j.erg||[]).find(x=>x&&/^https?:\/\//.test(x.url||""));
+      const dt=+r.d?r.d.toLocaleDateString("de-DE",{day:"2-digit",month:"2-digit"})+" <b>"+r.d.toLocaleTimeString("de-DE",{hour:"2-digit",minute:"2-digit"})+"</b>":"–";
+      return `<tr class="${r.arch?"arch":"cl"}" ${r.arch?`title="${esc((j.sum||"")+" (aus dem Archiv)")}"`:`data-avj="${j.id}"`}><td class="nr">${dt}</td><td class="nr">${esc(j.id)}</td>${ttl(r)}<td class="hm">${agc(r)}</td><td><span class="kst ${c}">${esc(l.replace("Erledigt","erledigt").replace("Abgebrochen","abgebrochen"))}</span></td><td class="hm">${e?`<a href="${esc(e.url)}" target="_blank" rel="noopener">↗ ${esc(e.t||"Öffnen")}</a>`:"—"}</td></tr>`});
+    rows.foot=`<div class="avfoot"><span>${Math.min(AVN,tot)} von ${tot} angezeigt${s.zeit==="aelter"?(AVLOAD?" · Archiv wird geladen …":AVARCH?" · inkl. Archiv":""):""}</span>${tot>AVN?'<button class="btn sm" id="avmore">Weitere laden</button>':""}</div>`}
+  const foot=rows.foot||"",empty=`<tr><td colspan="6" class="avempty">${s.tab==="offen"?"Keine offenen Aufträge in dieser Auswahl.":"Keine Aufträge in diesem Zeitraum."}</td></tr>`;
+  const html=`<div class="modal" id="avm"><div class="avbox" role="dialog" aria-label="Aufträge und Verlauf">
+    <div class="avhead"><h3>🕘 Aufträge &amp; Verlauf</h3><span class="sub">· ${esc(selN)}</span><button class="ic" id="avx" title="Schließen" style="font-size:18px">✕</button></div>
+    <div class="avgrid"><details class="avside" id="avside" ${AVSIDE()?"open":""}><summary><h4>Einschränken</h4><span class="avsn">${esc(selN)}</span></summary>
+      ${ORGS().length>1?`<div class="seg2 full" style="margin-bottom:8px">${ORGS().map(x=>`<button data-avo="${x.id}" class="${x.id===o?"on":""}">${esc(x.kurz||x.n)}</button>`).join("")}</div>`:""}
+      <div class="avtree">${tree||'<div class="hint">Keine Abteilungen</div>'}</div><div class="avall"><button class="lnk" id="avalle">Alle</button> · <button class="lnk" id="avkeine">Keine</button></div></details>
+     <div class="avmain"><div class="avbar">${tabs}${bar2}<input type="search" class="avq" id="avq" placeholder="🔍 Suchen …" value="${esc(s.q||"")}"></div>
+      <div class="avtw"><table class="avt"><thead><tr>${head}</tr></thead><tbody>${rows.length?rows.join(""):empty}</tbody></table>${foot}</div></div></div>
+    <div class="hint" style="margin:0">Auswahl links und Filter bleiben gespeichert. Ältere Aufträge (über 90 Tage) stehen als Kurzfassung im Archiv unter „Älter“.</div></div></div>`;
+  let d=$("#avdlg");const sc=d&&d.querySelector(".avtw")?d.querySelector(".avtw").scrollTop:0,qf=document.activeElement&&document.activeElement.id==="avq",pos=qf?document.activeElement.selectionStart:0;
+  if(!d){d=document.createElement("div");d.id="avdlg";document.body.appendChild(d)}d.innerHTML=html;if(keep)d.querySelector(".avtw").scrollTop=sc;
+  if(qf){const i=$("#avq");i.focus();try{i.setSelectionRange(pos,pos)}catch(e){}}
+  const rr=()=>{saveUI();avRender(true)};const sd=$("#avside");sd.ontoggle=()=>{if(window.innerWidth<=860){s.side=sd.open;saveUI()}};
+  $("#avx").onclick=avClose;$("#avm").onclick=e=>{if(e.target.id==="avm")avClose()};
+  d.querySelectorAll("[data-avo]").forEach(b=>b.onclick=()=>{s.org=b.dataset.avo;AVN=50;rr()});
+  d.querySelectorAll("[data-avt]").forEach(b=>b.onclick=()=>{s.tab=b.dataset.avt;AVN=50;rr()});
+  d.querySelectorAll("[data-avs]").forEach(b=>b.onclick=()=>{s.st=b.dataset.avs;rr()});
+  d.querySelectorAll("[data-avz]").forEach(b=>b.onclick=()=>{s.zeit=b.dataset.avz;AVN=50;if(s.zeit==="aelter")avArchivLaden();rr()});
+  const ab=$("#avabg");if(ab)ab.onchange=()=>{s.abg=ab.checked;rr()};
+  $("#avq").oninput=e=>{s.q=e.target.value;AVN=50;rr()};
+  const allK=()=>D.map(x=>x.id);
+  d.querySelectorAll("[data-avd]").forEach(c=>c.onchange=()=>{const k=c.dataset.avd;let L=S.d===null?allK():[...S.d];L=c.checked?[...new Set([...L,k])]:L.filter(x=>x!==k);S.d=L.length===allK().length&&allK().every(x=>L.includes(x))?null:L;rr()});
+  d.querySelectorAll("[data-ava]").forEach(c=>c.onchange=()=>{const k=c.dataset.ava,dk=c.dataset.avad;if(c.checked){S.ax=S.ax.filter(x=>x!==k);if(S.d!==null&&!S.d.includes(dk))S.d=[...S.d,dk]}else S.ax=[...new Set([...S.ax,k])];rr()});
+  $("#avalle").onclick=()=>{S.d=null;S.ax=[];rr()};$("#avkeine").onclick=()=>{S.d=[];S.ax=[];rr()};
+  const mo=$("#avmore");if(mo)mo.onclick=()=>{AVN+=50;avRender(true)};
+  d.querySelectorAll("[data-avres]").forEach(b=>b.onclick=ev=>{ev.stopPropagation();const j=AU.find(x=>x.id===b.dataset.avres);if(j)kiFresh(j).then(()=>resultModal(j))});
+  d.querySelectorAll("[data-avj]").forEach(t=>t.onclick=ev=>{if(ev.target.closest("a,button"))return;const j=AU.find(x=>x.id===t.dataset.avj);if(!j)return;KINEW.delete(j.id);if(j.ki)kiFresh(j).then(()=>resultModal(j));else jobModalK(j)});
+  if(s.tab==="erledigt"&&s.zeit==="aelter")avArchivLaden()}
+document.addEventListener("keydown",e=>{if(e.key==="Escape"&&AVOPEN&&!$("#modal").innerHTML&&!$("#dlg"))avClose()});
 
 boot();
 // Breitenregler Ablauf-Eigenschaften (rechts)
