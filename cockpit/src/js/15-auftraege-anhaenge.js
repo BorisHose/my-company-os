@@ -9,9 +9,15 @@ async function addPend(file,name){if(!file||!/^image\//.test(file.type))return t
   try{const r=await imgToJpeg(file);const aid=uid("an");PEND.push({aid,name:name||file.name||("Screenshot "+(PEND.length+1)),w:r.w,h:r.h,data:r.data});renderPend();toast("Bild angehängt")}catch(e){toast("Bild konnte nicht gelesen werden")}}
 function renderPend(){const b=$("#janh");if(!b)return;b.innerHTML=PEND.map((a,i)=>`<div class="anhth" title="${esc(a.name)} · ${a.w}×${a.h}"><img src="data:image/jpeg;base64,${a.data}" alt=""><button class="ic" data-pdel="${i}" title="Entfernen">✕</button><span>Bild ${i+1}</span></div>`).join("");
   b.querySelectorAll("[data-pdel]").forEach(x=>x.onclick=()=>{PEND.splice(+x.dataset.pdel,1);renderPend()})}
-async function anhSave(j){for(const a of (j.anh||[])){const d=ANHDATA.get(a.aid);if(!d)continue;for(let i=0;i<a.n;i++)await DB.doc("anhaenge/"+a.aid+"_"+i).set({job:j.id,aid:a.aid,i,n:a.n,name:a.name,mime:"image/jpeg",data:d.slice(i*CHUNK,(i+1)*CHUNK)});ANHDATA.delete(a.aid)}}
+// Auftragsnummer: Zähler zaehler/auftrag unter Sperre hochzählen; ohne Sperre lokale Nummer mit Existenzprüfung
+let NOQ=Promise.resolve();function nextJobNo(){const p=NOQ.then(nextJobNo0);NOQ=p.catch(()=>{});return p} // im selben Fenster nacheinander
+async function nextJobNo0(){const loc=Math.max(99,...AU.map(j=>+String(j.id).slice(2)||0))+1;if(!DB)return loc;const frei=async n=>{while(await Store.get("jobs/A-"+n))n++;return n};
+  try{for(let i=0;i<6;i++){if(await Store.lease("zaehler/auftrag",5000)){const z=await Store.get("zaehler/auftrag");const n=await frei(Math.max((z&&z.n)||0,loc-1)+1);await Store.set("zaehler/auftrag",{n});return n}await new Promise(r=>setTimeout(r,300+Math.random()*700))}
+    const z=await Store.get("zaehler/auftrag"),n=await frei(Math.max(loc,((z&&z.n)||0)+1));try{await Store.set("zaehler/auftrag",{n})}catch(e){}return n}catch(e){return loc}}
+let GOBUSY=false;
+async function anhSave(j){for(const a of (j.anh||[])){const d=ANHDATA.get(a.aid);if(!d)continue;for(let i=0;i<a.n;i++)await Store.set("anhaenge/"+a.aid+"_"+i,{job:j.id,aid:a.aid,i,n:a.n,name:a.name,mime:"image/jpeg",data:d.slice(i*CHUNK,(i+1)*CHUNK)});ANHDATA.delete(a.aid)}}
 const ANHCACHE=new Map();
-async function anhLoad(a){if(ANHCACHE.has(a.aid))return ANHCACHE.get(a.aid);if(ANHDATA.has(a.aid))return "data:image/jpeg;base64,"+ANHDATA.get(a.aid);let s="";for(let i=0;i<a.n;i++){const d=await DB.doc("anhaenge/"+a.aid+"_"+i).get();if(!d.exists)return null;s+=d.data().data}const u="data:image/jpeg;base64,"+s;ANHCACHE.set(a.aid,u);return u}
+async function anhLoad(a){if(ANHCACHE.has(a.aid))return ANHCACHE.get(a.aid);if(ANHDATA.has(a.aid))return "data:image/jpeg;base64,"+ANHDATA.get(a.aid);let s="";for(let i=0;i<a.n;i++){const d=await Store.get("anhaenge/"+a.aid+"_"+i);if(!d)return null;s+=d.data}const u="data:image/jpeg;base64,"+s;ANHCACHE.set(a.aid,u);return u}
 function anhHtml(j){return (j.anh||[]).length?`<div class="flabel">Anhänge (${j.anh.length})</div><div class="anhrow">${j.anh.map((a,i)=>`<a class="anhth big" data-anh="${a.aid}" title="${esc(a.name)} – anklicken zum Vergrößern"><img alt="Bild ${i+1}"><span>Bild ${i+1}</span></a>`).join("")}</div>`:""}
 function anhBind(j){(j.anh||[]).forEach(a=>{const el=document.querySelector(`[data-anh="${a.aid}"]`);if(!el)return;anhLoad(a).then(u=>{if(u){el.querySelector("img").src=u;el.onclick=()=>{const w=window.open();if(w)w.document.write('<img src="'+u+'" style="max-width:100%">')}}})})}
 const FREE=()=>FL.find(x=>x.frei);
@@ -74,8 +80,8 @@ function startModal(f,keep){if(!keep)PEND=[];keep=keep||{};
       else if(e.key==="Tab"){if(openState)close()}};
     q.onblur=()=>setTimeout(()=>{if(document.activeElement!==q&&openState)close()},120);
     draw()}}
-  $("#go").onclick=()=>{if(!s)return toast("Der Ablauf braucht einen Start-Knoten");if(art==="agent"&&!ag)return toast("Bitte einen Agenten wählen");
-    const n=Math.max(99,...AU.map(j=>+j.id.slice(2)||0))+1,e=f.E.find(e=>e.f===s.id),nx=e&&nodeOf(f,e.t);
+  $("#go").onclick=async()=>{if(GOBUSY)return;if(!s)return toast("Der Ablauf braucht einen Start-Knoten");if(art==="agent"&&!ag)return toast("Bitte einen Agenten wählen");
+    GOBUSY=true;let n;try{n=await nextJobNo()}finally{GOBUSY=false}const e=f.E.find(e=>e.f===s.id),nx=e&&nodeOf(f,e.t);
     const ki=art!=="ablauf"||$("#jki").checked,skv=$("#jsk")?$("#jsk").value:"";
     const j={id:"A-"+n,f,fid:f.id,art,org:O.id,t:$("#jt").value||(art==="agent"?ag.n:art==="frei"?(skv&&sk(skv)?sk(skv).n:"Freie Aufgabe"):"Neuer Auftrag"),in:$("#ji").value,path:ki?[s.id]:[s.id].concat(nx?[nx.id]:[]),st:"run",log:ki?[[now(),"KI-Auftrag angelegt von Boris"+(art==="agent"?" – an "+ag.n:art==="frei"?" – freie Aufgabe":"")]]:[[now(),"Auftrag gestartet von Boris"],[now(),nx?nlabel(nx)+" – beginnt":"–"]]};
     if(art==="agent")j.aid=ag.id;if(skv)j.sk=skv;
