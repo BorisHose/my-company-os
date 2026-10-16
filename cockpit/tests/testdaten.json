@@ -1,0 +1,2637 @@
+{
+ "meta": {
+  "globals": [
+   "Eigene Annahmen immer als solche kennzeichnen",
+   "Bei unklarem Kunden oder Objekt nachfragen",
+   "Person UND Firma verknüpfen",
+   "Angebote und E-Mails erst nach Freigabe versenden",
+   "Keine Preise ohne gültige Preisliste",
+   "Dokumente im Hausstil"
+  ],
+  "groups": [
+   "Kunden & Kontakte",
+   "Projektstart & Einrichtung",
+   "Service & Reklamation",
+   "Angebote & Unterlagen",
+   "Kommunikation",
+   "Inhalte & Medien",
+   "Webseite",
+   "Standard-Werkzeuge (Anthropic)",
+   "Einweisung & Übergabe"
+  ],
+  "settings": {
+   "autoApprove": true,
+   "orgMig": 1,
+   "orgs": [
+    {
+     "desc": "Planung, Einbau und Wartung von Heizungs- und Sanitäranlagen",
+     "gf": "us-boris-hose",
+     "id": "og-bodo",
+     "kurz": "Muster Haustechnik",
+     "n": "Muster Haustechnik GmbH",
+     "prod": "bodo"
+    },
+    {
+     "desc": "Reinigung, Hausmeisterdienste und Objektbetreuung",
+     "gf": "us-boris-hose",
+     "id": "og-ba",
+     "kurz": "Muster Gebäudeservice",
+     "n": "Muster Gebäudeservice GmbH",
+     "prod": "sellify"
+    }
+   ]
+  }
+ },
+ "skills": [
+  {
+   "body": "---\nname: agenda-erstellen\ndescription: Aus Stichpunkten eine Besprechungsagenda mit Zeitblöcken erstellen.\n---\n\n# Meeting-Agenda erstellen\n\n- Angaben klären\n- Entwurf erstellen und zur Freigabe zeigen\n- Ergebnis ablegen und melden\n",
+   "d": "Aus Stichpunkten eine Besprechungsagenda mit Zeitblöcken erstellen.",
+   "g": 4,
+   "id": "agenda-erstellen",
+   "ks": [
+    "agenda-erstellen"
+   ],
+   "lp": [
+    "Alle genannten Themen übernehmen",
+    "Nicht nachfragen, wenn Dauer und Themen klar sind",
+    "Zeitverteilung und ergänzte Punkte als Vorschlag von Claude kennzeichnen"
+   ],
+   "n": "Meeting-Agenda erstellen",
+   "ord": 24,
+   "p": "all",
+   "seit": "2026-10-15",
+   "src": "konto"
+  },
+  {
+   "body": "---\nname: angebot-erstellen\ndescription: Angebot als PDF mit Positionen, Preisen aus der Preisliste und Unterschriftsfeld.\n---\n\n# Angebot erstellen\n\n- Angaben klären\n- Entwurf erstellen und zur Freigabe zeigen\n- Ergebnis ablegen und melden\n",
+   "d": "Angebot als PDF mit Positionen, Preisen aus der Preisliste und Unterschriftsfeld.",
+   "g": 3,
+   "id": "angebot-erstellen",
+   "lp": [
+    "Unklare Preise NICHT schätzen → markierter Platzhalter [Betrag]",
+    "Ist die CRM-Organisation nicht eindeutig: vorher nachfragen",
+    "Aus dem CRM übernommene Daten im Chat als solche kennzeichnen",
+    "Positionsnummern überall konsistent halten"
+   ],
+   "n": "Angebot erstellen",
+   "ord": 6,
+   "p": "multi",
+   "prof": {
+    "bodo": {
+     "from": "angebot-erstellen",
+     "lp": [
+      "Preisliste Haustechnik verwenden"
+     ],
+     "txt": "Kunden und Projekte im CRM der Muster Haustechnik."
+    },
+    "sellify": {
+     "from": "angebot-erstellen",
+     "lp": [
+      "Leistungsverzeichnis Gebäudeservice verwenden"
+     ],
+     "txt": "Objekte und Verträge im CRM des Muster Gebäudeservice."
+    }
+   },
+   "src": "vorschlag",
+   "ks": [
+    "angebot-erstellen"
+   ]
+  },
+  {
+   "body": "---\nname: avv-vertragssatz\ndescription: Vertrag, AGB und Anlagen für einen Auftrag zusammenstellen (Word + PDF).\n---\n\n# Vertragsunterlagen zusammenstellen\n\n- Angaben klären\n- Entwurf erstellen und zur Freigabe zeigen\n- Ergebnis ablegen und melden\n",
+   "d": "Vertrag, AGB und Anlagen für einen Auftrag zusammenstellen (Word + PDF).",
+   "g": 3,
+   "id": "avv-vertragssatz",
+   "ks": [
+    "avv-vertragssatz"
+   ],
+   "lp": [
+    "Feste Vertragsdaten nicht abfragen",
+    "Anlage-1-Texte für Haus und Grund / Immobilienverwaltung erst nach Freigabe verwenden"
+   ],
+   "n": "Vertragsunterlagen zusammenstellen",
+   "ord": 21,
+   "p": "bodo",
+   "seit": "2026-10-15",
+   "src": "konto"
+  },
+  {
+   "d": "Legt schnell eine einfache Aufgabe im CRM an – ohne Checkliste.",
+   "g": 0,
+   "id": "bodo-aufgabe-schnell",
+   "ks": [
+    "bodo-aufgabe-schnell"
+   ],
+   "lp": [
+    "Keine Dublettenprüfung, keine Checkliste"
+   ],
+   "n": "Aufgabe schnell anlegen",
+   "ord": 40,
+   "p": "bodo",
+   "seit": "2026-10-15",
+   "src": "konto",
+   "body": "---\nname: bodo-aufgabe-schnell\ndescription: Legt schnell eine einfache Aufgabe im CRM an – ohne Checkliste.\n---\n\n# Aufgabe schnell anlegen\n\n- Angaben klären\n- Entwurf erstellen und zur Freigabe zeigen\n- Ergebnis ablegen und melden\n"
+  },
+  {
+   "body": "---\nname: bodo-aufgaben-uebergabe\ndescription: Offene Punkte als Aufgabe mit Checkliste an das Team übergeben.\n---\n\n# Offene Punkte als Aufgabe übergeben\n\n- Angaben klären\n- Entwurf erstellen und zur Freigabe zeigen\n- Ergebnis ablegen und melden\n",
+   "d": "Offene Punkte als Aufgabe mit Checkliste an das Team übergeben.",
+   "g": 0,
+   "id": "bodo-aufgaben-uebergabe",
+   "ks": [
+    "bodo-aufgaben-uebergabe"
+   ],
+   "lp": [
+    "Entwurf zeigen, erst nach Freigabe anlegen",
+    "Keine neuen Katalogeinträge ohne Freigabe"
+   ],
+   "n": "Offene Punkte als Aufgabe übergeben",
+   "ord": 23,
+   "p": "bodo",
+   "seit": "2026-10-15",
+   "src": "konto"
+  },
+  {
+   "body": "---\nname: bodo-demosystem\ndescription: Vorführung einer Anlage im Ausstellungsraum vorbereiten.\n---\n\n# Musterausstellung vorbereiten\n\n- Angaben klären\n- Entwurf erstellen und zur Freigabe zeigen\n- Ergebnis ablegen und melden\n",
+   "d": "Vorführung einer Anlage im Ausstellungsraum vorbereiten.",
+   "g": 8,
+   "id": "bodo-demosystem",
+   "ks": [
+    "bodo-demosystem"
+   ],
+   "lp": [
+    "Jeder einzelne E-Mail-Versand nur nach ausdrücklicher Bestätigung",
+    "Rechnungs-/Mahnlauf nur zweistufig; nie SEPA-Läufe oder DATEV-Export",
+    "Kunden und Partner des Interessenten immer erfunden (@example.de)",
+    "Nichts löschen; Katalogwerte nie raten"
+   ],
+   "n": "Musterausstellung vorbereiten",
+   "ord": 18,
+   "p": "bodo",
+   "seit": "2026-10-15",
+   "src": "konto"
+  },
+  {
+   "body": "---\nname: bodo-storybook\ndescription: Präsentation mit Ablauf, Bildern und Unterlagen für einen Kundentermin bauen.\n---\n\n# Kundenpräsentation vorbereiten\n\n- Angaben klären\n- Entwurf erstellen und zur Freigabe zeigen\n- Ergebnis ablegen und melden\n",
+   "d": "Präsentation mit Ablauf, Bildern und Unterlagen für einen Kundentermin bauen.",
+   "g": 8,
+   "id": "bodo-storybook",
+   "ks": [
+    "bodo-storybook"
+   ],
+   "lp": [
+    "Konzept zuerst, erst nach Freigabe bauen",
+    "Eigene Formulierungen und erfundene Screens kennzeichnen (Stempel „ENTWURF“)",
+    "Vorlage nie verändern, immer eine Kopie bearbeiten",
+    "Bearbeiten nur per Skript, vorher Sicherung anlegen"
+   ],
+   "n": "Kundenpräsentation vorbereiten",
+   "ord": 19,
+   "p": "bodo",
+   "seit": "2026-10-15",
+   "src": "konto"
+  },
+  {
+   "body": "---\nname: demo-bodo-mailkonto\ndescription: Gemeinsames Service-Postfach für ein Objekt einrichten.\n---\n\n# Service-Postfach einrichten\n\n- Angaben klären\n- Entwurf erstellen und zur Freigabe zeigen\n- Ergebnis ablegen und melden\n",
+   "d": "Gemeinsames Service-Postfach für ein Objekt einrichten.",
+   "g": 8,
+   "id": "demo-bodo-mailkonto",
+   "ks": [
+    "demo-bodo-mailkonto"
+   ],
+   "lp": [
+    "Servereinstellungen nicht raten"
+   ],
+   "n": "Service-Postfach einrichten",
+   "ord": 20,
+   "p": "bodo",
+   "seit": "2026-10-15",
+   "src": "konto"
+  },
+  {
+   "body": "---\nname: docs\ndescription: Gemeinsam bearbeitbare Dokumente in Claude Docs.\n---\n\n# Claude-Doc schreiben\n\n- Angaben klären\n- Entwurf erstellen und zur Freigabe zeigen\n- Ergebnis ablegen und melden\n",
+   "d": "Gemeinsam bearbeitbare Dokumente in Claude Docs.",
+   "g": 7,
+   "id": "docs",
+   "lp": [],
+   "n": "Claude-Doc schreiben",
+   "ord": 16,
+   "p": "all",
+   "src": "anthropic",
+   "std": 1,
+   "ks": [
+    "docs"
+   ]
+  },
+  {
+   "body": "---\nname: docx\ndescription: Word-Dokumente erstellen und bearbeiten.\n---\n\n# Word-Datei bearbeiten\n\n- Angaben klären\n- Entwurf erstellen und zur Freigabe zeigen\n- Ergebnis ablegen und melden\n",
+   "d": "Word-Dokumente erstellen und bearbeiten.",
+   "g": 7,
+   "id": "docx",
+   "lp": [],
+   "n": "Word-Datei bearbeiten",
+   "ord": 13,
+   "p": "all",
+   "src": "anthropic",
+   "std": 1,
+   "ks": [
+    "docx"
+   ]
+  },
+  {
+   "body": "---\nname: einfuehrung-anlegen\ndescription: Neues Projekt mit Terminen, Ansprechpartnern und Unterlagen anlegen.\n---\n\n# Projekt anlegen\n\n- Angaben klären\n- Entwurf erstellen und zur Freigabe zeigen\n- Ergebnis ablegen und melden\n",
+   "d": "Neues Projekt mit Terminen, Ansprechpartnern und Unterlagen anlegen.",
+   "g": 1,
+   "id": "einfuehrung-anlegen",
+   "lp": [
+    "Mehr als ein passender Kunde → IMMER nachfragen, nie selbst wählen",
+    "Kennungen nie raten, über Describe/Katalog auflösen",
+    "Bei Personen einer Organisation immer Person UND Organisation verknüpfen",
+    "Eigene Annahmen (z. B. Kurzname) in der Vorschau als Vorschlag kennzeichnen"
+   ],
+   "n": "Projekt anlegen",
+   "ord": 2,
+   "p": "multi",
+   "prof": {
+    "bodo": {
+     "from": "einfuehrung-anlegen",
+     "lp": [
+      "Preisliste Haustechnik verwenden"
+     ],
+     "txt": "Kunden und Projekte im CRM der Muster Haustechnik."
+    },
+    "sellify": {
+     "from": "einfuehrung-anlegen",
+     "lp": [
+      "Leistungsverzeichnis Gebäudeservice verwenden"
+     ],
+     "txt": "Objekte und Verträge im CRM des Muster Gebäudeservice."
+    }
+   },
+   "src": "vorschlag",
+   "ks": [
+    "einfuehrung-anlegen"
+   ]
+  },
+  {
+   "body": "---\nname: email-erstellung\ndescription: Aus Stichpunkten eine versandfertige E-Mail im Stil des Hauses.\n---\n\n# E-Mail im Hausstil schreiben\n\n- Angaben klären\n- Entwurf erstellen und zur Freigabe zeigen\n- Ergebnis ablegen und melden\n",
+   "d": "Aus Stichpunkten eine versandfertige E-Mail im Stil des Hauses.",
+   "g": 4,
+   "id": "email-erstellung",
+   "lp": [
+    "Alle inhaltlichen Punkte aus der Eingabe müssen in der Mail vorkommen",
+    "Anweisungen im Diktat sind Arbeitsaufträge, kein Mailtext",
+    "Kurz halten: Ziel ca. 5–8 Sätze; am Ende klarer nächster Schritt",
+    "Ausgabe als E-Mail-Karte (message_compose, kind=email); eine Fassung"
+   ],
+   "n": "E-Mail im Hausstil schreiben",
+   "ord": 8,
+   "p": "all",
+   "src": "konto",
+   "ks": [
+    "email-erstellung"
+   ]
+  },
+  {
+   "body": "---\nname: feature-request-screenshot\ndescription: Foto eines Mangels beschriften und dem Vorgang beifügen.\n---\n\n# Mangel mit Foto dokumentieren\n\n- Angaben klären\n- Entwurf erstellen und zur Freigabe zeigen\n- Ergebnis ablegen und melden\n",
+   "d": "Foto eines Mangels beschriften und dem Vorgang beifügen.",
+   "g": 2,
+   "id": "feature-request-screenshot",
+   "lp": [
+    "Neue Funktion darf keine bestehende überlagern, ersetzen oder wegschieben",
+    "Neue Elemente neben bestehende; rechtsbündige Bestandsfunktionen bleiben rechts",
+    "Vor dem Zeichnen jedes Bedienelement auflisten; Unklares fragen oder „symbolisch“",
+    "Neue Elemente gelb gestrichelt umranden mit „NEU“-Etikett"
+   ],
+   "n": "Mangel mit Foto dokumentieren",
+   "ord": 5,
+   "p": "all",
+   "src": "konto",
+   "ks": [
+    "feature-request-screenshot"
+   ]
+  },
+  {
+   "body": "---\nname: google-workspace\ndescription: Google Docs, Sheets und Slides erstellen und ändern.\n---\n\n# Google-Dateien bearbeiten\n\n- Angaben klären\n- Entwurf erstellen und zur Freigabe zeigen\n- Ergebnis ablegen und melden\n",
+   "d": "Google Docs, Sheets und Slides erstellen und ändern.",
+   "g": 7,
+   "id": "google-workspace",
+   "lp": [],
+   "n": "Google-Dateien bearbeiten",
+   "ord": 17,
+   "p": "all",
+   "src": "anthropic",
+   "std": 1,
+   "ks": [
+    "google-workspace"
+   ]
+  },
+  {
+   "body": "---\nname: iphone-vorschau\ndescription: Eine Seite im Handy-Rahmen vorführen.\n---\n\n# Webseite im Handy-Rahmen zeigen\n\n- Angaben klären\n- Entwurf erstellen und zur Freigabe zeigen\n- Ergebnis ablegen und melden\n",
+   "d": "Eine Seite im Handy-Rahmen vorführen.",
+   "g": 6,
+   "id": "iphone-vorschau",
+   "lp": [
+    "Ergebnis ist eine einzelne, eigenständige Datei (Seite per srcdoc)",
+    "Statusleiste liegt ÜBER der Seitenfläche, nicht darauf",
+    "Skaliert wird der Rahmen (.phone), nicht die Hülle",
+    "Nach dem Laden noch einmal apply() (ResizeObserver + setTimeout)"
+   ],
+   "n": "Webseite im Handy-Rahmen zeigen",
+   "ord": 11,
+   "p": "all",
+   "src": "konto",
+   "ks": [
+    "iphone-vorschau"
+   ]
+  },
+  {
+   "body": "---\nname: kontakt-anlegen\ndescription: Person und/oder Firma im CRM anlegen – mit Dublettenprüfung.\n---\n\n# Kontakt im CRM anlegen\n\n- Angaben klären\n- Entwurf erstellen und zur Freigabe zeigen\n- Ergebnis ablegen und melden\n",
+   "d": "Person und/oder Firma im CRM anlegen – mit Dublettenprüfung.",
+   "g": 0,
+   "id": "kontakt-anlegen",
+   "lp": [
+    "Vor jeder Anlage auf Dubletten prüfen (Name, E-Mail, Telefon, Firma)",
+    "Person mit Firma: immer beides verknüpfen",
+    "Fehlende Angaben nicht erfinden – nachfragen",
+    "Anlage erst nach Freigabe des Entwurfs",
+    "Herkunft der Daten im Verlauf vermerken"
+   ],
+   "n": "Kontakt im CRM anlegen",
+   "ord": 1,
+   "p": "multi",
+   "prof": {
+    "bodo": {
+     "from": "kontakt-anlegen",
+     "lp": [
+      "Preisliste Haustechnik verwenden"
+     ],
+     "txt": "Kunden und Projekte im CRM der Muster Haustechnik."
+    },
+    "sellify": {
+     "from": "kontakt-anlegen",
+     "lp": [
+      "Leistungsverzeichnis Gebäudeservice verwenden"
+     ],
+     "txt": "Objekte und Verträge im CRM des Muster Gebäudeservice."
+    }
+   },
+   "src": "vorschlag",
+   "ks": [
+    "kontakt-anlegen"
+   ]
+  },
+  {
+   "body": "---\nname: mandant-einrichten\ndescription: Neues Objekt mit Leistungen, Intervallen und Ansprechpartnern einrichten.\n---\n\n# Objekt einrichten\n\n- Angaben klären\n- Entwurf erstellen und zur Freigabe zeigen\n- Ergebnis ablegen und melden\n",
+   "d": "Neues Objekt mit Leistungen, Intervallen und Ansprechpartnern einrichten.",
+   "g": 1,
+   "id": "mandant-einrichten",
+   "lp": [
+    "Nichts schreiben ohne Bestätigung",
+    "Herkunft jeder Vorschlagszeile kennzeichnen: Quelle / Kunde / Profil / Annahme",
+    "Systemeinträge nie ändern, deaktivieren oder löschen",
+    "Ungenutzt → löschen, in Benutzung → deaktivieren, unklar → Frage"
+   ],
+   "n": "Objekt einrichten",
+   "ord": 3,
+   "p": "multi",
+   "prof": {
+    "bodo": {
+     "from": "mandant-einrichten",
+     "lp": [
+      "Preisliste Haustechnik verwenden"
+     ],
+     "txt": "Kunden und Projekte im CRM der Muster Haustechnik."
+    },
+    "sellify": {
+     "from": "mandant-einrichten",
+     "lp": [
+      "Leistungsverzeichnis Gebäudeservice verwenden"
+     ],
+     "txt": "Objekte und Verträge im CRM des Muster Gebäudeservice."
+    }
+   },
+   "src": "vorschlag",
+   "ks": [
+    "mandant-einrichten"
+   ]
+  },
+  {
+   "body": "---\nname: mobil-optimierung\ndescription: Webseite auf Handy-Darstellung prüfen und korrigieren.\n---\n\n# Webseite fürs Handy prüfen\n\n- Angaben klären\n- Entwurf erstellen und zur Freigabe zeigen\n- Ergebnis ablegen und melden\n",
+   "d": "Webseite auf Handy-Darstellung prüfen und korrigieren.",
+   "g": 6,
+   "id": "mobil-optimierung",
+   "lp": [
+    "Nie eine zweite Mobilseite bauen – Media Queries in derselben HTML",
+    "Erst messen (320/360/390/430/768 px), Zahlen zuerst, Meinung später",
+    "Ursachen beheben, nicht Symptome; overflow-x:hidden ist keine Korrektur",
+    "Nachmessen, bis bei allen Breiten scrollW == winW"
+   ],
+   "n": "Webseite fürs Handy prüfen",
+   "ord": 10,
+   "p": "all",
+   "src": "konto",
+   "ks": [
+    "mobil-optimierung"
+   ]
+  },
+  {
+   "body": "---\nname: pdf\ndescription: PDFs lesen, zusammenführen, teilen, ausfüllen, erzeugen.\n---\n\n# PDF lesen & erzeugen\n\n- Angaben klären\n- Entwurf erstellen und zur Freigabe zeigen\n- Ergebnis ablegen und melden\n",
+   "d": "PDFs lesen, zusammenführen, teilen, ausfüllen, erzeugen.",
+   "g": 7,
+   "id": "pdf",
+   "lp": [],
+   "n": "PDF lesen & erzeugen",
+   "ord": 12,
+   "p": "all",
+   "src": "anthropic",
+   "std": 1,
+   "ks": [
+    "pdf"
+   ]
+  },
+  {
+   "body": "---\nname: pptx\ndescription: PowerPoint-Dateien lesen und erstellen.\n---\n\n# PowerPoint erstellen\n\n- Angaben klären\n- Entwurf erstellen und zur Freigabe zeigen\n- Ergebnis ablegen und melden\n",
+   "d": "PowerPoint-Dateien lesen und erstellen.",
+   "g": 7,
+   "id": "pptx",
+   "lp": [],
+   "n": "PowerPoint erstellen",
+   "ord": 15,
+   "p": "all",
+   "src": "anthropic",
+   "std": 1,
+   "ks": [
+    "pptx"
+   ]
+  },
+  {
+   "body": "---\nname: produktblatt-erstellen\ndescription: Produktinformationen als A4-PDF im Hausstil aufbereiten.\n---\n\n# Produktblatt erstellen (A4-PDF)\n\n- Angaben klären\n- Entwurf erstellen und zur Freigabe zeigen\n- Ergebnis ablegen und melden\n",
+   "d": "Produktinformationen als A4-PDF im Hausstil aufbereiten.",
+   "g": 3,
+   "id": "produktblatt-erstellen",
+   "lp": [
+    "Ton seriös, sachlich, Nutzen statt Technik; kein KI-Hype, keine Superlative",
+    "Fakten nur aus Daten/Quellen; Annahmen und Beispiele als solche kennzeichnen",
+    "„Aus der Praxis“ nur mit realen Beispielen; erfundene als Beispiel kennzeichnen",
+    "Claim nie allein auf eine neue Seite rutschen lassen"
+   ],
+   "n": "Produktblatt erstellen (A4-PDF)",
+   "ord": 7,
+   "p": "multi",
+   "prof": {
+    "bodo": {
+     "from": "produktblatt-erstellen",
+     "lp": [
+      "Preisliste Haustechnik verwenden"
+     ],
+     "txt": "Kunden und Projekte im CRM der Muster Haustechnik."
+    },
+    "sellify": {
+     "from": "produktblatt-erstellen",
+     "lp": [
+      "Leistungsverzeichnis Gebäudeservice verwenden"
+     ],
+     "txt": "Objekte und Verträge im CRM des Muster Gebäudeservice."
+    }
+   },
+   "src": "vorschlag",
+   "ks": [
+    "produktblatt-erstellen"
+   ]
+  },
+  {
+   "body": "---\nname: schulung-einladung\ndescription: Einladung mit Ablauf zur Anlageneinweisung formulieren.\n---\n\n# Einladung zur Einweisung\n\n- Angaben klären\n- Entwurf erstellen und zur Freigabe zeigen\n- Ergebnis ablegen und melden\n",
+   "d": "Einladung mit Ablauf zur Anlageneinweisung formulieren.",
+   "g": 8,
+   "id": "schulung-einladung",
+   "ks": [
+    "schulung-einladung"
+   ],
+   "lp": [
+    "Entwurf → Freigabe → Termin aktualisieren, danach zurücklesen",
+    "Keine Einladungen versenden"
+   ],
+   "n": "Einladung zur Einweisung",
+   "ord": 27,
+   "p": "bodo",
+   "seit": "2026-10-15",
+   "src": "plugin"
+  },
+  {
+   "body": "---\nname: schulung-erstpraesentation\ndescription: Unterlagen und Ablauf für einen Beratungstermin vorbereiten.\n---\n\n# Beratungstermin vorbereiten\n\n- Angaben klären\n- Entwurf erstellen und zur Freigabe zeigen\n- Ergebnis ablegen und melden\n",
+   "d": "Unterlagen und Ablauf für einen Beratungstermin vorbereiten.",
+   "g": 8,
+   "id": "schulung-erstpraesentation",
+   "ks": [
+    "schulung-erstpraesentation"
+   ],
+   "lp": [
+    "Präsentation: Konzept → Freigabe → bauen"
+   ],
+   "n": "Beratungstermin vorbereiten",
+   "ord": 25,
+   "p": "bodo",
+   "seit": "2026-10-15",
+   "src": "plugin"
+  },
+  {
+   "body": "---\nname: schulung-nachschlage-handbuch\ndescription: Kurzanleitung mit Bildern für die übergebene Anlage.\n---\n\n# Bedienungsanleitung erstellen\n\n- Angaben klären\n- Entwurf erstellen und zur Freigabe zeigen\n- Ergebnis ablegen und melden\n",
+   "d": "Kurzanleitung mit Bildern für die übergebene Anlage.",
+   "g": 8,
+   "id": "schulung-nachschlage-handbuch",
+   "ks": [
+    "schulung-nachschlage-handbuch"
+   ],
+   "lp": [
+    "Erst ein Muster-Ablauf zur Freigabe, dann der Rest"
+   ],
+   "n": "Bedienungsanleitung erstellen",
+   "ord": 28,
+   "p": "bodo",
+   "seit": "2026-10-15",
+   "src": "plugin"
+  },
+  {
+   "body": "---\nname: schulung-storybook\ndescription: Übergabeprotokoll mit Prüfpunkten und Unterschriften.\n---\n\n# Übergabeprotokoll erstellen\n\n- Angaben klären\n- Entwurf erstellen und zur Freigabe zeigen\n- Ergebnis ablegen und melden\n",
+   "d": "Übergabeprotokoll mit Prüfpunkten und Unterschriften.",
+   "g": 8,
+   "id": "schulung-storybook",
+   "ks": [
+    "schulung-storybook"
+   ],
+   "lp": [],
+   "n": "Übergabeprotokoll erstellen",
+   "ord": 26,
+   "p": "bodo",
+   "seit": "2026-10-15",
+   "src": "plugin"
+  },
+  {
+   "body": "---\nname: schulungsunterlagen-sftp\ndescription: Dokumente für den Kunden im Kundenportal bereitstellen.\n---\n\n# Unterlagen im Kundenportal ablegen\n\n- Angaben klären\n- Entwurf erstellen und zur Freigabe zeigen\n- Ergebnis ablegen und melden\n",
+   "d": "Dokumente für den Kunden im Kundenportal bereitstellen.",
+   "g": 3,
+   "id": "schulungsunterlagen-sftp",
+   "ks": [
+    "schulungsunterlagen-sftp"
+   ],
+   "lp": [
+    "Vor jedem Hochladen Vorschau zeigen und Bestätigung abwarten",
+    ".htaccess im Wurzelverzeichnis nie löschen oder überschreiben",
+    "Je Kunde ein Ordner mit nicht erratbarem Namen; vorher auf Dubletten prüfen",
+    "Löschen nur auf ausdrücklichen Wunsch"
+   ],
+   "n": "Unterlagen im Kundenportal ablegen",
+   "ord": 22,
+   "p": "all",
+   "seit": "2026-10-15",
+   "src": "konto"
+  },
+  {
+   "body": "---\nname: skill-creator\ndescription: Neue Skills erstellen, verbessern und testen.\n---\n\n# Skills bauen & testen\n\n- Angaben klären\n- Entwurf erstellen und zur Freigabe zeigen\n- Ergebnis ablegen und melden\n",
+   "d": "Neue Skills erstellen, verbessern und testen.",
+   "g": 7,
+   "id": "skill-creator",
+   "lp": [],
+   "n": "Skills bauen & testen",
+   "ord": 18,
+   "p": "all",
+   "src": "anthropic",
+   "std": 1,
+   "ks": [
+    "skill-creator"
+   ]
+  },
+  {
+   "body": "---\nname: szenenvideo\ndescription: Kurzes Erklärvideo mit Storyboard, Bildern und Sprecher.\n---\n\n# Erklärvideo produzieren\n\n- Angaben klären\n- Entwurf erstellen und zur Freigabe zeigen\n- Ergebnis ablegen und melden\n",
+   "d": "Kurzes Erklärvideo mit Storyboard, Bildern und Sprecher.",
+   "g": 5,
+   "id": "szenenvideo",
+   "lp": [
+    "Erst Konzept/Storyboard zur Freigabe, dann umsetzen; vorher erklären und Kosten nennen",
+    "Eigene Annahmen, Schätzungen und Textvorschläge immer als solche kennzeichnen",
+    "Werbeaussagen gegen das echte Produkt prüfen; nachgestellte Screens offen benennen",
+    "Charaktere immer über Plus-Symbol → „Zum Prompt hinzufügen“ anhängen"
+   ],
+   "n": "Erklärvideo produzieren",
+   "ord": 9,
+   "p": "multi",
+   "prof": {
+    "bodo": {
+     "from": "szenenvideo",
+     "lp": [
+      "Preisliste Haustechnik verwenden"
+     ],
+     "txt": "Kunden und Projekte im CRM der Muster Haustechnik."
+    },
+    "sellify": {
+     "from": "szenenvideo",
+     "lp": [
+      "Leistungsverzeichnis Gebäudeservice verwenden"
+     ],
+     "txt": "Objekte und Verträge im CRM des Muster Gebäudeservice."
+    }
+   },
+   "src": "vorschlag",
+   "ks": [
+    "szenenvideo"
+   ]
+  },
+  {
+   "body": "---\nname: ticket-anlegen\ndescription: Reklamation mit Beschreibung, Fotos und Dringlichkeit erfassen.\n---\n\n# Reklamation erfassen\n\n- Angaben klären\n- Entwurf erstellen und zur Freigabe zeigen\n- Ergebnis ablegen und melden\n",
+   "d": "Reklamation mit Beschreibung, Fotos und Dringlichkeit erfassen.",
+   "g": 2,
+   "id": "ticket-anlegen",
+   "lp": [
+    "Ist das Zielsystem unklar: vorher nachfragen",
+    "Keine Dubletten anlegen",
+    "Entwurf im Chat; erst nach ausdrücklicher Freigabe anlegen",
+    "Eigene Ergänzungen als solche kennzeichnen"
+   ],
+   "n": "Reklamation erfassen",
+   "ord": 4,
+   "p": "multi",
+   "prof": {
+    "bodo": {
+     "from": "ticket-anlegen",
+     "lp": [
+      "Preisliste Haustechnik verwenden"
+     ],
+     "txt": "Kunden und Projekte im CRM der Muster Haustechnik."
+    },
+    "sellify": {
+     "from": "ticket-anlegen",
+     "lp": [
+      "Leistungsverzeichnis Gebäudeservice verwenden"
+     ],
+     "txt": "Objekte und Verträge im CRM des Muster Gebäudeservice."
+    }
+   },
+   "src": "vorschlag",
+   "ks": [
+    "ticket-anlegen"
+   ]
+  },
+  {
+   "body": "---\nname: xlsx\ndescription: Tabellen lesen, bereinigen, erstellen.\n---\n\n# Excel-Tabelle bearbeiten\n\n- Angaben klären\n- Entwurf erstellen und zur Freigabe zeigen\n- Ergebnis ablegen und melden\n",
+   "d": "Tabellen lesen, bereinigen, erstellen.",
+   "g": 7,
+   "id": "xlsx",
+   "lp": [],
+   "n": "Excel-Tabelle bearbeiten",
+   "ord": 14,
+   "p": "all",
+   "src": "anthropic",
+   "std": 1,
+   "ks": [
+    "xlsx"
+   ]
+  }
+ ],
+ "agents": [
+  {
+   "bsp": [
+    "Herr Schmidt meldet, dass die Heizung nachts ausgeht – nimm das als Reklamation auf."
+   ],
+   "gl": [
+    1,
+    1,
+    0,
+    0,
+    1,
+    0
+   ],
+   "id": "ag-bodo-produkt-tickets",
+   "m": "Sonnet",
+   "mcp": [
+    "CRM"
+   ],
+   "n": "Reklamation & Service",
+   "note": "",
+   "ord": 2,
+   "own": [],
+   "owner": "us-boris-hose",
+   "p": "bodo",
+   "pl": {
+    "og-bodo": {
+     "abt": "ab-produktentwicklung"
+    }
+   },
+   "r": "Nimmt Kundenanliegen und Reklamationen auf und bereitet die Bearbeitung vor.",
+   "s": [
+    "ticket-anlegen",
+    "feature-request-screenshot"
+   ],
+   "vorschlag": false,
+   "w": "Wenn ein Kunde einen Mangel, eine Störung oder einen Wunsch meldet.",
+   "wv": false
+  },
+  {
+   "bsp": [
+    "Mach aus dem Projekt Hofmann einen Referenzbeitrag mit Vorher-nachher-Bildern."
+   ],
+   "gl": [
+    1,
+    0,
+    0,
+    0,
+    0,
+    0
+   ],
+   "id": "ag-bodo-video-studio",
+   "m": "Opus",
+   "mcp": [],
+   "n": "Content-Studio Haustechnik",
+   "note": "",
+   "ord": 6,
+   "own": [],
+   "owner": "us-boris-hose",
+   "p": "bodo",
+   "pl": {
+    "og-bodo": {
+     "abt": "ab-mv8r9tf67byr"
+    }
+   },
+   "r": "Erstellt Referenzbeiträge, Erklärvideos und Social-Media-Posts.",
+   "s": [
+    "szenenvideo"
+   ],
+   "vorschlag": false,
+   "w": "Wenn ein Referenzprojekt, Video oder Beitrag für Webseite und Social Media entstehen soll.",
+   "wv": false
+  },
+  {
+   "bsp": [
+    "Hofmann hat unterschrieben – leg das Projekt an und plane den Montagetermin."
+   ],
+   "gl": [
+    1,
+    1,
+    1,
+    1,
+    0,
+    0
+   ],
+   "id": "ag-onboarding-mieterverein",
+   "m": "Opus",
+   "mcp": [
+    "CRM"
+   ],
+   "n": "Projektstart Haustechnik",
+   "note": "",
+   "ord": 4,
+   "own": [],
+   "owner": "us-boris-hose",
+   "p": "bodo",
+   "pl": {
+    "og-bodo": {
+     "abt": "ab-kundenservice"
+    }
+   },
+   "r": "Startet beauftragte Projekte: Projekt anlegen, Termine planen, Unterlagen vorbereiten.",
+   "s": [
+    "einfuehrung-anlegen",
+    "mandant-einrichten",
+    "kontakt-anlegen"
+   ],
+   "vorschlag": false,
+   "w": "Wenn ein Auftrag erteilt wurde und das Projekt starten soll.",
+   "wv": false
+  },
+  {
+   "bsp": [
+    "Der Vertrag mit der Becker KG startet am 1. Dezember – richte alles ein."
+   ],
+   "gl": [
+    1,
+    1,
+    1,
+    1,
+    0,
+    0
+   ],
+   "id": "ag-onboarding-sellify-kunde",
+   "m": "Opus",
+   "mcp": [
+    "CRM"
+   ],
+   "n": "Vertragsstart Gebäudeservice",
+   "note": "",
+   "ord": 5,
+   "own": [],
+   "owner": "us-boris-hose",
+   "p": "sellify",
+   "pl": {
+    "og-ba": {
+     "abt": "ab-kundenservice-ba"
+    }
+   },
+   "r": "Richtet neue Serviceverträge ein: Objekt, Leistungen, Ansprechpartner.",
+   "s": [
+    "einfuehrung-anlegen",
+    "mandant-einrichten",
+    "kontakt-anlegen"
+   ],
+   "vorschlag": false,
+   "w": "Wenn ein Servicevertrag beginnt und das Objekt eingerichtet werden soll.",
+   "wv": false
+  },
+  {
+   "bsp": [
+    "Bereite die Übergabe der Wärmepumpe bei Familie Hofmann am 05.11. vor."
+   ],
+   "gl": [
+    1,
+    1,
+    1,
+    1,
+    1,
+    0
+   ],
+   "id": "ag-schulungsbegleiter",
+   "m": "Opus",
+   "mcp": [
+    "CRM"
+   ],
+   "n": "Einweisung & Übergabe",
+   "note": "",
+   "ord": 9,
+   "own": [
+    "Unterlagen erst nach Freigabe an den Kunden"
+   ],
+   "owner": "us-boris-hose",
+   "p": "bodo",
+   "pl": {
+    "og-bodo": {
+     "abt": "ab-kundenservice"
+    }
+   },
+   "r": "Bereitet Anlagenübergaben und Kundeneinweisungen mit Unterlagen vor.",
+   "s": [
+    "schulung-erstpraesentation",
+    "schulung-storybook",
+    "schulung-einladung",
+    "schulung-nachschlage-handbuch"
+   ],
+   "seit": "2026-10-15",
+   "vorschlag": false,
+   "w": "Wenn eine Anlage übergeben oder ein Kunde eingewiesen werden soll."
+  },
+  {
+   "bsp": [
+    "Im Objekt Hafenstraße ist die Eingangstür defekt – bitte als Störung erfassen."
+   ],
+   "gl": [
+    1,
+    1,
+    0,
+    0,
+    1,
+    0
+   ],
+   "id": "ag-sellify-produkt-tickets",
+   "m": "Sonnet",
+   "mcp": [
+    "CRM"
+   ],
+   "n": "Störungsannahme Gebäudeservice",
+   "note": "",
+   "ord": 3,
+   "own": [],
+   "owner": "us-boris-hose",
+   "p": "sellify",
+   "pl": {
+    "og-ba": {
+     "abt": "ab-produktentwicklung-ba"
+    }
+   },
+   "r": "Nimmt Störungen aus den Objekten auf und plant den Einsatz.",
+   "s": [
+    "ticket-anlegen",
+    "feature-request-screenshot"
+   ],
+   "vorschlag": false,
+   "w": "Wenn aus einem betreuten Objekt eine Störung oder Beschwerde gemeldet wird.",
+   "wv": false
+  },
+  {
+   "bsp": [
+    "Erstell einen kurzen Beitrag zu unserem Winterdienst."
+   ],
+   "gl": [
+    1,
+    0,
+    0,
+    0,
+    0,
+    0
+   ],
+   "id": "ag-sellify-video-studio",
+   "m": "Opus",
+   "mcp": [],
+   "n": "Content-Studio Gebäudeservice",
+   "note": "",
+   "ord": 7,
+   "own": [],
+   "owner": "us-boris-hose",
+   "p": "sellify",
+   "pl": {
+    "og-ba": {
+     "abt": "ab-marketing-ba"
+    }
+   },
+   "r": "Erstellt Beiträge und kurze Videos zum Serviceangebot.",
+   "s": [
+    "szenenvideo"
+   ],
+   "vorschlag": false,
+   "w": "Wenn ein Beitrag oder Video zum Gebäudeservice entstehen soll.",
+   "wv": false
+  },
+  {
+   "bsp": [
+    "Ich war heute bei Familie Hofmann wegen der neuen Heizung – leg den Kontakt an und bereite ein Angebot vor.",
+    "Schreib eine kurze Begleitmail zum Angebot für die Hofmann Logistik."
+   ],
+   "dep": null,
+   "gl": [
+    1,
+    1,
+    1,
+    1,
+    0,
+    1
+   ],
+   "id": "ag-vertriebsassistent-bodo",
+   "m": "Opus",
+   "mcp": [
+    "CRM"
+   ],
+   "n": "Vertriebsassistent Haustechnik",
+   "note": "Einsatz z. B. nach einem Vor-Ort-Termin: Kontakt anlegen, Angebot erstellen, Begleitmail formulieren.",
+   "ord": 0,
+   "own": [
+    "Angebot und Mail erst gemeinsam zur Freigabe zeigen"
+   ],
+   "owner": "us-boris-hose",
+   "p": "bodo",
+   "pl": {
+    "og-bodo": {
+     "abt": "ab-mv8r9tf67byr"
+    }
+   },
+   "r": "Begleitet Anfragen vom Erstkontakt bis zum Angebot.",
+   "s": [
+    "produktblatt-erstellen",
+    "angebot-erstellen",
+    "email-erstellung",
+    "bodo-storybook",
+    "bodo-aufgaben-uebergabe",
+    "kontakt-anlegen",
+    "avv-vertragssatz",
+    "bodo-aufgabe-schnell"
+   ],
+   "vorschlag": false,
+   "w": "Wenn nach einer Anfrage oder einem Vor-Ort-Termin ein Angebot entstehen soll: Kontakt anlegen, Angebot und Produktblatt erstellen, Begleitmail formulieren.",
+   "wv": false
+  },
+  {
+   "bsp": [
+    "Die Becker KG fragt nach Unterhaltsreinigung für 1.200 m² Büro – mach ein Angebot.",
+    "Fass die Besichtigung von heute als Angebot zusammen."
+   ],
+   "dep": "us-andreas-lemacher",
+   "gl": [
+    1,
+    1,
+    1,
+    1,
+    0,
+    1
+   ],
+   "id": "ag-vertriebsassistent-sellify",
+   "m": "Opus",
+   "mcp": [
+    "CRM"
+   ],
+   "n": "Vertriebsassistent Gebäudeservice",
+   "note": "Gegenstück für den Gebäudeservice.",
+   "ord": 1,
+   "own": [
+    "Angebot und Mail erst gemeinsam zur Freigabe zeigen"
+   ],
+   "owner": "us-boris-hose",
+   "p": "sellify",
+   "pl": {
+    "og-ba": {
+     "abt": "ab-mv8r9tf67byr-ba"
+    }
+   },
+   "r": "Erstellt Angebote für Reinigung und Objektbetreuung.",
+   "s": [
+    "kontakt-anlegen",
+    "produktblatt-erstellen",
+    "angebot-erstellen",
+    "email-erstellung"
+   ],
+   "vorschlag": false,
+   "w": "Wenn eine Anfrage für einen Servicevertrag kommt: Objektdaten aufnehmen, Leistungsverzeichnis und Angebot erstellen.",
+   "wv": false
+  },
+  {
+   "bsp": [
+    "Prüf die neue Leistungsseite auf dem Handy."
+   ],
+   "gl": [
+    1,
+    0,
+    0,
+    0,
+    0,
+    0
+   ],
+   "id": "ag-web-qa",
+   "m": "Sonnet",
+   "mcp": [],
+   "n": "Web-Redaktion",
+   "note": "",
+   "ord": 8,
+   "own": [],
+   "owner": "us-boris-hose",
+   "p": "all",
+   "pl": {
+    "og-ba": {
+     "abt": "ab-marketing-ba"
+    },
+    "og-bodo": {
+     "abt": "ab-marketing"
+    }
+   },
+   "r": "Pflegt die Webseite und prüft sie auf dem Handy.",
+   "s": [
+    "mobil-optimierung",
+    "iphone-vorschau"
+   ],
+   "vorschlag": false,
+   "w": "Wenn Inhalte der Webseite geändert oder auf dem Handy geprüft werden sollen.",
+   "wv": false
+  }
+ ],
+ "flows": [
+  {
+   "E": [
+    {
+     "f": "n90",
+     "l": "",
+     "t": "n91"
+    },
+    {
+     "f": "n91",
+     "l": "",
+     "t": "n92"
+    }
+   ],
+   "N": [
+    {
+     "aid": null,
+     "id": "n90",
+     "label": "Start",
+     "type": "start",
+     "x": 20,
+     "y": 120
+    },
+    {
+     "aid": "ag-vertriebsassistent-bodo",
+     "ho": [
+      1,
+      1,
+      1,
+      1
+     ],
+     "id": "n91",
+     "o": "CRM-Aufgabe mit Link",
+     "sk": "bodo-aufgabe-schnell",
+     "t": "Legt schnell eine einfache Aufgabe im CRM an – ohne Dublettenprüfung, ohne Checkliste.",
+     "type": "task",
+     "x": 110,
+     "y": 108
+    },
+    {
+     "aid": null,
+     "id": "n92",
+     "label": "Ergebnis an dich",
+     "type": "end",
+     "x": 340,
+     "y": 120
+    }
+   ],
+   "goal": "Eine einfache Aufgabe im CRM anlegen – ohne Dublettenprüfung.",
+   "id": "fl-bodo-aufgabe-schnell",
+   "n": "Schnell: Aufgabe anlegen",
+   "nt": {
+    "ev": {
+     "ask": [
+      1,
+      1,
+      0
+     ],
+     "done": [
+      1,
+      1,
+      0
+     ],
+     "err": [
+      1,
+      1,
+      1
+     ],
+     "hold": [
+      1,
+      1,
+      0
+     ]
+    },
+    "mix": 1
+   },
+   "ord": 0,
+   "p": "bodo",
+   "rec": "manuell",
+   "start": "Was soll angelegt werden? (Titel, Kunde, ggf. Fälligkeit/Zuständig)"
+  },
+  {
+   "E": [
+    {
+     "f": "s",
+     "l": "",
+     "t": "t1"
+    },
+    {
+     "f": "t1",
+     "l": "",
+     "t": "d1"
+    },
+    {
+     "f": "d1",
+     "l": "ja",
+     "t": "t2"
+    },
+    {
+     "f": "d1",
+     "l": "nein",
+     "t": "t3"
+    },
+    {
+     "f": "t2",
+     "l": "",
+     "t": "h1"
+    },
+    {
+     "f": "t3",
+     "l": "",
+     "t": "h1"
+    },
+    {
+     "f": "h1",
+     "l": "freigeben",
+     "t": "t4"
+    },
+    {
+     "back": 1,
+     "f": "h1",
+     "l": "ändern",
+     "max": 3,
+     "t": "t3"
+    },
+    {
+     "f": "h1",
+     "l": "verwerfen",
+     "t": "t6"
+    },
+    {
+     "f": "t4",
+     "l": "",
+     "t": "t5"
+    },
+    {
+     "f": "t5",
+     "l": "",
+     "t": "e"
+    },
+    {
+     "f": "t6",
+     "l": "",
+     "t": "e"
+    }
+   ],
+   "N": [
+    {
+     "aid": null,
+     "id": "s",
+     "label": "Kundenwunsch",
+     "type": "start",
+     "x": 20,
+     "y": 200
+    },
+    {
+     "aid": "ag-bodo-produkt-tickets",
+     "ho": [
+      1,
+      1,
+      1,
+      1
+     ],
+     "id": "t1",
+     "o": "Prüfergebnis",
+     "t": "Wunsch verstehen, auf vergleichbare Vorgänge prüfen",
+     "type": "task",
+     "x": 100,
+     "y": 188
+    },
+    {
+     "aid": "ag-bodo-produkt-tickets",
+     "id": "d1",
+     "label": "Vergleichbarer Vorgang gefunden?",
+     "type": "dec",
+     "x": 310,
+     "y": 180
+    },
+    {
+     "aid": "ag-bodo-produkt-tickets",
+     "ho": [
+      1,
+      1,
+      1,
+      1
+     ],
+     "id": "t2",
+     "o": "Entwurf Ergänzung",
+     "t": "Ergänzung zum bestehenden Vorgang entwerfen",
+     "type": "task",
+     "x": 510,
+     "y": 60
+    },
+    {
+     "aid": "ag-bodo-produkt-tickets",
+     "ho": [
+      1,
+      1,
+      1,
+      1
+     ],
+     "id": "t3",
+     "o": "Vorgangs-Entwurf + Bild",
+     "t": "Vorgang mit Foto erstellen",
+     "type": "task",
+     "x": 510,
+     "y": 310
+    },
+    {
+     "aid": null,
+     "id": "h1",
+     "label": "Deine Freigabe?",
+     "type": "human",
+     "x": 740,
+     "y": 180
+    },
+    {
+     "aid": "ag-bodo-produkt-tickets",
+     "ho": [
+      1,
+      1,
+      0,
+      1
+     ],
+     "id": "t4",
+     "o": "Vorgangsnummer",
+     "t": "Vorgang anlegen bzw. Ergänzung eintragen (ohne Zuständigen)",
+     "type": "task",
+     "x": 960,
+     "y": 60
+    },
+    {
+     "aid": "ag-vertriebsassistent-bodo",
+     "ho": [
+      1,
+      1,
+      1,
+      1
+     ],
+     "id": "t5",
+     "o": "Mail-Entwurf",
+     "t": "Kunden per Mail informieren",
+     "type": "task",
+     "x": 1180,
+     "y": 60
+    },
+    {
+     "aid": "ag-vertriebsassistent-bodo",
+     "ho": [
+      1,
+      1,
+      1,
+      1
+     ],
+     "id": "t6",
+     "o": "Mail-Entwurf",
+     "t": "Kunden informieren, dass es nicht umgesetzt wird",
+     "type": "task",
+     "x": 960,
+     "y": 330
+    },
+    {
+     "aid": null,
+     "id": "e",
+     "label": "Erledigt",
+     "type": "end",
+     "x": 1400,
+     "y": 200
+    }
+   ],
+   "goal": "Ein Kundenwunsch wird sauber als Ticket erfasst (oder an ein bestehendes angehängt) und der Kunde informiert.",
+   "id": "fl-kundenwunsch-ticket-rueckmeldung",
+   "n": "Reklamation → Bearbeitung → Rückmeldung",
+   "nt": {
+    "ev": {
+     "ask": [
+      1,
+      1,
+      0
+     ],
+     "done": [
+      1,
+      1,
+      0
+     ],
+     "err": [
+      1,
+      1,
+      1
+     ],
+     "hold": [
+      1,
+      1,
+      0
+     ]
+    },
+    "mix": 1
+   },
+   "ord": 2,
+   "p": "bodo",
+   "rec": "manuell",
+   "start": "Kundenmail oder Notiz, ggf. Screenshot",
+   "vorschlag": true
+  },
+  {
+   "E": [
+    {
+     "f": "n33",
+     "l": "",
+     "t": "n34"
+    },
+    {
+     "f": "n34",
+     "l": "",
+     "t": "n35"
+    }
+   ],
+   "N": [
+    {
+     "aid": null,
+     "id": "n33",
+     "label": "Anfrage",
+     "type": "start",
+     "x": 20,
+     "y": 120
+    },
+    {
+     "aid": null,
+     "free": 1,
+     "ho": [
+      1,
+      1,
+      1,
+      1
+     ],
+     "id": "n34",
+     "o": "Antwort bzw. Ergebnis mit Links",
+     "t": "Anfrage aus der Eingabe direkt erledigen – beantworten, recherchieren oder eine einzelne Aktion ausführen (Freigabe vor Außenwirkung).",
+     "type": "task",
+     "x": 110,
+     "y": 108
+    },
+    {
+     "aid": null,
+     "id": "n35",
+     "label": "Ergebnis an dich",
+     "type": "end",
+     "x": 340,
+     "y": 120
+    }
+   ],
+   "frei": 1,
+   "goal": "Interner Ein-Schritt-Ablauf für freie Aufgaben und Agenten-Aufträge ohne Prozess – wird in „Abläufe“ nicht angezeigt.",
+   "id": "fl-mv8q7nplqsvw",
+   "n": "Freie Aufgabe (Systemablauf)",
+   "nt": {
+    "ev": {
+     "ask": [
+      1,
+      1,
+      0
+     ],
+     "done": [
+      1,
+      1,
+      0
+     ],
+     "err": [
+      1,
+      1,
+      1
+     ],
+     "hold": [
+      1,
+      1,
+      0
+     ]
+    },
+    "mix": 1
+   },
+   "p": "all",
+   "rec": "manuell",
+   "start": "Deine Anfrage"
+  },
+  {
+   "E": [
+    {
+     "f": "n93",
+     "l": "",
+     "t": "n94"
+    },
+    {
+     "f": "n94",
+     "l": "",
+     "t": "n95"
+    }
+   ],
+   "N": [
+    {
+     "aid": null,
+     "id": "n93",
+     "label": "Start",
+     "type": "start",
+     "x": 20,
+     "y": 120
+    },
+    {
+     "aid": "ag-vertriebsassistent-bodo",
+     "ho": [
+      1,
+      1,
+      1,
+      1
+     ],
+     "id": "n94",
+     "o": "",
+     "t": "",
+     "type": "task",
+     "x": 110,
+     "y": 108
+    },
+    {
+     "aid": null,
+     "id": "n95",
+     "label": "Ergebnis an dich",
+     "type": "end",
+     "x": 340,
+     "y": 120
+    }
+   ],
+   "goal": "",
+   "id": "fl-mv8xb58qrsu9",
+   "n": "Kontakt anlegen (Gebäudeservice)",
+   "nt": {
+    "ev": {
+     "ask": [
+      1,
+      1,
+      0
+     ],
+     "done": [
+      1,
+      1,
+      0
+     ],
+     "err": [
+      1,
+      1,
+      1
+     ],
+     "hold": [
+      1,
+      1,
+      0
+     ]
+    },
+    "mix": 1
+   },
+   "p": "bodo",
+   "rec": "manuell",
+   "start": ""
+  },
+  {
+   "E": [
+    {
+     "f": "n23",
+     "l": "",
+     "t": "n24"
+    },
+    {
+     "f": "n24",
+     "l": "",
+     "t": "n25"
+    },
+    {
+     "f": "n25",
+     "l": "",
+     "t": "n26"
+    },
+    {
+     "f": "n26",
+     "l": "",
+     "t": "n27"
+    },
+    {
+     "back": 1,
+     "f": "n27",
+     "l": "ändern",
+     "max": 3,
+     "t": "n26"
+    },
+    {
+     "f": "n27",
+     "l": "freigeben",
+     "t": "n28"
+    }
+   ],
+   "N": [
+    {
+     "aid": null,
+     "id": "n23",
+     "label": "Start",
+     "type": "start",
+     "x": 20,
+     "y": 202
+    },
+    {
+     "aid": "ag-vertriebsassistent-sellify",
+     "ho": [
+      1,
+      1,
+      1,
+      1
+     ],
+     "id": "n24",
+     "o": "Kunde + Ansprechpartner",
+     "t": "Beauftragung im CRM vermerken",
+     "type": "task",
+     "x": 110,
+     "y": 190
+    },
+    {
+     "aid": "ag-onboarding-sellify-kunde",
+     "ho": [
+      1,
+      1,
+      1,
+      1
+     ],
+     "id": "n25",
+     "o": "Projekt + Zeitplan",
+     "t": "Einführungsprojekt anlegen",
+     "type": "task",
+     "x": 330,
+     "y": 190
+    },
+    {
+     "aid": "ag-onboarding-sellify-kunde",
+     "ho": [
+      1,
+      1,
+      1,
+      1
+     ],
+     "id": "n26",
+     "o": "Einrichtungsplan",
+     "t": "Ersteinrichtung vorbereiten",
+     "type": "task",
+     "x": 550,
+     "y": 190
+    },
+    {
+     "aid": null,
+     "id": "n27",
+     "label": "Freigabe: Einrichtungsplan?",
+     "type": "human",
+     "x": 770,
+     "y": 182
+    },
+    {
+     "aid": null,
+     "id": "n28",
+     "label": "Ergebnis an dich",
+     "type": "end",
+     "x": 970,
+     "y": 202
+    }
+   ],
+   "goal": "Nach der Beauftragung startet die sellify-Einführung.",
+   "id": "fl-neukunde-sellify-vom-auftrag-zum-start",
+   "n": "Neuer Servicevertrag: vom Auftrag zum Start",
+   "nt": {
+    "ev": {
+     "ask": [
+      1,
+      1,
+      0
+     ],
+     "done": [
+      1,
+      1,
+      0
+     ],
+     "err": [
+      1,
+      1,
+      1
+     ],
+     "hold": [
+      1,
+      1,
+      0
+     ]
+    },
+    "mix": 1
+   },
+   "ord": 4,
+   "p": "sellify",
+   "rec": "manuell",
+   "start": "Beauftragung, Ansprechpartner",
+   "vorschlag": true
+  },
+  {
+   "E": [
+    {
+     "f": "n8",
+     "l": "",
+     "t": "n9"
+    },
+    {
+     "f": "n9",
+     "l": "",
+     "t": "n10"
+    },
+    {
+     "f": "n10",
+     "l": "",
+     "t": "n11"
+    },
+    {
+     "f": "n11",
+     "l": "",
+     "t": "n12"
+    },
+    {
+     "back": 1,
+     "f": "n12",
+     "l": "ändern",
+     "max": 3,
+     "t": "n11"
+    },
+    {
+     "f": "n12",
+     "l": "",
+     "t": "n13"
+    },
+    {
+     "f": "n13",
+     "l": "",
+     "t": "n14"
+    },
+    {
+     "back": 1,
+     "f": "n14",
+     "l": "ändern",
+     "max": 3,
+     "t": "n13"
+    },
+    {
+     "f": "n14",
+     "l": "freigeben",
+     "t": "n15"
+    }
+   ],
+   "N": [
+    {
+     "aid": null,
+     "id": "n8",
+     "label": "Start",
+     "type": "start",
+     "x": 20,
+     "y": 202
+    },
+    {
+     "aid": "ag-vertriebsassistent-bodo",
+     "ho": [
+      1,
+      1,
+      1,
+      1
+     ],
+     "id": "n9",
+     "o": "Kunde + Ansprechpartner",
+     "t": "Beauftragung im CRM vermerken, Kontakte prüfen",
+     "type": "task",
+     "x": 100,
+     "y": 350
+    },
+    {
+     "aid": "ag-onboarding-mieterverein",
+     "ho": [
+      1,
+      1,
+      1,
+      1
+     ],
+     "id": "n10",
+     "o": "Projekt + Zeitplan",
+     "t": "Einführungsprojekt anlegen",
+     "type": "task",
+     "x": 380,
+     "y": 350
+    },
+    {
+     "aid": "ag-onboarding-mieterverein",
+     "ho": [
+      1,
+      1,
+      1,
+      1
+     ],
+     "id": "n11",
+     "o": "Einrichtungsplan",
+     "t": "Ersteinrichtung vorbereiten",
+     "type": "task",
+     "x": 620,
+     "y": 350
+    },
+    {
+     "aid": null,
+     "id": "n12",
+     "label": "Freigabe: Einrichtungsplan?",
+     "type": "human",
+     "x": 770,
+     "y": 182
+    },
+    {
+     "aid": "ag-vertriebsassistent-bodo",
+     "ho": [
+      1,
+      1,
+      1,
+      1
+     ],
+     "id": "n13",
+     "o": "Mail-Entwurf",
+     "t": "Willkommensmail an den Kunden",
+     "type": "task",
+     "x": 970,
+     "y": 190
+    },
+    {
+     "aid": null,
+     "id": "n14",
+     "label": "Freigabe: Mail-Entwurf?",
+     "type": "human",
+     "x": 1190,
+     "y": 182
+    },
+    {
+     "aid": null,
+     "id": "n15",
+     "label": "Ergebnis an dich",
+     "type": "end",
+     "x": 1390,
+     "y": 202
+    }
+   ],
+   "goal": "Nach der Beauftragung läuft die Einführung ohne Lücke an.",
+   "id": "fl-neukunde-vom-auftrag-zum-start",
+   "n": "Neues Projekt: vom Auftrag zum Start",
+   "nt": {
+    "ev": {
+     "ask": [
+      1,
+      1,
+      0
+     ],
+     "done": [
+      1,
+      1,
+      0
+     ],
+     "err": [
+      1,
+      1,
+      1
+     ],
+     "hold": [
+      1,
+      1,
+      0
+     ]
+    },
+    "mix": 1
+   },
+   "ord": 1,
+   "p": "bodo",
+   "rec": "manuell",
+   "start": "Beauftragung (Mail/PDF), Ansprechpartner",
+   "vorschlag": true
+  },
+  {
+   "E": [
+    {
+     "f": "n16",
+     "l": "",
+     "t": "n17"
+    },
+    {
+     "f": "n17",
+     "l": "",
+     "t": "n18"
+    },
+    {
+     "f": "n18",
+     "l": "",
+     "t": "n19"
+    },
+    {
+     "back": 1,
+     "f": "n19",
+     "l": "ändern",
+     "max": 3,
+     "t": "n18"
+    },
+    {
+     "f": "n19",
+     "l": "",
+     "t": "n20"
+    },
+    {
+     "f": "n20",
+     "l": "",
+     "t": "n21"
+    },
+    {
+     "back": 1,
+     "f": "n21",
+     "l": "ändern",
+     "max": 3,
+     "t": "n20"
+    },
+    {
+     "f": "n21",
+     "l": "freigeben",
+     "t": "n22"
+    }
+   ],
+   "N": [
+    {
+     "aid": null,
+     "id": "n16",
+     "label": "Start",
+     "type": "start",
+     "x": 20,
+     "y": 202
+    },
+    {
+     "aid": "ag-vertriebsassistent-sellify",
+     "ho": [
+      1,
+      1,
+      1,
+      1
+     ],
+     "id": "n17",
+     "o": "Kontakt-Datensatz",
+     "t": "Kontakt anlegen, Dubletten prüfen",
+     "type": "task",
+     "x": 110,
+     "y": 190
+    },
+    {
+     "aid": "ag-vertriebsassistent-sellify",
+     "ho": [
+      1,
+      1,
+      1,
+      1
+     ],
+     "id": "n18",
+     "o": "Angebot + Produktblatt",
+     "t": "Produktblatt und Angebot erstellen",
+     "type": "task",
+     "x": 330,
+     "y": 190
+    },
+    {
+     "aid": null,
+     "id": "n19",
+     "label": "Freigabe: Angebot + Produktblatt?",
+     "type": "human",
+     "x": 550,
+     "y": 182
+    },
+    {
+     "aid": "ag-vertriebsassistent-sellify",
+     "ho": [
+      1,
+      1,
+      1,
+      1
+     ],
+     "id": "n20",
+     "o": "Mail-Entwurf",
+     "t": "Begleitmail formulieren",
+     "type": "task",
+     "x": 750,
+     "y": 190
+    },
+    {
+     "aid": null,
+     "id": "n21",
+     "label": "Freigabe: Mail-Entwurf?",
+     "type": "human",
+     "x": 970,
+     "y": 182
+    },
+    {
+     "aid": null,
+     "id": "n22",
+     "label": "Ergebnis an dich",
+     "type": "end",
+     "x": 1170,
+     "y": 202
+    }
+   ],
+   "goal": "Aus einem Erstgespräch wird ein versandfertiges sellify-Angebot.",
+   "id": "fl-vom-erstgespraech-zum-angebot-sellify",
+   "n": "Von der Besichtigung zum Angebot",
+   "nt": {
+    "ev": {
+     "ask": [
+      1,
+      1,
+      0
+     ],
+     "done": [
+      1,
+      1,
+      0
+     ],
+     "err": [
+      1,
+      1,
+      1
+     ],
+     "hold": [
+      1,
+      1,
+      0
+     ]
+    },
+    "mix": 1
+   },
+   "ord": 3,
+   "p": "sellify",
+   "rec": "manuell",
+   "start": "Gesprächsnotizen, Firma und Ansprechpartner",
+   "vorschlag": true
+  },
+  {
+   "E": [
+    {
+     "f": "n1",
+     "l": "",
+     "t": "n2"
+    },
+    {
+     "f": "n2",
+     "l": "",
+     "t": "n3"
+    },
+    {
+     "f": "n3",
+     "l": "",
+     "t": "n4"
+    },
+    {
+     "back": 1,
+     "f": "n4",
+     "l": "ändern",
+     "max": 3,
+     "t": "n3"
+    },
+    {
+     "f": "n4",
+     "l": "",
+     "t": "n5"
+    },
+    {
+     "f": "n5",
+     "l": "",
+     "t": "n6"
+    },
+    {
+     "back": 1,
+     "f": "n6",
+     "l": "ändern",
+     "max": 3,
+     "t": "n5"
+    },
+    {
+     "f": "n6",
+     "l": "freigeben",
+     "t": "n7"
+    }
+   ],
+   "N": [
+    {
+     "aid": null,
+     "id": "n1",
+     "label": "Start",
+     "type": "start",
+     "x": 20,
+     "y": 202
+    },
+    {
+     "aid": "ag-vertriebsassistent-bodo",
+     "ho": [
+      1,
+      1,
+      1,
+      1
+     ],
+     "id": "n2",
+     "o": "Kontakt-Datensatz",
+     "t": "Kontakt (Person + Organisation) anlegen, Dubletten prüfen",
+     "type": "task",
+     "x": 110,
+     "y": 190
+    },
+    {
+     "aid": "ag-vertriebsassistent-bodo",
+     "ho": [
+      1,
+      1,
+      1,
+      1
+     ],
+     "id": "n3",
+     "o": "Angebot + Produktblatt",
+     "t": "Produktblatt und Angebot erstellen",
+     "type": "task",
+     "x": 330,
+     "y": 190
+    },
+    {
+     "aid": null,
+     "id": "n4",
+     "label": "Freigabe: Angebot + Produktblatt?",
+     "type": "human",
+     "x": 550,
+     "y": 182
+    },
+    {
+     "aid": "ag-vertriebsassistent-bodo",
+     "ho": [
+      1,
+      1,
+      1,
+      1
+     ],
+     "id": "n5",
+     "o": "Mail-Entwurf",
+     "t": "Begleitmail formulieren",
+     "type": "task",
+     "x": 750,
+     "y": 190
+    },
+    {
+     "aid": null,
+     "id": "n6",
+     "label": "Freigabe: Mail-Entwurf?",
+     "type": "human",
+     "x": 970,
+     "y": 182
+    },
+    {
+     "aid": null,
+     "id": "n7",
+     "label": "Ergebnis an dich",
+     "type": "end",
+     "x": 1170,
+     "y": 202
+    }
+   ],
+   "goal": "Aus einem Erstgespräch wird ein versandfertiges Angebot mit Begleitmail.",
+   "id": "fl-vom-erstgespraech-zum-angebot",
+   "n": "Vom Erstgespräch zum Angebot",
+   "nt": {
+    "ev": {
+     "ask": [
+      1,
+      1,
+      0
+     ],
+     "done": [
+      1,
+      1,
+      0
+     ],
+     "err": [
+      1,
+      1,
+      1
+     ],
+     "hold": [
+      1,
+      1,
+      0
+     ]
+    },
+    "mix": 1
+   },
+   "ord": 0,
+   "p": "bodo",
+   "rec": "manuell",
+   "start": "Gesprächsnotizen, Name von Firma und Ansprechpartner",
+   "vorschlag": true
+  },
+  {
+   "E": [
+    {
+     "f": "n29",
+     "l": "",
+     "t": "n30"
+    },
+    {
+     "f": "n30",
+     "l": "",
+     "t": "n31"
+    },
+    {
+     "f": "n31",
+     "l": "",
+     "t": "n32"
+    }
+   ],
+   "N": [
+    {
+     "aid": null,
+     "id": "n29",
+     "label": "Start",
+     "type": "start",
+     "x": 20,
+     "y": 202
+    },
+    {
+     "aid": "ag-web-qa",
+     "ho": [
+      1,
+      1,
+      1,
+      1
+     ],
+     "id": "n30",
+     "o": "Korrigierte Seite + Fehlerliste",
+     "t": "Mobil prüfen und Fehler beheben",
+     "type": "task",
+     "x": 110,
+     "y": 190
+    },
+    {
+     "aid": "ag-web-qa",
+     "ho": [
+      1,
+      1,
+      1,
+      1
+     ],
+     "id": "n31",
+     "o": "Vorschau-Seite",
+     "t": "iPhone-Vorschau erstellen",
+     "type": "task",
+     "x": 330,
+     "y": 190
+    },
+    {
+     "aid": null,
+     "id": "n32",
+     "label": "Ergebnis an dich",
+     "type": "end",
+     "x": 550,
+     "y": 202
+    }
+   ],
+   "goal": "Eine Webseite ist mobil fehlerfrei und als iPhone-Vorschau vorführbar.",
+   "id": "fl-webseite-pruefen-und-vorfuehren",
+   "n": "Webseite prüfen und vorführen",
+   "nt": {
+    "ev": {
+     "ask": [
+      1,
+      1,
+      0
+     ],
+     "done": [
+      1,
+      1,
+      0
+     ],
+     "err": [
+      1,
+      1,
+      1
+     ],
+     "hold": [
+      1,
+      1,
+      0
+     ]
+    },
+    "mix": 1
+   },
+   "ord": 5,
+   "p": "all",
+   "rec": "manuell",
+   "start": "Link oder HTML-Datei",
+   "vorschlag": true
+  }
+ ],
+ "users": [
+  {
+   "aktiv": true,
+   "id": "us-andreas-lemacher",
+   "kz": "AB",
+   "mail": "anna.becker@muster-haustechnik.example",
+   "maps": [],
+   "n": "Anna Becker",
+   "ord": 2,
+   "orgs": [
+    "og-bodo"
+   ],
+   "rolle": "Vertriebsinnendienst"
+  },
+  {
+   "aktiv": true,
+   "id": "us-boris-hose",
+   "kz": "BH",
+   "mail": "boris.hose@muster-haustechnik.example",
+   "maps": [],
+   "n": "Boris Hose",
+   "ord": 0,
+   "orgs": [
+    "og-bodo",
+    "og-ba"
+   ],
+   "rolle": "Geschäftsführung"
+  },
+  {
+   "aktiv": false,
+   "id": "us-dominik-koppe",
+   "kz": "JR",
+   "mail": "jonas.richter@muster-haustechnik.example",
+   "maps": [],
+   "n": "Jonas Richter",
+   "ord": 1,
+   "orgs": [
+    "og-bodo",
+    "og-ba"
+   ],
+   "rolle": "Projektleitung"
+  },
+  {
+   "aktiv": false,
+   "id": "us-zainab-marji",
+   "kz": "LW",
+   "mail": "lea.wagner@muster-haustechnik.example",
+   "maps": [],
+   "n": "Lea Wagner",
+   "ord": 3,
+   "orgs": [
+    "og-bodo"
+   ],
+   "rolle": "Kundenservice"
+  }
+ ],
+ "depts": [
+  {
+   "id": "ab-kundenservice-ba",
+   "n": "Objekte & Kundenservice",
+   "ord": 1,
+   "org": "og-ba"
+  },
+  {
+   "id": "ab-kundenservice",
+   "n": "Projekte & Kundenservice",
+   "ord": 1,
+   "org": "og-bodo"
+  },
+  {
+   "id": "ab-marketing-ba",
+   "n": "Marketing",
+   "ord": 3,
+   "org": "og-ba"
+  },
+  {
+   "id": "ab-marketing",
+   "n": "Marketing",
+   "ord": 3,
+   "org": "og-bodo"
+  },
+  {
+   "id": "ab-mv8r9tf67byr-ba",
+   "n": "Vertrieb",
+   "ord": 0,
+   "org": "og-ba"
+  },
+  {
+   "id": "ab-mv8r9tf67byr",
+   "n": "Vertrieb",
+   "ord": 0,
+   "org": "og-bodo"
+  },
+  {
+   "id": "ab-produktentwicklung-ba",
+   "n": "Störungsannahme",
+   "ord": 2,
+   "org": "og-ba"
+  },
+  {
+   "id": "ab-produktentwicklung",
+   "n": "Service & Reklamation",
+   "ord": 2,
+   "org": "og-bodo"
+  }
+ ],
+ "jobs": [
+  {
+   "id": "A-201",
+   "t": "Angebot Hofmann Logistik",
+   "art": "ablauf",
+   "org": "og-bodo",
+   "fid": "fl-vom-erstgespraech-zum-angebot",
+   "path": [
+    "n1",
+    "n2",
+    "n3",
+    "n4"
+   ],
+   "st": "wait",
+   "ki": 1,
+   "tempo": "gruendlich",
+   "log": [
+    [
+     "15.10. 09:22",
+     "KI-Auftrag angelegt von Boris"
+    ],
+    [
+     "15.10. 09:23",
+     "Claude-Sitzung gestartet"
+    ],
+    [
+     "15.10. 09:25",
+     "Kontakt angelegt"
+    ],
+    [
+     "15.10. 09:31",
+     "Produktblatt erstellt"
+    ],
+    [
+     "15.10. 09:34",
+     "Angebot erstellt"
+    ],
+    [
+     "15.10. 09:34",
+     "Freigabe: Angebot + Produktblatt",
+     1
+    ]
+   ],
+   "q": {
+    "kind": "Freigabe",
+    "from": "Vertriebsassistent Haustechnik",
+    "text": "Angebot Hofmann Logistik, Wärmepumpe für Halle 2, Start 01.2027\nMontage, Inbetriebnahme und Wartung als Pakete\nProduktblatt im Hausstil liegt bei",
+    "why": "Angebot geht an einen Kunden – bitte prüfen.",
+    "opts": [
+     "Freigabe: so verschicken",
+     "Abbrechen"
+    ]
+   },
+   "erg": [
+    {
+     "t": "Angebot (PDF)",
+     "url": "https://crm.muster-haustechnik.example/vorgaenge/4711",
+     "art": "Entwurf Angebot",
+     "vorschau": "Hofmann Logistik · Wärmepumpe Halle 2"
+    },
+    {
+     "t": "Produktblatt (PDF)",
+     "url": "https://crm.muster-haustechnik.example/vorgaenge/4711",
+     "art": "Entwurf"
+    }
+   ],
+   "in": "Erstgespräch mit Hofmann Logistik war gut: neue Heizung für die Halle, Start im Januar. Bitte Kontakt anlegen und Angebot vorbereiten."
+  },
+  {
+   "id": "A-202",
+   "t": "Kontakt Müller GmbH",
+   "art": "frei",
+   "org": "og-bodo",
+   "sk": "kontakt-anlegen",
+   "fid": "fl-mv8q7nplqsvw",
+   "path": [
+    "n33",
+    "n34"
+   ],
+   "st": "run",
+   "ki": 1,
+   "tempo": "schnell",
+   "vorab": 1,
+   "log": [
+    [
+     "15.10. 09:37",
+     "KI-Auftrag angelegt von Boris – freie Aufgabe"
+    ],
+    [
+     "15.10. 09:38",
+     "Claude-Sitzung gestartet"
+    ],
+    [
+     "15.10. 09:39",
+     "Dubletten geprüft – keine"
+    ],
+    [
+     "15.10. 09:40",
+     "Firmendaten recherchiert"
+    ]
+   ],
+   "in": "Neuer Interessent: Müller GmbH, Ansprechpartnerin Anna Müller, Telefon steht in der Signatur. Bitte im CRM anlegen."
+  },
+  {
+   "id": "A-203",
+   "t": "Reklamation Heizung Schmidt",
+   "art": "agent",
+   "aid": "ag-bodo-produkt-tickets",
+   "org": "og-bodo",
+   "fid": "fl-mv8q7nplqsvw",
+   "path": [
+    "n33",
+    "n34"
+   ],
+   "st": "run",
+   "ki": 1,
+   "tempo": "gruendlich",
+   "anh": [
+    {
+     "aid": "an1",
+     "name": "Screenshot 1",
+     "w": 1200,
+     "h": 800,
+     "n": 1,
+     "kb": 80
+    }
+   ],
+   "log": [
+    [
+     "15.10. 09:35",
+     "KI-Auftrag angelegt von Boris – an Reklamation & Service"
+    ],
+    [
+     "15.10. 09:36",
+     "Claude-Sitzung gestartet"
+    ],
+    [
+     "15.10. 09:38",
+     "Foto ausgewertet"
+    ],
+    [
+     "15.10. 09:39",
+     "Wartungshistorie geprüft"
+    ]
+   ],
+   "in": "Herr Schmidt meldet, dass die Heizung nachts ausgeht. Bitte als Reklamation aufnehmen, Foto anbei."
+  },
+  {
+   "id": "A-198",
+   "t": "Rückruf Herr Schmidt",
+   "art": "frei",
+   "org": "og-bodo",
+   "sk": "bodo-aufgabe-schnell",
+   "fid": "fl-mv8q7nplqsvw",
+   "path": [
+    "n33",
+    "n34",
+    "n35"
+   ],
+   "st": "done",
+   "ok": "ja",
+   "ki": 1,
+   "tempo": "schnell",
+   "vorab": 1,
+   "fertig": "2026-10-15T08:48:00+02:00",
+   "log": [
+    [
+     "15.10. 08:45",
+     "KI-Auftrag angelegt von Boris"
+    ],
+    [
+     "15.10. 08:46",
+     "Claude-Sitzung gestartet"
+    ],
+    [
+     "15.10. 08:47",
+     "Aufgabe angelegt"
+    ],
+    [
+     "15.10. 08:48",
+     "Auftrag fertig",
+     1
+    ]
+   ],
+   "sum": "Aufgabe „Rückruf Herr Schmidt“ im CRM angelegt, fällig morgen 10:00 Uhr.",
+   "erg": [
+    {
+     "t": "CRM-Aufgabe Rückruf Herr Schmidt",
+     "url": "https://crm.muster-haustechnik.example/vorgaenge/4711"
+    }
+   ],
+   "in": "Erinnere mich morgen um 10 Uhr an den Rückruf bei Herrn Schmidt."
+  },
+  {
+   "id": "A-197",
+   "t": "Begleitmail Angebot Hofmann",
+   "art": "agent",
+   "aid": "ag-vertriebsassistent-bodo",
+   "org": "og-bodo",
+   "sk": "email-erstellung",
+   "fid": "fl-mv8q7nplqsvw",
+   "path": [
+    "n33",
+    "n34",
+    "n35"
+   ],
+   "st": "done",
+   "ok": "ja",
+   "ki": 1,
+   "tempo": "schnell",
+   "fertig": "2026-10-15T08:05:00+02:00",
+   "log": [
+    [
+     "15.10. 07:50",
+     "KI-Auftrag angelegt von Boris"
+    ],
+    [
+     "15.10. 07:52",
+     "Claude-Sitzung gestartet"
+    ],
+    [
+     "15.10. 07:56",
+     "Mail-Entwurf erstellt"
+    ],
+    [
+     "15.10. 08:00",
+     "Boris: Freigabe: so senden",
+     1
+    ],
+    [
+     "15.10. 08:04",
+     "Mail versendet"
+    ],
+    [
+     "15.10. 08:05",
+     "Auftrag fertig",
+     1
+    ]
+   ],
+   "sum": "Begleitmail an Hofmann Logistik nach deiner Freigabe versendet.",
+   "erg": [
+    {
+     "t": "E-Mail im CRM-Postfach",
+     "url": "https://crm.muster-haustechnik.example/vorgaenge/4711"
+    }
+   ],
+   "in": "Schreib eine kurze Begleitmail zum Angebot für Hofmann Logistik."
+  }
+ ]
+}

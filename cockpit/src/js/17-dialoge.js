@@ -1,0 +1,9 @@
+// ===== Dialoge (alert/confirm/prompt gibt es im Artefakt nicht) =====
+function dlg(html){return new Promise(res=>{const d=document.createElement("div");d.id="dlg";d.innerHTML=`<div class="modal" style="z-index:40"><div class="box">${html}</div></div>`;document.body.appendChild(d);
+  const done=v=>{d.remove();res(v)};d.querySelector("[data-no]").onclick=()=>done(null);d.querySelector("[data-yes]").onclick=()=>{const i=d.querySelector("input");done(i?i.value.trim():true)};
+  const i=d.querySelector("input");if(i){i.focus();i.select();i.onkeydown=e=>{if(e.key==="Enter")done(i.value.trim());if(e.key==="Escape")done(null)}}})}
+const askText=(t,v)=>dlg(`<h3 style="margin:0 0 10px;font-size:15px">${esc(t)}</h3><input type="text" id="dlgin" value="${esc(v||"")}"><div class="btns" style="margin-top:12px;justify-content:flex-end"><button class="btn" data-no>Abbrechen</button><button class="btn p" data-yes>OK</button></div>`);
+const askOk=(t,l)=>dlg(`<p style="margin:0 0 12px">${esc(t)}</p><div class="btns" style="justify-content:flex-end"><button class="btn" data-no>Abbrechen</button><button class="btn d" data-yes>${esc(l||"Ja, löschen")}</button></div>`).then(v=>!!v);
+async function copyText(t,msg){try{await navigator.clipboard.writeText(t);toast(msg)}catch(e){const p=$("#pv");if(p){p.closest("details").open=true;const r=document.createRange();r.selectNodeContents(p);const s=getSelection();s.removeAllRanges();s.addRange(r)}toast("Kopieren nicht möglich – Text ist markiert")}}
+const now=()=>{const d=new Date();return d.toLocaleDateString("de-DE",{day:"2-digit",month:"2-digit"})+" "+d.toLocaleTimeString("de-DE",{hour:"2-digit",minute:"2-digit"})};
+const uid=p=>p+"-"+Date.now().toString(36)+Math.random().toString(36).slice(2,6);

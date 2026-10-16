@@ -1,0 +1,54 @@
+</style>
+<header>
+  <h1>My Company OS</h1><span class="tag" id="save">Lädt …</span>
+  <button id="kifab" title="Neuer KI-Auftrag – von überall aus"><b>✦</b><small>KI</small><span class="n" style="display:none" title="Aufträge warten auf dich"></span></button><nav><button data-v="org" class="on">Organigramm</button><button data-v="jobs">KI-Aufträge<span class="cnt" id="wcnt"></span></button><button data-v="flows">Abläufe</button><button data-v="matrix">Matrix</button><button data-v="build">Agenten</button><button data-v="skills">Skills</button><button data-v="users">Benutzer</button></nav>
+</header>
+
+<main id="build" class="nolib">
+  <section class="panel" id="apanel">
+    <h2 style="justify-content:space-between">Agenten <span id="abted"></span></h2><div class="seg" id="aseg" style="margin-top:0"></div><div id="alist"></div><button class="btn" id="newA" style="width:100%">+ Neuer Agent</button>
+    <div class="hint">✎ am Agenten = Grunddaten bearbeiten · Abteilungen anlegen und Agenten hineinziehen: „✎ Abteilungen“</div>
+  </section>
+  <div class="split" id="split0" role="separator" aria-orientation="vertical" tabindex="0" title="Ziehen = Breite der Agentenliste ändern · Doppelklick = zurücksetzen · Pfeiltasten = feinjustieren"></div>
+  <section class="panel" id="epanel"><div id="editor"></div></section>
+</main>
+<main id="skills" class="hide" style="grid-template-columns:minmax(0,1.25fr) minmax(320px,1fr)">
+  <section class="panel" id="libp">
+    <h2 style="justify-content:space-between">Skills <span id="libed"></span></h2><div class="libact"><span class="syncline" id="syncline"></span><button class="btn sm" id="sknew" title="Neuen Skill als Entwurf anlegen – Claude legt ihn beim Abgleich als echten Skill an">+ Entwurf</button><button class="btn sm" id="sksync" title="Abgleich mit den echten Skills und Agenten im Konto">⟳ Abgleich</button></div>
+    <div class="libtop"><input type="search" id="q" placeholder="🔍 Skill suchen (Name, Beschreibung, Gruppe, Konto-Name) …"><button class="btn edonlylib" id="newG" title="Neue Gruppe anlegen">+ Gruppe</button></div>
+    <div class="skf"><span>Organisation</span><div class="seg" id="seg"></div></div>
+    <div class="skf"><span>Herkunft</span><div class="seg fseg" id="srcf"></div></div>
+    <div class="skf"><span>Verwendung</span><div class="seg fseg" id="afil"></div></div>
+    <div style="display:none"><input type="checkbox" id="gen"><input type="checkbox" id="follow" checked><div id="libag"></div></div>
+    <div class="libtools"><button id="colAll">Alle zuklappen</button><button id="expAll">Alle aufklappen</button></div>
+    <div id="lib"></div>
+    <div class="hint" style="margin-top:10px">Skill antippen = Details rechts · ⚙ = bearbeiten · Gruppen ordnen und umbenennen: „✎ Gruppen ordnen“ · Skills einem Agenten zuordnen: im Agenten unter „Skills“ → „+ Skills hinzufügen …“<br>Herkunft: <span class="srcb konto">Konto</span> echter Skill in deinem Konto · <span class="srcb plugin">Plugin</span> aus einem installierten Plugin · <span class="srcb anthropic">Anthropic</span> Standard-Skill · <span class="srcb vorschlag">Vorschlag</span> / <span class="srcb entwurf">Entwurf</span> nur im Cockpit</div>
+  </section>
+  <section class="panel" id="skdet"></section>
+</main>
+<main id="matrix" class="hide" style="grid-template-columns:1fr">
+  <section class="panel"><h2>Welcher Agent nutzt welchen Skill? <span class="mark" id="mf"></span> <span id="mxed" style="margin-left:auto"></span></h2><div id="mtx" style="overflow:auto"></div>
+  <p class="hint">Orange Zähler = Skill wird von keinem Agenten genutzt. Die Matrix zeigt immer alle Skills des gewählten Bereichs.</p></section>
+</main>
+<main id="flows" class="hide" style="grid-template-columns:260px minmax(0,1fr)">
+  <section class="panel"><h2>Abläufe</h2><div class="seg" id="fseg" style="margin-top:0"></div><div id="flist"></div><button class="btn" id="newF" style="width:100%">+ Neuer Ablauf</button>
+  <div class="hint">Ein Ablauf ist eine Vorlage als Prozessdiagramm: Agenten-Schritte, Entscheidungen (durch Agent oder dich) und Rücksprünge.</div></section>
+  <section class="panel" id="fedit"></section>
+</main>
+<main id="jobs" class="hide" style="grid-template-columns:1fr">
+  <section class="panel"><h2 style="justify-content:space-between"><span>KI-Aufträge <span id="exjobs"></span></span><button class="btn p" id="newJ" style="text-transform:none;letter-spacing:0">+ KI-Auftrag</button></h2><div class="kirun" id="kirun"></div><div class="kfilt" id="kfilt"></div><div class="kb" id="kb"></div>
+  <div class="hint" style="margin-top:8px">Auftrag antippen = Ergebnis mit Rückfrage/Freigabe; „Details …“ zeigt Verlauf, Ablauf und Sitzungen. Neue Aufträge legst du oben mit „+ KI-Auftrag“ an.</div></section>
+</main>
+<main id="org" class="hide" style="grid-template-columns:1fr">
+  <section class="panel"><h2 style="justify-content:space-between">Organigramm <span id="orged"></span></h2>
+   <div class="orgbar"><div class="oorg" id="oseg"></div><span class="hint" id="ohint" style="margin:0"></span><label class="cb" style="margin:0"><input type="checkbox" id="oskills" checked> Skills zeigen</label></div>
+   <div id="orgv"></div></section>
+</main>
+<main id="users" class="hide" style="grid-template-columns:300px minmax(0,1fr)">
+  <section class="panel"><h2>Benutzer</h2><div class="opts" style="margin-bottom:8px"><label><input type="checkbox" id="uold"> Ausgeschiedene zeigen</label></div><div id="ulist"></div><button class="btn p" id="newU" style="width:100%">+ Neuer Benutzer …</button><button class="btn sm" id="ownOrgs" style="width:100%;margin-top:6px">⚙ Eigene Bodo-Mandanten</button>
+  <div class="hint">Menschen, die in My Company OS handeln – z. B. als Verantwortliche für Agenten. Je Benutzer lässt sich hinterlegen, wer er in Bodo, sellify oder anderen Systemen ist.</div></section>
+  <section class="panel" id="uedit"></section>
+</main>
+<div id="modal"></div>
+
+<script>
