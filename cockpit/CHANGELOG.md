@@ -1,5 +1,14 @@
 # Änderungen – Cockpit
 
+## 53 · 16.10.2026 · Etappe 2 „Sammeln und Eingang“
+- Organigramm je Abteilung: „📥 n“ (Eingang) und „+ Sammeln“ neben „▶ Abteilung beauftragen“ und „🕘 Verlauf“.
+- Fenster „📥 Aufgabe sammeln“: Abteilung, Zuweisung („✦ KI-Teamleiter wählt“ oder ein Agent der Abteilung), Priorität (Dringend · Hoch · Normal · Niedrig), fällig bis, Anhänge, Tempo; Knöpfe „📥 Sammeln“ und „▶ Sammeln & sofort starten“.
+- Gesammelte Aufträge haben den Zustand `inbox` (mit `prio`, `due`, `gesammelt`) und starten keine Claude-Sitzung.
+- Eingang im Dialog „Aufträge & Verlauf“ (Offen → 📥 Gesammelt): sortiert nach Priorität, darin Fälligkeit, umschaltbar; „▶ Starten“ je Zeile, Auswahl und „Ausgewählte starten“; „✕“ verwirft (bleibt als abgebrochen im Verlauf).
+- KI-Aufträge-Seite: Knopf „📥 n gesammelt“. Priorität und Fälligkeit gehen in den Kontext für Claude.
+- „🕘 Aufträge & Verlauf“ oben öffnet immer alle Abteilungen; „📥“ und „🕘 Verlauf“ an der Abteilung wählen diese vor.
+- Smoke-Test: 54 Prüfungen.
+
 ## 52 · 16.10.2026 · Abteilung beauftragen (Entscheidung Boris: vorgezogen)
 - Organigramm: „▶ Abteilung beauftragen“ an jeder Abteilung als Hauptweg; ▶ am einzelnen Agenten bleibt, aber dezent.
 - „Neuer KI-Auftrag“: neue Art „Abteilung beauftragen“ mit Abteilungswahl; zeigt, aus welchen Agenten der KI-Teamleiter wählt.

@@ -14,9 +14,10 @@ let AVOPEN=false,AVN=50,AVARCH=null,AVLOAD=false;
 function AVS(){const s=UI.av=UI.av||{};s.tab=s.tab||"offen";s.st=s.st||"alle";s.zeit=s.zeit||"heute";s.sel=s.sel||{};if(!orgById(s.org))s.org=OC||(ORGS()[0]||{}).id;return s}
 function avSel(o){const s=AVS();if(!s.sel[o])s.sel[o]={d:null,ax:[]};return s.sel[o]}
 function avOpen(opt){opt=opt||{};const s=AVS();if(opt.org)s.org=opt.org;const S=avSel(s.org);
+  if(opt.all){S.d=null;S.ax=[]}
   if(opt.d){S.d=[...opt.d];S.ax=[]}
   if(opt.only){S.d=[PL(opt.only,s.org).abt||"_none"];S.ax=AG.filter(x=>x.id!==opt.only.id).map(x=>x.id).concat(["_frei","_tl"])}
-  if(opt.tab)s.tab=opt.tab;AVN=50;saveUI();AVOPEN=true;avRender()}
+  if(opt.tab)s.tab=opt.tab;if(opt.st)s.st=opt.st;AVN=50;saveUI();AVOPEN=true;avRender()}
 function avClose(){AVOPEN=false;const d=$("#avdlg");if(d)d.remove()}
 function avRefresh(){if(AVOPEN&&$("#avdlg"))avRender(true)}
 
@@ -49,8 +50,8 @@ function avRender(keep){const s=AVS(),o=s.org,S=avSel(o),O=orgById(o)||{},F=avFe
   const RO=R0.filter(r=>!r.end&&inSel(r)),cnt=st=>RO.filter(r=>st==="alle"||r.j.st===st).length;
   const tabs=`<div class="seg2"><button data-avt="offen" class="${s.tab==="offen"?"on":""}">Offen<span class="c">${R0.filter(r=>!r.end&&inSel(r)).length}</span></button><button data-avt="erledigt" class="${s.tab==="erledigt"?"on":""}">Erledigt</button></div>`;
   let bar2="";
-  if(s.tab==="offen"){const L=[["alle","Alle"],["run","Läuft"],["wait","Wartet auf dich"]].concat(cnt("inbox")?[["inbox","Gesammelt"]]:[]);
-    bar2=`<div class="seg2">${L.map(([k,l])=>`<button data-avs="${k}" class="${s.st===k?"on":""}">${l}${k==="alle"?"":`<span class="c">${cnt(k)}</span>`}</button>`).join("")}</div>`}
+  if(s.tab==="offen"){const L=[["alle","Alle"],["run","Läuft"],["wait","Wartet auf dich"],["inbox","📥 Gesammelt"]];
+    bar2=`<div class="seg2">${L.map(([k,l])=>`<button data-avs="${k}" class="${s.st===k?"on":""}">${l}${k==="alle"?"":`<span class="c">${cnt(k)}</span>`}</button>`).join("")}</div>${s.st==="inbox"?`<div class="seg2"><button data-avso="prio" class="${s.sort!=="due"?"on":""}" title="Priorität, darin Fälligkeit">Priorität</button><button data-avso="due" class="${s.sort==="due"?"on":""}" title="Fälligkeit, darin Priorität">Fälligkeit</button></div>`:""}`}
   else{const RE=R0.filter(r=>r.end&&(s.abg||r.j.st!=="cancel")&&inSel(r));
     bar2=`<div class="seg2">${AVZ.map(([k,l])=>`<button data-avz="${k}" class="${s.zeit===k?"on":""}">${l}${k==="aelter"&&!AVARCH?"":`<span class="c">${RE.filter(r=>inFenster(r.d,F[k])).length}</span>`}</button>`).join("")}</div>
       <label class="cb" style="margin:0"><input type="checkbox" id="avabg" ${s.abg?"checked":""}> Abgebrochene zeigen</label>`}
@@ -58,14 +59,17 @@ function avRender(keep){const s=AVS(),o=s.org,S=avSel(o),O=orgById(o)||{},F=avFe
   const agc=r=>r.a?`<div class="avag">${av(usr(r.a.owner),24,1)}<span>${esc(r.a.n)}</span></div>`:`<div class="avag"><span class="avfr">✦</span><span>${r.ak==="_tl"?"KI-Teamleiter":"Claude – frei"}</span></div>`;
   const dn=r=>{const d=dept(r.abt);return d?d.n:"Ohne Abteilung"};
   const ttl=r=>`<td class="t"><b>${esc(r.j.t||"–")}</b><small>${esc(dn(r))}</small></td>`;
-  let rows,head;
-  if(s.tab==="offen"){rows=R.filter(r=>s.st==="alle"||r.j.st===s.st).sort((a,b)=>(a.j.st==="wait"?0:1)-(b.j.st==="wait"?0:1)||(+String(b.j.id).slice(2)||0)-(+String(a.j.id).slice(2)||0));
+  let rows,head,foot0="";
+  if(s.tab==="offen"){const OR={wait:0,run:1,inbox:2},pr=j=>PRN[j.prio||"n"]??2,du=j=>j.due||"9999",ib=(a,b)=>s.sort==="due"?du(a.j).localeCompare(du(b.j))||pr(a.j)-pr(b.j):pr(a.j)-pr(b.j)||du(a.j).localeCompare(du(b.j));
+    rows=R.filter(r=>s.st==="alle"||r.j.st===s.st).sort((a,b)=>(OR[a.j.st]??1)-(OR[b.j.st]??1)||(a.j.st==="inbox"&&b.j.st==="inbox"?ib(a,b):0)||(+String(b.j.id).slice(2)||0)-(+String(a.j.id).slice(2)||0));
+    const NIB=rows.filter(r=>r.j.st==="inbox").length;
+    if(NIB)foot0=`<div class="avfoot"><span><label class="cb" style="margin:0"><input type="checkbox" id="avsall"> alle gesammelten wählen</label></span><button class="btn sm p" id="avstart" disabled>▶ Ausgewählte starten</button></div>`;
     head=`<th>Status</th><th>Nr.</th><th>Auftrag · Abteilung</th><th class="hm">Agent</th><th class="hm">Stand</th><th></th>`;
     rows=rows.map(r=>{const j=r.j,L=(j.log||[]).filter(x=>x&&!LOGSKIP.test(x[1]||"")),last=L[L.length-1];
-      const st=j.st==="wait"?'<span class="kst wait">■ wartet auf dich</span>':j.st==="inbox"?'<span class="kst">📥 gesammelt</span>':'<span class="kst run">● läuft</span>';
-      const stand=j.st==="wait"?esc(j.q?(j.q.kind==="Rückfrage"?"Rückfrage":"Zur Freigabe")+(j.q.from&&j.q.from!=="Company OS"?" · "+j.q.from:""):"Wartet auf dich"):j.st==="run"?esc([j.fired?"seit "+new Date(j.fired).toLocaleTimeString("de-DE",{hour:"2-digit",minute:"2-digit"}):"",last?last[1]:""].filter(Boolean).join(" · ")):"";
-      const act=j.st==="wait"?`<button class="btn sm p" data-avres="${j.id}">Prüfen &amp; freigeben</button>`:"";
-      return `<tr class="cl" data-avj="${j.id}"><td>${st}</td><td class="nr">${esc(j.id)}</td>${ttl(r)}<td class="hm">${agc(r)}</td><td class="hm sm">${stand}</td><td class="ac">${act}</td></tr>`})}
+      const st=j.st==="wait"?'<span class="kst wait">■ wartet auf dich</span>':j.st==="inbox"?`<label class="avsel"><input type="checkbox" data-avsel="${j.id}"> <span class="kst">📥 gesammelt</span></label>${prioB(j)}`:'<span class="kst run">● läuft</span>';
+      const stand=j.st==="wait"?esc(j.q?(j.q.kind==="Rückfrage"?"Rückfrage":"Zur Freigabe")+(j.q.from&&j.q.from!=="Company OS"?" · "+j.q.from:""):"Wartet auf dich"):j.st==="inbox"?esc([j.due?"fällig "+new Date(j.due+"T12:00").toLocaleDateString("de-DE",{day:"2-digit",month:"2-digit"}):"",j.gesammelt?"gesammelt "+new Date(j.gesammelt).toLocaleDateString("de-DE",{day:"2-digit",month:"2-digit"}):""].filter(Boolean).join(" · ")):j.st==="run"?esc([j.fired?"seit "+new Date(j.fired).toLocaleTimeString("de-DE",{hour:"2-digit",minute:"2-digit"}):"",last?last[1]:""].filter(Boolean).join(" · ")):"";
+      const act=j.st==="wait"?`<button class="btn sm p" data-avres="${j.id}">Prüfen &amp; freigeben</button>`:j.st==="inbox"?`<button class="btn sm" data-avgo="${j.id}">▶ Starten</button> <button class="ic" data-avdrop="${j.id}" title="Aus dem Eingang verwerfen">✕</button>`:"";
+      return `<tr class="${j.st==="inbox"?"ib":"cl"}" ${j.st==="inbox"?"":`data-avj="${j.id}"`}><td>${st}</td><td class="nr">${esc(j.id)}</td>${ttl(r)}<td class="hm">${agc(r)}</td><td class="hm sm">${stand}</td><td class="ac">${act}</td></tr>`})}
   else{const all=R.sort((a,b)=>b.d-a.d);rows=all.slice(0,AVN);
     head=`<th>Erledigt</th><th>Nr.</th><th>Auftrag · Abteilung</th><th class="hm">Agent</th><th>Status</th><th class="hm">Ergebnis</th>`;
     const tot=all.length;
@@ -73,7 +77,7 @@ function avRender(keep){const s=AVS(),o=s.org,S=avSel(o),O=orgById(o)||{},F=avFe
       const dt=+r.d?r.d.toLocaleDateString("de-DE",{day:"2-digit",month:"2-digit"})+" <b>"+r.d.toLocaleTimeString("de-DE",{hour:"2-digit",minute:"2-digit"})+"</b>":"–";
       return `<tr class="${r.arch?"arch":"cl"}" ${r.arch?`title="${esc((j.sum||"")+" (aus dem Archiv)")}"`:`data-avj="${j.id}"`}><td class="nr">${dt}</td><td class="nr">${esc(j.id)}</td>${ttl(r)}<td class="hm">${agc(r)}</td><td><span class="kst ${c}">${esc(l.replace("Erledigt","erledigt").replace("Abgebrochen","abgebrochen"))}</span></td><td class="hm">${e?`<a href="${esc(e.url)}" target="_blank" rel="noopener">↗ ${esc(e.t||"Öffnen")}</a>`:"—"}</td></tr>`});
     rows.foot=`<div class="avfoot"><span>${Math.min(AVN,tot)} von ${tot} angezeigt${s.zeit==="aelter"?(AVLOAD?" · Archiv wird geladen …":AVARCH?" · inkl. Archiv":""):""}</span>${tot>AVN?'<button class="btn sm" id="avmore">Weitere laden</button>':""}</div>`}
-  const foot=rows.foot||"",empty=`<tr><td colspan="6" class="avempty">${s.tab==="offen"?"Keine offenen Aufträge in dieser Auswahl.":"Keine Aufträge in diesem Zeitraum."}</td></tr>`;
+  const foot=rows.foot||foot0,empty=`<tr><td colspan="6" class="avempty">${s.tab==="offen"?"Keine offenen Aufträge in dieser Auswahl.":"Keine Aufträge in diesem Zeitraum."}</td></tr>`;
   const html=`<div class="modal" id="avm"><div class="avbox" role="dialog" aria-label="Aufträge und Verlauf">
     <div class="avhead"><h3>🕘 Aufträge &amp; Verlauf</h3><span class="sub">· ${esc(selN)}</span><button class="ic" id="avx" title="Schließen" style="font-size:18px">✕</button></div>
     <div class="avgrid"><details class="avside" id="avside" ${AVSIDE()?"open":""}><summary><h4>Einschränken</h4><span class="avsn">${esc(selN)}</span></summary>
@@ -100,5 +104,19 @@ function avRender(keep){const s=AVS(),o=s.org,S=avSel(o),O=orgById(o)||{},F=avFe
   const mo=$("#avmore");if(mo)mo.onclick=()=>{AVN+=50;avRender(true)};
   d.querySelectorAll("[data-avres]").forEach(b=>b.onclick=ev=>{ev.stopPropagation();const j=AU.find(x=>x.id===b.dataset.avres);if(j)kiFresh(j).then(()=>resultModal(j))});
   d.querySelectorAll("[data-avj]").forEach(t=>t.onclick=ev=>{if(ev.target.closest("a,button"))return;const j=AU.find(x=>x.id===t.dataset.avj);if(!j)return;KINEW.delete(j.id);if(j.ki)kiFresh(j).then(()=>resultModal(j));else jobModalK(j)});
+  d.querySelectorAll("[data-avso]").forEach(b=>b.onclick=()=>{s.sort=b.dataset.avso;rr()});
+  const selIds=()=>[...d.querySelectorAll("[data-avsel]:checked")].map(c=>c.dataset.avsel),upd=()=>{const b=$("#avstart");if(b){const n=selIds().length;b.disabled=!n;b.textContent="▶ Ausgewählte starten"+(n?" ("+n+")":"")}};
+  d.querySelectorAll("[data-avsel]").forEach(c=>c.onchange=upd);
+  const sa=$("#avsall");if(sa)sa.onchange=()=>{d.querySelectorAll("[data-avsel]").forEach(c=>c.checked=sa.checked);upd()};
+  const sb=$("#avstart");if(sb)sb.onclick=()=>eingangStarten(selIds());
+  d.querySelectorAll("[data-avgo]").forEach(b=>b.onclick=ev=>{ev.stopPropagation();eingangStarten([b.dataset.avgo])});
+  d.querySelectorAll("[data-avdrop]").forEach(b=>b.onclick=async ev=>{ev.stopPropagation();const j=AU.find(x=>x.id===b.dataset.avdrop);if(!j||!await askOk("„"+j.t+"“ aus dem Eingang verwerfen? Der Eintrag bleibt als „abgebrochen“ im Verlauf.","Ja, verwerfen"))return;
+    j.st="cancel";markDone(j);j.log.push([now(),"Aus dem Eingang verworfen von Boris",1]);try{await Store.set("jobs/"+j.id,JSON.parse(jobSer(j)));LAST.set("jobs/"+j.id,jobSer(j))}catch(e){schedule()}avRefresh();if(!$("#org").classList.contains("hide"))org()});
   if(s.tab==="erledigt"&&s.zeit==="aelter")avArchivLaden()}
+const prioB=j=>j.prio==="d"?' <span class="prio d">Dringend</span>':j.prio==="h"?' <span class="prio h">Hoch</span>':j.prio==="l"?' <span class="prio l">Niedrig</span>':"";
+const inboxCnt=(o,did)=>AU.filter(j=>j.st==="inbox"&&jobOrg(j)===o&&jobAbt(j,jobAgent(j))===did).length;
+async function eingangStarten(ids){const L=ids.map(id=>AU.find(j=>j.id===id)).filter(j=>j&&j.st==="inbox");if(!L.length)return;
+  if(L.length>1&&!await askOk(L.length+" gesammelte Aufträge starten? Jeder startet eine eigene Claude-Sitzung.","Ja, starten"))return;
+  for(const j of L){j.log.push([now(),"Aus dem Eingang gestartet"]);kiStart(j,"starten");await new Promise(r=>setTimeout(r,400))}
+  avRefresh();if(!$("#org").classList.contains("hide"))org()}
 document.addEventListener("keydown",e=>{if(e.key==="Escape"&&AVOPEN&&!$("#modal").innerHTML&&!$("#dlg"))avClose()});

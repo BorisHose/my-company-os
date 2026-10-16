@@ -341,6 +341,11 @@ fieldset:disabled .ic,fieldset:disabled .ownadd,fieldset:disabled [data-r],field
 .oact{flex-wrap:wrap}.oact .btn.p{flex:1}
 .oag .oplay{width:24px;height:24px;font-size:10px;background:#fff;color:var(--acc);border:1px solid var(--line);opacity:.5}.oag:hover .oplay,.oag .oplay:focus-visible{opacity:1;border-color:var(--acc)}.oag .oplay:hover{background:var(--accbg)}
 @media(hover:none){.oag .oplay{opacity:.85}}
+/* v53: Sammeln und Eingang */
+.oact .btn.p{flex:1 1 100%}
+.prio{font-size:11px;font-weight:700;border-radius:8px;padding:1px 7px;margin-left:4px;white-space:nowrap}.prio.d{background:#fdecec;color:#b42318}.prio.h{background:#fff4d6;color:#8a5a00}.prio.l{background:#eef0f4;color:#667085}
+.avsel{display:inline-flex;align-items:center;gap:5px;cursor:pointer}.avt tr.ib td{background:#fffdf7}
+#jprio button{flex:1}
 
 </style>
 <header>
@@ -681,7 +686,7 @@ function org(){
   const dz=(abt,team,L,empty)=>`<div class="odz" data-dz-abt="${abt}" data-dz-team="${team}">${L.map(card).join("")||(empty?`<div class="hint" style="margin:0;padding:4px 2px">${empty}</div>`:"")}</div>`;
   const col=d=>{const L=A.filter(a=>ab(a)===d.id),T=teamsOf(d),direct=L.filter(a=>!T.some(t=>t.id===tm(a)));
     return `<div class="odept"><div class="odh"><b>${esc(d.n)}</b><span class="cnt">${L.length} Agent${L.length===1?"":"en"}</span>${oe?`<button class="ic" data-dren="${d.id}" title="Abteilung umbenennen">✎</button><button class="ic" data-ddel="${d.id}" title="Abteilung löschen">🗑</button>`:""}</div>
-     <div class="odb">${oe?"":`<div class="oact"><button class="btn sm p" data-oabt="${d.id}" title="Auftrag an die Abteilung – der KI-Teamleiter wählt den passenden Agenten">▶ Abteilung beauftragen</button><button class="btn sm" data-oav="${d.id}" title="Aufträge dieser Abteilung">🕘 Verlauf</button></div>`}${lead("d",d.id,d.lead,"Leitung")}
+     <div class="odb">${oe?"":`<div class="oact"><button class="btn sm p" data-oabt="${d.id}" title="Auftrag an die Abteilung – der KI-Teamleiter wählt den passenden Agenten">▶ Abteilung beauftragen</button><button class="btn sm" data-oin="${d.id}" title="Gesammelte Aufgaben dieser Abteilung (Eingang)">📥 ${inboxCnt(OC,d.id)}</button><button class="btn sm" data-osm="${d.id}" title="Aufgabe für diese Abteilung sammeln – später starten">+ Sammeln</button><button class="btn sm" data-oav="${d.id}" title="Aufträge dieser Abteilung">🕘 Verlauf</button></div>`}${lead("d",d.id,d.lead,"Leitung")}
       ${T.map(t=>{const TL=L.filter(a=>tm(a)===t.id);return `<div class="oteam"><div class="oth"><span>Team ${esc(t.n)}</span><span class="cnt">${TL.length}</span>${oe?`<button class="ic" data-tren="${d.id}|${t.id}" title="Team umbenennen">✎</button><button class="ic" data-tdel="${d.id}|${t.id}" title="Team löschen">🗑</button>`:""}</div>
         ${lead("t",d.id+"|"+t.id,t.lead,"Teamleitung")}${dz(d.id,t.id,TL,oe?"Agenten hierher ziehen":"–")}</div>`}).join("")}
       ${T.length&&(direct.length||oe)?`<div class="odlab">Direkt in der Abteilung</div>`:""}${dz(d.id,"",direct,oe?"Agenten hierher ziehen":(T.length?"":"–"))}
@@ -704,8 +709,10 @@ function org(){
     document.querySelectorAll("[data-play]").forEach(b=>b.onclick=ev=>{ev.stopPropagation();startModal(null,{art:"agent",aid:b.dataset.play,org:OC})});
     document.querySelectorAll("[data-orun]").forEach(b=>b.onclick=ev=>{ev.stopPropagation();const a=AG.find(x=>x.id===b.dataset.orun);if(a)avOpen({org:OC,only:a,tab:"offen"})});
     document.querySelectorAll("[data-oabt]").forEach(b=>b.onclick=()=>startModal(null,{art:"abteilung",abt:b.dataset.oabt,org:OC}));
+    document.querySelectorAll("[data-oin]").forEach(b=>b.onclick=()=>avOpen({org:OC,d:[b.dataset.oin],tab:"offen",st:"inbox"}));
+    document.querySelectorAll("[data-osm]").forEach(b=>b.onclick=()=>startModal(null,{sm:1,abt:b.dataset.osm,org:OC}));
     document.querySelectorAll("[data-oav]").forEach(b=>b.onclick=()=>avOpen({org:OC,d:[b.dataset.oav]}));
-    const oav=$("#orgav");if(oav)oav.onclick=()=>avOpen({org:OC});
+    const oav=$("#orgav");if(oav)oav.onclick=()=>avOpen({org:OC,all:1,st:"alle"});
     document.querySelectorAll("[data-gos]").forEach(e=>e.onclick=ev=>{ev.stopPropagation();const [ai,si]=e.dataset.gos.split("|");goSkill(ai,si)})}
   if(!oe)return;
   document.querySelectorAll(".odz").forEach(z=>{z.ondragover=e=>{e.preventDefault();e.stopPropagation();z.classList.add("over")};z.ondragleave=e=>{if(!z.contains(e.relatedTarget))z.classList.remove("over")};
@@ -1345,46 +1352,51 @@ async function anhLoad(a){if(ANHCACHE.has(a.aid))return ANHCACHE.get(a.aid);if(A
 function anhHtml(j){return (j.anh||[]).length?`<div class="flabel">Anhänge (${j.anh.length})</div><div class="anhrow">${j.anh.map((a,i)=>`<a class="anhth big" data-anh="${a.aid}" title="${esc(a.name)} – anklicken zum Vergrößern"><img alt="Bild ${i+1}"><span>Bild ${i+1}</span></a>`).join("")}</div>`:""}
 function anhBind(j){(j.anh||[]).forEach(a=>{const el=document.querySelector(`[data-anh="${a.aid}"]`);if(!el)return;anhLoad(a).then(u=>{if(u){el.querySelector("img").src=u;el.onclick=()=>{const w=window.open();if(w)w.document.write('<img src="'+u+'" style="max-width:100%">')}}})})}
 const FREE=()=>FL.find(x=>x.frei);
+const PRIO=[["d","Dringend"],["h","Hoch"],["n","Normal"],["l","Niedrig"]],PRN={d:0,h:1,n:2,l:3};
 const skOrg=(o)=>SK.filter(x=>!["vorschlag","entwurf"].includes(srcOf(x))&&(!o||!o.prod||x.p===o.prod||x.p==="all"||x.p==="multi"));
 const grName=g=>(g!=null&&g!==""&&GR[+g]!=null)?GR[+g]:(typeof g==="string"&&isNaN(+g)?g:"Ohne Gruppe");
 function skOpts(L,cur){const G=[...new Set(L.map(x=>x.g))].sort((a,b)=>(+a)-(+b));return G.map(g=>`<optgroup label="${esc(grName(g))}">${L.filter(x=>x.g===g).map(x=>`<option value="${esc(x.id)}" ${x.id===cur?'selected':''}>${esc(x.n)}</option>`).join("")}</optgroup>`).join("")}
 function jobLbl(j){if(!j.f)return "–";if(!j.f.frei)return j.f.n;const a=j.aid&&AG.find(x=>x.id===j.aid),S=j.sk&&sk(j.sk);return (j.art==="agent"&&a?a.n:"Freie Aufgabe")+(S?" · "+S.n:j.sk?" · "+j.sk:"")}
-function startModal(f,keep){if(!keep)PEND=[];keep=keep||{};
+function startModal(f,keep){if(!keep)PEND=[];keep=keep||{};const SM=!!keep.sm;if(SM)keep.art=keep.art==="agent"&&keep.aid?"agent":"abteilung";
   const art=keep.art||(f&&!f.frei?"ablauf":"frei"),O=orgById(keep.org||OC)||ORGS()[0];
   const FLO=FL.filter(x=>!x.frei&&(x.p==="all"||!O.prod||x.p===O.prod));
   if(art==="ablauf"){f=f&&!f.frei&&FLO.includes(f)?f:FLO[0];if(!f){f=null}}else f=FREE();
   if(!f)return toast(art==="ablauf"?"Für diese Organisation gibt es noch keinen Ablauf":"Systemablauf „Freie Aufgabe“ fehlt");
-  const AGO=AG.filter(a=>inOrg(a,O)),ag=art==="agent"?(AGO.find(a=>a.id===keep.aid)||AGO[0]):null;
+  const AGO=AG.filter(a=>inOrg(a,O)),ag=art==="agent"?(AGO.find(a=>a.id===keep.aid)||AGO[0]):null,PR=keep.prio||"n";
   const SKL=art==="agent"?(ag?ag.s.map(id=>sk(id)).filter(Boolean).filter(x=>!["vorschlag","entwurf"].includes(srcOf(x))):[]):skOrg(O);
   const skc=SKL.some(x=>x.id===keep.sk)?keep.sk:"";
   const s=f.N.find(n=>n.type==="start");
-  const DPO=deptsOf(O.id),abt=art==="abteilung"?(DPO.find(d=>d.id===keep.abt)||DPO[0]||null):null,ABA=abt?AG.filter(a=>inOrg(a,O)&&PL(a,O.id).abt===abt.id):[];
+  const DPO=deptsOf(O.id),abt=art==="abteilung"||SM?(DPO.find(d=>d.id===keep.abt)||DPO[0]||null):null,ABA=abt?AG.filter(a=>inOrg(a,O)&&PL(a,O.id).abt===abt.id):[];
   const ART=[["frei","Freie Aufgabe","Eine Aufgabe an Claude – ohne Prozess, optional mit einem bestimmten Skill"],["abteilung","Abteilung beauftragen","Der KI-Teamleiter der Abteilung wählt den passenden Agenten und erledigt die Aufgabe mit ihm"],["agent","Agent beauftragen","Ein Agent übernimmt die Aufgabe mit seinem Ziel, seinen Regeln und Skills – ohne Prozess"],["ablauf","Ablauf starten","Ein Prozess mit festen Schritten, Entscheidungen und Freigaben"]];
-  $("#modal").innerHTML=`<div class="modal"><div class="box"><div class="bhead"><h3>Neuer KI-Auftrag</h3><button class="ic" id="mclose" style="font-size:18px">✕</button></div>
+  $("#modal").innerHTML=`<div class="modal"><div class="box"><div class="bhead"><h3>${SM?"📥 Aufgabe sammeln":"Neuer KI-Auftrag"}</h3><button class="ic" id="mclose" style="font-size:18px">✕</button></div>
    <div class="field" style="margin-top:10px"><label>Organisation</label><div class="seg" id="jorg" style="margin:0">${ORGS().map(o=>`<button data-o="${o.id}" class="${o===O?'on':''}">${esc(o.kurz||o.n)}</button>`).join("")}</div></div>
-   <div class="field"><label>Art des Auftrags</label><div class="seg" id="jart" style="margin:0">${ART.map(([k,l,t])=>`<button data-a="${k}" class="${k===art?'on':''}" title="${esc(t)}">${l}</button>`).join("")}</div><div class="hint">${esc(ART.find(x=>x[0]===art)[2])}</div></div>
+   ${SM?"":`<div class="field"><label>Art des Auftrags</label><div class="seg" id="jart" style="margin:0">${ART.map(([k,l,t])=>`<button data-a="${k}" class="${k===art?'on':''}" title="${esc(t)}">${l}</button>`).join("")}</div><div class="hint">${esc(ART.find(x=>x[0]===art)[2])}</div></div>`}
    ${art==="ablauf"?`<div class="field"><label>Ablauf</label><select id="jf">${PK.map(([p,l])=>{const L=FLO.filter(x=>x.p===p);return L.length?`<optgroup label="${esc(l)}">${L.map(x=>`<option value="${x.id}" ${x===f?'selected':''}>${esc(x.n)}</option>`).join("")}</optgroup>`:""}).join("")}</select>${f.goal?`<div class="hint">${esc(f.goal)}</div>`:""}${s?"":'<div class="warnbox">Dieser Ablauf hat noch keinen Start-Knoten – unter „Abläufe“ ergänzen.</div>'}</div>`:""}
-   ${art==="agent"?`<div class="field"><label>Agent</label>${AGO.length?`<select id="jag">${AGO.map(a=>`<option value="${a.id}" ${a===ag?'selected':''}>${esc(a.n)}</option>`).join("")}</select>${ag&&ag.r?`<div class="hint">${esc(ag.r)}</div>`:""}`:'<div class="warnbox">In dieser Organisation ist noch kein Agent platziert.</div>'}</div>`:""}
-   ${art==="abteilung"?`<div class="field"><label>Abteilung</label>${DPO.length?`<select id="jabt">${DPO.map(d=>`<option value="${d.id}" ${d===abt?'selected':''}>${esc(d.n)}</option>`).join("")}</select><div class="hint">✦ Der KI-Teamleiter wählt aus: ${ABA.length?ABA.map(a=>esc(a.n)).join(", "):"– in dieser Abteilung ist noch kein Agent –"}</div>`:'<div class="warnbox">Diese Organisation hat noch keine Abteilungen.</div>'}</div>`:""}
-   ${art!=="ablauf"&&art!=="abteilung"?`<div class="field"><label for="jskq">Skill</label><div class="cbx" id="jskbox"><input type="text" id="jskq" role="combobox" aria-expanded="false" aria-autocomplete="list" autocomplete="off" placeholder="🔍 Skill suchen oder auswählen …" value="${esc(skc&&sk(skc)?sk(skc).n:(art==="agent"?"Agent entscheidet selbst":"Claude wählt selbst"))}"><span class="cbx-car" aria-hidden="true">▾</span><div class="cbx-list" id="jsklist" role="listbox" hidden></div></div><input type="hidden" id="jsk" value="${esc(skc)}"><div class="hint">${art==="agent"?"Nur Skills dieses Agenten.":"Nur Skills, die für "+esc(O.kurz||O.n)+" gelten und im Konto aktiv sind (keine Entwürfe oder Vorschläge)."}${skc&&sk(skc)&&sk(skc).d?"<br>"+esc(sk(skc).d):""}</div></div>`:""}
+   ${art==="agent"&&!SM?`<div class="field"><label>Agent</label>${AGO.length?`<select id="jag">${AGO.map(a=>`<option value="${a.id}" ${a===ag?'selected':''}>${esc(a.n)}</option>`).join("")}</select>${ag&&ag.r?`<div class="hint">${esc(ag.r)}</div>`:""}`:'<div class="warnbox">In dieser Organisation ist noch kein Agent platziert.</div>'}</div>`:""}
+   ${art==="abteilung"||SM?`<div class="${SM?"row":""}"><div class="field"><label>Abteilung</label>${DPO.length?`<select id="jabt">${DPO.map(d=>`<option value="${d.id}" ${d===abt?'selected':''}>${esc(d.n)}</option>`).join("")}</select>${SM?`</div><div class="field"><label>Zuweisung</label><select id="jzu"><option value="">✦ KI-Teamleiter wählt</option>${ABA.map(a=>`<option value="${a.id}" ${art==="agent"&&ag&&ag.id===a.id?"selected":""}>${esc(a.n)}</option>`).join("")}</select>`:""}<div class="hint">✦ Der KI-Teamleiter wählt aus: ${ABA.length?ABA.map(a=>esc(a.n)).join(", "):"– in dieser Abteilung ist noch kein Agent –"}</div>`:'<div class="warnbox">Diese Organisation hat noch keine Abteilungen.</div>'}</div></div>`:""}
+   ${SM?`<div class="row"><div class="field"><label>Priorität</label><div class="seg" id="jprio" style="margin:0">${PRIO.map(([k,l])=>`<button data-p="${k}" class="${k===PR?"on":""}">${l}</button>`).join("")}</div></div><div class="field"><label>Fällig bis</label><input type="date" id="jdue" value="${esc(keep.due||"")}"></div></div>`:""}
+   ${art!=="ablauf"&&art!=="abteilung"&&!SM?`<div class="field"><label for="jskq">Skill</label><div class="cbx" id="jskbox"><input type="text" id="jskq" role="combobox" aria-expanded="false" aria-autocomplete="list" autocomplete="off" placeholder="🔍 Skill suchen oder auswählen …" value="${esc(skc&&sk(skc)?sk(skc).n:(art==="agent"?"Agent entscheidet selbst":"Claude wählt selbst"))}"><span class="cbx-car" aria-hidden="true">▾</span><div class="cbx-list" id="jsklist" role="listbox" hidden></div></div><input type="hidden" id="jsk" value="${esc(skc)}"><div class="hint">${art==="agent"?"Nur Skills dieses Agenten.":"Nur Skills, die für "+esc(O.kurz||O.n)+" gelten und im Konto aktiv sind (keine Entwürfe oder Vorschläge)."}${skc&&sk(skc)&&sk(skc).d?"<br>"+esc(sk(skc).d):""}</div></div>`:""}
    <div class="field"><label>Kurzbezeichnung</label><input type="text" id="jt" placeholder="Kurzbezeichnung des Auftrags, z. B. „Angebot Muster AG“" value="${esc(keep.t||"")}"></div>
    <div class="field"><label>${esc(art==="ablauf"?(f.start||"Eingabe"):"Aufgabe")}</label><textarea id="ji" placeholder="Alles, was Claude für den Auftrag wissen muss (Kunde, Mandant, Unterlagen, Links). Screenshots einfach hier einfügen (Strg+V) oder hineinziehen.">${esc(keep.i||"")}</textarea>
      <div class="anhbar"><div class="anhrow" id="janh"></div><label class="btn sm" style="cursor:pointer">📎 Bild anhängen<input type="file" id="jfile" accept="image/*" multiple style="display:none"></label></div></div>
    ${art==="ablauf"?`<label class="cb" style="margin:6px 0 0"><input type="checkbox" id="jki" ${keep.ki===false?'':'checked'}> Von Claude ausführen lassen (startet eine Sitzung in deinem Abo)</label>`:""}
    <div class="row" style="margin-top:8px"><div class="field"><label>Tempo</label><select id="jtempo">${Object.entries(RUNNERS).map(([k,R])=>`<option value="${k}" ${k===(keep.tempo||"schnell")?'selected':''}>${R.l}</option>`).join("")}</select><div class="hint">Schnell reicht für Datensätze und kurze Texte; gründlich für Dokumente, Angebote, Analysen.</div></div>
    <div class="field"><label>Freigabe</label><label class="cb" style="margin:4px 0 0"><input type="checkbox" id="jvorab" ${keep.vorab?'checked':''}> Ohne Rückfrage ausführen, wenn eindeutig</label><div class="hint">Nur für einfache CRM-Anlagen (Aufgabe, Kontakt, Notiz, Termin) mit eindeutigem System und Mandant. E-Mails, Tickets, Änderungen und Löschen immer mit Freigabe.</div></div></div>
-   <div class="btns" style="margin-top:14px;justify-content:flex-end"><button class="btn" id="mx">Abbrechen</button><button class="btn p" id="go">▶ Starten</button></div></div></div>`;
+   <div class="btns" style="margin-top:14px;justify-content:flex-end"><button class="btn" id="mx">Abbrechen</button>${SM?'<button class="btn" id="gonow">▶ Sammeln &amp; sofort starten</button><button class="btn p" id="go">📥 Sammeln</button>':'<button class="btn p" id="go">▶ Starten</button>'}</div></div></div>`;
   const close=()=>$("#modal").innerHTML="";$("#mclose").onclick=close;$("#mx").onclick=close;
   renderPend();const ji=$("#ji");
   ji.addEventListener("paste",e=>{const it=[...(e.clipboardData&&e.clipboardData.items||[])].filter(x=>x.type&&x.type.startsWith("image/"));if(!it.length)return;e.preventDefault();it.forEach(x=>addPend(x.getAsFile(),"Screenshot "+(PEND.length+1)))});
   ji.addEventListener("dragover",e=>{e.preventDefault();ji.classList.add("drop")});ji.addEventListener("dragleave",()=>ji.classList.remove("drop"));
   ji.addEventListener("drop",e=>{e.preventDefault();ji.classList.remove("drop");[...(e.dataTransfer.files||[])].forEach(f=>addPend(f))});
   $("#jfile").onchange=e=>{[...e.target.files].forEach(f=>addPend(f));e.target.value=""};
-  const K=o=>({art,org:O.id,aid:ag&&ag.id,abt:abt&&abt.id,sk:$("#jsk")?$("#jsk").value:"",t:$("#jt").value,i:$("#ji").value,tempo:$("#jtempo").value,vorab:$("#jvorab").checked,ki:$("#jki")?$("#jki").checked:true,...o});
+  const prio=()=>{const b=document.querySelector("#jprio .on");return b?b.dataset.p:PR};
+  const K=o=>({art,sm:SM,prio:SM?prio():PR,due:$("#jdue")?$("#jdue").value:"",org:O.id,aid:ag&&ag.id,abt:abt&&abt.id,sk:$("#jsk")?$("#jsk").value:"",t:$("#jt").value,i:$("#ji").value,tempo:$("#jtempo").value,vorab:$("#jvorab").checked,ki:$("#jki")?$("#jki").checked:true,...o});
   document.querySelectorAll("#jorg [data-o]").forEach(b=>b.onclick=()=>startModal(art==="ablauf"?f:null,K({org:b.dataset.o,sk:"",aid:null})));
   document.querySelectorAll("#jart [data-a]").forEach(b=>b.onclick=()=>startModal(null,K({art:b.dataset.a,sk:""})));
   const jf=$("#jf");if(jf)jf.onchange=e=>startModal(FL.find(x=>x.id===e.target.value),K());
-  const jab=$("#jabt");if(jab)jab.onchange=e=>startModal(null,K({abt:e.target.value}));
+  const jab=$("#jabt");if(jab)jab.onchange=e=>startModal(null,K(SM?{abt:e.target.value,art:"abteilung",aid:null}:{abt:e.target.value}));
+  const jzu=$("#jzu");if(jzu)jzu.onchange=e=>startModal(null,K({art:e.target.value?"agent":"abteilung",aid:e.target.value||null}));
+  document.querySelectorAll("#jprio [data-p]").forEach(b=>b.onclick=()=>{document.querySelectorAll("#jprio [data-p]").forEach(x=>x.classList.toggle("on",x===b))});
   const jag=$("#jag");if(jag)jag.onchange=e=>startModal(null,K({aid:e.target.value,sk:""}));
   {const jsk=$("#jsk"),q=$("#jskq"),L=$("#jsklist");if(jsk&&q){
     const none=art==="agent"?"Agent entscheidet selbst":"Claude wählt selbst",lab=()=>jsk.value&&sk(jsk.value)?sk(jsk.value).n:none;
@@ -1407,13 +1419,17 @@ function startModal(f,keep){if(!keep)PEND=[];keep=keep||{};
       else if(e.key==="Tab"){if(openState)close()}};
     q.onblur=()=>setTimeout(()=>{if(document.activeElement!==q&&openState)close()},120);
     draw()}}
-  $("#go").onclick=async()=>{if(GOBUSY)return;if(!s)return toast("Der Ablauf braucht einen Start-Knoten");if(art==="agent"&&!ag)return toast("Bitte einen Agenten wählen");if(art==="abteilung"&&!abt)return toast("Bitte eine Abteilung wählen");if(art==="abteilung"&&!ABA.length)return toast("In dieser Abteilung ist noch kein Agent – bitte zuerst einen platzieren");
+  const go=async sofort=>{if(GOBUSY)return;if(!s)return toast("Der Ablauf braucht einen Start-Knoten");if(art==="agent"&&!ag)return toast("Bitte einen Agenten wählen");if((art==="abteilung"||SM)&&!abt)return toast("Bitte eine Abteilung wählen");if(art==="abteilung"&&!ABA.length)return toast("In dieser Abteilung ist noch kein Agent – bitte zuerst einen platzieren");
     GOBUSY=true;let n;try{n=await nextJobNo()}finally{GOBUSY=false}const e=f.E.find(e=>e.f===s.id),nx=e&&nodeOf(f,e.t);
     const ki=art!=="ablauf"||$("#jki").checked,skv=$("#jsk")?$("#jsk").value:"";
-    const j={id:"A-"+n,f,fid:f.id,art,org:O.id,t:$("#jt").value||(art==="agent"?ag.n:art==="abteilung"?"Auftrag an "+abt.n:art==="frei"?(skv&&sk(skv)?sk(skv).n:"Freie Aufgabe"):"Neuer Auftrag"),in:$("#ji").value,path:ki?[s.id]:[s.id].concat(nx?[nx.id]:[]),st:"run",log:ki?[[now(),"KI-Auftrag angelegt von Boris"+(art==="agent"?" – an "+ag.n:art==="abteilung"?" – an Abteilung "+abt.n+" (KI-Teamleiter)":art==="frei"?" – freie Aufgabe":"")]]:[[now(),"Auftrag gestartet von Boris"],[now(),nx?nlabel(nx)+" – beginnt":"–"]]};
-    if(art==="agent")j.aid=ag.id;if(art==="abteilung")j.abt=abt.id;if(skv&&art!=="abteilung")j.sk=skv;
+    const j={id:"A-"+n,f,fid:f.id,art,org:O.id,...(SM?{prio:prio(),gesammelt:new Date().toISOString()}:{}),t:$("#jt").value||(art==="agent"?ag.n:art==="abteilung"?"Auftrag an "+abt.n:art==="frei"?(skv&&sk(skv)?sk(skv).n:"Freie Aufgabe"):"Neuer Auftrag"),in:$("#ji").value,path:ki?[s.id]:[s.id].concat(nx?[nx.id]:[]),st:"run",log:ki?[[now(),"KI-Auftrag angelegt von Boris"+(art==="agent"?" – an "+ag.n:art==="abteilung"?" – an Abteilung "+abt.n+" (KI-Teamleiter)":art==="frei"?" – freie Aufgabe":"")]]:[[now(),"Auftrag gestartet von Boris"],[now(),nx?nlabel(nx)+" – beginnt":"–"]]};
+    if(SM){const d=$("#jdue").value;if(d)j.due=d;j.log=[[now(),"Aufgabe gesammelt von Boris"+(art==="agent"?" – für "+ag.n:" – für Abteilung "+abt.n)]];if(!sofort)j.st="inbox"}
+    if(art==="agent")j.aid=ag.id;if(art==="abteilung"||SM)j.abt=abt.id;if(skv&&art!=="abteilung")j.sk=skv;
     if(ki){j.ki=1;j.tempo=$("#jtempo").value;if($("#jvorab").checked)j.vorab=1}
-    if(PEND.length){j.anh=PEND.map(a=>({aid:a.aid,name:a.name,w:a.w,h:a.h,n:Math.ceil(a.data.length/CHUNK),kb:Math.round(a.data.length*.75/1024)}));PEND.forEach(a=>ANHDATA.set(a.aid,a.data));PEND=[]}jobPlatz(j);AU.unshift(j);close();show("jobs");if(ki)kiStart(j,"starten");else{anhSave(j).catch(()=>{});toast("Auftrag gestartet")}};
+    if(PEND.length){j.anh=PEND.map(a=>({aid:a.aid,name:a.name,w:a.w,h:a.h,n:Math.ceil(a.data.length/CHUNK),kb:Math.round(a.data.length*.75/1024)}));PEND.forEach(a=>ANHDATA.set(a.aid,a.data));PEND=[]}jobPlatz(j);AU.unshift(j);close();
+    if(SM&&!sofort){try{await anhSave(j);await Store.set("jobs/"+j.id,JSON.parse(jobSer(j)));LAST.set("jobs/"+j.id,jobSer(j))}catch(e){schedule()}toast("📥 In den Eingang von „"+abt.n+"“ gelegt");if(!$("#org").classList.contains("hide"))org();avRefresh();return}
+    show("jobs");if(ki)kiStart(j,"starten");else{anhSave(j).catch(()=>{});toast("Auftrag gestartet")}};
+  $("#go").onclick=()=>go(false);const gn=$("#gonow");if(gn)gn.onclick=()=>go(true);
 }
 const curN=j=>nodeOf(j.f,j.path[j.path.length-1]);
 // ===== KI-Aufträge: Ausführung durch Claude über die geplante Aufgabe „Company OS – KI-Auftrag ausführen“ (Abo, keine API) =====
@@ -1429,7 +1445,7 @@ function kiApply(docs,quiet){/* docs: einfache Objekte aus Store */const M=new M
   waitCnt();if(!$("#jobs").classList.contains("hide")&&!$("#modal").innerHTML)jobs();avRefresh();{const sig=AG.map(a=>runCnt(a.id)).join(",");if(sig!==ORGRUN){ORGRUN=sig;if(!$("#org").classList.contains("hide")&&!isEd("org"))org()}}if(!quiet&&!ch.length)toast("Stand geladen")}
 let KIEDIT=null,ORGRUN="";
 const KINEW=new Set();
-const okTxt=j=>j.st==="cancel"?["no","✕ Abgebrochen"]:j.st==="done"?(j.ok==="nein"?["no","✗ Nicht erledigt"]:j.ok==="teilweise"?["part","◐ Teilweise erledigt"]:["ok","✓ Erledigt"]):j.st==="wait"?["wait","⏸ Wartet auf dich"]:["run","▶ Läuft"];
+const okTxt=j=>j.st==="inbox"?["wait","📥 Gesammelt"]:j.st==="cancel"?["no","✕ Abgebrochen"]:j.st==="done"?(j.ok==="nein"?["no","✗ Nicht erledigt"]:j.ok==="teilweise"?["part","◐ Teilweise erledigt"]:["ok","✓ Erledigt"]):j.st==="wait"?["wait","⏸ Wartet auf dich"]:["run","▶ Läuft"];
 async function kiAnswer(j,a){await kiFresh(j);const Q=j.q||{};j.ans=[...(j.ans||[]),{q:Q.text||"",a,at:new Date().toISOString()}];j.log.push([now(),"Boris: "+a,1]);delete j.q;kiStart(j,"fortsetzen",{a,q:Q.text,kind:Q.kind,from:Q.from})}
 async function kiCancel(j){if(!await askOk("Auftrag „"+j.t+"“ abbrechen? Claude führt nichts mehr aus; bereits Angelegtes bleibt bestehen.","Ja, abbrechen"))return false;await kiFresh(j);
   j.st="cancel";markDone(j);j.ok="nein";delete j.q;j.log.push([now(),"Auftrag abgebrochen von Boris",1]);j.sum=(j.sum?j.sum+" ":"")+"Von Boris abgebrochen – nichts weiter ausgeführt.";
@@ -1461,6 +1477,7 @@ function kiContext(j){const f=j.f,L=[];if(!f)return "";const cur=j.path[j.path.l
   if(JS)L.push("SKILL VERWENDEN: „"+JS.n+"“ – im Konto: "+(KS(JS).join(", ")||"nur im Cockpit, kein Konto-Skill")+(JS.d?" · "+JS.d:""));
   if(JO)L.push("Organisation des Auftrags: "+JO.n+(JO.prod?" (Produkt "+PN[JO.prod]+")":""));
   L.push("Auftrag "+j.id+": "+(j.t||"")+(j.in?"\nEingabe von Boris: "+j.in:""));
+  if(j.prio&&j.prio!=="n"||j.due)L.push("Priorität des Auftrags: "+((PRIO.find(p=>p[0]===(j.prio||"n"))||[])[1]||"Normal")+(j.due?" · Fällig bis: "+new Date(j.due+"T12:00").toLocaleDateString("de-DE"):""));
   const seen=new Set(),order=[];(function walk(id){if(seen.has(id))return;seen.add(id);const n=nodeOf(f,id);if(!n)return;order.push(n);f.E.filter(e=>e.f===id&&!e.back).forEach(e=>walk(e.t))})((f.N.find(n=>n.type==="start")||{}).id);
   L.push("Ablauf „"+f.n+"“ ("+f.id+"), Schritte: "+order.map(n=>n.id+" "+n.type+(n.type==="task"?" ["+(n.a?.n||(n.free?"Claude – frei, kein fester Agent: direkt mit Boris' Vorgaben handeln":"?"))+(n.sk?" · SKILL VERWENDEN: "+skLbl(n)+" ("+(sk(n.sk)?(KS(sk(n.sk)).join(", ")||"nur im Cockpit, kein Konto-Skill"):n.sk)+")"+(skOk(n)?"":" – Achtung: Skill ist dem Agenten nicht mehr zugeordnet"):"")+": "+(n.t||"–")+(n.o?" → "+n.o:"")+"]":n.label?" ["+n.label+"]":"")).join(" | "));
   L.push("Verbindungen: "+f.E.map(e=>e.f+">"+e.t+(e.l?" ("+e.l+")":"")+(e.back?" ↩":"")).join(", "));
@@ -1555,8 +1572,10 @@ function jobs(){
   const de=$("#delEx");if(de)de.onclick=async()=>{if(await askOk("Alle "+ex+" Beispiel-Aufträge löschen?")){AU=AU.filter(j=>!j.beispiel);jobs();schedule()}};
   const col=(st,title,cls,LL)=>{const L=LL?LL.flat():AU.filter(j=>j.st===st&&j.f);const cards=L.map(jobCard).join("");return LL?cards:`<div class="kcol ${cls||''}"><h3>${title} <span class="badge">${L.length}</span></h3>${cards||'<div class="hint">–</div>'}</div>`};
   const DM=UI.kidone||"heute",DN=AU.filter(j=>isEnd(j)&&j.f),DH=DN.filter(j=>dayBucket(doneAt(j))===0).length;
-  $("#kfilt").innerHTML=`<span>Erledigte:</span><div class="seg">${[["alle","Alle anzeigen",DN.length],["heute","Nur heute erledigt",DH],["aus","Ausblenden",""]].map(([k,l,n])=>`<button data-kd="${k}" class="${DM===k?'on':''}">${l}${n!==""?'<span class="n">'+n+'</span>':''}</button>`).join("")}</div>${DM!=="alle"&&DN.length>(DM==="heute"?DH:0)?`<span class="hint">${DM==="heute"?(DN.length-DH)+" ältere erledigte":DN.length+" erledigte"} ausgeblendet</span>`:""}`;
+  const NIB=AU.filter(j=>j.st==="inbox").length;
+  $("#kfilt").innerHTML=(NIB?`<button class="btn sm" id="kiinbox" title="Gesammelte Aufgaben im Eingang">📥 ${NIB} gesammelt</button>`:"")+`<span>Erledigte:</span><div class="seg">${[["alle","Alle anzeigen",DN.length],["heute","Nur heute erledigt",DH],["aus","Ausblenden",""]].map(([k,l,n])=>`<button data-kd="${k}" class="${DM===k?'on':''}">${l}${n!==""?'<span class="n">'+n+'</span>':''}</button>`).join("")}</div>${DM!=="alle"&&DN.length>(DM==="heute"?DH:0)?`<span class="hint">${DM==="heute"?(DN.length-DH)+" ältere erledigte":DN.length+" erledigte"} ausgeblendet</span>`:""}`;
   document.querySelectorAll("[data-kd]").forEach(b=>b.onclick=()=>{UI.kidone=b.dataset.kd;saveUI();jobs()});
+  const kib=$("#kiinbox");if(kib)kib.onclick=()=>avOpen({tab:"offen",st:"inbox"});
   const card=g=>col(null,null,null,[g]);
   let doneCol="";
   if(DM!=="aus"){const G=[[],[],[],[],[]];DN.map(j=>[doneAt(j),j]).sort((a,b)=>b[0]-a[0]).forEach(([d,j])=>{const k=dayBucket(d);if(DM==="alle"||k===0)G[k].push(j)});
@@ -1740,9 +1759,10 @@ let AVOPEN=false,AVN=50,AVARCH=null,AVLOAD=false;
 function AVS(){const s=UI.av=UI.av||{};s.tab=s.tab||"offen";s.st=s.st||"alle";s.zeit=s.zeit||"heute";s.sel=s.sel||{};if(!orgById(s.org))s.org=OC||(ORGS()[0]||{}).id;return s}
 function avSel(o){const s=AVS();if(!s.sel[o])s.sel[o]={d:null,ax:[]};return s.sel[o]}
 function avOpen(opt){opt=opt||{};const s=AVS();if(opt.org)s.org=opt.org;const S=avSel(s.org);
+  if(opt.all){S.d=null;S.ax=[]}
   if(opt.d){S.d=[...opt.d];S.ax=[]}
   if(opt.only){S.d=[PL(opt.only,s.org).abt||"_none"];S.ax=AG.filter(x=>x.id!==opt.only.id).map(x=>x.id).concat(["_frei","_tl"])}
-  if(opt.tab)s.tab=opt.tab;AVN=50;saveUI();AVOPEN=true;avRender()}
+  if(opt.tab)s.tab=opt.tab;if(opt.st)s.st=opt.st;AVN=50;saveUI();AVOPEN=true;avRender()}
 function avClose(){AVOPEN=false;const d=$("#avdlg");if(d)d.remove()}
 function avRefresh(){if(AVOPEN&&$("#avdlg"))avRender(true)}
 
@@ -1775,8 +1795,8 @@ function avRender(keep){const s=AVS(),o=s.org,S=avSel(o),O=orgById(o)||{},F=avFe
   const RO=R0.filter(r=>!r.end&&inSel(r)),cnt=st=>RO.filter(r=>st==="alle"||r.j.st===st).length;
   const tabs=`<div class="seg2"><button data-avt="offen" class="${s.tab==="offen"?"on":""}">Offen<span class="c">${R0.filter(r=>!r.end&&inSel(r)).length}</span></button><button data-avt="erledigt" class="${s.tab==="erledigt"?"on":""}">Erledigt</button></div>`;
   let bar2="";
-  if(s.tab==="offen"){const L=[["alle","Alle"],["run","Läuft"],["wait","Wartet auf dich"]].concat(cnt("inbox")?[["inbox","Gesammelt"]]:[]);
-    bar2=`<div class="seg2">${L.map(([k,l])=>`<button data-avs="${k}" class="${s.st===k?"on":""}">${l}${k==="alle"?"":`<span class="c">${cnt(k)}</span>`}</button>`).join("")}</div>`}
+  if(s.tab==="offen"){const L=[["alle","Alle"],["run","Läuft"],["wait","Wartet auf dich"],["inbox","📥 Gesammelt"]];
+    bar2=`<div class="seg2">${L.map(([k,l])=>`<button data-avs="${k}" class="${s.st===k?"on":""}">${l}${k==="alle"?"":`<span class="c">${cnt(k)}</span>`}</button>`).join("")}</div>${s.st==="inbox"?`<div class="seg2"><button data-avso="prio" class="${s.sort!=="due"?"on":""}" title="Priorität, darin Fälligkeit">Priorität</button><button data-avso="due" class="${s.sort==="due"?"on":""}" title="Fälligkeit, darin Priorität">Fälligkeit</button></div>`:""}`}
   else{const RE=R0.filter(r=>r.end&&(s.abg||r.j.st!=="cancel")&&inSel(r));
     bar2=`<div class="seg2">${AVZ.map(([k,l])=>`<button data-avz="${k}" class="${s.zeit===k?"on":""}">${l}${k==="aelter"&&!AVARCH?"":`<span class="c">${RE.filter(r=>inFenster(r.d,F[k])).length}</span>`}</button>`).join("")}</div>
       <label class="cb" style="margin:0"><input type="checkbox" id="avabg" ${s.abg?"checked":""}> Abgebrochene zeigen</label>`}
@@ -1784,14 +1804,17 @@ function avRender(keep){const s=AVS(),o=s.org,S=avSel(o),O=orgById(o)||{},F=avFe
   const agc=r=>r.a?`<div class="avag">${av(usr(r.a.owner),24,1)}<span>${esc(r.a.n)}</span></div>`:`<div class="avag"><span class="avfr">✦</span><span>${r.ak==="_tl"?"KI-Teamleiter":"Claude – frei"}</span></div>`;
   const dn=r=>{const d=dept(r.abt);return d?d.n:"Ohne Abteilung"};
   const ttl=r=>`<td class="t"><b>${esc(r.j.t||"–")}</b><small>${esc(dn(r))}</small></td>`;
-  let rows,head;
-  if(s.tab==="offen"){rows=R.filter(r=>s.st==="alle"||r.j.st===s.st).sort((a,b)=>(a.j.st==="wait"?0:1)-(b.j.st==="wait"?0:1)||(+String(b.j.id).slice(2)||0)-(+String(a.j.id).slice(2)||0));
+  let rows,head,foot0="";
+  if(s.tab==="offen"){const OR={wait:0,run:1,inbox:2},pr=j=>PRN[j.prio||"n"]??2,du=j=>j.due||"9999",ib=(a,b)=>s.sort==="due"?du(a.j).localeCompare(du(b.j))||pr(a.j)-pr(b.j):pr(a.j)-pr(b.j)||du(a.j).localeCompare(du(b.j));
+    rows=R.filter(r=>s.st==="alle"||r.j.st===s.st).sort((a,b)=>(OR[a.j.st]??1)-(OR[b.j.st]??1)||(a.j.st==="inbox"&&b.j.st==="inbox"?ib(a,b):0)||(+String(b.j.id).slice(2)||0)-(+String(a.j.id).slice(2)||0));
+    const NIB=rows.filter(r=>r.j.st==="inbox").length;
+    if(NIB)foot0=`<div class="avfoot"><span><label class="cb" style="margin:0"><input type="checkbox" id="avsall"> alle gesammelten wählen</label></span><button class="btn sm p" id="avstart" disabled>▶ Ausgewählte starten</button></div>`;
     head=`<th>Status</th><th>Nr.</th><th>Auftrag · Abteilung</th><th class="hm">Agent</th><th class="hm">Stand</th><th></th>`;
     rows=rows.map(r=>{const j=r.j,L=(j.log||[]).filter(x=>x&&!LOGSKIP.test(x[1]||"")),last=L[L.length-1];
-      const st=j.st==="wait"?'<span class="kst wait">■ wartet auf dich</span>':j.st==="inbox"?'<span class="kst">📥 gesammelt</span>':'<span class="kst run">● läuft</span>';
-      const stand=j.st==="wait"?esc(j.q?(j.q.kind==="Rückfrage"?"Rückfrage":"Zur Freigabe")+(j.q.from&&j.q.from!=="Company OS"?" · "+j.q.from:""):"Wartet auf dich"):j.st==="run"?esc([j.fired?"seit "+new Date(j.fired).toLocaleTimeString("de-DE",{hour:"2-digit",minute:"2-digit"}):"",last?last[1]:""].filter(Boolean).join(" · ")):"";
-      const act=j.st==="wait"?`<button class="btn sm p" data-avres="${j.id}">Prüfen &amp; freigeben</button>`:"";
-      return `<tr class="cl" data-avj="${j.id}"><td>${st}</td><td class="nr">${esc(j.id)}</td>${ttl(r)}<td class="hm">${agc(r)}</td><td class="hm sm">${stand}</td><td class="ac">${act}</td></tr>`})}
+      const st=j.st==="wait"?'<span class="kst wait">■ wartet auf dich</span>':j.st==="inbox"?`<label class="avsel"><input type="checkbox" data-avsel="${j.id}"> <span class="kst">📥 gesammelt</span></label>${prioB(j)}`:'<span class="kst run">● läuft</span>';
+      const stand=j.st==="wait"?esc(j.q?(j.q.kind==="Rückfrage"?"Rückfrage":"Zur Freigabe")+(j.q.from&&j.q.from!=="Company OS"?" · "+j.q.from:""):"Wartet auf dich"):j.st==="inbox"?esc([j.due?"fällig "+new Date(j.due+"T12:00").toLocaleDateString("de-DE",{day:"2-digit",month:"2-digit"}):"",j.gesammelt?"gesammelt "+new Date(j.gesammelt).toLocaleDateString("de-DE",{day:"2-digit",month:"2-digit"}):""].filter(Boolean).join(" · ")):j.st==="run"?esc([j.fired?"seit "+new Date(j.fired).toLocaleTimeString("de-DE",{hour:"2-digit",minute:"2-digit"}):"",last?last[1]:""].filter(Boolean).join(" · ")):"";
+      const act=j.st==="wait"?`<button class="btn sm p" data-avres="${j.id}">Prüfen &amp; freigeben</button>`:j.st==="inbox"?`<button class="btn sm" data-avgo="${j.id}">▶ Starten</button> <button class="ic" data-avdrop="${j.id}" title="Aus dem Eingang verwerfen">✕</button>`:"";
+      return `<tr class="${j.st==="inbox"?"ib":"cl"}" ${j.st==="inbox"?"":`data-avj="${j.id}"`}><td>${st}</td><td class="nr">${esc(j.id)}</td>${ttl(r)}<td class="hm">${agc(r)}</td><td class="hm sm">${stand}</td><td class="ac">${act}</td></tr>`})}
   else{const all=R.sort((a,b)=>b.d-a.d);rows=all.slice(0,AVN);
     head=`<th>Erledigt</th><th>Nr.</th><th>Auftrag · Abteilung</th><th class="hm">Agent</th><th>Status</th><th class="hm">Ergebnis</th>`;
     const tot=all.length;
@@ -1799,7 +1822,7 @@ function avRender(keep){const s=AVS(),o=s.org,S=avSel(o),O=orgById(o)||{},F=avFe
       const dt=+r.d?r.d.toLocaleDateString("de-DE",{day:"2-digit",month:"2-digit"})+" <b>"+r.d.toLocaleTimeString("de-DE",{hour:"2-digit",minute:"2-digit"})+"</b>":"–";
       return `<tr class="${r.arch?"arch":"cl"}" ${r.arch?`title="${esc((j.sum||"")+" (aus dem Archiv)")}"`:`data-avj="${j.id}"`}><td class="nr">${dt}</td><td class="nr">${esc(j.id)}</td>${ttl(r)}<td class="hm">${agc(r)}</td><td><span class="kst ${c}">${esc(l.replace("Erledigt","erledigt").replace("Abgebrochen","abgebrochen"))}</span></td><td class="hm">${e?`<a href="${esc(e.url)}" target="_blank" rel="noopener">↗ ${esc(e.t||"Öffnen")}</a>`:"—"}</td></tr>`});
     rows.foot=`<div class="avfoot"><span>${Math.min(AVN,tot)} von ${tot} angezeigt${s.zeit==="aelter"?(AVLOAD?" · Archiv wird geladen …":AVARCH?" · inkl. Archiv":""):""}</span>${tot>AVN?'<button class="btn sm" id="avmore">Weitere laden</button>':""}</div>`}
-  const foot=rows.foot||"",empty=`<tr><td colspan="6" class="avempty">${s.tab==="offen"?"Keine offenen Aufträge in dieser Auswahl.":"Keine Aufträge in diesem Zeitraum."}</td></tr>`;
+  const foot=rows.foot||foot0,empty=`<tr><td colspan="6" class="avempty">${s.tab==="offen"?"Keine offenen Aufträge in dieser Auswahl.":"Keine Aufträge in diesem Zeitraum."}</td></tr>`;
   const html=`<div class="modal" id="avm"><div class="avbox" role="dialog" aria-label="Aufträge und Verlauf">
     <div class="avhead"><h3>🕘 Aufträge &amp; Verlauf</h3><span class="sub">· ${esc(selN)}</span><button class="ic" id="avx" title="Schließen" style="font-size:18px">✕</button></div>
     <div class="avgrid"><details class="avside" id="avside" ${AVSIDE()?"open":""}><summary><h4>Einschränken</h4><span class="avsn">${esc(selN)}</span></summary>
@@ -1826,7 +1849,21 @@ function avRender(keep){const s=AVS(),o=s.org,S=avSel(o),O=orgById(o)||{},F=avFe
   const mo=$("#avmore");if(mo)mo.onclick=()=>{AVN+=50;avRender(true)};
   d.querySelectorAll("[data-avres]").forEach(b=>b.onclick=ev=>{ev.stopPropagation();const j=AU.find(x=>x.id===b.dataset.avres);if(j)kiFresh(j).then(()=>resultModal(j))});
   d.querySelectorAll("[data-avj]").forEach(t=>t.onclick=ev=>{if(ev.target.closest("a,button"))return;const j=AU.find(x=>x.id===t.dataset.avj);if(!j)return;KINEW.delete(j.id);if(j.ki)kiFresh(j).then(()=>resultModal(j));else jobModalK(j)});
+  d.querySelectorAll("[data-avso]").forEach(b=>b.onclick=()=>{s.sort=b.dataset.avso;rr()});
+  const selIds=()=>[...d.querySelectorAll("[data-avsel]:checked")].map(c=>c.dataset.avsel),upd=()=>{const b=$("#avstart");if(b){const n=selIds().length;b.disabled=!n;b.textContent="▶ Ausgewählte starten"+(n?" ("+n+")":"")}};
+  d.querySelectorAll("[data-avsel]").forEach(c=>c.onchange=upd);
+  const sa=$("#avsall");if(sa)sa.onchange=()=>{d.querySelectorAll("[data-avsel]").forEach(c=>c.checked=sa.checked);upd()};
+  const sb=$("#avstart");if(sb)sb.onclick=()=>eingangStarten(selIds());
+  d.querySelectorAll("[data-avgo]").forEach(b=>b.onclick=ev=>{ev.stopPropagation();eingangStarten([b.dataset.avgo])});
+  d.querySelectorAll("[data-avdrop]").forEach(b=>b.onclick=async ev=>{ev.stopPropagation();const j=AU.find(x=>x.id===b.dataset.avdrop);if(!j||!await askOk("„"+j.t+"“ aus dem Eingang verwerfen? Der Eintrag bleibt als „abgebrochen“ im Verlauf.","Ja, verwerfen"))return;
+    j.st="cancel";markDone(j);j.log.push([now(),"Aus dem Eingang verworfen von Boris",1]);try{await Store.set("jobs/"+j.id,JSON.parse(jobSer(j)));LAST.set("jobs/"+j.id,jobSer(j))}catch(e){schedule()}avRefresh();if(!$("#org").classList.contains("hide"))org()});
   if(s.tab==="erledigt"&&s.zeit==="aelter")avArchivLaden()}
+const prioB=j=>j.prio==="d"?' <span class="prio d">Dringend</span>':j.prio==="h"?' <span class="prio h">Hoch</span>':j.prio==="l"?' <span class="prio l">Niedrig</span>':"";
+const inboxCnt=(o,did)=>AU.filter(j=>j.st==="inbox"&&jobOrg(j)===o&&jobAbt(j,jobAgent(j))===did).length;
+async function eingangStarten(ids){const L=ids.map(id=>AU.find(j=>j.id===id)).filter(j=>j&&j.st==="inbox");if(!L.length)return;
+  if(L.length>1&&!await askOk(L.length+" gesammelte Aufträge starten? Jeder startet eine eigene Claude-Sitzung.","Ja, starten"))return;
+  for(const j of L){j.log.push([now(),"Aus dem Eingang gestartet"]);kiStart(j,"starten");await new Promise(r=>setTimeout(r,400))}
+  avRefresh();if(!$("#org").classList.contains("hide"))org()}
 document.addEventListener("keydown",e=>{if(e.key==="Escape"&&AVOPEN&&!$("#modal").innerHTML&&!$("#dlg"))avClose()});
 
 boot();

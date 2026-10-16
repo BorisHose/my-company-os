@@ -339,3 +339,8 @@ fieldset:disabled .ic,fieldset:disabled .ownadd,fieldset:disabled [data-r],field
 .oact{flex-wrap:wrap}.oact .btn.p{flex:1}
 .oag .oplay{width:24px;height:24px;font-size:10px;background:#fff;color:var(--acc);border:1px solid var(--line);opacity:.5}.oag:hover .oplay,.oag .oplay:focus-visible{opacity:1;border-color:var(--acc)}.oag .oplay:hover{background:var(--accbg)}
 @media(hover:none){.oag .oplay{opacity:.85}}
+/* v53: Sammeln und Eingang */
+.oact .btn.p{flex:1 1 100%}
+.prio{font-size:11px;font-weight:700;border-radius:8px;padding:1px 7px;margin-left:4px;white-space:nowrap}.prio.d{background:#fdecec;color:#b42318}.prio.h{background:#fff4d6;color:#8a5a00}.prio.l{background:#eef0f4;color:#667085}
+.avsel{display:inline-flex;align-items:center;gap:5px;cursor:pointer}.avt tr.ib td{background:#fffdf7}
+#jprio button{flex:1}

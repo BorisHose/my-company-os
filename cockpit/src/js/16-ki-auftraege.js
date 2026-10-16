@@ -11,7 +11,7 @@ function kiApply(docs,quiet){/* docs: einfache Objekte aus Store */const M=new M
   waitCnt();if(!$("#jobs").classList.contains("hide")&&!$("#modal").innerHTML)jobs();avRefresh();{const sig=AG.map(a=>runCnt(a.id)).join(",");if(sig!==ORGRUN){ORGRUN=sig;if(!$("#org").classList.contains("hide")&&!isEd("org"))org()}}if(!quiet&&!ch.length)toast("Stand geladen")}
 let KIEDIT=null,ORGRUN="";
 const KINEW=new Set();
-const okTxt=j=>j.st==="cancel"?["no","✕ Abgebrochen"]:j.st==="done"?(j.ok==="nein"?["no","✗ Nicht erledigt"]:j.ok==="teilweise"?["part","◐ Teilweise erledigt"]:["ok","✓ Erledigt"]):j.st==="wait"?["wait","⏸ Wartet auf dich"]:["run","▶ Läuft"];
+const okTxt=j=>j.st==="inbox"?["wait","📥 Gesammelt"]:j.st==="cancel"?["no","✕ Abgebrochen"]:j.st==="done"?(j.ok==="nein"?["no","✗ Nicht erledigt"]:j.ok==="teilweise"?["part","◐ Teilweise erledigt"]:["ok","✓ Erledigt"]):j.st==="wait"?["wait","⏸ Wartet auf dich"]:["run","▶ Läuft"];
 async function kiAnswer(j,a){await kiFresh(j);const Q=j.q||{};j.ans=[...(j.ans||[]),{q:Q.text||"",a,at:new Date().toISOString()}];j.log.push([now(),"Boris: "+a,1]);delete j.q;kiStart(j,"fortsetzen",{a,q:Q.text,kind:Q.kind,from:Q.from})}
 async function kiCancel(j){if(!await askOk("Auftrag „"+j.t+"“ abbrechen? Claude führt nichts mehr aus; bereits Angelegtes bleibt bestehen.","Ja, abbrechen"))return false;await kiFresh(j);
   j.st="cancel";markDone(j);j.ok="nein";delete j.q;j.log.push([now(),"Auftrag abgebrochen von Boris",1]);j.sum=(j.sum?j.sum+" ":"")+"Von Boris abgebrochen – nichts weiter ausgeführt.";
@@ -43,6 +43,7 @@ function kiContext(j){const f=j.f,L=[];if(!f)return "";const cur=j.path[j.path.l
   if(JS)L.push("SKILL VERWENDEN: „"+JS.n+"“ – im Konto: "+(KS(JS).join(", ")||"nur im Cockpit, kein Konto-Skill")+(JS.d?" · "+JS.d:""));
   if(JO)L.push("Organisation des Auftrags: "+JO.n+(JO.prod?" (Produkt "+PN[JO.prod]+")":""));
   L.push("Auftrag "+j.id+": "+(j.t||"")+(j.in?"\nEingabe von Boris: "+j.in:""));
+  if(j.prio&&j.prio!=="n"||j.due)L.push("Priorität des Auftrags: "+((PRIO.find(p=>p[0]===(j.prio||"n"))||[])[1]||"Normal")+(j.due?" · Fällig bis: "+new Date(j.due+"T12:00").toLocaleDateString("de-DE"):""));
   const seen=new Set(),order=[];(function walk(id){if(seen.has(id))return;seen.add(id);const n=nodeOf(f,id);if(!n)return;order.push(n);f.E.filter(e=>e.f===id&&!e.back).forEach(e=>walk(e.t))})((f.N.find(n=>n.type==="start")||{}).id);
   L.push("Ablauf „"+f.n+"“ ("+f.id+"), Schritte: "+order.map(n=>n.id+" "+n.type+(n.type==="task"?" ["+(n.a?.n||(n.free?"Claude – frei, kein fester Agent: direkt mit Boris' Vorgaben handeln":"?"))+(n.sk?" · SKILL VERWENDEN: "+skLbl(n)+" ("+(sk(n.sk)?(KS(sk(n.sk)).join(", ")||"nur im Cockpit, kein Konto-Skill"):n.sk)+")"+(skOk(n)?"":" – Achtung: Skill ist dem Agenten nicht mehr zugeordnet"):"")+": "+(n.t||"–")+(n.o?" → "+n.o:"")+"]":n.label?" ["+n.label+"]":"")).join(" | "));
   L.push("Verbindungen: "+f.E.map(e=>e.f+">"+e.t+(e.l?" ("+e.l+")":"")+(e.back?" ↩":"")).join(", "));
@@ -137,8 +138,10 @@ function jobs(){
   const de=$("#delEx");if(de)de.onclick=async()=>{if(await askOk("Alle "+ex+" Beispiel-Aufträge löschen?")){AU=AU.filter(j=>!j.beispiel);jobs();schedule()}};
   const col=(st,title,cls,LL)=>{const L=LL?LL.flat():AU.filter(j=>j.st===st&&j.f);const cards=L.map(jobCard).join("");return LL?cards:`<div class="kcol ${cls||''}"><h3>${title} <span class="badge">${L.length}</span></h3>${cards||'<div class="hint">–</div>'}</div>`};
   const DM=UI.kidone||"heute",DN=AU.filter(j=>isEnd(j)&&j.f),DH=DN.filter(j=>dayBucket(doneAt(j))===0).length;
-  $("#kfilt").innerHTML=`<span>Erledigte:</span><div class="seg">${[["alle","Alle anzeigen",DN.length],["heute","Nur heute erledigt",DH],["aus","Ausblenden",""]].map(([k,l,n])=>`<button data-kd="${k}" class="${DM===k?'on':''}">${l}${n!==""?'<span class="n">'+n+'</span>':''}</button>`).join("")}</div>${DM!=="alle"&&DN.length>(DM==="heute"?DH:0)?`<span class="hint">${DM==="heute"?(DN.length-DH)+" ältere erledigte":DN.length+" erledigte"} ausgeblendet</span>`:""}`;
+  const NIB=AU.filter(j=>j.st==="inbox").length;
+  $("#kfilt").innerHTML=(NIB?`<button class="btn sm" id="kiinbox" title="Gesammelte Aufgaben im Eingang">📥 ${NIB} gesammelt</button>`:"")+`<span>Erledigte:</span><div class="seg">${[["alle","Alle anzeigen",DN.length],["heute","Nur heute erledigt",DH],["aus","Ausblenden",""]].map(([k,l,n])=>`<button data-kd="${k}" class="${DM===k?'on':''}">${l}${n!==""?'<span class="n">'+n+'</span>':''}</button>`).join("")}</div>${DM!=="alle"&&DN.length>(DM==="heute"?DH:0)?`<span class="hint">${DM==="heute"?(DN.length-DH)+" ältere erledigte":DN.length+" erledigte"} ausgeblendet</span>`:""}`;
   document.querySelectorAll("[data-kd]").forEach(b=>b.onclick=()=>{UI.kidone=b.dataset.kd;saveUI();jobs()});
+  const kib=$("#kiinbox");if(kib)kib.onclick=()=>avOpen({tab:"offen",st:"inbox"});
   const card=g=>col(null,null,null,[g]);
   let doneCol="";
   if(DM!=="aus"){const G=[[],[],[],[],[]];DN.map(j=>[doneAt(j),j]).sort((a,b)=>b[0]-a[0]).forEach(([d,j])=>{const k=dayBucket(d);if(DM==="alle"||k===0)G[k].push(j)});
