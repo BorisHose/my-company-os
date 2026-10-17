@@ -393,6 +393,44 @@ const check = (name, ok, info = '') => { CHECKS.push({ name, ok }); console.log(
     const kb = ADAPTER.bodo.projektKontext({ sys: 'bodo', id: 'bp1', n: 'X', orgId: 'o1', orgN: 'Muster', url: 'u' }); R.kontext = /projectId bp1/.test(kb.wo) && /Mandant für diese Anlagen ist Muster/.test(kb.ziel);
     return R }, BER);
   check('Adapter: Vertrag vollständig, Berechtigungen passen, Projekte/Benutzer/Prüfung/Fehler/Kontext je System richtig', Object.values(ad).every(Boolean), JSON.stringify(ad));
+  // ----- v71 Agenten im Organigramm anlegen und bearbeiten -----
+  await p.setViewportSize({ width: 1400, height: 900 });
+  const ga = await p.evaluate(async () => { const w = ms => new Promise(r => setTimeout(r, ms)); const R = {}; const $q = s => document.querySelector(s);
+    document.getElementById('modal').innerHTML = ''; show('org'); OC = ORGS()[0].id; org(); const O = orgById(OC), d = deptsOf(OC)[0];
+    R.knoepfe = document.querySelectorAll('#orgv .oadd').length > deptsOf(OC).length - 1 && document.querySelectorAll('#orgv .oedit').length === document.querySelectorAll('#orgv .oag').length;
+    const vor = AG.length; $q(`[data-oadd="${d.id}|"]`).click(); await w(100);
+    R.titel = /Neuer Agent in „/.test($q('#gwh').textContent) && $q('#gwh').textContent.includes(d.n);
+    R.produkt = $q('#gwp').value === (O.prod || 'all') && $q('#gwa').value === d.id;
+    $q('#gww').click(); R.pflicht = $q('#gwerr').style.display !== 'none' && !!$q('#gwn');
+    const n = $q('#gwn'); n.value = 'Testagent Assistent'; n.dispatchEvent(new Event('input')); const r = $q('#gwr'); r.value = 'Prüft den Assistenten.'; r.dispatchEvent(new Event('input'));
+    $q('#gww').click(); await w(50); const c = $q('#gwkat [data-pks]'); R.katalog = !!c && !!$q('#pkq') && !!$q('#pkonly');
+    c.checked = true; c.dispatchEvent(new Event('change')); R.gewaehlt = $q('#gwsn').textContent === 'Ausgewählt (1)';
+    $q('#gwsl [data-gwx]').click(); R.entfernt = $q('#gwsn').textContent === 'Ausgewählt (0)' && !$q('#gwkat [data-pks]').checked;
+    const c2 = $q('#gwkat [data-pks]'); c2.checked = true; c2.dispatchEvent(new Event('change'));
+    $q('#gww').click(); const o = $q('#gwown'); o.value = 'Nie ohne Freigabe versenden'; o.dispatchEvent(new KeyboardEvent('keydown', { key: 'Enter' })); R.regel = document.querySelectorAll('[data-gwro]').length === 1;
+    $q('#gww').click(); R.zusammen = $q('.gwsum').textContent.includes('Testagent Assistent') && $q('.gwsum').textContent.includes(d.n);
+    R.nochNicht = AG.length === vor; $q('#gwok').click(); await w(1300);
+    const a = AG.find(x => x.n === 'Testagent Assistent'); R.angelegt = !!a && AG.length === vor + 1 && PL(a, OC).abt === d.id && a.s.length === 1 && a.own.length === 1 && a.r === 'Prüft den Assistenten.';
+    R.gespeichert = !!window.__S['agents/' + a.id]; R.imOrg = !!document.querySelector(`#orgv [data-oa="${a.id}"]`);
+    $q('#gwgo').click(); await w(150); R.auftrag = !!$q('#modal').innerHTML && !$q('#gwh');
+    document.getElementById('modal').innerHTML = ''; org();
+    // Abbrechen verwirft den Entwurf
+    $q(`[data-oadd="${d.id}|"]`).click(); await w(50); const n2 = $q('#gwn'); n2.value = 'Wird verworfen'; n2.dispatchEvent(new Event('input')); $q('#gwx').click(); await w(50);
+    $q('#dlg [data-yes]').click(); await w(50); R.verworfen = !AG.some(x => x.n === 'Wird verworfen') && !$q('#gwh');
+    // doppelter Name wird abgewiesen
+    $q(`[data-oadd="${d.id}|"]`).click(); await w(50); const n3 = $q('#gwn'); n3.value = 'testagent assistent'; n3.dispatchEvent(new Event('input')); $q('#gww').click(); R.doppelt = /gibt es schon/.test($q('#gwerr').textContent) && !!$q('#gwn');
+    document.getElementById('modal').innerHTML = '';
+    // Bearbeiten über ✎: gleiche Kopie, Speichern übernimmt, Objekt bleibt dasselbe
+    $q(`#orgv [data-oed="${a.id}"]`).click(); await w(50); R.bearbTitel = /bearbeiten/.test($q('#gwh').textContent) && document.querySelectorAll('#gwst [data-gws]').length === 3;
+    const n4 = $q('#gwn'); n4.value = 'Testagent Umbenannt'; n4.dispatchEvent(new Event('input')); R.nichtSofort = a.n === 'Testagent Assistent';
+    $q('#gwok').click(); await w(1300); R.bearbeitet = AG.includes(a) && a.n === 'Testagent Umbenannt' && (window.__S['agents/' + a.id] || {}).n === 'Testagent Umbenannt';
+    document.getElementById('modal').innerHTML = ''; const dl = $q('#dlg'); if (dl) dl.remove();
+    // im Bearbeitungsmodus des Organigramms keine Assistent-Knöpfe
+    $q('#orgedit').click(); R.editAus = !document.querySelector('#orgv .oadd') && !document.querySelector('#orgv .oedit'); $q('#orged [data-ecancel]').click();
+    // Skill-Auswahl im Agenten-Editor nutzt dieselbe Komponente
+    skPick(a); await w(50); const c3 = [...document.querySelectorAll('#pkt [data-pks]')].find(x => !x.checked); c3.checked = true; c3.dispatchEvent(new Event('change')); R.skPick = /1 hinzu/.test($q('#pkcnt').textContent); $q('#pkno').click(); R.skPickUnveraendert = a.s.length === 1;
+    AG.splice(AG.indexOf(a), 1); schedule(); org(); return R });
+  check('Agent im Organigramm: + Agent, 4 Schritte, Pflichtname, Skills aus dem Katalog, Regeln, Anlegen erst bei Bestätigung, Auftrag, Abbrechen, Bearbeiten über ✎', Object.values(ga).every(Boolean), JSON.stringify(ga));
   check('keine Laufzeitfehler', errs.length === 0, errs.slice(0, 3).join(' | '));
   await b.close();
   if (process.env.KEEP) fs.copyFileSync(tmp, path.join(ROOT, 'tests', '.keep.html')); fs.unlinkSync(tmp);

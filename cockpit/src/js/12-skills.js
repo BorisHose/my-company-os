@@ -37,24 +37,32 @@ function skDetail(){const P=$("#skdet");if(!P)return;const s=SKSEL&&sk(SKSEL);
    ${s.body?`<details><summary>Inhalt (SKILL.md)</summary><pre>${esc(s.body)}</pre></details>`:""}`;
   $("#skdedit").onclick=()=>skillModal(s.id);
   P.querySelectorAll("[data-goag]").forEach(c=>c.onclick=()=>goAgent(c.dataset.goag))}
-function skPick(a){const OLD=new Set(a.s),SEL=new Set(a.s);let q="",only=true;
-  const okA=s=>a.p==="all"||s.p===a.p||s.p==="all"||s.p==="multi";
-  const close=modalBox(`<div class="bhead"><h3>Skills für „${esc(a.n)}“</h3><button class="ic" id="mclose" style="font-size:18px">✕</button></div>
-   <input type="search" id="pkq" placeholder="🔍 Skill suchen (Name, Beschreibung, Gruppe, Konto-Name) …" autocomplete="off">
-   <label class="cb" style="margin:8px 0 0"><input type="checkbox" id="pkonly" checked> Nur Skills, die zum Produkt des Agenten passen (${esc(PN[a.p])}${a.p==="all"?"":" + produktneutral"})</label>
-   <div class="pkwrap"><table class="pkt" id="pkt"></table></div>
-   <div class="btns" style="margin-top:12px;align-items:center"><span id="pkcnt" class="hint" style="margin:0;flex:1"></span><button class="btn" id="pkno">Abbrechen</button><button class="btn p" id="pkok">Übernehmen</button></div>`,true);
+// Skill-Auswahl aus dem Katalog: Suche, Gruppen (ganze Gruppe per Häkchen), Produktfilter; Entwürfe und Vorschläge sind markiert.
+// Zeichnet in root. SEL (Set der Skill-Ids) wird direkt geändert; onChange läuft nach jeder Änderung. Genutzt von skPick und dem Agenten-Assistenten.
+function skAuswahl(root,{p,SEL,onChange,fokus}){let q="",only=true;
+  const okA=s=>p==="all"||s.p===p||s.p==="all"||s.p==="multi";
+  root.innerHTML=`<input type="search" id="pkq" placeholder="🔍 Skill suchen (Name, Beschreibung, Gruppe, Konto-Name) …" autocomplete="off">
+   <label class="cb" style="margin:8px 0 0"><input type="checkbox" id="pkonly" checked> Nur Skills, die zum Produkt des Agenten passen (${esc(PN[p])}${p==="all"?"":" + produktneutral"})</label>
+   <div class="pkwrap"><table class="pkt" id="pkt"></table></div>`;
+  const tab=root.querySelector("#pkt"),geaendert=()=>{draw();if(onChange)onChange()};
   const draw=()=>{const L=SK.filter(s=>(!only||okA(s)||SEL.has(s.id))&&skMatch(s,q));let h="";
     [...new Set(L.map(s=>s.g))].sort((x,y)=>(+x)-(+y)).forEach(g=>{const G=L.filter(s=>s.g===g),n=G.filter(s=>SEL.has(s.id)).length;
       h+=`<tr class="gh"><td style="width:28px"><input type="checkbox" data-pkg="${g}" ${n===G.length?"checked":""} title="Ganze Gruppe auswählen"></td><td colspan="2">${esc(grName(g))} <span class="hint" style="margin:0;font-weight:400">${n}/${G.length}</span></td></tr>`;
       G.forEach(s=>{const dim=["entwurf","vorschlag"].includes(srcOf(s));h+=`<tr class="${dim?"dim":""}"><td><input type="checkbox" data-pks="${esc(s.id)}" ${SEL.has(s.id)?"checked":""}></td><td><b style="color:var(--ink)">${esc(s.n)}</b>${dim?' <span class="hint" style="margin:0">(noch nicht im Konto)</span>':""}<small>${esc((s.d||"").split(/\s*Nutzen bei\s*:/i)[0].slice(0,160))}</small></td><td style="white-space:nowrap">${srcBadge(s)}</td></tr>`})});
-    $("#pkt").innerHTML=h||'<tr><td class="hint">Kein Skill gefunden.</td></tr>';
-    const add=[...SEL].filter(x=>!OLD.has(x)).length,rem=[...OLD].filter(x=>!SEL.has(x)).length;$("#pkcnt").textContent=SEL.size+" ausgewählt · "+add+" hinzu · "+rem+" entfernt";
-    document.querySelectorAll("[data-pks]").forEach(c=>c.onchange=()=>{c.checked?SEL.add(c.dataset.pks):SEL.delete(c.dataset.pks);draw()});
-    document.querySelectorAll("[data-pkg]").forEach(c=>c.onchange=()=>{L.filter(s=>String(s.g)===c.dataset.pkg).forEach(s=>c.checked?SEL.add(s.id):SEL.delete(s.id));draw()})};
-  draw();const qi=$("#pkq");qi.focus();qi.oninput=()=>{q=qi.value.toLowerCase().trim();draw()};$("#pkonly").onchange=e=>{only=e.target.checked;draw()};
+    tab.innerHTML=h||'<tr><td class="hint">Kein Skill gefunden.</td></tr>';
+    tab.querySelectorAll("[data-pks]").forEach(c=>c.onchange=()=>{c.checked?SEL.add(c.dataset.pks):SEL.delete(c.dataset.pks);geaendert()});
+    tab.querySelectorAll("[data-pkg]").forEach(c=>c.onchange=()=>{L.filter(s=>String(s.g)===c.dataset.pkg).forEach(s=>c.checked?SEL.add(s.id):SEL.delete(s.id));geaendert()})};
+  draw();const qi=root.querySelector("#pkq");if(fokus!==false)qi.focus();qi.oninput=()=>{q=qi.value.toLowerCase().trim();draw()};root.querySelector("#pkonly").onchange=e=>{only=e.target.checked;draw()};
+  return {draw}}
+function skPick(a){const OLD=new Set(a.s),SEL=new Set(a.s);
+  const close=modalBox(`<div class="bhead"><h3>Skills für „${esc(a.n)}“</h3><button class="ic" id="mclose" style="font-size:18px">✕</button></div>
+   <div id="pkbox"></div>
+   <div class="btns" style="margin-top:12px;align-items:center"><span id="pkcnt" class="hint" style="margin:0;flex:1"></span><button class="btn" id="pkno">Abbrechen</button><button class="btn p" id="pkok">Übernehmen</button></div>`,true);
+  const diff=()=>[[...SEL].filter(x=>!OLD.has(x)).length,[...OLD].filter(x=>!SEL.has(x)).length];
+  const cnt=()=>{const [add,rem]=diff();$("#pkcnt").textContent=SEL.size+" ausgewählt · "+add+" hinzu · "+rem+" entfernt"};
+  skAuswahl($("#pkbox"),{p:a.p,SEL,onChange:cnt});cnt();
   $("#mclose").onclick=$("#pkno").onclick=close;
-  $("#pkok").onclick=()=>{a.s=a.s.filter(x=>SEL.has(x)).concat([...SEL].filter(x=>!OLD.has(x)));close();render();const add=[...SEL].filter(x=>!OLD.has(x)).length,rem=[...OLD].filter(x=>!SEL.has(x)).length;toast((add||rem)?(add+" hinzugefügt · "+rem+" entfernt – Speichern nicht vergessen"):"Keine Änderung")}}
+  $("#pkok").onclick=()=>{a.s=a.s.filter(x=>SEL.has(x)).concat([...SEL].filter(x=>!OLD.has(x)));close();render();const [add,rem]=diff();toast((add||rem)?(add+" hinzugefügt · "+rem+" entfernt – Speichern nicht vergessen"):"Keine Änderung")}}
 
 function seg(){
   const sv=s=>(!SKSRC||srcOf(s)===SKSRC);

@@ -439,3 +439,18 @@ img.olg{height:18px;max-width:60px;object-fit:contain;margin-right:6px;vertical-
 
 /* v68 Zuordnungen nur systemseitig */
 .mapw{overflow-x:auto}.map td.mids code{font-size:11.5px}.map tr.mfehlt td{background:#fff7e8}
+
+/* Agent im Organigramm anlegen/bearbeiten (v71) */
+.oag .obtns{margin-left:auto;flex:none;display:flex;flex-direction:column;gap:4px}.oag .obtns .oplay{margin-left:0}
+.oag .oedit{flex:none;width:24px;height:24px;border-radius:50%;border:1px solid var(--line);background:#fff;color:var(--mut);font-size:12px;cursor:pointer;display:grid;place-items:center;padding:0;opacity:.5}
+.oag .oh>div{min-width:0}.oag .oh b{display:block;hyphens:auto;overflow-wrap:break-word}.oag:hover .oedit,.oag .oedit:focus-visible{opacity:1;border-color:var(--acc);color:var(--acc)}
+@media(hover:none){.oag .oedit{opacity:.85}}
+.oadd{display:block;width:100%;margin-top:6px;padding:5px 8px;border:1px dashed var(--line);border-radius:8px;background:transparent;color:var(--mut);font-size:12.5px;cursor:pointer;text-align:center}
+.oadd:hover,.oadd:focus-visible{border-color:var(--acc);color:var(--acc);background:var(--accbg)}
+.wz .steps2 span[data-gws]{cursor:pointer}
+.gwsk{display:grid;grid-template-columns:minmax(0,1fr) 220px;gap:14px;align-items:start}
+.gwsk .pkwrap{max-height:46vh}
+.gwsel{border-left:1px solid var(--line);padding-left:12px}.gwsel .flabel{margin-top:0}
+#gwsl{display:flex;flex-wrap:wrap;gap:6px}
+.gwsum{display:grid;grid-template-columns:150px minmax(0,1fr);gap:8px 12px;font-size:13.5px}.gwsum>b{color:var(--mut);font-weight:600}
+@media(max-width:700px){.gwsk{grid-template-columns:minmax(0,1fr)}.gwsel{border-left:0;padding-left:0;border-top:1px solid var(--line);padding-top:10px}.gwsum{grid-template-columns:minmax(0,1fr);gap:2px}.gwsum>span{margin-bottom:8px}}

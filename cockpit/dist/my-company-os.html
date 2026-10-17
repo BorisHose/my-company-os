@@ -442,6 +442,21 @@ img.olg{height:18px;max-width:60px;object-fit:contain;margin-right:6px;vertical-
 /* v68 Zuordnungen nur systemseitig */
 .mapw{overflow-x:auto}.map td.mids code{font-size:11.5px}.map tr.mfehlt td{background:#fff7e8}
 
+/* Agent im Organigramm anlegen/bearbeiten (v71) */
+.oag .obtns{margin-left:auto;flex:none;display:flex;flex-direction:column;gap:4px}.oag .obtns .oplay{margin-left:0}
+.oag .oedit{flex:none;width:24px;height:24px;border-radius:50%;border:1px solid var(--line);background:#fff;color:var(--mut);font-size:12px;cursor:pointer;display:grid;place-items:center;padding:0;opacity:.5}
+.oag .oh>div{min-width:0}.oag .oh b{display:block;hyphens:auto;overflow-wrap:break-word}.oag:hover .oedit,.oag .oedit:focus-visible{opacity:1;border-color:var(--acc);color:var(--acc)}
+@media(hover:none){.oag .oedit{opacity:.85}}
+.oadd{display:block;width:100%;margin-top:6px;padding:5px 8px;border:1px dashed var(--line);border-radius:8px;background:transparent;color:var(--mut);font-size:12.5px;cursor:pointer;text-align:center}
+.oadd:hover,.oadd:focus-visible{border-color:var(--acc);color:var(--acc);background:var(--accbg)}
+.wz .steps2 span[data-gws]{cursor:pointer}
+.gwsk{display:grid;grid-template-columns:minmax(0,1fr) 220px;gap:14px;align-items:start}
+.gwsk .pkwrap{max-height:46vh}
+.gwsel{border-left:1px solid var(--line);padding-left:12px}.gwsel .flabel{margin-top:0}
+#gwsl{display:flex;flex-wrap:wrap;gap:6px}
+.gwsum{display:grid;grid-template-columns:150px minmax(0,1fr);gap:8px 12px;font-size:13.5px}.gwsum>b{color:var(--mut);font-weight:600}
+@media(max-width:700px){.gwsk{grid-template-columns:minmax(0,1fr)}.gwsel{border-left:0;padding-left:0;border-top:1px solid var(--line);padding-top:10px}.gwsum{grid-template-columns:minmax(0,1fr);gap:2px}.gwsum>span{margin-bottom:8px}}
+
 /* erzeugt von tools/dunkel.py – nicht von Hand ändern */
 :root[data-theme=dark]{color-scheme:dark;--bg:#0f141b;--panel:#171e29;--ink:#e4e8ef;--mut:#9aa4b4;--line:#2b3442;--acc:#5b8def;--accbg:#1c2b47;--warn:#f79009;--warnbg:#3a2615;--ok:#47cd89;--okbg:#12301f;--vio:#9b8afb;--viobg:#28213d;--teal:#36bffa;--tealbg:#11303a;--bodobg:#1d2939;--sellbg:#11303c}
 :root[data-theme=dark] body{background:var(--bg);color:var(--ink)}
@@ -900,6 +915,13 @@ img.olg{height:18px;max-width:60px;object-fit:contain;margin-right:6px;vertical-
 :root[data-theme=dark] .ndm button:hover,:root[data-theme=dark] .ndm button:focus-visible{background:#151c26;outline:none}
 :root[data-theme=dark] .ndm button.on{color:#9ab7de}
 :root[data-theme=dark] .map tr.mfehlt td{background:#33280f}
+:root[data-theme=dark] .oag .oedit{border-radius:50%;border:1px solid var(--line);background:#171e29;color:var(--mut)}
+:root[data-theme=dark] .oag:hover .oedit,:root[data-theme=dark] .oag .oedit:focus-visible{border-color:var(--acc);color:var(--acc)}
+:root[data-theme=dark] .oadd{border:1px dashed var(--line);border-radius:8px;background:transparent;color:var(--mut)}
+:root[data-theme=dark] .oadd:hover,:root[data-theme=dark] .oadd:focus-visible{border-color:var(--acc);color:var(--acc);background:var(--accbg)}
+:root[data-theme=dark] .gwsel{border-left:1px solid var(--line)}
+:root[data-theme=dark] .gwsum>b{color:var(--mut)}
+:root[data-theme=dark] .gwsel{border-left:0;border-top:1px solid var(--line)}
 :root[data-theme=dark] nav button.on{background:#2f6fdf;color:#fff}:root[data-theme=dark] body{background:var(--bg);color:var(--ink)}:root[data-theme=dark] input,:root[data-theme=dark] select,:root[data-theme=dark] textarea{background:#131a24;color:var(--ink);border-color:#3a4456}:root[data-theme=dark] .modal{background:#000000a6}:root[data-theme=dark] img.olg,:root[data-theme=dark] .av img{filter:none}
 @media (prefers-color-scheme:dark){:root[data-theme=auto]{color-scheme:dark;--bg:#0f141b;--panel:#171e29;--ink:#e4e8ef;--mut:#9aa4b4;--line:#2b3442;--acc:#5b8def;--accbg:#1c2b47;--warn:#f79009;--warnbg:#3a2615;--ok:#47cd89;--okbg:#12301f;--vio:#9b8afb;--viobg:#28213d;--teal:#36bffa;--tealbg:#11303a;--bodobg:#1d2939;--sellbg:#11303c}
 :root[data-theme=auto] body{background:var(--bg);color:var(--ink)}
@@ -1358,6 +1380,13 @@ img.olg{height:18px;max-width:60px;object-fit:contain;margin-right:6px;vertical-
 :root[data-theme=auto] .ndm button:hover,:root[data-theme=auto] .ndm button:focus-visible{background:#151c26;outline:none}
 :root[data-theme=auto] .ndm button.on{color:#9ab7de}
 :root[data-theme=auto] .map tr.mfehlt td{background:#33280f}
+:root[data-theme=auto] .oag .oedit{border-radius:50%;border:1px solid var(--line);background:#171e29;color:var(--mut)}
+:root[data-theme=auto] .oag:hover .oedit,:root[data-theme=auto] .oag .oedit:focus-visible{border-color:var(--acc);color:var(--acc)}
+:root[data-theme=auto] .oadd{border:1px dashed var(--line);border-radius:8px;background:transparent;color:var(--mut)}
+:root[data-theme=auto] .oadd:hover,:root[data-theme=auto] .oadd:focus-visible{border-color:var(--acc);color:var(--acc);background:var(--accbg)}
+:root[data-theme=auto] .gwsel{border-left:1px solid var(--line)}
+:root[data-theme=auto] .gwsum>b{color:var(--mut)}
+:root[data-theme=auto] .gwsel{border-left:0;border-top:1px solid var(--line)}
 :root[data-theme=auto] nav button.on{background:#2f6fdf;color:#fff}:root[data-theme=auto] body{background:var(--bg);color:var(--ink)}:root[data-theme=auto] input,:root[data-theme=auto] select,:root[data-theme=auto] textarea{background:#131a24;color:var(--ink);border-color:#3a4456}:root[data-theme=auto] .modal{background:#000000a6}:root[data-theme=auto] img.olg,:root[data-theme=auto] .av img{filter:none}}
 
 </style>
@@ -1422,7 +1451,7 @@ const COL=new Set();
 let PF="bodo",AF="bodo",GEN=false;
 const PK=[["bodo","Bodo"],["sellify","sellify"],["all","Andere"]];
 const PN={bodo:"Bodo",sellify:"sellify",all:"Andere",multi:"Bodo + sellify"};
-const VER="70";
+const VER="71";
 // Produktbereiche: fest im Programm hinterlegt (Entscheidung Boris 09.10.2026), keine Konfiguration in der Datenbank
 const PT={bodo:"Produktbereich Bodo (Bodo Solutions, Mitgliederverwaltung) – alles, was für Bodo-Kunden und das Bodo-System gebraucht wird. Fest im Programm hinterlegt.",sellify:"Produktbereich sellify (business//acts, CRM-Plattform) – alles, was für sellify-Kunden und das sellify-System gebraucht wird. Fest im Programm hinterlegt.",all:"Andere = produktunabhängig, z. B. Web-QA, E-Mail, Word/PDF. Fest im Programm hinterlegt."};
 let AFIL="all";
@@ -1791,7 +1820,9 @@ function org(){
   $("#ohint").textContent=O.n+(O.prod?" · Produkt "+PN[O.prod]+" – zeigt "+PN[O.prod]+"-Agenten und produktunabhängige":" · ohne Produkt – zeigt nur produktunabhängige Agenten");
   const showS=$("#oskills").checked,A=AG.filter(a=>inOrg(a,OC)),D=deptsOf(OC),known=new Set(D.map(d=>d.id));
   const gf=usr(O.gf),ab=a=>PL(a,OC).abt,tm=a=>PL(a,OC).team;
-  const card=a=>{const ow=usr(a.owner);return `<div class="oag p-${a.p}" data-oa="${a.id}" ${oe?'draggable="true" title="Ziehen = in andere Abteilung oder anderes Team"':''}><div class="oh" ${oe?'':`data-goa="${a.id}" title="Agent „${esc(a.n)}“ öffnen"`}>${av(ow,50,1)}<div><b>${esc(a.n)}</b><small>${PN[a.p]}${ow?" · "+esc(ow.n):" · Verantwortlich offen"}</small></div>${oe?"":`<button class="oplay" data-play="${a.id}" title="Auftrag direkt an „${esc(a.n)}“ geben" aria-label="Auftrag an ${esc(a.n)}">▶</button>`}</div>
+  // „+ Agent“ (nur außerhalb des Bearbeitungsmodus): öffnet den Assistenten mit vorbelegtem Platz
+  const addBtn=(abt,team,wo)=>oe?"":`<button class="oadd" data-oadd="${abt}|${team}" title="Neuen Agenten in ${esc(wo)} anlegen">+ Agent</button>`;
+  const card=a=>{const ow=usr(a.owner);return `<div class="oag p-${a.p}" data-oa="${a.id}" ${oe?'draggable="true" title="Ziehen = in andere Abteilung oder anderes Team"':''}><div class="oh" ${oe?'':`data-goa="${a.id}" title="Agent „${esc(a.n)}“ öffnen"`}>${av(ow,50,1)}<div><b>${esc(a.n)}</b><small>${PN[a.p]}${ow?" · "+esc(ow.n):" · Verantwortlich offen"}</small></div>${oe?"":`<span class="obtns"><button class="oplay" data-play="${a.id}" title="Auftrag direkt an „${esc(a.n)}“ geben" aria-label="Auftrag an ${esc(a.n)}">▶</button><button class="oedit" data-oed="${a.id}" title="Agent „${esc(a.n)}“ bearbeiten" aria-label="${esc(a.n)} bearbeiten">✎</button></span>`}</div>
       ${showS?`<div class="oskl">${a.s.map(id=>sk(id)).filter(Boolean).map(s=>`<span ${oe?'':`data-gos="${a.id}|${s.id}"`} title="${oe?"":"Skill in der Bibliothek zeigen · "}${esc(KS(s).join(", "))}">${esc(s.n)}</span>`).join("")||'<span style="background:#eef0f4;color:var(--mut)">keine Skills</span>'}</div>`:""}${!oe&&runCnt(a.id)?`<button class="orun" data-orun="${a.id}" title="Laufende Aufträge dieses Agenten zeigen">● ${runCnt(a.id)} läuft</button>`:""}</div>`};
   const uopts=v=>{const M=US.filter(x=>(x.aktiv!==false&&(x.orgs||[]).includes(OC))||x.id===v),L=M.length?M:US.filter(x=>x.aktiv!==false||x.id===v);return `<option value="">– offen –</option>`+L.map(x=>`<option value="${x.id}" ${x.id===v?'selected':''}>${esc(x.n)}</option>`).join("")};
   const lead=(kind,id,uidv,label)=>{const u=usr(uidv);if(oe)return `<div class="olead">${av(u,26)}<span>${label}:</span><select data-lead="${kind}" data-lid="${id}">${uopts(uidv)}</select></div>`;
@@ -1801,25 +1832,27 @@ function org(){
     return `<div class="odept"><div class="odh"><b>${esc(d.n)}</b><span class="cnt">${L.length} Agent${L.length===1?"":"en"}</span>${oe?`<button class="ic" data-dren="${d.id}" title="Abteilung umbenennen">✎</button><button class="ic" data-ddel="${d.id}" title="Abteilung löschen">🗑</button>`:""}</div>
      <div class="odb">${oe?"":`<div class="oact"><button class="btn sm p" data-oabt="${d.id}" title="Auftrag an die Abteilung – der KI-Teamleiter wählt den passenden Agenten">▶ Abteilung beauftragen</button><button class="btn sm" data-oin="${d.id}" title="Gesammelte Aufgaben dieser Abteilung (Eingang)">📥 ${inboxCnt(OC,d.id)}</button><button class="btn sm" data-osm="${d.id}" title="Aufgabe für diese Abteilung sammeln – später starten">+ Sammeln</button><button class="btn sm" data-oav="${d.id}" title="Aufträge dieser Abteilung">🕘 Verlauf</button></div>`}${lead("d",d.id,d.lead,"Leitung")}
       ${T.map(t=>{const TL=L.filter(a=>tm(a)===t.id);return `<div class="oteam"><div class="oth"><span>Team ${esc(t.n)}</span><span class="cnt">${TL.length}</span>${oe?"":`<button class="otplay" data-otm="${d.id}|${t.id}" title="Auftrag an Team ${esc(t.n)} – der KI-Teamleiter des Teams wählt den Agenten">▶</button>`}${oe?`<button class="ic" data-tren="${d.id}|${t.id}" title="Team umbenennen">✎</button><button class="ic" data-tdel="${d.id}|${t.id}" title="Team löschen">🗑</button>`:""}</div>
-        ${lead("t",d.id+"|"+t.id,t.lead,"Teamleitung")}${dz(d.id,t.id,TL,oe?"Agenten hierher ziehen":"–")}</div>`}).join("")}
-      ${T.length&&(direct.length||oe)?`<div class="odlab">Direkt in der Abteilung · Team „Allgemein“${oe?"":`<button class="otplay" data-otm="${d.id}|_allg" title="Auftrag an Team Allgemein – Agenten direkt in der Abteilung">▶</button>`}</div>`:""}${dz(d.id,"",direct,oe?"Agenten hierher ziehen":(T.length?"":"–"))}
+        ${lead("t",d.id+"|"+t.id,t.lead,"Teamleitung")}${dz(d.id,t.id,TL,oe?"Agenten hierher ziehen":"–")}${addBtn(d.id,t.id,"Team "+t.n)}</div>`}).join("")}
+      ${T.length&&(direct.length||oe)?`<div class="odlab">Direkt in der Abteilung · Team „Allgemein“${oe?"":`<button class="otplay" data-otm="${d.id}|_allg" title="Auftrag an Team Allgemein – Agenten direkt in der Abteilung">▶</button>`}</div>`:""}${dz(d.id,"",direct,oe?"Agenten hierher ziehen":(T.length?"":"–"))}${addBtn(d.id,"",d.n)}
       ${oe?`<button class="btn sm" data-tnew="${d.id}">+ Team</button>`:""}</div></div>`};
   let cols=D.map(col).join("");
   const none=A.filter(a=>!known.has(ab(a)));
-  if(none.length||oe)cols+=`<div class="odept none"><div class="odh"><b>Ohne Abteilung</b><span class="cnt">${none.length} Agent${none.length===1?"":"en"}</span></div><div class="odb">${dz("","",none,oe?"Agenten hierher ziehen = aus Abteilung lösen":"–")}</div></div>`;
+  if(none.length||oe||!D.length)cols+=`<div class="odept none"><div class="odh"><b>Ohne Abteilung</b><span class="cnt">${none.length} Agent${none.length===1?"":"en"}</span></div><div class="odb">${dz("","",none,oe?"Agenten hierher ziehen = aus Abteilung lösen":"–")}${addBtn("","","„Ohne Abteilung“")}</div></div>`;
   if(oe)cols+=`<div class="orgnew" id="dnew">+ Abteilung</div>`;
   const nT=D.reduce((n,d)=>n+teamsOf(d).length,0);
   const top=oe?`<div class="obox">${av(gf,40)}<div><b>${esc(O.n)}</b> <button class="ic" id="oren" title="Organisation umbenennen">✎</button>${ORGS().length>1?`<button class="ic" id="odel" title="Organisation löschen">🗑</button>`:""}
       <div class="orow2">Geschäftsführung: <select id="ogf">${uopts(O.gf)}</select></div>
       <div class="orow2">Produkt: <select id="oprod"><option value="">– keins –</option>${["bodo","sellify"].map(p=>`<option value="${p}" ${O.prod===p?'selected':''}>${PN[p]}</option>`).join("")}</select></div></div></div>`
     :`<div class="obox">${O.logo?`<img class="olgb" src="${O.logo}" alt="Logo">`:""}${av(gf,40)}<div><b>${esc(O.n)}</b><small>Geschäftsführung: ${gf?esc(gf.n):"offen"} · ${A.length} Agenten in ${D.length} Abteilungen${nT?" · "+nT+" Teams":""}</small></div></div>`;
-  $("#orgv").innerHTML=`<div class="orgwrap"><div class="otop">${top}</div><div class="otrunk"></div><div class="orow">${cols}</div></div>`;
+  $("#orgv").innerHTML=`<div class="orgwrap" lang="de"><div class="otop">${top}</div><div class="otrunk"></div><div class="orow">${cols}</div></div>`;
   const row=$("#orgv .orow"),ds=row.querySelectorAll(".odept");if(ds.length>1){const f=ds[0],l=ds[ds.length-1];row.style.setProperty("--l",(f.offsetLeft+f.offsetWidth/2)+"px");row.style.setProperty("--r",(row.scrollWidth-l.offsetLeft-l.offsetWidth/2)+"px")}else{row.style.setProperty("--l","50%");row.style.setProperty("--r","50%")}
   const ob=$("#orgedit");if(ob)ob.onclick=()=>{if(startEdit("org",null,null,["meta/config",...DP.map(d=>"depts/"+d.id),...AG.map(a=>"agents/"+a.id),...US.map(u=>"users/"+u.id)],false,["depts"]))org()};
   bindEd($("#orged"),()=>org());
   document.querySelectorAll("[data-oa]").forEach(e=>{e.ondragstart=ev=>{if(oe)ev.dataTransfer.setData("ag",e.dataset.oa)}});
-  if(!oe){document.querySelectorAll("[data-goa]").forEach(e=>e.onclick=ev=>{if(ev.target.closest("[data-play]"))return;goAgent(e.dataset.goa)});
+  if(!oe){document.querySelectorAll("[data-goa]").forEach(e=>e.onclick=ev=>{if(ev.target.closest("[data-play],[data-oed]"))return;goAgent(e.dataset.goa)});
     document.querySelectorAll("[data-play]").forEach(b=>b.onclick=ev=>{ev.stopPropagation();startModal(null,{art:"agent",aid:b.dataset.play,org:OC})});
+    document.querySelectorAll("[data-oed]").forEach(b=>b.onclick=ev=>{ev.stopPropagation();agAssistent({org:OC,aid:b.dataset.oed})});
+    document.querySelectorAll("[data-oadd]").forEach(b=>b.onclick=()=>{const [abt,team]=b.dataset.oadd.split("|");agAssistent({org:OC,abt,team})});
     document.querySelectorAll("[data-orun]").forEach(b=>b.onclick=ev=>{ev.stopPropagation();const a=AG.find(x=>x.id===b.dataset.orun);if(a)avOpen({org:OC,only:a,tab:"offen"})});
     document.querySelectorAll("[data-oabt]").forEach(b=>b.onclick=()=>startModal(null,{art:"abteilung",abt:b.dataset.oabt,org:OC}));
     document.querySelectorAll("[data-otm]").forEach(b=>b.onclick=()=>{const [di,ti]=b.dataset.otm.split("|");startModal(null,{art:"abteilung",abt:di,team:ti,org:OC})});
@@ -1852,6 +1885,103 @@ function goAgent(id){const i=AG.findIndex(a=>a.id===id);if(i<0)return false;if(E
   setTimeout(()=>{const el=document.querySelector(`.aitem[data-i="${i}"]`);if(el){el.scrollIntoView({block:"nearest",behavior:"smooth"});el.classList.remove("hit");void el.offsetWidth;el.classList.add("hit")}},80);return true}
 function goSkill(aid,sid){const s=sk(sid);if(!s)return;if(EDIT&&blocked())return;SKSEL=sid;SKORG="";SKSRC="";AFIL="all";$("#q").value="";COL.delete(s.g);show("skills");
   setTimeout(()=>{const el=document.querySelector(`#lib .skill[data-id="${CSS.escape(sid)}"]`);if(!el)return;el.scrollIntoView({block:"center",behavior:"smooth"});el.classList.remove("hit");void el.offsetWidth;el.classList.add("hit")},120)}
+// ===== Agent im Organigramm anlegen oder bearbeiten (Assistent in 4 Schritten) =====
+// Aufruf aus dem Organigramm: „+ Agent“ je Abteilung, Team oder „Ohne Abteilung“ und ✎ an jeder Agentenkarte.
+// Gearbeitet wird auf einem Entwurf (Kopie). Erst „Agent anlegen“ bzw. „Änderungen speichern“ übernimmt ihn und speichert;
+// Abbrechen verwirft ihn. Die Ansicht „Agenten“ bleibt die Gesamtübersicht mit allen Feldern.
+const AGW_SCHRITTE=[["grund","Grunddaten"],["skills","Skills"],["regeln","Regeln"],["fertig","Zusammenfassung"]];
+// Produkte, die ein Agent in dieser Organisation haben kann – sonst erschiene er dort nicht (inOrg): das Produkt der Organisation oder produktunabhängig
+const agProdukte=O=>O&&O.prod?[O.prod,"all"]:["all"];
+const agLeer=p=>({id:uid("ag"),n:"",p,owner:null,dep:null,r:"",w:"",bsp:[],note:"",s:[],mcp:[],m:"Sonnet",own:[],gl:GLOBAL.map((g,i)=>i<4?1:0)});
+// Prüfung vor „Weiter“ bzw. „Anlegen“: liefert einen Fehlertext oder ""
+function agPruefen(E){const n=(E.n||"").trim();if(!n)return "Bitte einen Namen eingeben";
+  if(AG.some(a=>a.id!==E.id&&a.n.trim().toLowerCase()===n.toLowerCase()))return "Einen Agenten „"+n+"“ gibt es schon – bitte einen anderen Namen wählen";return ""}
+
+// ziel = {org, abt, team} für einen neuen Agenten oder {org, aid} zum Bearbeiten
+function agAssistent(ziel){if(blocked())return;const oid=ziel.org,O=orgById(oid);if(!O)return;
+  const alt=ziel.aid?AG.find(x=>x.id===ziel.aid):null;if(ziel.aid&&!alt)return toast("Agent nicht gefunden");
+  const E=alt?JSON.parse(JSON.stringify(alt)):agLeer(agProdukte(O)[0]);
+  if(!alt){if(ziel.abt)moveAg(E,oid,ziel.abt,ziel.team||"");const a=adapter(E.p);if(a)E.mcp=[a.n];const me=ME();if(me&&(me.orgs||[]).includes(oid))E.owner=me.id}
+  const START=JSON.stringify(E),SEL=new Set(E.s);let schritt=0,weit=alt?AGW_SCHRITTE.length-1:0;
+  const close=modalBox(`<div class="bhead"><h3 id="gwh"></h3><button class="ic" id="mclose" style="font-size:18px" title="Abbrechen">✕</button></div>
+    <div class="steps2" id="gwst"></div><div id="gwb"></div><div class="warnbox" id="gwerr" style="display:none;margin-top:10px"></div>
+    <div class="btns" id="gwf" style="margin-top:14px;align-items:center"></div>`,true);
+  const kopf=()=>{$("#gwh").textContent=alt?"Agent „"+alt.n+"“ bearbeiten":"Neuer Agent in "+(dept(PL(E,oid).abt)?"„"+dept(PL(E,oid).abt).n+"“":"„"+(O.kurz||O.n)+"“ · ohne Abteilung")};
+  const fehler=t=>{const b=$("#gwerr");b.style.display=t?"":"none";b.textContent=t||""};
+  const syncSkills=()=>{E.s=E.s.filter(x=>SEL.has(x)).concat([...SEL].filter(x=>!E.s.includes(x)))};
+  const abbrechen=async()=>{if(JSON.stringify(E)!==START&&!await askOk(alt?"Änderungen an „"+alt.n+"“ verwerfen?":"Entwurf für den neuen Agenten verwerfen?","Verwerfen"))return;close()};
+  $("#mclose").onclick=abbrechen;
+
+  // --- Schritt 1: Grunddaten ---
+  const grund=B=>{const pl=PL(E,oid),T=teamsOf(dept(pl.abt)),P=agProdukte(O).includes(E.p)?agProdukte(O):[E.p,...agProdukte(O)];
+    B.innerHTML=`<div class="field"><label>Name <span class="need">Pflicht</span></label><input type="text" id="gwn" value="${esc(E.n)}" placeholder="z. B. Angebotsassistent"></div>
+      <div class="field"><label>Ziel – was erreicht der Agent?</label><textarea id="gwr" placeholder="z. B. Erstellt nach einem Erstgespräch Angebot und Begleitmail für den Interessenten.">${esc(E.r)}</textarea></div>
+      <div class="row"><div class="field"><label>Produkt</label><select id="gwp">${P.map(p=>`<option value="${p}" ${E.p===p?"selected":""}>${esc(PN[p])}</option>`).join("")}</select></div>
+        <div class="field"><label>Modell</label><select id="gwm">${["Opus","Sonnet","Haiku"].map(m=>`<option ${m===E.m?"selected":""}>${m}</option>`).join("")}</select></div></div>
+      <div class="hint" style="margin:-6px 0 10px">${O.prod?"Vorbelegt mit dem Produkt der Organisation. „"+esc(PN.all)+"“ = produktunabhängig, erscheint in jeder Organisation.":"Die Organisation hat kein Produkt – der Agent ist produktunabhängig und erscheint in jeder Organisation."}</div>
+      <div class="row"><div class="field"><label>Abteilung · ${esc(O.kurz||O.n)}</label><select id="gwa"><option value="">– ohne Abteilung –</option>${deptsOf(oid).map(d=>`<option value="${d.id}" ${pl.abt===d.id?"selected":""}>${esc(d.n)}</option>`).join("")}</select></div>
+        <div class="field"><label>Team</label><select id="gwt" ${T.length?"":"disabled"}><option value="">${T.length?"– direkt in der Abteilung –":"– keine Teams –"}</option>${T.map(t=>`<option value="${t.id}" ${pl.team===t.id?"selected":""}>${esc(t.n)}</option>`).join("")}</select></div></div>
+      <div class="row"><div class="field"><label>Verantwortlich (Mensch)</label>${usersSel("gwo",E.owner,"– offen –")}</div><div class="field"><label>Vertretung</label>${usersSel("gwd",E.dep,"– offen –")}</div></div>
+      <div class="field"><label>Verbindungen (MCP)</label><div style="display:flex;gap:16px;flex-wrap:wrap">${adapterListe().map(x=>`<label class="cb"><input type="checkbox" data-gwc="${esc(x.n)}" ${E.mcp.includes(x.n)?"checked":""}> ${esc(x.n)}</label>`).join("")}</div></div>`;
+    $("#gwn").oninput=e=>{E.n=e.target.value;fehler("")};$("#gwr").oninput=e=>{E.r=e.target.value};$("#gwm").onchange=e=>{E.m=e.target.value};
+    $("#gwp").onchange=e=>{E.p=e.target.value};
+    $("#gwa").onchange=e=>{moveAg(E,oid,e.target.value,"");kopf();zeige()};$("#gwt").onchange=e=>{moveAg(E,oid,PL(E,oid).abt,e.target.value)};
+    $("#gwo").onchange=e=>{E.owner=e.target.value||null;if(E.owner&&E.dep===E.owner){E.dep=null;zeige()}};$("#gwd").onchange=e=>{E.dep=e.target.value||null};
+    B.querySelectorAll("[data-gwc]").forEach(c=>c.onchange=()=>{E.mcp=c.checked?[...E.mcp,c.dataset.gwc]:E.mcp.filter(x=>x!==c.dataset.gwc)});
+    if(!alt)setTimeout(()=>{const n=$("#gwn");if(n)n.focus()},30)};
+
+  // --- Schritt 2: Skills aus dem Katalog ---
+  const skills=B=>{B.innerHTML=`<div class="gwsk"><div id="gwkat"></div><div class="gwsel"><div class="flabel" id="gwsn"></div><div id="gwsl"></div></div></div>`;
+    const auswahl=()=>{syncSkills();$("#gwsn").textContent="Ausgewählt ("+E.s.length+")";
+      $("#gwsl").innerHTML=E.s.map(id=>{const s=sk(id),b=s&&bad(E,s),dim=s&&["entwurf","vorschlag"].includes(srcOf(s));return `<span class="chip ${b?"bad":""}" title="${b?"Gehört zu "+esc(PN[s.p])+" – passt nicht zum Produkt dieses Agenten":dim?"Noch nicht im Konto":""}"><span>${b?"⚠ ":""}${esc(s?s.n:id)}${dim?` <small class="prf">· ${srcOf(s)==="vorschlag"?"Vorschlag":"Entwurf"}</small>`:""}</span><button class="ic" data-gwx="${esc(id)}" title="entfernen">×</button></span>`}).join("")||'<span class="hint">Noch keine Skills – links ankreuzen.</span>';
+      $("#gwsl").querySelectorAll("[data-gwx]").forEach(b=>b.onclick=()=>{SEL.delete(b.dataset.gwx);K.draw();auswahl()})};
+    const K=skAuswahl($("#gwkat"),{p:E.p,SEL,onChange:auswahl});auswahl()};
+
+  // --- Schritt 3: Regeln ---
+  const regeln=B=>{const inh=inherited(E);
+    B.innerHTML=`<div class="lpwrap"><div class="lpsec"><h4>Eigene Regeln dieses Agenten <span class="badge">${E.own.length}</span></h4>
+        ${E.own.map((r,i)=>`<div class="lprule"><span class="txt">${esc(r)}</span><button class="ic" data-gwro="${i}" title="entfernen">×</button></div>`).join("")||'<div class="hint">Noch keine.</div>'}
+        <div class="ownadd"><input type="text" id="gwown" placeholder="Neue Regel, z. B. „Angebote nie ohne Freigabe versenden“ …"><button class="btn" id="gwownb">Hinzufügen</button></div></div>
+      <div class="lpsec"><h4>Aus den Skills geerbt <span class="badge lp">${inh.length}</span><span class="hint" style="margin:0;font-weight:400">automatisch, nur im Skill änderbar</span></h4>
+        ${inh.map(([r,srcs])=>`<div class="lprule"><span class="txt">${esc(r)}</span>${srcs.map(x=>`<span class="src" title="${esc(x.s.id)}">⛨ ${esc(x.l)}</span>`).join(" ")}</div>`).join("")||'<div class="hint">Die gewählten Skills bringen keine Leitplanken mit.</div>'}</div>
+      <div class="lpsec"><h4>Deine allgemeinen Vorgaben</h4><div class="hint" style="margin:0 0 6px">Gelten in Cowork sowieso immer. Häkchen = zusätzlich fest in den Agenten schreiben.</div>
+        ${GLOBAL.map((r,i)=>`<label class="cb"><input type="checkbox" data-gwgl="${i}" ${E.gl[i]?"checked":""}> ${esc(r)}</label>`).join("")}</div></div>`;
+    const add=()=>{const v=$("#gwown").value.trim();if(!v)return;if(E.own.includes(v))return toast("Diese Regel gibt es schon");E.own.push(v);zeige();const i=$("#gwown");if(i)i.focus()};
+    $("#gwownb").onclick=add;$("#gwown").onkeydown=e=>{if(e.key==="Enter")add()};
+    B.querySelectorAll("[data-gwro]").forEach(b=>b.onclick=()=>{E.own.splice(+b.dataset.gwro,1);zeige()});
+    B.querySelectorAll("[data-gwgl]").forEach(c=>c.onchange=()=>{E.gl[+c.dataset.gwgl]=c.checked?1:0})};
+
+  // --- Schritt 4: Zusammenfassung ---
+  const fertig=B=>{const pl=PL(E,oid),d=dept(pl.abt),t=teamsOf(d).find(x=>x.id===pl.team),ow=usr(E.owner),dp=usr(E.dep),inh=inherited(E);
+    const S=E.s.map(id=>sk(id)),falsch=S.filter(s=>s&&bad(E,s)),entw=S.filter(s=>s&&["entwurf","vorschlag"].includes(srcOf(s)));
+    const z=(k,v,warn)=>`<b>${k}</b><span${warn?' style="color:var(--warn)"':""}>${v}</span>`;
+    B.innerHTML=`<div class="gwsum">${z("Name",esc(E.n))}${z("Platz",esc(O.kurz||O.n)+" · "+(d?esc(d.n)+(t?" · Team "+esc(t.n):""):"ohne Abteilung"))}${z("Produkt · Modell",esc(PN[E.p])+" · "+esc(E.m))}
+      ${z("Ziel",E.r?esc(E.r):"offen",!E.r)}${z("Verantwortlich",ow?esc(ow.n)+(dp?" · Vertretung "+esc(dp.n):" · Vertretung offen"):"offen",!ow)}${z("Verbindungen",E.mcp.length?esc(E.mcp.join(", ")):"keine")}
+      ${z("Skills",S.length?S.map(s=>s?esc(s.n):"?").join(", "):"keine",!S.length)}${z("Regeln",E.own.length+" eigene · "+inh.length+" aus Skills geerbt")}
+      ${z("Einsatz",E.w&&(E.bsp||[]).length?"festgelegt":"„Wann einsetzen?“ und Beispielsätze offen – für das Plugin nötig, in der Ansicht „Agenten“ unter Einsatz ergänzen",!(E.w&&(E.bsp||[]).length))}</div>
+      ${falsch.length?`<div class="warnbox" style="margin-top:10px">⚠ ${falsch.map(s=>esc(s.n)).join(", ")} ${falsch.length===1?"gehört":"gehören"} zu einem anderen Produkt.</div>`:""}
+      ${entw.length?`<div class="hint" style="margin-top:8px">${entw.map(s=>esc(s.n)).join(", ")}: noch nicht im Konto (Entwurf bzw. Vorschlag) – der Agent kann ${entw.length===1?"diesen Skill":"diese Skills"} erst nutzen, wenn ${entw.length===1?"er":"sie"} übernommen ${entw.length===1?"ist":"sind"}.</div>`:""}`};
+
+  // --- Anlegen bzw. Speichern ---
+  const sichern=()=>{const f=agPruefen(E);if(f){schritt=0;zeige();return fehler(f)}E.n=E.n.trim();
+    if(alt){const vor=JSON.parse(JSON.stringify(alt));Object.keys(alt).forEach(k=>delete alt[k]);Object.assign(alt,E);const pv=markProv("agents",alt,vor);schedule();close();org();toast("Agent „"+alt.n+"“ gespeichert");if(pv)setTimeout(()=>provConfirm([["agents",alt]]),60);return}
+    E.ord=AG.length;AG.push(E);schedule();org();
+    $("#gwh").textContent="Agent „"+E.n+"“ ist angelegt";$("#gwst").innerHTML="";fehler("");
+    $("#gwb").innerHTML=`<p style="margin:0 0 6px">Der Agent steht jetzt im Organigramm${dept(PL(E,oid).abt)?" in „"+esc(dept(PL(E,oid).abt).n)+"“":""}. Alle Felder findest du auch in der Ansicht „Agenten“.</p>${E.w&&(E.bsp||[]).length?"":'<div class="hint">Für das Plugin fehlen noch „Wann einsetzen?“ und Beispielsätze.</div>'}`;
+    $("#gwf").innerHTML=`<button class="btn" id="gwopen">Im Agenten öffnen</button><span style="flex:1"></span><button class="btn" id="gwdone">Fertig</button><button class="btn p" id="gwgo">▶ Ersten Auftrag geben</button>`;
+    $("#mclose").onclick=$("#gwdone").onclick=close;$("#gwopen").onclick=()=>{close();goAgent(E.id)};
+    $("#gwgo").onclick=()=>{close();startModal(null,{art:"agent",aid:E.id,org:oid})}};
+
+  const ANS={grund,skills,regeln,fertig};
+  const geh=i=>{if(i>schritt&&schritt===0){const f=agPruefen(E);if(f)return fehler(f)}fehler("");schritt=i;weit=Math.max(weit,i);zeige()};
+  function zeige(){kopf();
+    $("#gwst").innerHTML=AGW_SCHRITTE.map(([k,l],i)=>`<span class="${i===schritt?"on":i<=weit?"ok":""}" ${i<=weit&&i!==schritt?`data-gws="${i}" role="button" tabindex="0" title="Zu „${l}“"`:""}>${i+1} · ${l}</span>`).join("");
+    $("#gwst").querySelectorAll("[data-gws]").forEach(s=>{s.onclick=()=>geh(+s.dataset.gws);s.onkeydown=e=>{if(e.key==="Enter")geh(+s.dataset.gws)}});
+    ANS[AGW_SCHRITTE[schritt][0]]($("#gwb"));const letzt=schritt===AGW_SCHRITTE.length-1;
+    $("#gwf").innerHTML=`<button class="btn" id="gwx">Abbrechen</button><span style="flex:1"></span>${schritt?'<button class="btn" id="gwz">◂ Zurück</button>':""}${letzt?`<button class="btn p" id="gwok">${alt?"Änderungen speichern":"Agent anlegen"}</button>`:`<button class="btn ${alt?"":"p"}" id="gww">Weiter ▸</button>`}${alt&&!letzt?'<button class="btn p" id="gwok">Speichern</button>':""}`;
+    $("#gwx").onclick=abbrechen;const z=$("#gwz");if(z)z.onclick=()=>geh(schritt-1);const w=$("#gww");if(w)w.onclick=()=>geh(schritt+1);const ok=$("#gwok");if(ok)ok.onclick=sichern}
+  zeige()}
+
 function users(){
   const L=US.map((u,i)=>[u,i]).filter(([u])=>UOLD||u.aktiv!==false);
   $("#ulist").innerHTML=(L.length?"":'<p class="hint">Noch keine Benutzer.</p>')+L.map(([u,i])=>{const ag=AG.filter(a=>a.owner===u.id).length;
@@ -2013,24 +2143,32 @@ function skDetail(){const P=$("#skdet");if(!P)return;const s=SKSEL&&sk(SKSEL);
    ${s.body?`<details><summary>Inhalt (SKILL.md)</summary><pre>${esc(s.body)}</pre></details>`:""}`;
   $("#skdedit").onclick=()=>skillModal(s.id);
   P.querySelectorAll("[data-goag]").forEach(c=>c.onclick=()=>goAgent(c.dataset.goag))}
-function skPick(a){const OLD=new Set(a.s),SEL=new Set(a.s);let q="",only=true;
-  const okA=s=>a.p==="all"||s.p===a.p||s.p==="all"||s.p==="multi";
-  const close=modalBox(`<div class="bhead"><h3>Skills für „${esc(a.n)}“</h3><button class="ic" id="mclose" style="font-size:18px">✕</button></div>
-   <input type="search" id="pkq" placeholder="🔍 Skill suchen (Name, Beschreibung, Gruppe, Konto-Name) …" autocomplete="off">
-   <label class="cb" style="margin:8px 0 0"><input type="checkbox" id="pkonly" checked> Nur Skills, die zum Produkt des Agenten passen (${esc(PN[a.p])}${a.p==="all"?"":" + produktneutral"})</label>
-   <div class="pkwrap"><table class="pkt" id="pkt"></table></div>
-   <div class="btns" style="margin-top:12px;align-items:center"><span id="pkcnt" class="hint" style="margin:0;flex:1"></span><button class="btn" id="pkno">Abbrechen</button><button class="btn p" id="pkok">Übernehmen</button></div>`,true);
+// Skill-Auswahl aus dem Katalog: Suche, Gruppen (ganze Gruppe per Häkchen), Produktfilter; Entwürfe und Vorschläge sind markiert.
+// Zeichnet in root. SEL (Set der Skill-Ids) wird direkt geändert; onChange läuft nach jeder Änderung. Genutzt von skPick und dem Agenten-Assistenten.
+function skAuswahl(root,{p,SEL,onChange,fokus}){let q="",only=true;
+  const okA=s=>p==="all"||s.p===p||s.p==="all"||s.p==="multi";
+  root.innerHTML=`<input type="search" id="pkq" placeholder="🔍 Skill suchen (Name, Beschreibung, Gruppe, Konto-Name) …" autocomplete="off">
+   <label class="cb" style="margin:8px 0 0"><input type="checkbox" id="pkonly" checked> Nur Skills, die zum Produkt des Agenten passen (${esc(PN[p])}${p==="all"?"":" + produktneutral"})</label>
+   <div class="pkwrap"><table class="pkt" id="pkt"></table></div>`;
+  const tab=root.querySelector("#pkt"),geaendert=()=>{draw();if(onChange)onChange()};
   const draw=()=>{const L=SK.filter(s=>(!only||okA(s)||SEL.has(s.id))&&skMatch(s,q));let h="";
     [...new Set(L.map(s=>s.g))].sort((x,y)=>(+x)-(+y)).forEach(g=>{const G=L.filter(s=>s.g===g),n=G.filter(s=>SEL.has(s.id)).length;
       h+=`<tr class="gh"><td style="width:28px"><input type="checkbox" data-pkg="${g}" ${n===G.length?"checked":""} title="Ganze Gruppe auswählen"></td><td colspan="2">${esc(grName(g))} <span class="hint" style="margin:0;font-weight:400">${n}/${G.length}</span></td></tr>`;
       G.forEach(s=>{const dim=["entwurf","vorschlag"].includes(srcOf(s));h+=`<tr class="${dim?"dim":""}"><td><input type="checkbox" data-pks="${esc(s.id)}" ${SEL.has(s.id)?"checked":""}></td><td><b style="color:var(--ink)">${esc(s.n)}</b>${dim?' <span class="hint" style="margin:0">(noch nicht im Konto)</span>':""}<small>${esc((s.d||"").split(/\s*Nutzen bei\s*:/i)[0].slice(0,160))}</small></td><td style="white-space:nowrap">${srcBadge(s)}</td></tr>`})});
-    $("#pkt").innerHTML=h||'<tr><td class="hint">Kein Skill gefunden.</td></tr>';
-    const add=[...SEL].filter(x=>!OLD.has(x)).length,rem=[...OLD].filter(x=>!SEL.has(x)).length;$("#pkcnt").textContent=SEL.size+" ausgewählt · "+add+" hinzu · "+rem+" entfernt";
-    document.querySelectorAll("[data-pks]").forEach(c=>c.onchange=()=>{c.checked?SEL.add(c.dataset.pks):SEL.delete(c.dataset.pks);draw()});
-    document.querySelectorAll("[data-pkg]").forEach(c=>c.onchange=()=>{L.filter(s=>String(s.g)===c.dataset.pkg).forEach(s=>c.checked?SEL.add(s.id):SEL.delete(s.id));draw()})};
-  draw();const qi=$("#pkq");qi.focus();qi.oninput=()=>{q=qi.value.toLowerCase().trim();draw()};$("#pkonly").onchange=e=>{only=e.target.checked;draw()};
+    tab.innerHTML=h||'<tr><td class="hint">Kein Skill gefunden.</td></tr>';
+    tab.querySelectorAll("[data-pks]").forEach(c=>c.onchange=()=>{c.checked?SEL.add(c.dataset.pks):SEL.delete(c.dataset.pks);geaendert()});
+    tab.querySelectorAll("[data-pkg]").forEach(c=>c.onchange=()=>{L.filter(s=>String(s.g)===c.dataset.pkg).forEach(s=>c.checked?SEL.add(s.id):SEL.delete(s.id));geaendert()})};
+  draw();const qi=root.querySelector("#pkq");if(fokus!==false)qi.focus();qi.oninput=()=>{q=qi.value.toLowerCase().trim();draw()};root.querySelector("#pkonly").onchange=e=>{only=e.target.checked;draw()};
+  return {draw}}
+function skPick(a){const OLD=new Set(a.s),SEL=new Set(a.s);
+  const close=modalBox(`<div class="bhead"><h3>Skills für „${esc(a.n)}“</h3><button class="ic" id="mclose" style="font-size:18px">✕</button></div>
+   <div id="pkbox"></div>
+   <div class="btns" style="margin-top:12px;align-items:center"><span id="pkcnt" class="hint" style="margin:0;flex:1"></span><button class="btn" id="pkno">Abbrechen</button><button class="btn p" id="pkok">Übernehmen</button></div>`,true);
+  const diff=()=>[[...SEL].filter(x=>!OLD.has(x)).length,[...OLD].filter(x=>!SEL.has(x)).length];
+  const cnt=()=>{const [add,rem]=diff();$("#pkcnt").textContent=SEL.size+" ausgewählt · "+add+" hinzu · "+rem+" entfernt"};
+  skAuswahl($("#pkbox"),{p:a.p,SEL,onChange:cnt});cnt();
   $("#mclose").onclick=$("#pkno").onclick=close;
-  $("#pkok").onclick=()=>{a.s=a.s.filter(x=>SEL.has(x)).concat([...SEL].filter(x=>!OLD.has(x)));close();render();const add=[...SEL].filter(x=>!OLD.has(x)).length,rem=[...OLD].filter(x=>!SEL.has(x)).length;toast((add||rem)?(add+" hinzugefügt · "+rem+" entfernt – Speichern nicht vergessen"):"Keine Änderung")}}
+  $("#pkok").onclick=()=>{a.s=a.s.filter(x=>SEL.has(x)).concat([...SEL].filter(x=>!OLD.has(x)));close();render();const [add,rem]=diff();toast((add||rem)?(add+" hinzugefügt · "+rem+" entfernt – Speichern nicht vergessen"):"Keine Änderung")}}
 
 function seg(){
   const sv=s=>(!SKSRC||srcOf(s)===SKSRC);

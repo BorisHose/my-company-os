@@ -1,5 +1,14 @@
 # Änderungen – Cockpit
 
+## 71 · 17.10.2026 · Agenten im Organigramm anlegen und bearbeiten (Konzept freigegeben von Boris)
+- Im Organigramm „+ Agent“ je Abteilung, je Team und unter „Ohne Abteilung“ (die Spalte erscheint auch, wenn die Organisation noch keine Abteilungen hat); an jeder Agentenkarte ✎ neben ▶. Beides nur außerhalb von „✎ Bearbeiten“ des Organigramms.
+- Assistent in 4 Schritten: Grunddaten (Name Pflicht, Ziel, Produkt vorbelegt mit dem der Organisation, Modell, Abteilung/Team, Verantwortlich/Vertretung, Verbindungen) · Skills aus dem Katalog (Suche, Gruppen, Produktfilter, Entwürfe/Vorschläge markiert, Auswahl rechts) · Regeln (eigene, geerbte zur Ansicht, allgemeine Vorgaben) · Zusammenfassung mit Hinweisen (Einsatz für das Plugin offen, Skill eines anderen Produkts, Skill noch nicht im Konto).
+- Gearbeitet wird auf einer Kopie: erst „Agent anlegen“ bzw. „Änderungen speichern“ übernimmt und speichert, Abbrechen verwirft (mit Rückfrage, wenn etwas geändert wurde). Doppelte Namen werden abgewiesen.
+- Nach dem Anlegen: „▶ Ersten Auftrag geben“, „Im Agenten öffnen“ oder „Fertig“. Beim Bearbeiten gelten die Regeln zur Rückgabe an Claude wie im Agenten-Editor.
+- Die Skill-Auswahl ist eine gemeinsame Komponente (`skAuswahl`), genutzt vom Assistenten und von „+ Skills hinzufügen …“ im Agenten-Editor.
+- Agentenkarte: ▶ und ✎ untereinander, lange Namen brechen um statt über den Rand zu laufen.
+- Smoke-Test: 104 Prüfungen.
+
 ## 70 · 17.10.2026 · Adapter-Umbau (Architektur, ohne sichtbare Änderung)
 - Backend-Systeme hängen jetzt an je einem Adapter mit festem Vertrag: `07a-adapter-basis.js` (Verbindung, Fehlertexte, Register, Vertrag), `07b-adapter-bodo.js`, `07c-adapter-sellify.js`. Ein weiteres System = eine weitere Adapter-Datei.
 - Projekte (Übernehmen/Verbinden, Kontext für Claude), Anbindungen (Systemauswahl, Mandanten, Verbindung prüfen), Benutzer-Zuordnung (Suchen, Abgleichen) und KI-Kontext fragen nur noch den Adapter; feste Unterscheidungen „bodo/sellify“ im Code entfallen.
