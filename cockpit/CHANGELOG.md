@@ -1,5 +1,10 @@
 # Änderungen – Cockpit
 
+## 74 · 17.10.2026 · Sicherheitsnetz für den Dialog-Umbau (Plan „Dialoge rund um Aufträge“, Etappe 0)
+- Vor dem Umbau gesichert: Git-Tag `sicherung-vor-dialog-umbau-v73`, Datenbank-Export und Live-Seite unter `05 Datensicherung 2026-10-17`.
+- Smoke-Test um 12 Verhaltens-Prüfungen erweitert, die nicht vom Aussehen abhängen: Auftrag je Art (Claude direkt mit Skill/Tempo/Freigabe/Projekt, Abteilung mit Team, Agent mit Skill, Prozess mit und ohne Claude), Art wechseln behält Titel und Text, Sammeln mit Priorität und Fälligkeit, Antwort-Option, Änderungswunsch, Abbrechen, Fortschritt pflegen, Löschen nur nach Bestätigung.
+- Keine sichtbare Änderung. Smoke-Test: 118 Prüfungen.
+
 ## 73 · 17.10.2026 · Produktname „Organigraph“ (Entscheidung Boris)
 - Seitentitel, Kopfzeile, Hinweise, Einstellungen und Texte für Claude heißen jetzt „Organigraph“ statt „My Company OS“/„Company OS“.
 - Instanzname „(My) Company OS …“ wird beim Laden einmalig in „Organigraph …“ umbenannt und gespeichert (`nameMigrieren`); neue Instanzen starten mit „Organigraph business//acts“.

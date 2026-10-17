@@ -470,6 +470,67 @@ const check = (name, ok, info = '') => { CHECKS.push({ name, ok }); console.log(
     R.absender = SYSFROM('Company OS') && SYSFROM('Organigraph') && !SYSFROM('Boris');
     R.kein = !document.body.innerText.includes('Company OS'); return R });
   check('Produktname Organigraph: Titel, Kopfzeile, Seitenüberschrift, Instanzname umgestellt, alte Absender erkannt', Object.values(pn).every(Boolean), JSON.stringify(pn));
+
+  // ===== Verhaltens-Prüfungen (Dialog-Umbau, Etappe 0): hängen nicht am Aussehen, müssen vor und nach dem Umbau gelten =====
+  await p.setViewportSize({ width: 1440, height: 900 });
+  const vClr = () => p.evaluate(() => { document.getElementById('modal').innerHTML = ''; const d = document.getElementById('dlg'); if (d) d.remove(); try { avClose() } catch (e) { } });
+  const vSet = async (sel, v) => { await p.evaluate(([s, v]) => { const e = document.querySelector(s); if (!e) return; e.value = v; e.dispatchEvent(new Event('change', { bubbles: true })) }, [sel, v]); await p.waitForTimeout(150); };
+  const vTxt = sel => p.evaluate(s => { const e = document.querySelector(s); return e ? (e.value !== undefined ? e.value : e.innerText) : null }, sel);
+  const vNeu = async (keep, fill, titel, text) => {
+    await vClr(); await p.evaluate(() => show('org'));
+    await p.evaluate(k => startModal(null, k), keep); await p.waitForTimeout(250);
+    if (fill) await fill();
+    await p.fill('#modal #jt', titel || 'Verhalten'); await p.fill('#modal #ji', text || 'Verhaltenstest');
+    const n0 = await p.evaluate(() => AU.length);
+    await p.click('#modal #go'); await p.waitForTimeout(900);
+    return p.evaluate(n0 => { const j = AU[0]; return { neu: AU.length > n0, id: j.id, art: j.art, org: j.org, aid: j.aid || null, abt: j.abt || null, team: j.team || null, sk: j.sk || null, prj: j.prj || null, tempo: j.tempo || null, vorab: !!j.vorab, ki: !!j.ki, st: j.st, prio: j.prio || null, due: j.due || null, t: j.t, in: j.in, path: (j.path || []).length } }, n0);
+  };
+  const VB = await p.evaluate(() => { const o = 'og-bodo', S = skOrg(orgById(o)), d = deptsOf(o).find(x => teamsOf(x).length && tlAgents(o, x.id, teamsOf(x)[0].id).length), a = AG.find(x => inOrg(x, o) && (x.s || []).some(id => sk(id) && !['vorschlag', 'entwurf'].includes(srcOf(sk(id))))), pj0 = (PJ || []).find(x => x.org === o);
+    return { o, sk: S[0] && S[0].id, d: d && d.id, t: d && teamsOf(d)[0].id, a: a && a.id, ask: a && a.s.find(id => sk(id) && !['vorschlag', 'entwurf'].includes(srcOf(sk(id)))), pj: pj0 && pj0.id, d1: deptsOf(o).find(x => tlAgents(o, x.id, '').length).id } });
+  const v1 = await vNeu({ org: VB.o }, async () => { await vSet('#jsk', VB.sk); await vSet('#jtempo', 'gruendlich'); await p.evaluate(() => { const c = document.querySelector('#jvorab'); if (!c.checked) c.click() }); if (VB.pj) await vSet('#jprj', VB.pj) }, 'V1 frei', 'Text V1');
+  check('Verhalten: Claude direkt mit Skill, Tempo, Freigabe, Projekt', v1.neu && v1.art === 'frei' && v1.sk === VB.sk && v1.tempo === 'gruendlich' && v1.vorab && v1.ki && (!VB.pj || v1.prj === VB.pj) && v1.t === 'V1 frei' && v1.in === 'Text V1', JSON.stringify(v1));
+  const v2 = await vNeu({ org: VB.o, art: 'abteilung', abt: VB.d, team: VB.t }, null, 'V2 Team');
+  check('Verhalten: Abteilung mit Team', v2.neu && v2.art === 'abteilung' && v2.abt === VB.d && v2.team === VB.t && !v2.aid, JSON.stringify(v2));
+  const v3 = await vNeu({ org: VB.o, art: 'agent', aid: VB.a }, async () => { await vSet('#jsk', VB.ask) }, 'V3 Agent');
+  check('Verhalten: Agent mit Skill', v3.neu && v3.art === 'agent' && v3.aid === VB.a && v3.sk === VB.ask, JSON.stringify(v3));
+  const v4 = await vNeu({ org: VB.o, art: 'ablauf' }, null, 'V4 Prozess');
+  check('Verhalten: Prozess von Claude ausgeführt', v4.neu && v4.art === 'ablauf' && v4.ki && v4.st === 'run', JSON.stringify(v4));
+  const v4b = await vNeu({ org: VB.o, art: 'ablauf' }, async () => { await p.evaluate(() => { const c = document.querySelector('#jki'); if (c.checked) c.click() }) }, 'V4b manuell');
+  check('Verhalten: Prozess ohne Claude (manuell)', v4b.neu && v4b.art === 'ablauf' && !v4b.ki && v4b.path >= 1, JSON.stringify(v4b));
+  await vClr(); await p.evaluate(o => startModal(null, { org: o }), VB.o); await p.waitForTimeout(200);
+  await p.fill('#modal #jt', 'Behalten'); await p.fill('#modal #ji', 'Text bleibt'); await p.click('#jart [data-a="agent"]'); await p.waitForTimeout(250);
+  const v5 = { t: await vTxt('#jt'), i: await vTxt('#ji'), art: await p.$eval('#jart .on', e => e.dataset.a) };
+  check('Verhalten: Art wechseln behält Titel und Text', v5.t === 'Behalten' && (v5.i || '').trim() === 'Text bleibt' && v5.art === 'agent', JSON.stringify(v5));
+  const v6 = await vNeu({ org: VB.o, sm: 1, abt: VB.d1 }, async () => { await p.click('#jprio [data-p="d"]'); await p.fill('#jdue', '2026-12-24') }, 'V6 Sammeln');
+  check('Verhalten: Sammeln mit Priorität und Fälligkeit', v6.neu && v6.st === 'inbox' && v6.prio === 'd' && v6.due === '2026-12-24' && v6.abt === VB.d1, JSON.stringify(v6));
+  // Rückfrage beantworten, Ändern, Abbrechen
+  const vWait = (id, opts) => p.evaluate(async ([id, opts]) => { const j = AU.find(x => x.id === id); j.st = 'wait'; j.q = { kind: 'Freigabe', from: 'Test', text: 'Bitte prüfen', why: '', opts }; await Store.set('jobs/' + j.id, JSON.parse(jobSer(j))); LAST.set('jobs/' + j.id, jobSer(j)); resultModal(j) }, [id, opts]);
+  await vClr(); await vWait(v1.id, ['So freigeben', 'Abbrechen']); await p.waitForTimeout(250);
+  const v7o = await p.$$eval('#modal [data-rans]', b => b.map(x => x.dataset.rans));
+  await p.click('#modal [data-rans]'); await p.waitForTimeout(600);
+  const v7 = await p.evaluate(id => { const j = AU.find(x => x.id === id); return { a: (j.ans || []).slice(-1)[0], st: j.st } }, v1.id);
+  check('Verhalten: Antwort-Option geht an Claude, „Abbrechen“ ist keine Antwort-Option', v7.a && v7.a.a === 'So freigeben' && !v7o.some(o => /^abbrechen/i.test(o)), JSON.stringify([v7o, v7]));
+  await vClr(); await vWait(v2.id, ['Freigeben']); await p.waitForTimeout(250);
+  if (await p.$('#rchg') && !(await p.isVisible('#rchgt'))) await p.click('#rchg');
+  await p.fill('#rchgt', 'Wartung als Option'); await p.click('#rchgok'); await p.waitForTimeout(600);
+  const v8 = await p.evaluate(id => (AU.find(x => x.id === id).ans || []).slice(-1)[0], v2.id);
+  check('Verhalten: Änderungswunsch geht mit „Ändern:“ an Claude', v8 && v8.a === 'Ändern: Wartung als Option', JSON.stringify(v8));
+  await vClr(); await vWait(v3.id, ['Freigeben']); await p.waitForTimeout(250);
+  await p.evaluate(() => document.querySelector('#rcan').click()); await p.waitForTimeout(200); await p.click('#dlg [data-yes]'); await p.waitForTimeout(600);
+  check('Verhalten: Auftrag abbrechen nach Bestätigung', await p.evaluate(id => AU.find(x => x.id === id).st === 'cancel' && window.__S['jobs/' + id].st === 'cancel', v3.id));
+  // manueller Auftrag: Fortschritt pflegen, Löschen nur nach Bestätigung
+  await vClr(); await p.evaluate(id => jobModal(AU.find(x => x.id === id)), v4b.id); await p.waitForTimeout(300);
+  const p0 = await p.evaluate(id => AU.find(x => x.id === id).path.length, v4b.id);
+  await p.evaluate(() => document.querySelector('[data-adv]').click()); await p.waitForTimeout(300);
+  check('Verhalten: manueller Auftrag – Fortschritt pflegen', await p.evaluate(([id, n]) => AU.find(x => x.id === id).path.length === n + 1, [v4b.id, p0]));
+  const v4c = await vNeu({ org: VB.o, art: 'ablauf' }, async () => { await p.evaluate(() => { const c = document.querySelector('#jki'); if (c.checked) c.click() }) }, 'V4c löschen');
+  await vClr(); await p.evaluate(id => jobModal(AU.find(x => x.id === id)), v4c.id); await p.waitForTimeout(300);
+  await p.evaluate(() => document.querySelector('#stop').click()); await p.waitForTimeout(200); await p.click('#dlg [data-no]'); await p.waitForTimeout(200);
+  const v10a = await p.evaluate(id => !!AU.find(x => x.id === id), v4c.id);
+  await p.evaluate(() => document.querySelector('#stop').click()); await p.waitForTimeout(200); await p.click('#dlg [data-yes]'); await p.waitForTimeout(300);
+  const v10b = await p.evaluate(id => !AU.find(x => x.id === id), v4c.id);
+  check('Verhalten: Löschen nur nach Bestätigung', v10a && v10b, JSON.stringify([v10a, v10b]));
+  await vClr();
   check('keine Laufzeitfehler', errs.length === 0, errs.slice(0, 3).join(' | '));
   await b.close();
   if (process.env.KEEP) fs.copyFileSync(tmp, path.join(ROOT, 'tests', '.keep.html')); fs.unlinkSync(tmp);
