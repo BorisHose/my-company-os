@@ -1,5 +1,10 @@
 # Änderungen – Cockpit
 
+## 67 · 17.10.2026 · Benutzerliste gleich hoch wie „Benutzer bearbeiten“ (Wunsch Boris)
+- Der Kasten „Benutzer“ ist immer genau so hoch wie „Benutzer bearbeiten“ und wächst mit ihm; passen nicht alle Benutzer hinein, scrollt die Liste in sich.
+- Schmale Fenster (unter 1100 px, untereinander): Liste höchstens halbe Bildschirmhöhe, darin scrollbar.
+- Smoke-Test: 100 Prüfungen.
+
 ## 66 · 17.10.2026 · Benutzer in den Einstellungen eingebettet (Wunsch Boris)
 - ⚙ Einstellungen › Benutzer verhält sich wie die übrigen Bereiche: Die Menüführung bleibt links, Benutzerliste und Bearbeitung erscheinen rechts daneben. Eigene Ansicht „Benutzer“ und Rücksprung-Link entfallen.
 - Wechsel zwischen Bereichen ist gesperrt, solange ein Benutzer bearbeitet wird.

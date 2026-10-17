@@ -432,6 +432,13 @@ img.olg{height:18px;max-width:60px;object-fit:contain;margin-right:6px;vertical-
 .setu{display:grid;grid-template-columns:300px minmax(0,1fr);gap:16px;min-width:0;align-items:start}.setu[hidden],#setc[hidden]{display:none}
 @media(max-width:1100px){.setu{grid-template-columns:minmax(0,1fr)}}
 
+/* v67 Benutzerliste so hoch wie „Benutzer bearbeiten“, darin scrollen */
+.setu{align-items:stretch}
+#ulp{display:flex;flex-direction:column;height:0;min-height:100%;overflow:hidden}
+#ulp #ulist{flex:1 1 0;min-height:120px;overflow-y:auto;margin:0 -4px;padding:0 4px}
+#ulp>.btn,#ulp>.hint,#ulp>.opts,#ulp>h2{flex:none}
+@media(max-width:1100px){#ulp{height:auto;min-height:0}#ulp #ulist{flex:none;max-height:50vh}}
+
 /* erzeugt von tools/dunkel.py – nicht von Hand ändern */
 :root[data-theme=dark]{color-scheme:dark;--bg:#0f141b;--panel:#171e29;--ink:#e4e8ef;--mut:#9aa4b4;--line:#2b3442;--acc:#5b8def;--accbg:#1c2b47;--warn:#f79009;--warnbg:#3a2615;--ok:#47cd89;--okbg:#12301f;--vio:#9b8afb;--viobg:#28213d;--teal:#36bffa;--tealbg:#11303a;--bodobg:#1d2939;--sellbg:#11303c}
 :root[data-theme=dark] body{background:var(--bg);color:var(--ink)}
@@ -1397,7 +1404,7 @@ img.olg{height:18px;max-width:60px;object-fit:contain;margin-right:6px;vertical-
 </main>
 <main id="projects" class="hide"><section class="panel"><h2>Projekte</h2><div id="pjl"></div></section><section class="panel" id="pjd"></section></main>
 <main id="settings" class="hide" style="grid-template-columns:220px minmax(0,1fr)"><section class="panel"><h2>⚙ Einstellungen</h2><div id="setnav"></div></section><section class="panel" id="setc"></section><div id="setu" class="setu" hidden>
-  <section class="panel"><h2>Benutzer</h2><div class="opts" style="margin-bottom:8px"><label><input type="checkbox" id="uold"> Ausgeschiedene zeigen</label></div><div id="ulist"></div><button class="btn p" id="newU" style="width:100%">+ Neuer Benutzer …</button><button class="btn sm" id="ownOrgs" style="width:100%;margin-top:6px">⚙ Eigene Bodo-Mandanten</button>
+  <section class="panel" id="ulp"><h2>Benutzer</h2><div class="opts" style="margin-bottom:8px"><label><input type="checkbox" id="uold"> Ausgeschiedene zeigen</label></div><div id="ulist"></div><button class="btn p" id="newU" style="width:100%">+ Neuer Benutzer …</button><button class="btn sm" id="ownOrgs" style="width:100%;margin-top:6px">⚙ Eigene Bodo-Mandanten</button>
   <div class="hint">Menschen, die in My Company OS handeln – z. B. als Verantwortliche für Agenten. Je Benutzer lässt sich hinterlegen, wer er in Bodo, sellify oder anderen Systemen ist.</div></section>
   <section class="panel" id="uedit"></section>
 </div></main>
@@ -1410,7 +1417,7 @@ const COL=new Set();
 let PF="bodo",AF="bodo",GEN=false;
 const PK=[["bodo","Bodo"],["sellify","sellify"],["all","Andere"]];
 const PN={bodo:"Bodo",sellify:"sellify",all:"Andere",multi:"Bodo + sellify"};
-const VER="66";
+const VER="67";
 // Produktbereiche: fest im Programm hinterlegt (Entscheidung Boris 09.10.2026), keine Konfiguration in der Datenbank
 const PT={bodo:"Produktbereich Bodo (Bodo Solutions, Mitgliederverwaltung) – alles, was für Bodo-Kunden und das Bodo-System gebraucht wird. Fest im Programm hinterlegt.",sellify:"Produktbereich sellify (business//acts, CRM-Plattform) – alles, was für sellify-Kunden und das sellify-System gebraucht wird. Fest im Programm hinterlegt.",all:"Andere = produktunabhängig, z. B. Web-QA, E-Mail, Word/PDF. Fest im Programm hinterlegt."};
 let AFIL="all";

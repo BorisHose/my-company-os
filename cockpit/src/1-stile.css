@@ -429,3 +429,10 @@ img.olg{height:18px;max-width:60px;object-fit:contain;margin-right:6px;vertical-
 /* v66 Benutzer in den Einstellungen eingebettet */
 .setu{display:grid;grid-template-columns:300px minmax(0,1fr);gap:16px;min-width:0;align-items:start}.setu[hidden],#setc[hidden]{display:none}
 @media(max-width:1100px){.setu{grid-template-columns:minmax(0,1fr)}}
+
+/* v67 Benutzerliste so hoch wie „Benutzer bearbeiten“, darin scrollen */
+.setu{align-items:stretch}
+#ulp{display:flex;flex-direction:column;height:0;min-height:100%;overflow:hidden}
+#ulp #ulist{flex:1 1 0;min-height:120px;overflow-y:auto;margin:0 -4px;padding:0 4px}
+#ulp>.btn,#ulp>.hint,#ulp>.opts,#ulp>h2{flex:none}
+@media(max-width:1100px){#ulp{height:auto;min-height:0}#ulp #ulist{flex:none;max-height:50vh}}

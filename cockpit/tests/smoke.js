@@ -352,6 +352,13 @@ const check = (name, ok, info = '') => { CHECKS.push({ name, ok }); console.log(
     const R = { nav: document.querySelectorAll('#setnav [data-sets]').length === 6, on: document.querySelector('#setnav .on').dataset.sets === 'users', liste: document.querySelectorAll('#setu #ulist .uitem').length > 0, edit: !!document.querySelector('#setu #uedit .etop'), setcAus: document.querySelector('#setc').hidden, kein: !document.querySelector('main#users') };
     document.querySelector('[data-sets="ausf"]').click(); R.zurueck = !document.querySelector('#setc').hidden && document.querySelector('#setu').hidden && /Ausführung/.test(document.querySelector('#setc').textContent); return R });
   check('Benutzer eingebettet: Menü links bleibt, Liste und Bearbeitung rechts, Wechsel zurück', Object.values(bu).every(Boolean), JSON.stringify(bu));
+  // ----- v67 Benutzerliste gleich hoch, Scrollbar bei vielen -----
+  const uh = await p.evaluate(async () => { show('settings'); einst('users'); await new Promise(r => setTimeout(r, 150));
+    const h = () => [document.querySelector('#ulp').getBoundingClientRect().height, document.querySelector('#uedit').getBoundingClientRect().height];
+    const [a1, b1] = h(); const n0 = US.length; for (let i = 0; i < 30; i++) US.push({ id: 'tmp-u' + i, n: 'Test ' + i, maps: [] }); users(); await new Promise(r => setTimeout(r, 100));
+    const [a2, b2] = h(), L = document.querySelector('#ulist'), sc = L.scrollHeight > L.clientHeight + 5; US.splice(n0); users();
+    return { gleich1: Math.abs(a1 - b1) < 2, gleich2: Math.abs(a2 - b2) < 2, nichtGewachsen: Math.abs(b2 - b1) < 2, sc, h: [a1, b1, a2, b2] } });
+  check('Benutzer: Liste so hoch wie „Benutzer bearbeiten“, bei vielen Benutzern Scrollbar', uh.gleich1 && uh.gleich2 && uh.nichtGewachsen && uh.sc, JSON.stringify(uh));
   check('keine Laufzeitfehler', errs.length === 0, errs.slice(0, 3).join(' | '));
   await b.close();
   if (process.env.KEEP) fs.copyFileSync(tmp, path.join(ROOT, 'tests', '.keep.html')); fs.unlinkSync(tmp);
