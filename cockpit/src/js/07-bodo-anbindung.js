@@ -14,6 +14,10 @@ function mcpMsg(e){const c=e&&e.code;return c==="server_not_connected"?"Bodo-Ver
   :c==="tool_error"?"Bodo hat abgelehnt: "+(e.message||""):"Fehler bei Bodo ("+(c||"unbekannt")+"): "+(e&&e.message||"")}
 async function bodo(tool,input,write){await mcpP;if(!MCP)throw {code:"not_granted",message:"Bodo-Anbindung auf dieser Seite nicht verfügbar"};
   const r=await MCP.callTool(BODO,tool,input,write?{cache:false}:undefined);let p=r.payload;if(typeof p==="string"){try{p=JSON.parse(p)}catch(x){}}return p}
+const SELLIFY="sellify_mcp";
+async function sellify(tool,input){await mcpP;if(!MCP)throw {code:"not_granted",message:"sellify-Anbindung auf dieser Seite nicht verfügbar"};
+  const r=await MCP.callTool(SELLIFY,tool,input);let p=r.payload;if(typeof p==="string"){try{p=JSON.parse(p)}catch(x){}}return p}
+const sfMsg=e=>mcpMsg(e).replace(/„bodo solutions“/g,"„sellify“").replace(/Bodo/g,"sellify");
 async function findSeats(orgId,mail,name){const q=async s=>{const p=await bodo("bodo_search",{resourceType:"benutzer",orgId,query:s,limit:50});return (p&&p.items||[]).map(x=>x.data||{})};
   const L=[];const add=a=>a.forEach(x=>{if(!L.some(y=>y.membershipId===x.membershipId))L.push(x)});
   if(mail)add(await q(mail));if(name)add(await q(name));

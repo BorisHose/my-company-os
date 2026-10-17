@@ -4,7 +4,7 @@
 const DIENSTE=[["crm","CRM","Kontakte, Organisationen, Verkaufschancen"],["auftrag","Auftragsmanagement","der kommerzielle Auftrag – in der Regel über das Projekt geführt"],["projekt","Projekt","Klammer für Aufgaben, Notizen und Termine eines Auftrags"],["zeit","Zeiterfassung","Zeiteinträge, z. B. für die Laufzeit der KI-Sitzungen"]];
 const SYSKAT={
   bodo:{n:"Bodo",mcp:"bodo solutions",mand:true,pruefbar:true,kiUser:false,ent:{crm:[["contact","Kontakt/Firma"],["member","Vertragsinhaber"],["opportunity","Verkaufschance"],["lead","Vertriebsanfrage"]],auftrag:[["order","Auftrag"],["opportunity","Verkaufschance"]],projekt:[["project","Projekt"]],zeit:[["timeEntry","Zeiteintrag"]]}},
-  sellify:{n:"sellify",mcp:"sellify",mand:false,pruefbar:false,kiUser:false,ent:{crm:[["contact","Organisation"],["person","Person"],["sale","Chance"]],auftrag:[["sale","Chance"],["project","Projekt"]],projekt:[["project","Projekt"]],zeit:[]}}};
+  sellify:{n:"sellify",mcp:"sellify",mand:false,pruefbar:false,pruefEnt:{project:"sellify_project"},kiUser:false,ent:{crm:[["contact","Organisation"],["person","Person"],["sale","Chance"]],auftrag:[["sale","Chance"],["project","Projekt"]],projekt:[["project","Projekt"]],zeit:[]}}};
 const ZEITTIP=s=>"Zeiterfassung ist mit "+SYSKAT[s].n+" nicht möglich. Soll ein anderes System für die Zeiterfassung angebunden werden? Bitte sprich uns als Hersteller an.";
 const entN=(s,d,e)=>((SYSKAT[s]&&SYSKAT[s].ent[d]||[]).find(x=>x[0]===e)||[e,e])[1];
 const dienstVon=(o,k)=>{o=typeof o==="string"?orgById(o):o;const d=o&&o.dienste&&o.dienste[k];return d&&d.sys&&SYSKAT[d.sys]?d:null};
@@ -19,7 +19,7 @@ function dienstEinst(C){const O=ORGS(),M=ownOrgs();
   C.innerHTML=`<h2>Anbindungen</h2><div class="hint" style="margin:0 0 10px">Je Organigramm vier Dienste. Mehrere oder alle dürfen auf dasselbe System zeigen. Claude nutzt diese Zuordnung als Standard, wenn ein Auftrag kein System nennt; Projekte werden im Mandanten des Dienstes „Projekt“ gesucht.</div>
     ${O.map(o=>`<div class="dorg"><div class="dhd"><b>${o.logo?`<img class="olg" src="${o.logo}" alt="">`:""}${esc(o.n)}</b><span style="flex:1"></span>${o.chk?`<span class="hint" style="margin:0">geprüft ${esc(new Date(o.chk.at).toLocaleString("de-DE",{dateStyle:"short",timeStyle:"short"}))}</span>`:""}<button class="btn sm" data-dchk="${o.id}">Verbindung prüfen</button></div>${DIENSTE.map(x=>zeile(o,x)).join("")}</div>`).join("")}
     <div class="flabel">Systemkatalog</div><table class="dkat"><thead><tr><th>System</th>${DIENSTE.map(d=>`<th>${d[1]}</th>`).join("")}<th>KI-Benutzer</th></tr></thead><tbody>${Object.values(SYSKAT).map(S=>`<tr><td><b>${esc(S.n)}</b></td>${DIENSTE.map(([k])=>`<td>${S.ent[k].length?S.ent[k].map(e=>esc(e[1])).join(", "):'<span class="hint" style="margin:0" title="'+esc(ZEITTIP(Object.keys(SYSKAT).find(x=>SYSKAT[x]===S)))+'">–</span>'}</td>`).join("")}<td>${S.kiUser?"ja":'<span class="hint" style="margin:0">noch nicht</span>'}</td></tr>`).join("")}</tbody></table>
-    <div class="hint">KI-Benutzer: Agenten sollen künftig als eigener, nicht-physischer Benutzer im Backend buchen. Bodo und sellify unterstützen das noch nicht – vorbereitet, nicht umgesetzt. sellify ist aus dieser Seite nicht prüfbar; die Claude-Sitzung erreicht es über ihren Connector.</div>
+    <div class="hint">KI-Benutzer: Agenten sollen künftig als eigener, nicht-physischer Benutzer im Backend buchen. Bodo und sellify unterstützen das noch nicht – vorbereitet, nicht umgesetzt. Bei sellify prüft die Seite nur die Projekte; die übrigen Bereiche erreicht die Claude-Sitzung über ihren Connector.</div>
     <div class="btns"><button class="btn sm" id="sbodo">⚙ Eigene Bodo-Mandanten</button></div>`;
   const D=(v)=>{const [oid,k]=v.split("|"),o=orgById(oid);o.dienste={...(o.dienste||{})};o.dienste[k]={...(o.dienste[k]||{})};return [o,k,o.dienste[k]]};
   document.querySelectorAll("[data-ds]").forEach(s=>s.onchange=()=>{const [o,k,d]=D(s.dataset.ds);if(!s.value){delete o.dienste[k]}else{d.sys=s.value;d.ent=SYSKAT[s.value].ent[k][0][0];if(!SYSKAT[s.value].mand){delete d.orgId;delete d.orgN}
@@ -31,6 +31,7 @@ function dienstEinst(C){const O=ORGS(),M=ownOrgs();
   $("#sbodo").onclick=ownOrgsDlg}
 async function dienstPruefen(o){const r={at:new Date().toISOString(),erg:{}};let orgs=null;
   for(const [k] of DIENSTE){const d=dienstVon(o,k);if(!d)continue;const S=SYSKAT[d.sys];
+    if(!S.pruefbar&&S.pruefEnt&&S.pruefEnt[d.ent]){try{await sellify(S.pruefEnt[d.ent],{action:"list",params:{limit:1}});r.erg[k]={st:"ok",t:S.n+" erreichbar, "+entN(d.sys,k,d.ent)+" lesbar"}}catch(e){r.erg[k]={st:"err",t:sfMsg(e)}}continue}
     if(!S.pruefbar){r.erg[k]={st:"info",t:S.n+" ist aus dieser Seite nicht prüfbar – die Claude-Sitzung nutzt den Connector „"+S.mcp+"“."};continue}
     if(S.mand&&!d.orgId){r.erg[k]={st:"err",t:"Kein Mandant gewählt"};continue}
     try{if(!orgs)orgs=((await bodo("bodo_list_orgs",{}))||{}).orgs||[];const m=orgs.find(x=>x.orgId===d.orgId);

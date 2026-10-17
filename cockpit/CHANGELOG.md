@@ -1,5 +1,13 @@
 # Änderungen – Cockpit
 
+## 62 · 17.10.2026 · sellify-Projekte (Hinweis Boris)
+- Projekte lassen sich jetzt auch aus sellify übernehmen bzw. mit einem sellify-Projekt verbinden („⇣ Aus Backend übernehmen …“, „↔ Mit Backend-Projekt verbinden …“, Umschalter Bodo · sellify; sellify ohne Mandant). Vorbelegt ist das System des Dienstes „Projekt“, sonst das Produkt des Organigramms.
+- Status aus sellify: abgeschlossen (done), pausiert (Statusname), sonst aktiv; Projektnummer im Titel der Trefferliste.
+- Claude bekommt bei sellify-Projekten die Projekt-Id und legt Aufgaben, Notizen und Termine am Projekt an.
+- „Verbindung prüfen“ prüft bei sellify jetzt die Projekte (übrige sellify-Bereiche weiterhin nur über die Claude-Sitzung).
+- Seite darf dafür das sellify-Werkzeug sellify_project lesen (neue Berechtigung, beim ersten Aufruf Zustimmung im Browser).
+- Smoke-Test: 93 Prüfungen.
+
 ## 61 · 17.10.2026 · Etappe 4c „Handy“ (Freigabe Boris)
 - Organigramm auf schmalen Bildschirmen (bis 760 px) untereinander statt als Baum: Geschäftsführung oben, Abteilungen darunter an einer senkrechten Linie, kein seitliches Scrollen mehr.
 - Alle Ansichten ohne seitliches Scrollen der Seite (gemessen bei 320, 390, 430 und 768 px): zweispaltige Ansichten werden einspaltig, Filterleisten (Skills, Aufträge) sind wischbar statt abgeschnitten, Systemtabelle beim Benutzer scrollt in sich, Kopfzeilen mit Knöpfen brechen um.
