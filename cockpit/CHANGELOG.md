@@ -1,5 +1,12 @@
 # Änderungen – Cockpit
 
+## 80 · 17.10.2026 · Nachbesserungen nach Code-Prüfung (Etappe 6)
+- Formatierter Text: Zeilen wie „17. Oktober …“ oder „2024. …“ werden nicht mehr als nummerierte Liste gelesen (Listen nur ab 1 und fortlaufend); „5 * 3 * 2“ bleibt unverändert; Einfügen aus Outlook/Word/Webseiten ohne falsche Zeilenumbrüche, Tabellenzellen mit „|“ getrennt.
+- Rückfragen von Claude ohne Antwort-Optionen: eigenes Feld „Antwort senden“ (geht ohne „Ändern:“ an Claude), daneben weiter „Änderung senden“.
+- Platzhalter-Werte mit „$“ werden wörtlich übernommen; Vorlagen-Auswahl auf dem Handy einspaltig; kein Fehler mehr, wenn der Vorlagen-Editor kurz nach einer Eingabe geschlossen wird; Menü im Auftragsfenster mit einem gemeinsamen Klick-Listener; Bestätigungsfenster teilen den Titel nicht mehr am „?“ eines Auftragstitels.
+- Hinweis „Claude arbeitet“ korrigiert (Stand laden statt automatischer Aktualisierung im geöffneten Fenster).
+- Smoke-Test: 132 Prüfungen.
+
 ## 79 · 17.10.2026 · Auftragsvorlagen mit Schnellwahl (Etappe 5)
 - Neue Sammlung `vorlagen` (über die Speicher-Schicht, gespeichert wie Projekte); `18h-vorlagen.js`. Jede Vorlage gehört zu genau einer Organisation und damit zu deren System (Bodo/sellify) – Auswahl, Schnellwahl und Verwaltung zeigen nur Vorlagen der gewählten Organisation. Kundeninstanzen sind über ihre eigene Datenbank getrennt.
 - „Neuer Auftrag“: Leiste mit „📋 Vorlage wählen …“ und Schnellwahl-Knöpfen in zwei Gruppen „Für alle“ und „Meine“ (je höchstens 4), „✎ Schnellwahl anpassen“. Auswahlfenster mit Suche, Filter (Alle/Für alle/Nur meine), Gruppen nach Abteilung, Vorschau und Nutzungszähler.

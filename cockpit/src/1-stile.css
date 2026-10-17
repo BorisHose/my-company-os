@@ -613,3 +613,4 @@ img.olg{height:18px;max-width:60px;object-fit:contain;margin-right:6px;vertical-
 @media(max-width:860px){#vlphl .avt th:nth-child(2),#vlphl .avt td:nth-child(2){min-width:0}#vlphl .avt input[type=text]{min-width:0!important}#vlbox .row{grid-template-columns:1fr!important}}
 #vlphl .avt{table-layout:fixed;width:100%}#vlphl .avt th{white-space:normal}#vlphl .avt th:first-child{width:34%}#vlphl .avt th:last-child{width:64px}#vlphl .avt input[type=text]{width:100%}
 @media(max-width:860px){.dx-head .dx-dd{position:static}.dx-head .dx-pop{left:12px;right:12px;min-width:0;max-width:none}}
+.vlw-body{grid-template-columns:minmax(0,1fr) 320px}.vlw-list{max-height:60vh;overflow:auto}@media(max-width:860px){.vlw-body{grid-template-columns:1fr}.vlw-list{max-height:none}}

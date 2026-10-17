@@ -537,6 +537,10 @@ const check = (name, ok, info = '') => { CHECKS.push({ name, ok }); console.log(
     const d = document.createElement('div'); d.innerHTML = mdHtml(md, { ed: 1 }); const back = htmlMd(d);
     const w = document.createElement('template'); w.innerHTML = '<p style="color:red">Hallo <b>Welt</b><script>alert(1)<\/script></p><ul><li>a</li></ul><img src=x onerror=alert(1)>'; const san = mdHtml(htmlMd(w.content));
     const alt = mdHtml('Zeile 1\nZeile 2'); return { gleich: back === md, back, san, sauber: !/script|onerror|img|style/.test(san) && /<b>Welt<\/b>/.test(san), alt: alt === '<p>Zeile 1<br>Zeile 2</p>', txt: mdText(md).includes('Erstgespräch war gut') } });
+  const rt2 = await p.evaluate(() => { const rund = md => { const d = document.createElement('div'); d.innerHTML = mdHtml(md, { ed: 1 }); return htmlMd(d) };
+    const t = document.createElement('template'); t.innerHTML = '<p>Sehr geehrte Damen und\nHerren</p><table><tr><td>Name</td><td>Wert</td></tr></table>';
+    return { datum: rund('17. Oktober Termin\n2024. Jahresbericht'), mal: rund('5 * 3 * 2'), liste: rund('1. eins\n2. zwei\n4. vier'), paste: htmlMd(t.content), plain: mdHtml('Rechnung 5 * 3') } });
+  check('Verhalten: Klartext bleibt beim Hin und Zurück erhalten (Datumszahlen, Sternchen), Einfügen ohne falsche Umbrüche', rt2.datum === '17. Oktober Termin\n2024. Jahresbericht' && rt2.mal === '5 * 3 * 2' && rt2.liste === '1. eins\n2. zwei\n4. vier' && rt2.paste === 'Sehr geehrte Damen und Herren\n\nName | Wert' && !/<i>/.test(rt2.plain), JSON.stringify(rt2));
   check('Verhalten: formatierter Auftragstext (Markdown hin und zurück, Einfügen bereinigt, alter Klartext)', rt.gleich && rt.sauber && rt.alt && rt.txt, JSON.stringify(rt));
   // Übersicht: Reiter „Alle“ (offen + erledigt), Projektfilter, Reiter „Wartet auf dich“
   await vClr(); await p.evaluate(o => { AVS().q = ''; avOpen({ org: o, all: 1, tab: 'alle' }) }, VB.o); await p.waitForTimeout(300);

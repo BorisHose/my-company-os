@@ -615,6 +615,7 @@ img.olg{height:18px;max-width:60px;object-fit:contain;margin-right:6px;vertical-
 @media(max-width:860px){#vlphl .avt th:nth-child(2),#vlphl .avt td:nth-child(2){min-width:0}#vlphl .avt input[type=text]{min-width:0!important}#vlbox .row{grid-template-columns:1fr!important}}
 #vlphl .avt{table-layout:fixed;width:100%}#vlphl .avt th{white-space:normal}#vlphl .avt th:first-child{width:34%}#vlphl .avt th:last-child{width:64px}#vlphl .avt input[type=text]{width:100%}
 @media(max-width:860px){.dx-head .dx-dd{position:static}.dx-head .dx-pop{left:12px;right:12px;min-width:0;max-width:none}}
+.vlw-body{grid-template-columns:minmax(0,1fr) 320px}.vlw-list{max-height:60vh;overflow:auto}@media(max-width:860px){.vlw-body{grid-template-columns:1fr}.vlw-list{max-height:none}}
 
 /* erzeugt von tools/dunkel.py – nicht von Hand ändern */
 :root[data-theme=dark]{color-scheme:dark;--bg:#0f141b;--panel:#171e29;--ink:#e4e8ef;--mut:#9aa4b4;--line:#2b3442;--acc:#5b8def;--accbg:#1c2b47;--warn:#f79009;--warnbg:#3a2615;--ok:#47cd89;--okbg:#12301f;--vio:#9b8afb;--viobg:#28213d;--teal:#36bffa;--tealbg:#11303a;--bodobg:#1d2939;--sellbg:#11303c}
@@ -1806,7 +1807,7 @@ const COL=new Set();
 let PF="bodo",AF="bodo",GEN=false;
 const PK=[["bodo","Bodo"],["sellify","sellify"],["all","Andere"]];
 const PN={bodo:"Bodo",sellify:"sellify",all:"Andere",multi:"Bodo + sellify"};
-const VER="79";
+const VER="80";
 // Produktbereiche: fest im Programm hinterlegt (Entscheidung Boris 09.10.2026), keine Konfiguration in der Datenbank
 const PT={bodo:"Produktbereich Bodo (Bodo Solutions, Mitgliederverwaltung) – alles, was für Bodo-Kunden und das Bodo-System gebraucht wird. Fest im Programm hinterlegt.",sellify:"Produktbereich sellify (business//acts, CRM-Plattform) – alles, was für sellify-Kunden und das sellify-System gebraucht wird. Fest im Programm hinterlegt.",all:"Andere = produktunabhängig, z. B. Web-QA, E-Mail, Word/PDF. Fest im Programm hinterlegt."};
 let AFIL="all";
@@ -3360,8 +3361,8 @@ function jobView(j,opt){opt=opt||{};KINEW.delete(j.id);const f=j.f,c=f&&j.path&&
   if(W&&PLAN)todo=`<div class="dx-card y"><h4>✦ Plan zur Freigabe</h4>${planHtml(j)}<div class="dx-ans"><button class="btn p" id="plgo">▶ Plan freigeben &amp; starten</button><textarea id="rchgt" placeholder="Was soll der Teamleiter anders planen? z. B. ohne Video, anderer Agent für Schritt 2 …"></textarea><button class="btn" id="rchgok">Änderung senden</button></div></div>`;
   else if(W)todo=`<div class="dx-card y"><h4>${esc(Q.kind||"Rückfrage")} · ${esc(Q.from||"Claude")}${man&&c&&c.type==="human"?": "+esc(c.label||""):""}${nt?`<span class="hint">benachrichtigt über ${esc(nt)}</span>`:""}</h4><div style="white-space:pre-wrap;font-size:14px;line-height:1.55">${esc(Q.text||"")}</div>${Q.why?`<div class="hint">${esc(Q.why)}</div>`:""}${E.length?res(E):""}
     <div class="dx-ans">${man?humanOpts.map((o,i)=>`<button class="btn ${i?"":"p"}" data-ans="${esc(o)}">${esc(o)}</button>`).join(""):kiOpts.map((o,i)=>`<button class="btn ${i?"":"p"}" data-rans="${esc(o)}">${i?"":"✓ "}${esc(o)}</button>`).join("")}</div>
-    <div class="dx-ans">${man?`<input type="text" id="free" placeholder="… oder eigene Antwort schreiben und Enter">`:`<textarea id="rchgt" placeholder="Änderung wünschen … z. B. anderer Mandant, anderer Titel, Fälligkeit"></textarea><button class="btn" id="rchgok">Änderung senden</button>`}</div></div>`;
-  else if(!man&&j.st==="run")todo=`<div class="dx-card b"><h4>Claude arbeitet<span class="hint">aktualisiert sich alle 30 Sekunden</span></h4><div class="dx-ans" style="margin:0"><button class="btn" id="kirl2">⟳ Stand laden</button><button class="btn" id="kire">▶ Erneut anstoßen</button></div></div>`;
+    <div class="dx-ans">${man?`<input type="text" id="free" placeholder="… oder eigene Antwort schreiben und Enter">`:`${Q.kind!=="Freigabe"?`<input type="text" id="kifree" placeholder="Antwort schreiben und Enter …" style="flex:1 1 260px"><button class="btn p" id="kifreeok">Antwort senden</button></div><div class="dx-ans">`:""}<textarea id="rchgt" placeholder="Änderung wünschen … z. B. anderer Mandant, anderer Titel, Fälligkeit"></textarea><button class="btn" id="rchgok">Änderung senden</button>`}</div></div>`;
+  else if(!man&&j.st==="run")todo=`<div class="dx-card b"><h4>Claude arbeitet<span class="hint">„Stand laden“ holt den aktuellen Stand</span></h4><div class="dx-ans" style="margin:0"><button class="btn" id="kirl2">⟳ Stand laden</button><button class="btn" id="kire">▶ Erneut anstoßen</button></div></div>`;
   else if(j.st==="inbox")todo=`<div class="dx-card v"><h4>📥 Im Eingang${j.prio&&j.prio!=="n"?prioB(j):""}${j.due?`<span class="hint">fällig ${esc(new Date(j.due+"T12:00").toLocaleDateString("de-DE"))}</span>`:""}</h4><div class="hint" style="margin:0 0 8px">${(j.nach||[]).length?"wartet auf "+esc(j.nach.join(", ")):"Noch nicht gestartet."}</div><button class="btn p" id="jvgo">▶ Jetzt starten</button></div>`;
   if(man&&j.st==="run"&&c)todo+=`<div class="dx-card"><h4>Nächster Schritt<span class="hint">aktuell: ${esc(nlabel(c))}</span></h4><div class="dx-ans" style="margin:0">${f.E.map((e,i)=>[e,i]).filter(([e])=>e.f===c.id).map(([e,i])=>`<button class="btn ${e.back?'':'p'}" data-adv="${i}">${c.type==="dec"?"Entscheidung: "+esc(e.l||"weiter")+" → ":"✓ erledigt → "}${esc(nlabel(nodeOf(f,e.t)))}</button>`).join("")||'<span class="hint">Kein weiterer Schritt verbunden.</span>'}</div><div class="dx-ans"><button class="btn" id="addQ">Rückfrage erfassen</button><button class="btn" id="addN">Notiz zum Verlauf</button></div></div>`;
   if(man&&!end)todo+=`<div class="dx-ans" style="margin:0 0 14px"><button class="btn" id="kigo" title="Diesen Auftrag ab dem aktuellen Schritt von Claude ausführen lassen">▶ Von Claude ausführen lassen</button></div>`;
@@ -3404,6 +3405,7 @@ function jobView(j,opt){opt=opt||{};KINEW.delete(j.id);const f=j.f,c=f&&j.path&&
   document.querySelectorAll("[data-rans]").forEach(b=>b.onclick=()=>{zu();kiAnswer(j,b.dataset.rans)});
   document.querySelectorAll("[data-ans]").forEach(b=>b.onclick=()=>answer(b.dataset.ans));
   {const fr=$("#free");if(fr)fr.onkeydown=e=>{if(e.key==="Enter"&&fr.value.trim())answer(fr.value.trim())}}
+  {const fi=$("#kifree"),fb=$("#kifreeok"),send=()=>{const t=fi.value.trim();if(!t)return toast("Bitte eine Antwort schreiben");zu();kiAnswer(j,t)};if(fi){fi.onkeydown=e=>{if(e.key==="Enter")send()};fb.onclick=send}}
   {const ok=$("#rchgok");if(ok)ok.onclick=()=>{const t=$("#rchgt").value.trim();if(!t)return toast("Bitte die Änderung beschreiben");zu();kiAnswer(j,(PLAN?"Plan ändern: ":"Ändern: ")+t)}}
   {const b=$("#rcan");if(b)b.onclick=async()=>{if(await kiCancel(j)){zu();jobs()}}}
   {const b=$("#jvgo");if(b)b.onclick=async()=>{zu();await eingangStarten([j.id]);jobs()}}
@@ -3420,7 +3422,8 @@ function jobView(j,opt){opt=opt||{};KINEW.delete(j.id);const f=j.f,c=f&&j.path&&
   {const b=$("#kire");if(b)b.onclick=()=>{zu();kiStart(j,(j.sess||[]).length?"fortsetzen":"starten")}}
   {const b=$("#stop");if(b)b.onclick=async()=>{$("#jvmenu").open=false;const F=[(j.log||[]).length+" Einträge im Verlauf",...(E.length?[E.length+" eingetragene Ergebnisse (die Datensätze im Backend bleiben bestehen)"]:[]),...((j.anh||[]).length?[(j.anh.length)+" angehängte Bilder"]:[]),...(teileVon(j).filter(Boolean).length?[teileVon(j).filter(Boolean).length+" Teilaufträge verlieren ihren Hauptauftrag"]:[])];
     if(await askOk("Auftrag „"+j.t+"“ endgültig löschen?","Endgültig löschen",{text:j.id+" wird aus dem Organigraph entfernt. Das lässt sich nicht rückgängig machen. Verloren gehen:",folgen:F,nein:"Behalten"})){AU=AU.filter(x=>x!==j);zu();jobs();schedule();toast("Auftrag "+j.id+" gelöscht")}}}
-  document.addEventListener("click",function zuKl(e){const m=$("#jvmenu");if(!m){document.removeEventListener("click",zuKl);return}if(m.open&&!m.contains(e.target))m.open=false})}
+}
+document.addEventListener("click",e=>{const m=document.getElementById("jvmenu");if(m&&m.open&&document.contains(e.target)&&!m.contains(e.target))m.open=false});
 
 // ===== Dialoge (alert/confirm/prompt gibt es im Artefakt nicht) =====
 // dlg(html,dx): kleines Fenster; mit dx im neuen Aufbau (Kopf, Inhalt, Fuß). Rückgabe: Text (Eingabefeld), true (Ja) oder null.
@@ -3435,7 +3438,7 @@ const dlgKopf=(t,sub)=>`<div class="dx-head"><h3>${esc(t)}${sub?`<span class="dx
 // askText(Titel, Vorgabe, {mehrzeilig, bezug, ph, ok})
 const askText=(t,v,o)=>{o=o||{};return dlg(`${dlgKopf(t,o.bezug?esc(o.bezug):"")}<div class="dx-pad">${o.mehrzeilig?`<textarea id="dlgin" placeholder="${esc(o.ph||"")}">${esc(v||"")}</textarea><div class="hint">Strg+Enter speichert</div>`:`<input type="text" id="dlgin" value="${esc(v||"")}" placeholder="${esc(o.ph||"")}">`}</div><div class="dx-foot"><span class="dx-sum"></span><button class="btn" data-no>Abbrechen</button><button class="btn p" data-yes>${esc(o.ok||"OK")}</button></div>`,1)};
 // askOk(Frage, Knopftext, {text, folgen:[…], nein, gefahr, titel}) – Titel = Frage bis zum ersten „?“, der Rest als Erklärung
-const askOk=(t,l,o)=>{o=o||{};l=l||"Ja, löschen";const m=String(t).match(/^(.*?\?)\s+(.+)$/s),ti=o.titel||(m?m[1]:t),tx=o.text||(m?m[2]:"");
+const askOk=(t,l,o)=>{o=o||{};l=l||"Ja, löschen";const m=o.text||o.titel?null:String(t).match(/^(.*?\?)\s+(.+)$/s),ti=o.titel||(m?m[1]:t),tx=o.text||(m?m[2]:"");
   const gef=o.gefahr!==undefined?o.gefahr:/lösch|abbrech|verwerf|entfern|lösen/i.test(l);
   return dlg(`${dlgKopf(ti)}${tx||(o.folgen||[]).length?`<div class="dx-pad">${tx?`<p>${esc(tx)}</p>`:""}${(o.folgen||[]).length?`<ul class="dx-fol">${o.folgen.map(f=>`<li>${esc(f)}</li>`).join("")}</ul>`:""}</div>`:""}<div class="dx-foot"><span class="dx-sum"></span><button class="btn" data-no>${esc(o.nein||"Abbrechen")}</button><button class="btn ${gef?"dd":"p"}" data-yes>${esc(l)}</button></div>`,1).then(v=>!!v)};
 async function copyText(t,msg){try{await navigator.clipboard.writeText(t);toast(msg)}catch(e){const p=$("#pv");if(p){p.closest("details").open=true;const r=document.createRange();r.selectNodeContents(p);const s=getSelection();s.removeAllRanges();s.addRange(r)}toast("Kopieren nicht möglich – Text ist markiert")}}
@@ -3450,29 +3453,31 @@ function modalBox(html,wide){$("#modal").innerHTML=`<div class="modal"><div clas
 const MDLINK=/\[([^\]\n]+)\]\(((?:https?:\/\/|mailto:)[^\s)]+)\)/g;
 function mdInline(s,o){o=o||{};let t=esc(s);
   t=t.replace(MDLINK,(m,a,h)=>`<a href="${h}" target="_blank" rel="noopener">${a}</a>`);
-  t=t.replace(/\*\*([^*\n]+?)\*\*/g,"<b>$1</b>").replace(/(^|[^*\w])\*([^*\n]+?)\*(?!\w)/g,"$1<i>$2</i>");
+  t=t.replace(/\*\*(?=\S)([^*\n]+?)\*\*/g,(m,x)=>/\s$/.test(x)?m:"<b>"+x+"</b>").replace(/(^|[^*\w])\*(?=\S)([^*\n]+?)\*(?!\w)/g,(m,a,x)=>/\s$/.test(x)?m:a+"<i>"+x+"</i>");
   if(o.ph)t=t.replace(/\[([^\]\n<>]{1,40})\](?!\()/g,'<span class="dx-ph">[$1]</span>');
   return t}
 // mdHtml(md,{ed,ph}): ed = für das Eingabefeld (eine Zeile je <div>), sonst Anzeige mit Absätzen
 function mdHtml(md,o){o=o||{};const L=String(md||"").replace(/\r/g,"").split("\n"),H=[];let i=0;
-  const li=(re,tag)=>{const it=[];while(i<L.length&&re.test(L[i])){it.push("<li>"+mdInline(L[i].replace(re,""),o)+"</li>");i++}H.push(`<${tag}>${it.join("")}</${tag}>`)};
+  const OL=/^\s*(\d+)[.)]\s+/,olStart=k=>{const m=OL.exec(L[k]||"");return !!m&&+m[1]===1};
+  const li=(re,tag)=>{const it=[];let n=1;while(i<L.length&&re.test(L[i])){if(tag==="ol"){const m=OL.exec(L[i]);if(+m[1]!==n)break;n++}it.push("<li>"+mdInline(L[i].replace(re,""),o)+"</li>");i++}H.push(`<${tag}>${it.join("")}</${tag}>`)};
+  const blk=k=>/^\s*(#{1,4}|[-*•])\s+/.test(L[k])||olStart(k);
   while(i<L.length){const l=L[i];
     if(/^\s*#{1,4}\s+/.test(l)){H.push("<h3>"+mdInline(l.replace(/^\s*#{1,4}\s+/,""),o)+"</h3>");i++}
     else if(/^\s*[-*•]\s+/.test(l))li(/^\s*[-*•]\s+/,"ul");
-    else if(/^\s*\d+[.)]\s+/.test(l))li(/^\s*\d+[.)]\s+/,"ol");
+    else if(olStart(i))li(OL,"ol");
     else if(o.ed){H.push("<div>"+(l.trim()?mdInline(l,o):"<br>")+"</div>");i++}
     else if(!l.trim())i++;
-    else{const P=[];while(i<L.length&&L[i].trim()&&!/^\s*(#{1,4}|[-*•]|\d+[.)])\s+/.test(L[i])){P.push(mdInline(L[i],o));i++}H.push("<p>"+P.join("<br>")+"</p>")}}
+    else{const P=[];while(i<L.length&&L[i].trim()&&(!P.length||!blk(i))){P.push(mdInline(L[i],o));i++}H.push("<p>"+P.join("<br>")+"</p>")}}
   return H.join("")}
 // htmlMd(element): Inhalt eines Eingabefelds (contenteditable) → Markdown
 function htmlMd(root){const BL=/^(DIV|P|H[1-6]|UL|OL|LI|BLOCKQUOTE|PRE|TABLE|TR)$/;
-  const inl=n=>{if(n.nodeType===3)return n.nodeValue.replace(/ /g," ");if(n.nodeType!==1)return "";
+  const inl=n=>{if(n.nodeType===3)return n.nodeValue.replace(/[\t\r\n ]+/g," ").replace(/ /g," ");if(n.nodeType!==1)return "";
     const t=n.tagName;if(t==="BR")return "\n";if(t==="STYLE"||t==="SCRIPT")return "";
     const c=[...n.childNodes].map(inl).join("");const w=x=>{const m=c.match(/^(\s*)([\s\S]*?)(\s*)$/);return m[2]?m[1]+x+m[2]+x+m[3]:c};
     if(t==="B"||t==="STRONG"||(t==="SPAN"&&/^(bold|[6-9]00)$/.test(n.style&&n.style.fontWeight)))return w("**");
     if(t==="I"||t==="EM")return w("*");
     if(t==="A"){const h=n.getAttribute("href")||"";return /^(https?:|mailto:)/i.test(h)&&c.trim()?"["+c.trim()+"]("+h+")":c}
-    if(BL.test(t))return c+"\n";return c};
+    if(t==="TD"||t==="TH")return c.trim()+" | ";if(BL.test(t))return c+"\n";return c};
   const L=[];let cur="";const fl=()=>{if(cur!==""){cur.split("\n").forEach(x=>L.push(x));cur=""}};
   const walk=n=>{for(const c of n.childNodes){
     if(c.nodeType===1&&BL.test(c.tagName)){fl();const t=c.tagName;
@@ -3483,9 +3488,9 @@ function htmlMd(root){const BL=/^(DIV|P|H[1-6]|UL|OL|LI|BLOCKQUOTE|PRE|TABLE|TR)
       else{inl(c).replace(/\n$/,"").split("\n").forEach(x=>L.push(x));if(t==="P")L.push("")}}
     else cur+=inl(c)}};
   walk(root);fl();
-  return L.join("\n").replace(/[ \t]+$/gm,"").replace(/\n{3,}/g,"\n\n").trim()}
+  return L.map(x=>x.replace(/^ +/,"").replace(/ \| *$/,"")).join("\n").replace(/[ \t]+$/gm,"").replace(/\n{3,}/g,"\n\n").trim()}
 const rtMd=el=>el?(el.isContentEditable||el.getAttribute("contenteditable")?htmlMd(el):String(el.value||"")):"";
-const mdText=md=>String(md||"").replace(MDLINK,"$1").replace(/\*\*([^*\n]+?)\*\*/g,"$1").replace(/(^|[^*\w])\*([^*\n]+?)\*(?!\w)/g,"$1$2").replace(/^\s*#{1,4}\s+/gm,"").replace(/^\s*[-*•]\s+/gm,"• ");
+const mdText=md=>String(md||"").replace(MDLINK,"$1").replace(/\*\*(?=\S)([^*\n]+?)\*\*/g,"$1").replace(/(^|[^*\w])\*(?=\S)([^*\n]+?)\*(?!\w)/g,"$1$2").replace(/^\s*#{1,4}\s+/gm,"").replace(/^\s*[-*•]\s+/gm,"• ");
 // Eingabefeld mit Leiste: Knöpfe [data-rt], Einfügen wird bereinigt; Bilder bleiben Sache des Aufrufers (onImage)
 function rtBind(ed,bar,o){o=o||{};let rng=null;const keep=()=>{const s=getSelection();if(s.rangeCount&&ed.contains(s.anchorNode))rng=s.getRangeAt(0).cloneRange()};
   const back=()=>{ed.focus();if(rng){const s=getSelection();s.removeAllRanges();s.addRange(rng)}};
@@ -4086,7 +4091,7 @@ function vlBind(O,keep,K){const voll=()=>!!($("#jt").value.trim()||rtMd($("#ji")
   {const b=$("#jvlsa");if(b)b.onclick=()=>vlSchnell(O.id,()=>startModal(null,K()))}}
 // Vorlage anwenden: Platzhalter abfragen, dann „Neuer Auftrag“ füllen
 async function vlAnwenden(v,base){base=base||{};let t=v.t||"",i=v.in||"";const P=(v.ph||[]).filter(p=>vlPh(t+"\n"+i).includes(p.k));
-  if(P.length){const r=await vlPhDialog(v,P);if(r===null)return;Object.entries(r).forEach(([k,w])=>{if(!w)return;const re=new RegExp("\\["+k.replace(/[.*+?^${}()|[\]\\]/g,"\\$&")+"\\](?!\\()","g");t=t.replace(re,w);i=i.replace(re,w)})}
+  if(P.length){const r=await vlPhDialog(v,P);if(r===null)return;Object.entries(r).forEach(([k,w])=>{if(!w)return;const re=new RegExp("\\["+k.replace(/[.*+?^${}()|[\]\\]/g,"\\$&")+"\\](?!\\()","g");t=t.replace(re,()=>w);i=i.replace(re,()=>w)})}
   const F=vlFehlt(v);if(F.length)toast("Aus der Vorlage nicht mehr vorhanden: "+F.join(", ")+" – bitte neu wählen");
   const due=v.faellig?new Date(Date.now()+v.faellig*864e5).toISOString().slice(0,10):(base.due||"");
   const keep={...base,org:v.org,art:v.art||"frei",abt:v.abt||null,team:v.team||"",aid:v.aid||null,sk:v.sk||"",tempo:v.tempo||"schnell",vorab:!!v.vorab,prj:v.prj&&pj(v.prj)?v.prj:(base.prj||""),t,i,vl:v.id,vlN:v.n,ki:true};
@@ -4111,7 +4116,7 @@ function vlWahl(o,pick,f0){const s={q:"",f:f0||"alle",sel:null};const box=docume
     if(!L.some(v=>v.id===s.sel))s.sel=(L[0]||{}).id||null;const V=VL.find(v=>v.id===s.sel);
     const G=[...new Set(L.map(v=>vlAbt(v)))].sort((a,b)=>(a?0:1)-(b?0:1)||String((dept(a)||{}).n).localeCompare(String((dept(b)||{}).n),"de"));
     box.innerHTML=`<div class="modal" style="z-index:36"><div class="box dx" style="max-width:900px">${dlgKopf("Vorlage wählen",esc(O.kurz||O.n||"")+(O.prod?" · "+esc(PN[O.prod]||""):""))}
-     <div class="dx-body" style="grid-template-columns:minmax(0,1fr) 320px"><div class="dx-main" style="max-height:60vh;overflow:auto">
+     <div class="dx-body vlw-body"><div class="dx-main vlw-list">
       <input type="search" id="vlwq" placeholder="🔍 Vorlage suchen …" value="${esc(s.q)}">
       <div style="display:flex;gap:6px;margin:10px 0">${[["alle","Alle"],["alle2","Für alle"],["ich","Nur meine"]].map(([k,l])=>`<button class="dx-chip ${s.f===k?"on":""}" data-vlwf="${k}">${l}</button>`).join("")}</div>
       ${L.length?G.map(g=>`<div class="dx-lbl" style="margin-top:12px">${esc(g?(dept(g)||{}).n||"Abteilung":"Ohne Abteilung")}</div>${L.filter(v=>vlAbt(v)===g).map(v=>{const F=vlFehlt(v);return `<button class="vlrow ${v.id===s.sel?"on":""}" data-vlws="${v.id}"><span class="t"><b>${esc(v.n)}</b>${F.length?` <span class="dx-pill wait">⚠ ${esc(F.join(", "))} fehlt</span>`:""}${v.gilt==="ich"?' <span class="dx-pill inbox">persönlich</span>':""}<small>${esc(vlWer(v))}${(v.ph||[]).length?" · "+v.ph.length+" Platzhalter":""}</small></span><span class="hint" style="margin:0">${vlNutz(v).length}×</span></button>`}).join("")}`).join(""):`<div class="hint">${vlOrg(o).length?"Keine Vorlage passt zur Suche.":"Für diese Organisation gibt es noch keine Vorlagen – anlegen unter ⚙ Einstellungen › Auftragsvorlagen oder im Auftrag über ⋯ › „Als Vorlage speichern“."}</div>`}
@@ -4178,7 +4183,7 @@ function vlEditor(v0,o,fertig){const neu=!v0||!VL.includes(v0);const E=JSON.pars
        <label class="cb" style="margin-top:8px"><input type="checkbox" id="vlprj" ${E.prj?"checked":""}> Projekt vorbelegen</label><select id="vlprjs" ${E.prj?"":"hidden"}>${pjOpts(O.id,E.prj||"")}</select></div>
      </div></div>
      <div class="dx-foot"><span class="dx-sum">${!neu&&usr(E.von)?"zuletzt geändert von "+esc(usr(E.von).n)+(E.geaendert?" · "+esc(new Date(E.geaendert).toLocaleDateString("de-DE")):""):neu?"Neue Vorlage für "+esc(O.kurz||O.n||""):""}</span><button class="btn" id="vlab">Abbrechen</button><button class="btn" id="vltry" title="„Neuer Auftrag“ mit dieser Vorlage öffnen, ohne zu speichern">Ausprobieren ▶</button><button class="btn p" id="vlok">Vorlage speichern</button></div></div></div>`;
-    const ed=$("#vled"),phl=()=>{sync();$("#vlphl").innerHTML=E.ph.length?`<div style="overflow-x:auto"><table class="avt" style="font-size:12.5px;min-width:0"><thead><tr><th>Name</th><th>Hinweis beim Ausfüllen</th><th>Pflicht</th></tr></thead><tbody>${E.ph.map(p=>`<tr data-phk="${esc(p.k)}"><td><span class="dx-ph">${esc(p.k)}</span></td><td><input type="text" value="${esc(p.h||"")}" placeholder="z. B. Firmenname, wie er im CRM steht" style="min-width:120px"></td><td><input type="checkbox" ${p.pf?"checked":""}></td></tr>`).join("")}</tbody></table></div>`:'<div class="hint" style="margin:0">Noch keine – mit „＋ Platzhalter“ einfügen oder [Name] in den Text schreiben.</div>'};
+    const ed=$("#vled"),phl=()=>{if(!$("#vlphl"))return;sync();$("#vlphl").innerHTML=E.ph.length?`<div style="overflow-x:auto"><table class="avt" style="font-size:12.5px;min-width:0"><thead><tr><th>Name</th><th>Hinweis beim Ausfüllen</th><th>Pflicht</th></tr></thead><tbody>${E.ph.map(p=>`<tr data-phk="${esc(p.k)}"><td><span class="dx-ph">${esc(p.k)}</span></td><td><input type="text" value="${esc(p.h||"")}" placeholder="z. B. Firmenname, wie er im CRM steht" style="min-width:120px"></td><td><input type="checkbox" ${p.pf?"checked":""}></td></tr>`).join("")}</tbody></table></div>`:'<div class="hint" style="margin:0">Noch keine – mit „＋ Platzhalter“ einfügen oder [Name] in den Text schreiben.</div>'};
     rtBind(ed,$("#vlbox .dx-tb"),{onPh:phl});let pt=null;const lazy=()=>{clearTimeout(pt);pt=setTimeout(phl,500)};ed.addEventListener("input",lazy);$("#vlt").addEventListener("input",lazy);phl();
     const re=()=>{sync();draw()};
     document.querySelectorAll("[data-vla]").forEach(b=>b.onclick=()=>{sync();E.art=b.dataset.vla;E.sk="";draw()});
