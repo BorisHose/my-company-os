@@ -547,6 +547,15 @@
 :root[data-theme=dark] .btn.dd{background:#b42318;color:#fff;border-color:#b42318}
 :root[data-theme=dark] .dx-fol{color:#c8cfda}
 :root[data-theme=dark] .dx-side{border-left:0;border-top:1px solid var(--line)}
+:root[data-theme=dark] .dx-tabs{border-bottom:1px solid var(--line)}
+:root[data-theme=dark] .dx-tabs button{border:0;background:none;color:var(--mut);border-bottom:2.5px solid transparent}
+:root[data-theme=dark] .dx-tabs button.on{color:var(--ink);border-bottom-color:var(--navy)}
+:root[data-theme=dark] .dx-tabs .c{background:#262f3d;color:#b3bcc9;border-radius:999px}
+:root[data-theme=dark] .dx-tabs .c.y{background:#3a2e10;color:#fdb022}
+:root[data-theme=dark] .dx-tabs .sep{background:var(--line)}
+:root[data-theme=dark] .dx-filter{border-bottom:1px solid var(--line);background:#141b25}
+:root[data-theme=dark] .dx-av .avtw{border:0;border-radius:0}
+:root[data-theme=dark] .avt tr.avsec td{background:#131a24;color:var(--mut)}
 :root[data-theme=dark] nav button.on{background:#2f6fdf;color:#fff}:root[data-theme=dark] body{background:var(--bg);color:var(--ink)}:root[data-theme=dark] input,:root[data-theme=dark] select,:root[data-theme=dark] textarea{background:#131a24;color:var(--ink);border-color:#3a4456}:root[data-theme=dark] .modal{background:#000000a6}:root[data-theme=dark] img.olg,:root[data-theme=dark] .av img{filter:none}
 @media (prefers-color-scheme:dark){:root[data-theme=auto]{color-scheme:dark;--bg:#0f141b;--panel:#171e29;--ink:#e4e8ef;--mut:#9aa4b4;--line:#2b3442;--acc:#5b8def;--accbg:#1c2b47;--warn:#f79009;--warnbg:#3a2615;--ok:#47cd89;--okbg:#12301f;--vio:#9b8afb;--viobg:#28213d;--teal:#36bffa;--tealbg:#11303a;--bodobg:#1d2939;--sellbg:#11303c}
 :root[data-theme=auto] body{background:var(--bg);color:var(--ink)}
@@ -1096,4 +1105,13 @@
 :root[data-theme=auto] .btn.dd{background:#b42318;color:#fff;border-color:#b42318}
 :root[data-theme=auto] .dx-fol{color:#c8cfda}
 :root[data-theme=auto] .dx-side{border-left:0;border-top:1px solid var(--line)}
+:root[data-theme=auto] .dx-tabs{border-bottom:1px solid var(--line)}
+:root[data-theme=auto] .dx-tabs button{border:0;background:none;color:var(--mut);border-bottom:2.5px solid transparent}
+:root[data-theme=auto] .dx-tabs button.on{color:var(--ink);border-bottom-color:var(--navy)}
+:root[data-theme=auto] .dx-tabs .c{background:#262f3d;color:#b3bcc9;border-radius:999px}
+:root[data-theme=auto] .dx-tabs .c.y{background:#3a2e10;color:#fdb022}
+:root[data-theme=auto] .dx-tabs .sep{background:var(--line)}
+:root[data-theme=auto] .dx-filter{border-bottom:1px solid var(--line);background:#141b25}
+:root[data-theme=auto] .dx-av .avtw{border:0;border-radius:0}
+:root[data-theme=auto] .avt tr.avsec td{background:#131a24;color:var(--mut)}
 :root[data-theme=auto] nav button.on{background:#2f6fdf;color:#fff}:root[data-theme=auto] body{background:var(--bg);color:var(--ink)}:root[data-theme=auto] input,:root[data-theme=auto] select,:root[data-theme=auto] textarea{background:#131a24;color:var(--ink);border-color:#3a4456}:root[data-theme=auto] .modal{background:#000000a6}:root[data-theme=auto] img.olg,:root[data-theme=auto] .av img{filter:none}}

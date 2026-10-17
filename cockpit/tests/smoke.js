@@ -162,14 +162,17 @@ const check = (name, ok, info = '') => { CHECKS.push({ name, ok }); console.log(
   check('Abgebrochene einblendbar', /abgebrochen/.test(ab1));
   if (SHOT) await p.screenshot({ path: SHOT + '/e1-erledigt.png' });
   const n1 = (await p.$$('#avdlg tbody tr[data-avj]')).length;
+  await p.evaluate(() => { const x = document.querySelector('#avdd-abt'); if (x) x.open = true });
   await p.click('#avkeine'); await p.waitForTimeout(200);
   check('Einschränken „Keine“ leert die Tabelle', (await p.$$('#avdlg tbody tr[data-avj]')).length === 0 && n1 > 0);
   await p.click('#avalle'); await p.waitForTimeout(200);
   const d0 = await p.$eval('[data-avd]', e => e.dataset.avd);
   await p.click(`[data-avd="${d0}"]`); await p.waitForTimeout(200);
   check('Abteilung abwählen wirkt und wird gemerkt', await p.evaluate(d => { const S = avSel(AVS().org); return S.d && !S.d.includes(d) && JSON.parse(localStorage.getItem('cos-ui') || '{}').av.sel }, d0));
+  await p.evaluate(() => { const x = document.querySelector('#avdd-abt'); if (x) x.open = false });
   await p.click('[data-avz="aelter"]'); await p.waitForTimeout(800);
   check('Älter lädt das Archiv (A-150)', await p.$$eval('#avdlg tbody tr.arch', r => r.some(x => x.textContent.includes('A-150'))) || await p.evaluate(() => (AVARCH || []).some(x => x.id === 'A-150')));
+  await p.evaluate(() => { const x = document.querySelector('#avdd-abt'); if (x) x.open = true });
   await p.click('#avalle'); await p.waitForTimeout(200);
   await p.fill('#avq', 'A-150'); await p.waitForTimeout(200);
   check('Suche im Dialog behält den Fokus', await p.evaluate(() => document.activeElement.id === 'avq'));
@@ -535,6 +538,18 @@ const check = (name, ok, info = '') => { CHECKS.push({ name, ok }); console.log(
     const w = document.createElement('template'); w.innerHTML = '<p style="color:red">Hallo <b>Welt</b><script>alert(1)<\/script></p><ul><li>a</li></ul><img src=x onerror=alert(1)>'; const san = mdHtml(htmlMd(w.content));
     const alt = mdHtml('Zeile 1\nZeile 2'); return { gleich: back === md, back, san, sauber: !/script|onerror|img|style/.test(san) && /<b>Welt<\/b>/.test(san), alt: alt === '<p>Zeile 1<br>Zeile 2</p>', txt: mdText(md).includes('Erstgespräch war gut') } });
   check('Verhalten: formatierter Auftragstext (Markdown hin und zurück, Einfügen bereinigt, alter Klartext)', rt.gleich && rt.sauber && rt.alt && rt.txt, JSON.stringify(rt));
+  // Übersicht: Reiter „Alle“ (offen + erledigt), Projektfilter, Reiter „Wartet auf dich“
+  await vClr(); await p.evaluate(o => { AVS().q = ''; avOpen({ org: o, all: 1, tab: 'alle' }) }, VB.o); await p.waitForTimeout(300);
+  await p.click('[data-avz="monat"]'); await p.waitForTimeout(200);
+  const va = await p.evaluate(() => { const ids = [...document.querySelectorAll('#avdlg tbody tr[data-avj]')].map(t => t.dataset.avj); const J = ids.map(id => AU.find(x => x.id === id)).filter(Boolean); return { offen: J.some(j => !isEnd(j)), fertig: J.some(j => isEnd(j)), sek: !!document.querySelector('#avdlg tr.avsec') } });
+  check('Übersicht: „Alle“ zeigt offene und erledigte', va.offen && va.fertig && va.sek, JSON.stringify(va));
+  await p.evaluate(() => { document.querySelector('#avdd-prj').open = true }); await p.click('#avdlg [data-avp="_ohne"]'); await p.waitForTimeout(250);
+  const vp = await p.evaluate(() => { const ids = [...document.querySelectorAll('#avdlg tbody tr[data-avj]')].map(t => t.dataset.avj); const J = ids.map(id => AU.find(x => x.id === id)).filter(Boolean); return { n: J.length, alleMitProjekt: J.every(j => j.prj && pj(j.prj)), gespeichert: JSON.parse(localStorage.getItem('cos-ui') || '{}').av.sel[AVS().org].p } });
+  check('Übersicht: Projektfilter (ohne „Ohne Projekt“) zeigt nur Aufträge mit Projekt, wird gemerkt', vp.n > 0 && vp.alleMitProjekt && Array.isArray(vp.gespeichert) && !vp.gespeichert.includes('_ohne'), JSON.stringify(vp));
+  await p.click('#avpalle'); await p.waitForTimeout(200); await p.click('[data-avs="wait"]'); await p.waitForTimeout(200);
+  const vw = await p.evaluate(() => [...document.querySelectorAll('#avdlg tbody tr[data-avj]')].every(t => AU.find(x => x.id === t.dataset.avj).st === 'wait'));
+  check('Übersicht: Reiter „Wartet auf dich“ zeigt nur wartende', vw);
+  await p.evaluate(() => avClose());
   await vClr();
   check('keine Laufzeitfehler', errs.length === 0, errs.slice(0, 3).join(' | '));
   await b.close();

@@ -1,5 +1,12 @@
 # Änderungen – Cockpit
 
+## 78 · 17.10.2026 · Übersicht „Aufträge“ neu (Etappe 4)
+- „Aufträge & Verlauf“ heißt „Aufträge“: eine Reiterreihe nach Status mit Zählern – Wartet auf dich · Läuft · Eingang · Alle offenen | Erledigt · Alle. „Alle“ zeigt offene und darunter erledigte Aufträge (Entscheidung Boris).
+- Filter als Auswahl oben statt Häkchen-Spalte links: Abteilung/Agent (wie bisher mit Zählern, Alle/Keine) und neu **Projekt** (Ohne Projekt + Projekte der Organisation, Mehrfachauswahl, gemerkt; gilt auch fürs Archiv). Zeitfenster und „Abgebrochene zeigen“ bei Erledigt und Alle; Sortierschalter im Eingang.
+- Organisation und „+ Neuer Auftrag“ im Kopf; Projekt erscheint in der Auftragszeile; Klick auf eine Eingangszeile öffnet den Auftrag. Verwerfen aus dem Eingang mit „Behalten“ / „Ja, verwerfen“.
+- Handy: Reiter brechen um, Auswahlmenüs über die volle Breite.
+- Smoke-Test: 122 Prüfungen (neu: Reiter „Alle“, Projektfilter, Reiter „Wartet auf dich“).
+
 ## 77 · 17.10.2026 · Ein Fenster je Auftrag (Etappe 3)
 - „Ergebnis“ und „Details“ sind zusammengelegt (`16a-auftrag-fenster.js`, `jobView`); `resultModal` und `jobModal` leiten dorthin weiter, alle Einstiege bleiben gleich.
 - Links steht, was zu tun ist: Freigabe/Rückfrage mit allen Antwort-Optionen und den Ergebnissen direkt darin, Feld „Änderung wünschen“ (geht als „Ändern: …“ an Claude), Plan des KI-Teamleiters mit Agentenwahl je Schritt, „Claude arbeitet“ mit Stand laden/Erneut anstoßen, „Nächster Schritt“ bei manuellen Aufträgen, „Im Eingang“ mit „Jetzt starten“. Danach Rückmeldung, Ergebnisse, Teilaufträge und der formatierte Auftragstext mit Bildern.

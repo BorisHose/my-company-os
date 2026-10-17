@@ -582,3 +582,21 @@ img.olg{height:18px;max-width:60px;object-fit:contain;margin-right:6px;vertical-
 @media(max-width:860px){.dx-body{grid-template-columns:1fr}.dx-side{border-left:0;border-top:1px solid var(--line)}.dx-head,.dx-foot,.dx-banner{padding-left:14px;padding-right:14px}.dx-main,.dx-side,.dx-pad{padding:14px}.dx-foot .btn{flex:1 1 auto}.dx-ed{min-height:180px}.dx-sum{flex-basis:100%}.dx-pop{min-width:200px;max-width:calc(100vw - 40px)}}
 .dx-ctx .seg button{white-space:nowrap}
 @media(max-width:860px){.dx-head{position:relative;padding-right:46px}.dx-head>.dx-x{position:absolute;right:10px;top:12px}}
+/* Übersicht Aufträge (v78) */
+.avbox.dx-av{padding:0;gap:0;max-width:1240px}
+.dx-tabs{display:flex;gap:2px;padding:0 16px;border-bottom:1px solid var(--line);overflow-x:auto;align-items:stretch}
+.dx-tabs button{border:0;background:none;padding:11px 12px;font:inherit;font-weight:600;color:var(--mut);border-bottom:2.5px solid transparent;cursor:pointer;white-space:nowrap;display:flex;gap:6px;align-items:center}
+.dx-tabs button.on{color:var(--ink);border-bottom-color:var(--navy)}
+.dx-tabs .c{background:#eef0f4;color:#475467;border-radius:999px;font-size:11.5px;padding:1px 7px;font-weight:700}
+.dx-tabs .c.y{background:#fef0c7;color:#8a5a00}
+.dx-tabs .sep{width:1px;background:var(--line);margin:8px 6px}
+.dx-filter{display:flex;gap:8px;flex-wrap:wrap;align-items:center;padding:10px 16px;border-bottom:1px solid var(--line);background:#fafbfc}
+.dx-filter .avq{flex:0 1 260px}
+.dx-av .avtw{border:0;border-radius:0;max-height:calc(100vh - 330px)}
+.dx-av .dx-foot{padding:10px 16px}
+.avt tr.avsec td{background:#f7f9fc;font-size:11.5px;font-weight:700;letter-spacing:.05em;text-transform:uppercase;color:var(--mut);padding:7px 10px}
+.avt tr.ib{cursor:pointer}
+.dx-dd .dx-chip{max-width:320px;overflow:hidden;text-overflow:ellipsis}
+.dx-filter .dx-pop{min-width:320px}
+@media(max-width:860px){.dx-tabs{padding:0 8px;flex-wrap:wrap;overflow:visible}.dx-tabs button{padding:9px 8px}.dx-tabs .sep{display:none}.dx-filter{padding:10px 12px}.dx-filter .avq{flex:1 1 100%}.dx-av .avtw{max-height:none}}
+@media(max-width:860px){.dx-filter{position:relative}.dx-filter .dx-dd{position:static}.dx-filter .dx-pop,.dx-filter .dx-pop.l{left:12px;right:12px;min-width:0;max-width:none}}
