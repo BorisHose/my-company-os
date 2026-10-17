@@ -111,7 +111,7 @@ function avRender(keep){const s=AVS(),o=s.org,S=avSel(o),O=orgById(o)||{},F=avFe
   const sb=$("#avstart");if(sb)sb.onclick=()=>eingangStarten(selIds());
   d.querySelectorAll("[data-avgo]").forEach(b=>b.onclick=ev=>{ev.stopPropagation();eingangStarten([b.dataset.avgo])});
   d.querySelectorAll("[data-avdrop]").forEach(b=>b.onclick=async ev=>{ev.stopPropagation();const j=AU.find(x=>x.id===b.dataset.avdrop);if(!j||!await askOk("„"+j.t+"“ aus dem Eingang verwerfen? Der Eintrag bleibt als „abgebrochen“ im Verlauf.","Ja, verwerfen"))return;
-    j.st="cancel";markDone(j);j.log.push([now(),"Aus dem Eingang verworfen von Boris",1]);try{await Store.set("jobs/"+j.id,JSON.parse(jobSer(j)));LAST.set("jobs/"+j.id,jobSer(j))}catch(e){schedule()}avRefresh();if(!$("#org").classList.contains("hide"))org()});
+    j.st="cancel";markDone(j);j.log.push([now(),"Aus dem Eingang verworfen von "+ICH()+"",1]);try{await Store.set("jobs/"+j.id,JSON.parse(jobSer(j)));LAST.set("jobs/"+j.id,jobSer(j))}catch(e){schedule()}avRefresh();if(!$("#org").classList.contains("hide"))org()});
   if(s.tab==="erledigt"&&s.zeit==="aelter")avArchivLaden()}
 const prioB=j=>j.prio==="d"?' <span class="prio d">Dringend</span>':j.prio==="h"?' <span class="prio h">Hoch</span>':j.prio==="l"?' <span class="prio l">Niedrig</span>':"";
 const inboxCnt=(o,did)=>AU.filter(j=>j.st==="inbox"&&jobOrg(j)===o&&jobAbt(j,jobAgent(j))===did).length;

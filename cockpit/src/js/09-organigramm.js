@@ -4,7 +4,7 @@ function org(){
   const oe=isEd("org");$("#org").classList.toggle("editing",oe);
   if(!orgById(OC))OC=ORGS()[0].id;const O=orgById(OC);
   $("#orged").innerHTML=oe?`<span class="hint" style="text-transform:none;letter-spacing:0;font-weight:400;margin:0 10px 0 0">Agenten ziehen · Abteilungen, Teams und Organisationen anlegen</span>`+edBtns(1):`<button class="btn sm" id="orgav" title="Offene und erledigte Aufträge aller Abteilungen">🕘 Aufträge &amp; Verlauf</button> <button class="btn sm ebtn" id="orgedit" title="Agenten verschieben, Abteilungen, Teams und Organisationen anlegen">✎ Bearbeiten</button>`;
-  $("#oseg").innerHTML=ORGS().map(o=>`<button data-oc="${o.id}" class="${o.id===OC?'on':''}" title="${esc(o.n+(o.desc?" – "+o.desc:"")+(o.prod?"\nProdukt: "+PN[o.prod]:""))}">${esc(o.kurz||o.n)}</button>`).join("")+(oe?`<button class="add" id="onew" title="Neue Organisation (Unternehmen) mit eigenem Organigramm">+ Organisation</button>`:"");
+  $("#oseg").innerHTML=ORGS().map(o=>`<button data-oc="${o.id}" class="${o.id===OC?'on':''}" title="${esc(o.n+(o.desc?" – "+o.desc:"")+(o.prod?"\nProdukt: "+PN[o.prod]:""))}">${o.logo?`<img class="olg" src="${o.logo}" alt="">`:""}${esc(o.kurz||o.n)}</button>`).join("")+(oe?`<button class="add" id="onew" title="Neue Organisation (Unternehmen) mit eigenem Organigramm">+ Organisation</button>`:"");
   document.querySelectorAll("[data-oc]").forEach(b=>b.onclick=()=>{OC=b.dataset.oc;org()});$("#oskills").onchange=org;
   $("#ohint").textContent=O.n+(O.prod?" · Produkt "+PN[O.prod]+" – zeigt "+PN[O.prod]+"-Agenten und produktunabhängige":" · ohne Produkt – zeigt nur produktunabhängige Agenten");
   const showS=$("#oskills").checked,A=AG.filter(a=>inOrg(a,OC)),D=deptsOf(OC),known=new Set(D.map(d=>d.id));
@@ -30,7 +30,7 @@ function org(){
   const top=oe?`<div class="obox">${av(gf,40)}<div><b>${esc(O.n)}</b> <button class="ic" id="oren" title="Organisation umbenennen">✎</button>${ORGS().length>1?`<button class="ic" id="odel" title="Organisation löschen">🗑</button>`:""}
       <div class="orow2">Geschäftsführung: <select id="ogf">${uopts(O.gf)}</select></div>
       <div class="orow2">Produkt: <select id="oprod"><option value="">– keins –</option>${["bodo","sellify"].map(p=>`<option value="${p}" ${O.prod===p?'selected':''}>${PN[p]}</option>`).join("")}</select></div></div></div>`
-    :`<div class="obox">${av(gf,40)}<div><b>${esc(O.n)}</b><small>Geschäftsführung: ${gf?esc(gf.n):"offen"} · ${A.length} Agenten in ${D.length} Abteilungen${nT?" · "+nT+" Teams":""}</small></div></div>`;
+    :`<div class="obox">${O.logo?`<img class="olgb" src="${O.logo}" alt="Logo">`:""}${av(gf,40)}<div><b>${esc(O.n)}</b><small>Geschäftsführung: ${gf?esc(gf.n):"offen"} · ${A.length} Agenten in ${D.length} Abteilungen${nT?" · "+nT+" Teams":""}</small></div></div>`;
   $("#orgv").innerHTML=`<div class="orgwrap"><div class="otop">${top}</div><div class="otrunk"></div><div class="orow">${cols}</div></div>`;
   const row=$("#orgv .orow"),ds=row.querySelectorAll(".odept");if(ds.length>1){const f=ds[0],l=ds[ds.length-1];row.style.setProperty("--l",(f.offsetLeft+f.offsetWidth/2)+"px");row.style.setProperty("--r",(row.scrollWidth-l.offsetLeft-l.offsetWidth/2)+"px")}else{row.style.setProperty("--l","50%");row.style.setProperty("--r","50%")}
   const ob=$("#orgedit");if(ob)ob.onclick=()=>{if(startEdit("org",null,null,["meta/config",...DP.map(d=>"depts/"+d.id),...AG.map(a=>"agents/"+a.id),...US.map(u=>"users/"+u.id)],false,["depts"]))org()};

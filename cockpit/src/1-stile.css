@@ -353,3 +353,11 @@ fieldset:disabled .ic,fieldset:disabled .ownadd,fieldset:disabled [data-r],field
 .plsum{font-size:13px;color:#4a3a7a}.pltl{cursor:pointer}.pltl:hover{border-color:var(--acc)}
 /* v55: Team beauftragen */
 .otplay{margin-left:6px;width:22px;height:22px;border-radius:50%;border:1px solid var(--line);background:#fff;color:var(--acc);font-size:9px;cursor:pointer;display:inline-grid;place-items:center;padding:0 0 0 2px;vertical-align:middle}.otplay:hover{border-color:var(--acc);background:var(--accbg)}
+/* v56: Kopfzeile, Einstellungen, Logos */
+.hdr-r{display:flex;align-items:center;gap:10px}#clock{font-size:12.5px;opacity:.85;white-space:nowrap}
+.meav{background:none;border:0;padding:0;cursor:pointer;border-radius:50%;line-height:0}.meav .av{box-shadow:0 0 0 2px #ffffff55}
+.gear{background:none;border:1px solid #ffffff40;color:#fff;width:32px;height:32px;border-radius:8px;cursor:pointer;font-size:17px;line-height:1}.gear.on{background:#fff;color:var(--navy)}
+.setn{display:block;width:100%;text-align:left;background:none;border:0;border-radius:7px;padding:8px 10px;font:inherit;font-size:13.5px;cursor:pointer;color:var(--ink)}.setn:hover{background:var(--accbg)}.setn.on{background:var(--navy);color:#fff}
+.setorg{display:flex;gap:14px;border:1px solid var(--line);border-radius:10px;padding:12px;margin-bottom:10px;align-items:flex-start}.sologo{width:120px;min-height:56px;flex:none;display:grid;place-items:center;border:1px dashed var(--line);border-radius:8px;padding:6px}.sologo img{max-width:108px;max-height:48px}.sof{flex:1;min-width:0}
+img.olg{height:18px;max-width:60px;object-fit:contain;margin-right:6px;vertical-align:-4px}img.olgb{height:40px;max-width:120px;object-fit:contain;margin-right:4px}
+@media(max-width:860px){#clock{display:none}.setorg{flex-direction:column}}

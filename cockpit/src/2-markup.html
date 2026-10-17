@@ -1,7 +1,7 @@
 </style>
 <header>
   <h1>My Company OS</h1><span class="tag" id="save">Lädt …</span>
-  <button id="kifab" title="Neuer KI-Auftrag – von überall aus"><b>✦</b><small>KI</small><span class="n" style="display:none" title="Aufträge warten auf dich"></span></button><nav><button data-v="org" class="on">Organigramm</button><button data-v="jobs">KI-Aufträge<span class="cnt" id="wcnt"></span></button><button data-v="flows">Abläufe</button><button data-v="matrix">Matrix</button><button data-v="build">Agenten</button><button data-v="skills">Skills</button><button data-v="users">Benutzer</button></nav>
+  <button id="kifab" title="Neuer KI-Auftrag – von überall aus"><b>✦</b><small>KI</small><span class="n" style="display:none" title="Aufträge warten auf dich"></span></button><nav><button data-v="org" class="on">Organigramm</button><button data-v="jobs">KI-Aufträge<span class="cnt" id="wcnt"></span></button><button data-v="flows">Abläufe</button><button data-v="matrix">Matrix</button><button data-v="build">Agenten</button><button data-v="skills">Skills</button></nav><div class="hdr-r"><span id="clock"></span><button id="me" class="meav" title="Angemeldet"></button><button id="gear" class="gear" title="Einstellungen" aria-label="Einstellungen">⚙</button></div>
 </header>
 
 <main id="build" class="nolib">
@@ -44,8 +44,9 @@
    <div class="orgbar"><div class="oorg" id="oseg"></div><span class="hint" id="ohint" style="margin:0"></span><label class="cb" style="margin:0"><input type="checkbox" id="oskills" checked> Skills zeigen</label></div>
    <div id="orgv"></div></section>
 </main>
+<main id="settings" class="hide" style="grid-template-columns:220px minmax(0,1fr)"><section class="panel"><h2>⚙ Einstellungen</h2><div id="setnav"></div></section><section class="panel" id="setc"></section></main>
 <main id="users" class="hide" style="grid-template-columns:300px minmax(0,1fr)">
-  <section class="panel"><h2>Benutzer</h2><div class="opts" style="margin-bottom:8px"><label><input type="checkbox" id="uold"> Ausgeschiedene zeigen</label></div><div id="ulist"></div><button class="btn p" id="newU" style="width:100%">+ Neuer Benutzer …</button><button class="btn sm" id="ownOrgs" style="width:100%;margin-top:6px">⚙ Eigene Bodo-Mandanten</button>
+  <section class="panel"><h2><button class="lnk" id="ub" title="Zurück zu den Einstellungen">⚙ Einstellungen</button> › Benutzer</h2><div class="opts" style="margin-bottom:8px"><label><input type="checkbox" id="uold"> Ausgeschiedene zeigen</label></div><div id="ulist"></div><button class="btn p" id="newU" style="width:100%">+ Neuer Benutzer …</button><button class="btn sm" id="ownOrgs" style="width:100%;margin-top:6px">⚙ Eigene Bodo-Mandanten</button>
   <div class="hint">Menschen, die in My Company OS handeln – z. B. als Verantwortliche für Agenten. Je Benutzer lässt sich hinterlegen, wer er in Bodo, sellify oder anderen Systemen ist.</div></section>
   <section class="panel" id="uedit"></section>
 </main>

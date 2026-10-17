@@ -1,5 +1,5 @@
 // ===== Organisationen (Unternehmen) – je eigenes Organigramm =====
-const DEFORGS=[{id:"og-bodo",n:"Bodo Solutions GmbH",kurz:"Bodo Solutions",prod:"bodo",gf:"us-boris-hose",desc:"Unternehmen hinter dem Produkt Bodo (Mitgliederverwaltung)"},{id:"og-ba",n:"business//acts GmbH",kurz:"business//acts",prod:"sellify",gf:"us-boris-hose",desc:"Unternehmen hinter der CRM-Plattform sellify"}];
+const DEFORGS=[{id:"og-1",n:"Meine Organisation",kurz:"Meine Organisation",prod:"",gf:null,desc:""}]; // Startwert einer neuen Instanz; echte Organisationen stehen in den Einstellungen
 const ORGS=()=>{if(!Array.isArray(SET.orgs)||!SET.orgs.length)SET.orgs=JSON.parse(JSON.stringify(DEFORGS));return SET.orgs};
 const orgById=id=>ORGS().find(o=>o.id===id);
 const inOrg=(a,o)=>{if(typeof o==="string")o=orgById(o);return !!o&&(a.p==="all"||o.prod===a.p)};

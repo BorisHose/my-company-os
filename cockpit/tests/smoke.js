@@ -180,12 +180,39 @@ const check = (name, ok, info = '') => { CHECKS.push({ name, ok }); console.log(
   check('Dialog bei 390 px: nichts ragt über den Rand', ov.n === 0, JSON.stringify(ov));
   if (SHOT) await p.screenshot({ path: SHOT + '/e1-mobil.png' });
   await p.evaluate(() => avClose()); await p.setViewportSize({ width: 1440, height: 900 });
+  // ----- Etappe 4a: Kopfzeile, Einstellungen, Darstellung, Logos -----
+  await p.evaluate(() => show('org')); await p.waitForTimeout(200);
+  const hd = await p.evaluate(() => ({ clock: (document.querySelector('#clock') || {}).textContent || '', me: !!document.querySelector('#me .av'), gear: !!document.querySelector('#gear'), users: !!document.querySelector('nav [data-v="users"]') }));
+  check('Kopfzeile: Datum/Uhrzeit, Avatar, Zahnrad; Benutzer nicht mehr in der Leiste', /\d\d\.\d\d\.\d{4} · \d\d:\d\d/.test(hd.clock) && hd.me && hd.gear && !hd.users, JSON.stringify(hd));
+  await p.click('#gear'); await p.waitForTimeout(250);
+  const se = await p.evaluate(() => ({ vis: !document.querySelector('#settings').classList.contains('hide'), nav: [...document.querySelectorAll('[data-sets]')].map(b => b.dataset.sets) }));
+  check('Einstellungen öffnen mit allen Bereichen', se.vis && ['darst', 'inst', 'orgs', 'users', 'ausf', 'dienste'].every(k => se.nav.includes(k)), JSON.stringify(se));
+  await p.click('[data-thm="dark"]'); await p.waitForTimeout(150);
+  const dk = await p.evaluate(() => ({ t: document.documentElement.dataset.theme, bg: getComputedStyle(document.body).backgroundColor, pan: getComputedStyle(document.querySelector('#setc')).backgroundColor }));
+  check('Dunkel-Modus schaltet um', dk.t === 'dark' && dk.bg !== 'rgb(245, 246, 248)' && dk.pan !== 'rgb(255, 255, 255)', JSON.stringify(dk));
+  if (SHOT) await p.screenshot({ path: SHOT + '/e4-einst-dunkel.png' });
+  await p.evaluate(() => { show('org') }); await p.waitForTimeout(200);
+  if (SHOT) await p.screenshot({ path: SHOT + '/e4-org-dunkel.png' });
+  await p.evaluate(() => { show('jobs') }); await p.waitForTimeout(200);
+  if (SHOT) await p.screenshot({ path: SHOT + '/e4-jobs-dunkel.png' });
+  await p.evaluate(() => themeSet('light'));
+  await p.evaluate(() => einst('orgs')); await p.waitForTimeout(200);
+  await p.evaluate(() => { const o = ORGS()[0]; o.logo = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNkYAAAAAYAAjCB0C8AAAAASUVORK5CYII='; einst('orgs'); });
+  if (SHOT) await p.screenshot({ path: SHOT + '/e4-einst-orgs.png' });
+  await p.evaluate(() => show('org')); await p.waitForTimeout(200);
+  check('Logo erscheint im Umschalter und in der Kopfbox', !!(await p.$('#oseg img.olg')) && !!(await p.$('.obox img.olgb')));
+  await p.evaluate(() => document.querySelector('#me').click()); await p.waitForTimeout(250);
+  await p.evaluate(() => { const s = document.querySelector('#sme'); s.value = US.find(u => u.aktiv !== false && u.id !== ME().id).id; s.dispatchEvent(new Event('change')) }); await p.waitForTimeout(150);
+  const nm = await p.evaluate(() => ICH());
+  check('Angemeldeter Benutzer umschaltbar, Name wird übernommen', nm && nm !== 'Boris', nm);
+  await p.evaluate(() => { UI.me = undefined; saveUI(); hdr(); show('org') });
   // ----- Datenstand 2 -----
   const st = await p.evaluate(() => { const S = window.__S, j = k => S['jobs/' + k] || null;
     return { schema: (S['meta/config'].settings || {}).schema, a190: j('A-190'), a191: j('A-191'), a150: j('A-150'), z: S['zaehler/auftrag'],
       arch: Object.keys(S).filter(k => k.startsWith('archiv/')).map(k => S[k]), ohneOrg: Object.keys(S).filter(k => k.startsWith('jobs/') && !S[k].org).length,
       geladen: AU.map(x => x.id), subs: window.__L.size }; });
-  check('Umstellung: Datenstand 2', st.schema === 2);
+  check('Umstellung: Datenstand 3', st.schema === 3);
+  check('Datenstand 3: Mandanten, Inhaber und Mandantenregel aus dem Code in die Einstellungen', await p.evaluate(() => { const c = window.__S['meta/config']; return (c.settings.bodoOrgs || []).length === 2 && c.settings.inhaber === 'us-boris-hose' && (c.globals || []).some(g => g.includes('BusinessActs')) }));
   check('Umstellung: Abbruch wird Zustand cancel', st.a190 && st.a190.st === 'cancel' && /^\d{4}-\d\d-\d\d$/.test(st.a190.fTag || ''), JSON.stringify(st.a190 && [st.a190.st, st.a190.fTag]));
   check('Umstellung: Erledigt bekommt Datum aus dem Verlauf', st.a191 && !!st.a191.fertig && st.a191.fMon === st.a191.fTag.slice(0, 7));
   check('Umstellung: alle Aufträge haben eine Organisation', st.ohneOrg === 0, String(st.ohneOrg));

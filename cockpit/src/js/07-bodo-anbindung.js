@@ -1,6 +1,6 @@
 // ===== Bodo-Anbindung (MCP) =====
 const BODO="bodo solutions";
-const DEF_ORGS=[{id:"k57bshnkdpahzs3fv4hvq6wz1s8aq2pm",name:"Bodo Solutions"},{id:"k5717wnvya5c7g26kr5jmgsx3x88edd1",name:"business//GmbH GmbH"}];
+const DEF_ORGS=[]; // eigene Mandanten stehen in den Einstellungen (settings.bodoOrgs)
 const ownOrgs=()=>(SET.bodoOrgs&&SET.bodoOrgs.length?SET.bodoOrgs:DEF_ORGS);
 let MCP;const mcpP=(window.claude?window.claude.use("mcp"):Promise.resolve(null)).then(m=>MCP=m).catch(()=>MCP=null);
 const ST={active:"aktiv",unclaimed:"ohne Zugang",invited:"eingeladen",suspended:"gesperrt",left:"ausgetreten"};

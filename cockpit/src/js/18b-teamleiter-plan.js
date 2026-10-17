@@ -4,7 +4,7 @@
 // startet Schritte ohne Vorgänger sofort und die übrigen, sobald ihre Vorgänger erledigt sind. Der Hauptauftrag endet, wenn alle Teile enden.
 const istPlan=j=>!!(j&&j.st==="wait"&&j.q&&j.q.kind==="Plan"&&j.plan&&Array.isArray(j.plan.steps)&&j.plan.steps.length);
 const teileVon=p=>(p.teile||[]).map(id=>AU.find(x=>x.id===id));
-function leitungTxt(did){const d=dept(did),u=d&&usr(d.lead);return u?u.n:"Boris (Leitung offen)"}
+function leitungTxt(did){const d=dept(did),u=d&&usr(d.lead);return u?u.n:""+ICH()+" (Leitung offen)"}
 function planHtml(j){const P=j.plan,S=P.steps,o=jobOrg(j),AGO=AG.filter(a=>inOrg(a,o)),nA=new Set(S.map(s=>s.aid)).size;
   const opt=s=>{const D=deptsOf(o);return D.map(d=>{const L=AGO.filter(a=>PL(a,o).abt===d.id);return L.length?`<optgroup label="${esc(d.n)}">${L.map(a=>`<option value="${a.id}" ${a.id===s.aid?"selected":""}>${esc(a.n)}</option>`).join("")}</optgroup>`:""}).join("")+
     (AGO.some(a=>!PL(a,o).abt)?`<optgroup label="Ohne Abteilung">${AGO.filter(a=>!PL(a,o).abt).map(a=>`<option value="${a.id}" ${a.id===s.aid?"selected":""}>${esc(a.n)}</option>`).join("")}</optgroup>`:"")+
@@ -22,14 +22,14 @@ async function planFreigeben(j){await kiFresh(j);if(!istPlan(j))throw {message:"
   for(const s of S)if(!AG.some(a=>a.id===s.aid))throw {message:"Schritt mit unbekanntem Agenten – bitte Agent wählen"};
   const ids=[];for(let i=0;i<S.length;i++)ids.push("A-"+await nextJobNo());
   const kids=S.map((s,i)=>{const a=AG.find(x=>x.id===s.aid),p=PL(a,o),skx=s.sk&&a.s.map(id=>sk(id)).find(x=>x&&(x.n===s.sk||x.id===s.sk));
-    const k={id:ids[i],f:F,fid:F.id,art:"agent",aid:a.id,org:o,t:s.t&&s.t.length<80?s.t:(j.t+" – Teil "+(i+1)),in:"Teilauftrag "+(i+1)+" von "+S.length+" aus Plan "+j.id+" „"+j.t+"“: "+(s.t||"")+"\n\nUrsprüngliche Aufgabe von Boris: "+(j.in||j.t),
+    const k={id:ids[i],f:F,fid:F.id,art:"agent",aid:a.id,org:o,t:s.t&&s.t.length<80?s.t:(j.t+" – Teil "+(i+1)),in:"Teilauftrag "+(i+1)+" von "+S.length+" aus Plan "+j.id+" „"+j.t+"“: "+(s.t||"")+"\n\nUrsprüngliche Aufgabe von "+ICH()+": "+(j.in||j.t),
       path:[st.id],st:"inbox",ki:1,tempo:j.tempo||"schnell",parent:j.id,step:i+1,nach:(s.nach||[]).map(n=>ids[n-1]).filter(Boolean),auto:1,gesammelt:new Date().toISOString(),
       log:[[now(),"Teilauftrag "+(i+1)+"/"+S.length+" aus Plan "+j.id]]};
     if(p.abt)k.abt=p.abt;if(p.team)k.team=p.team;if(skx)k.sk=skx.id;if(j.vorab)k.vorab=1;if(j.prio)k.prio=j.prio;if(j.due)k.due=j.due;if((j.anh||[]).length)k.anh=j.anh;return k});
   for(const k of kids){await Store.set("jobs/"+k.id,JSON.parse(jobSer(k)));LAST.set("jobs/"+k.id,jobSer(k));AU.unshift(k)}
   const fremd=[...new Set(kids.map(k=>k.abt).filter(a=>a&&a!==j.abt))];
-  j.teile=ids;j.st="run";delete j.q;j.plan.frei=new Date().toISOString();j.log.push([now(),"Plan freigegeben von Boris – "+S.length+" Teilaufträge",1]);
-  fremd.forEach(a=>j.log.push([now(),"Zustimmung für Abteilung "+((dept(a)||{}).n||a)+" erteilt von Boris"+(usr((dept(a)||{}).lead)?" (Leitung: "+usr(dept(a).lead).n+")":" (Leitung offen)")]));
+  j.teile=ids;j.st="run";delete j.q;j.plan.frei=new Date().toISOString();j.log.push([now(),"Plan freigegeben von "+ICH()+" – "+S.length+" Teilaufträge",1]);
+  fremd.forEach(a=>j.log.push([now(),"Zustimmung für Abteilung "+((dept(a)||{}).n||a)+" erteilt von "+ICH()+""+(usr((dept(a)||{}).lead)?" (Leitung: "+usr(dept(a).lead).n+")":" (Leitung offen)")]));
   await Store.set("jobs/"+j.id,JSON.parse(jobSer(j)));LAST.set("jobs/"+j.id,jobSer(j));toast("Plan freigegeben – "+S.length+" Teilaufträge angelegt");await planWeiter()}
 let PLBUSY=false;
 async function planWeiter(){if(PLBUSY||!DB||RO)return;PLBUSY=true;try{

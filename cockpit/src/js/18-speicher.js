@@ -1,7 +1,7 @@
 // ===== Speicher (db) =====
 let DB=null,RO=false;const LAST=new Map();let tmr=null,busy=false,again=false;
 // ===== Datenschicht: jeder Datenbankzugriff läuft über Store (eine Stelle für Abfragen, Sperren, spätere Umzüge) =====
-const SCHEMA=2,ARCHIV_TAGE=90,OFFEN=["run","wait","inbox"],HOLDER="cos-"+Math.random().toString(36).slice(2,10);
+const SCHEMA=3,ARCHIV_TAGE=90,OFFEN=["run","wait","inbox"],HOLDER="cos-"+Math.random().toString(36).slice(2,10);
 const plain=o=>o==null?o:JSON.parse(JSON.stringify(o));
 const Store={ok:()=>!!DB,
   async get(k){const d=await DB.doc(k).get();return d.exists?plain(d.data()):null},
@@ -11,7 +11,7 @@ const Store={ok:()=>!!DB,
   watch(c,o,next,err){return Store.query(c,o).onSnapshot(s=>next(s.docs.map(d=>plain(d.data()))),err)},
   async lease(k,ms){try{const r=await DB.doc(k).acquire({holder:HOLDER,ttlMs:ms||8000});return !!(r&&r.acquired)}catch(e){return false}}};
 const cutoffISO=()=>new Date(Date.now()-ARCHIV_TAGE*864e5).toISOString();
-const neuSchema=()=>(SET.schema||0)>=SCHEMA;
+const neuSchema=()=>(SET.schema||0)>=2;
 function vereinen(...L){const m=new Map();L.flat().forEach(o=>{if(o&&o.id)m.set(o.id,o)});return [...m.values()]}
 // Aufträge: offene immer, erledigte/abgebrochene der letzten 90 Tage; Älteres liegt im Monatsarchiv
 async function jobsLaden(){if(!neuSchema())return Store.list("jobs");const [a,b]=await Promise.all([Store.list("jobs",{where:[["st","in",OFFEN]]}),Store.list("jobs",{where:[["fertig",">=",cutoffISO()]]})]);return vereinen(a,b)}
@@ -24,7 +24,7 @@ function jobsBeobachten(next,err){if(!neuSchema())return Store.watch("jobs",{},n
 const isoNorm=s=>{const d=new Date(s);return +d?d.toISOString():null};
 // Einmalige Umstellung auf Datenstand 2 (läuft unter einer Sperre nur in einem Fenster)
 async function migrieren(){const m=await Store.get("meta/config"),s=(m&&m.settings)||{};if((s.schema||0)>=SCHEMA)return false;
-  if(!await Store.lease("meta/umzug",60000))return false;
+  if(!await Store.lease("meta/umzug",60000))return false;if((s.schema||0)>=2){await umzug3(m,s);return true}
   const [J,A,F]=await Promise.all(["jobs","agents","flows"].map(c=>Store.list(c)));const orgs=s.orgs||[],og=p=>(orgs.find(o=>o.prod===p)||orgs[0]||{}).id;let max=99;
   for(const j of J){const p={},n=+String(j.id||"").slice(2)||0;if(n>max)max=n;
     if(j.st==="done"&&(j.log||[]).some(l=>/abgebrochen von/i.test((l&&l[1])||"")))p.st="cancel";
@@ -35,7 +35,14 @@ async function migrieren(){const m=await Store.get("meta/config"),s=(m&&m.settin
     if(pl&&pl.abt&&!j.abt){p.abt=pl.abt;if(pl.team)p.team=pl.team}
     if(Object.keys(p).length)await Store.update("jobs/"+j.id,p)}
   const z=await Store.get("zaehler/auftrag");if(!z||(z.n||0)<max)await Store.set("zaehler/auftrag",{n:max});
-  if(m)await Store.update("meta/config",{settings:{schema:SCHEMA}});else await Store.set("meta/config",{settings:{schema:SCHEMA}});return true}
+  if(m)await Store.update("meta/config",{settings:{schema:2}});else await Store.set("meta/config",{settings:{schema:2}});await umzug3(await Store.get("meta/config"),s);return true}
+// Datenstand 3: bisher fest im Code hinterlegte Werte der Instanz von Boris in die Einstellungen übernehmen
+async function umzug3(m,s){const alt=(s.orgs||[]).some(o=>o.id==="og-bodo"),p={schema:3};
+  if(alt){if(!(s.bodoOrgs||[]).length)p.bodoOrgs=[{id:"k57bshnkdpahzs3fv4hvq6wz1s8aq2pm",name:"Bodo Solutions"},{id:"k5717wnvya5c7g26kr5jmgsx3x88edd1",name:"business//GmbH GmbH"}];
+    if(!s.inhaber)p.inhaber="us-boris-hose";if(!s.inst)p.inst={n:"Company OS business//acts"}}
+  const R="„business//acts“, „Business Acts“, „BusinessActs“ u. ä. meint in Bodo den Mandanten business//GmbH GmbH (eindeutig, keine Annahme); „Bodo“ ohne Mandant meint Bodo Solutions",G=(m&&m.globals)||[];
+  const upd={settings:p};if(alt&&!G.some(g=>g.includes("BusinessActs")))upd.globals=[...G,R];
+  if(m)await Store.update("meta/config",upd);else await Store.set("meta/config",upd)}
 // Archiv: nach 90 Tagen Kurzfassung in archiv/<Org>-<JJJJ-MM>, dann Auftrag samt Anhängen löschen
 async function archivieren(){if(!neuSchema()||!await Store.lease("meta/archiv-lauf",120000))return 0;let n=0;
   const alt=await Store.list("jobs",{where:[["fertig","<",cutoffISO()]],limit:50});
@@ -67,7 +74,7 @@ function hydrate(){FL.forEach(f=>f.N.forEach(n=>{if("aid" in n)n.a=AG.find(a=>a.
   NID=1+Math.max(0,...FL.flatMap(f=>f.N.map(n=>+(/^n(\d+)$/.exec(n.id)||[0,0])[1])))}
 function emptyState(t,s){$("#lib").innerHTML=`<div class="empty"><b>${t}</b>${s}</div>`}
 async function boot(){
-  render();jobs();setSave("","Lädt …");
+  render();jobs();setSave("","Lädt …");try{hdr()}catch(e){}
   DB=window.claude?await window.claude.use("db"):null;
   if(!DB){RO=true;setSave("err","Speicher nicht verfügbar");emptyState("Speicher nicht verfügbar","Öffne das Cockpit angemeldet auf claude.ai, damit deine Daten geladen und gespeichert werden.");return}
   try{let umg=false;try{umg=await migrieren()}catch(e){console.warn("Umstellung auf Datenstand "+SCHEMA+" nicht möglich",e)}
@@ -77,7 +84,7 @@ async function boot(){
     SK.sort((a,b)=>(a.ord??0)-(b.ord??0));AG.sort((a,b)=>(a.ord??0)-(b.ord??0));FL.sort((a,b)=>(a.ord??0)-(b.ord??0));AU.sort((a,b)=>(+b.id.slice(2)||0)-(+a.id.slice(2)||0));
     hydrate();GR.forEach((g,i)=>COL.add(i));const s0=snapshot();s0.forEach((v,k)=>LAST.set(k,v));if(migrateOrgs()){toast("Organisationen eingerichtet");schedule()}
     const f=agVis()[0];cur=f?f[1]:-1;fcur=FL.findIndex(x=>x.p===FF&&!x.frei);
-    render();jobs();setSave("ok","Gespeichert");kiSubscribe();show("org");if(umg)toast("Datenbestand auf Stand "+SCHEMA+" umgestellt");
+    render();jobs();setSave("ok","Gespeichert");kiSubscribe();show("org");hdr();if(SET.inst&&SET.inst.n)document.title=SET.inst.n;if(umg)toast("Datenbestand auf Stand "+SCHEMA+" umgestellt");
     archivieren().then(n=>{if(n)toast(n+" alte Aufträge ins Archiv verschoben")}).catch(e=>console.warn("Archiv",e));
     if(!SK.length)emptyState("Noch keine Skills","Bitte Claude, die Startdaten einzuspielen – danach erscheinen hier deine Skills.");
   }catch(e){setSave("err","Laden fehlgeschlagen");emptyState("Laden fehlgeschlagen","Seite neu laden. Wenn es wieder passiert, Claude Bescheid geben.")}

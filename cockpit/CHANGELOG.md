@@ -1,5 +1,13 @@
 # Änderungen – Cockpit
 
+## 56 · 17.10.2026 · Etappe 4a „Einstellungen“ (Freigabe Boris)
+- Kopfzeile: Datum und Uhrzeit, Avatar des angemeldeten Benutzers, Zahnrad ⚙ für die Einstellungen; „Benutzer“ ist aus der Leiste in die Einstellungen gewandert.
+- Einstellungen: Darstellung (Hell · Dunkel · Automatisch; angemeldeter Benutzer je Browser), Instanz (Name, Inhaber, Version), Organigramme (Name, Kurzname, Produkt, Geschäftsführung, Logo), Benutzer, Ausführung (Kennungen der geplanten Aufgaben), Anbindungen (Bodo-Mandanten; vier Dienste in Vorbereitung).
+- Logo je Organigramm: erscheint mit Kurzname im Umschalter und in der Kopfbox des Organigramms.
+- Dunkel-Modus: `tools/dunkel.py` erzeugt `src/1b-dunkel.css` aus den Stilen; build.py nimmt alle `1*.css` auf und setzt die Versionsnummer ein.
+- Nichts Kundenspezifisches mehr im Code: Startorganisation neutral, eigene Bodo-Mandanten, Inhaber und Mandantenregel wandern per Datenstand 3 in die Einstellungen bzw. „Allgemeine Vorgaben“; Namen in Verläufen und im Kontext kommen vom angemeldeten Benutzer.
+- Smoke-Test: 67 Prüfungen.
+
 ## 55 · 17.10.2026 · KI-Teamleiter je Team
 - Teams im Organigramm haben ein eigenes „▶“ (Auftrag an das Team); Agenten direkt in der Abteilung bilden das Team „Allgemein“ mit eigenem „▶“.
 - Fenster „Abteilung beauftragen“: bei Abteilungen mit Teams zusätzlich Auswahl „Ganze Abteilung“ oder ein Team; der KI-Teamleiter wählt nur aus den Agenten dieses Bereichs (Plan darf weiterhin andere Bereiche einbeziehen, wenn nötig).
