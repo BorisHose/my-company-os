@@ -47,7 +47,7 @@ async function umzug3(m,s){const alt=(s.orgs||[]).some(o=>o.id==="og-bodo"),p={s
 async function archivieren(){if(!neuSchema()||!await Store.lease("meta/archiv-lauf",120000))return 0;let n=0;
   const alt=await Store.list("jobs",{where:[["fertig","<",cutoffISO()]],limit:50});
   for(const j of alt){if(!isEnd(j))continue;const mon=j.fMon||String(j.fertig).slice(0,7),base="archiv/"+(j.org||"ohne")+"-"+mon;
-    const kurz=plain({id:j.id,t:j.t||"",art:j.art||"",aid:j.aid||null,abt:j.abt||null,team:j.team||null,fertig:j.fertig,st:j.st,ok:j.ok||null,prj:j.prj||null,sum:j.sum||"",erg:(j.erg||[]).map(e=>({t:e.t||"",url:e.url||""}))});
+    const kurz=plain({id:j.id,t:j.t||"",art:j.art||"",aid:j.aid||null,abt:j.abt||null,team:j.team||null,fertig:j.fertig,st:j.st,ok:j.ok||null,prj:j.prj||null,vb:vbArchiv(j),sum:j.sum||"",erg:(j.erg||[]).map(e=>({t:e.t||"",url:e.url||""}))});
     let k=base,a=null;for(let i=1;i<100;i++){k=base+(i>1?"-"+i:"");a=await Store.get(k);if(!a||(a.items||[]).some(x=>x.id===j.id)||JSON.stringify(a).length<200000)break}
     a=a||{org:j.org||null,mon,items:[]};if(!(a.items||[]).some(x=>x.id===j.id)){a.items=[...(a.items||[]),kurz];await Store.set(k,a)}
     const chk=await Store.get(k);if(!chk||!(chk.items||[]).some(x=>x.id===j.id))continue;

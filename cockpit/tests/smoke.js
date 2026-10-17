@@ -278,6 +278,12 @@ const check = (name, ok, info = '') => { CHECKS.push({ name, ok }); console.log(
   await p.setViewportSize({ width: 390, height: 844 }); await p.waitForTimeout(200);
   check('Projekte: Handy ohne seitliches Scrollen', await p.evaluate(() => document.documentElement.scrollWidth <= innerWidth + 1), '');
   await p.setViewportSize({ width: 1440, height: 900 });
+  // ----- v59 Verbrauch -----
+  const vbr = await p.evaluate(async id => { const j = AU.find(x => x.id === id); j.verb = [{ sess: 'x', art: 'start', sek: 125, tin: 10, tcw: 2000, tcr: 50000, tout: 800 }, { sess: 'y', art: 'fortsetzen', sek: 65, tin: 5, tcw: 1000, tcr: 20000, tout: 400 }, { sess: 'z', fehler: 'kein Protokoll' }];
+    resultModal(j); await new Promise(r => setTimeout(r, 200)); const t = document.querySelector('#box').textContent; document.getElementById('modal').innerHTML = '';
+    show('projects'); PJSEL = j.prj; prj(); const d = document.querySelector('#pjd').textContent; return { a: vbJob(j), tok: vbTok(vbJob(j)), t: t.includes('3:10 min') && t.includes('2 Sitzungen gemessen') && t.includes('kein Protokoll'), d: d.includes('3:10 min') && d.includes('1 von 1'), arch: vbArchiv(j) } }, pjA.id);
+  check('Verbrauch: Summe je Auftrag, Anzeige im Ergebnis und im Projekt, Archiv-Kurzfassung', vbr.a.sek === 190 && vbr.tok === 74215 && vbr.t && vbr.d && vbr.arch.sek === 190, JSON.stringify(vbr));
+  if (SHOT) await p.screenshot({ path: SHOT + '/e7-verbrauch.png' });
   check('keine Laufzeitfehler', errs.length === 0, errs.slice(0, 3).join(' | '));
   await b.close();
   fs.unlinkSync(tmp);

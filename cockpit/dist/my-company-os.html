@@ -383,6 +383,13 @@ img.olg{height:18px;max-width:60px;object-fit:contain;margin-right:6px;vertical-
 .pbl{max-height:52vh;overflow:auto}.pbr{display:flex;align-items:center;gap:10px;padding:7px 9px;border:1px solid var(--line);border-radius:8px;margin:0 0 5px;cursor:pointer}
 .pbr span{flex:1;min-width:0;display:flex;flex-direction:column}.pbr small{font-size:12px;color:var(--mut)}.pbr.dis{opacity:.6}.pbr a{text-decoration:none}
 
+/* v59 Verbrauch */
+.vbbox{padding:8px 10px;border:1px solid var(--line);border-radius:8px;background:#f7f9fc;font-size:13px}
+.vbgrid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px}.vbgrid>div{border:1px solid var(--line);border-radius:8px;padding:7px 10px;background:#fff}
+.vbgrid small{display:block;font-size:11.8px;color:var(--mut)}.vbgrid b{font-size:15px}@media(max-width:600px){.vbgrid{grid-template-columns:repeat(2,minmax(0,1fr))}}
+.pjr .pjvb{font-size:12px;color:var(--mut);white-space:nowrap}@media(max-width:600px){.pjr .pjvb{display:none}}
+#pjd .flabel{margin-top:12px}
+
 /* erzeugt von tools/dunkel.py – nicht von Hand ändern */
 :root[data-theme=dark]{color-scheme:dark;--bg:#0f141b;--panel:#171e29;--ink:#e4e8ef;--mut:#9aa4b4;--line:#2b3442;--acc:#5b8def;--accbg:#1c2b47;--warn:#f79009;--warnbg:#3a2615;--ok:#47cd89;--okbg:#12301f;--vio:#9b8afb;--viobg:#28213d;--teal:#36bffa;--tealbg:#11303a;--bodobg:#1d2939;--sellbg:#11303c}
 :root[data-theme=dark] body{background:var(--bg);color:var(--ink)}
@@ -819,6 +826,10 @@ img.olg{height:18px;max-width:60px;object-fit:contain;margin-right:6px;vertical-
 :root[data-theme=dark] .pjsel label{color:var(--mut)}
 :root[data-theme=dark] .pbr{border:1px solid var(--line);border-radius:8px}
 :root[data-theme=dark] .pbr small{color:var(--mut)}
+:root[data-theme=dark] .vbbox{border:1px solid var(--line);border-radius:8px;background:#131a24}
+:root[data-theme=dark] .vbgrid>div{border:1px solid var(--line);border-radius:8px;background:#171e29}
+:root[data-theme=dark] .vbgrid small{color:var(--mut)}
+:root[data-theme=dark] .pjr .pjvb{color:var(--mut)}
 :root[data-theme=dark] nav button.on{background:#2f6fdf;color:#fff}:root[data-theme=dark] body{background:var(--bg);color:var(--ink)}:root[data-theme=dark] input,:root[data-theme=dark] select,:root[data-theme=dark] textarea{background:#131a24;color:var(--ink);border-color:#3a4456}:root[data-theme=dark] .modal{background:#000000a6}:root[data-theme=dark] img.olg,:root[data-theme=dark] .av img{filter:none}
 @media (prefers-color-scheme:dark){:root[data-theme=auto]{color-scheme:dark;--bg:#0f141b;--panel:#171e29;--ink:#e4e8ef;--mut:#9aa4b4;--line:#2b3442;--acc:#5b8def;--accbg:#1c2b47;--warn:#f79009;--warnbg:#3a2615;--ok:#47cd89;--okbg:#12301f;--vio:#9b8afb;--viobg:#28213d;--teal:#36bffa;--tealbg:#11303a;--bodobg:#1d2939;--sellbg:#11303c}
 :root[data-theme=auto] body{background:var(--bg);color:var(--ink)}
@@ -1255,6 +1266,10 @@ img.olg{height:18px;max-width:60px;object-fit:contain;margin-right:6px;vertical-
 :root[data-theme=auto] .pjsel label{color:var(--mut)}
 :root[data-theme=auto] .pbr{border:1px solid var(--line);border-radius:8px}
 :root[data-theme=auto] .pbr small{color:var(--mut)}
+:root[data-theme=auto] .vbbox{border:1px solid var(--line);border-radius:8px;background:#131a24}
+:root[data-theme=auto] .vbgrid>div{border:1px solid var(--line);border-radius:8px;background:#171e29}
+:root[data-theme=auto] .vbgrid small{color:var(--mut)}
+:root[data-theme=auto] .pjr .pjvb{color:var(--mut)}
 :root[data-theme=auto] nav button.on{background:#2f6fdf;color:#fff}:root[data-theme=auto] body{background:var(--bg);color:var(--ink)}:root[data-theme=auto] input,:root[data-theme=auto] select,:root[data-theme=auto] textarea{background:#131a24;color:var(--ink);border-color:#3a4456}:root[data-theme=auto] .modal{background:#000000a6}:root[data-theme=auto] img.olg,:root[data-theme=auto] .av img{filter:none}}
 
 </style>
@@ -1319,7 +1334,7 @@ const COL=new Set();
 let PF="bodo",AF="bodo",GEN=false;
 const PK=[["bodo","Bodo"],["sellify","sellify"],["all","Andere"]];
 const PN={bodo:"Bodo",sellify:"sellify",all:"Andere",multi:"Bodo + sellify"};
-const VER="58";
+const VER="59";
 // Produktbereiche: fest im Programm hinterlegt (Entscheidung Boris 09.10.2026), keine Konfiguration in der Datenbank
 const PT={bodo:"Produktbereich Bodo (Bodo Solutions, Mitgliederverwaltung) – alles, was für Bodo-Kunden und das Bodo-System gebraucht wird. Fest im Programm hinterlegt.",sellify:"Produktbereich sellify (business//acts, CRM-Plattform) – alles, was für sellify-Kunden und das sellify-System gebraucht wird. Fest im Programm hinterlegt.",all:"Andere = produktunabhängig, z. B. Web-QA, E-Mail, Word/PDF. Fest im Programm hinterlegt."};
 let AFIL="all";
@@ -2383,6 +2398,7 @@ function resultModal(j){KINEW.delete(j.id);const [cls,lab]=okTxt(j),E=j.erg||[],
    ${j.sum?`<div class="kisum"><b>Rückmeldung von Claude:</b> ${esc(j.sum)}</div>`:isEnd(j)||W?"":`<div class="hint">Claude arbeitet noch – die Ansicht aktualisiert sich von selbst.</div>`}
    ${E.length?`<div class="flabel">Ergebnisse (${E.length})</div>${E.map(e=>`<div class="ergit"><div class="ergh"><b>${esc(e.t||"Ergebnis")}</b>${e.art?`<span class="hint" style="margin:0">${esc(e.art)}</span>`:""}<span style="flex:1"></span>${e.url?`<a class="btn sm p" href="${esc(e.url)}" target="_blank" rel="noopener">Öffnen ↗</a>`:""}</div>${e.vorschau?`<div class="ergv">${esc(e.vorschau)}</div>`:""}${e.url?`<div class="hint" style="margin:4px 0 0;word-break:break-all">${esc(e.url)}</div>`:""}</div>`).join("")}`:istPlan(j)||Array.isArray(j.teile)?"":'<div class="hint">Noch keine Ergebnisse eingetragen.</div>'}
    ${(j.sess||[]).length?`<div class="flabel" style="margin-top:10px">Claude-Sitzungen</div><div class="sessl">${j.sess.map((s,i)=>`<a href="${esc(s.url)}" target="_blank" rel="noopener">🔗 Sitzung ${i+1}${s.at?" · "+esc(new Date(s.at).toLocaleString("de-DE",{dateStyle:"short",timeStyle:"short"})):""}</a>`).join("")}</div>`:""}
+   ${vbJobHtml(j)}
    <div class="btns" style="justify-content:flex-end;margin-top:12px"><button class="btn" id="rlog" title="Verlauf, Prozessgrafik, Sitzungen und weitere Aktionen">Details …</button><button class="btn p" id="rclose">Schließen</button></div>`,true);
   anhBind(j);{const rp=$("#rprj");if(rp)rp.onchange=e=>pjSetJob(j,e.target.value)}$("#mclose").onclick=$("#rclose").onclick=()=>{close();if(!$("#projects").classList.contains("hide"))prj();else jobs()};$("#rlog").onclick=()=>{close();jobModalK(j)};
   document.querySelectorAll("[data-plk]").forEach(e=>e.onclick=()=>{const k=AU.find(x=>x.id===e.dataset.plk);if(k){close();resultModal(k)}});
@@ -2638,7 +2654,7 @@ async function umzug3(m,s){const alt=(s.orgs||[]).some(o=>o.id==="og-bodo"),p={s
 async function archivieren(){if(!neuSchema()||!await Store.lease("meta/archiv-lauf",120000))return 0;let n=0;
   const alt=await Store.list("jobs",{where:[["fertig","<",cutoffISO()]],limit:50});
   for(const j of alt){if(!isEnd(j))continue;const mon=j.fMon||String(j.fertig).slice(0,7),base="archiv/"+(j.org||"ohne")+"-"+mon;
-    const kurz=plain({id:j.id,t:j.t||"",art:j.art||"",aid:j.aid||null,abt:j.abt||null,team:j.team||null,fertig:j.fertig,st:j.st,ok:j.ok||null,prj:j.prj||null,sum:j.sum||"",erg:(j.erg||[]).map(e=>({t:e.t||"",url:e.url||""}))});
+    const kurz=plain({id:j.id,t:j.t||"",art:j.art||"",aid:j.aid||null,abt:j.abt||null,team:j.team||null,fertig:j.fertig,st:j.st,ok:j.ok||null,prj:j.prj||null,vb:vbArchiv(j),sum:j.sum||"",erg:(j.erg||[]).map(e=>({t:e.t||"",url:e.url||""}))});
     let k=base,a=null;for(let i=1;i<100;i++){k=base+(i>1?"-"+i:"");a=await Store.get(k);if(!a||(a.items||[]).some(x=>x.id===j.id)||JSON.stringify(a).length<200000)break}
     a=a||{org:j.org||null,mon,items:[]};if(!(a.items||[]).some(x=>x.id===j.id)){a.items=[...(a.items||[]),kurz];await Store.set(k,a)}
     const chk=await Store.get(k);if(!chk||!(chk.items||[]).some(x=>x.id===j.id))continue;
@@ -2927,7 +2943,7 @@ const pjOpts=(o,v)=>{const A=pjOrg(o).filter(p=>(p.st||"aktiv")==="aktiv"||p.id=
 function prj(){if(!orgById(OC))OC=ORGS()[0].id;const O=orgById(OC),F=UI.pjf||"aktiv";
   const L=pjOrg(OC),cnt=k=>L.filter(p=>(p.st||"aktiv")===k).length,V=L.filter(p=>F==="alle"||(p.st||"aktiv")===F).sort((a,b)=>String(a.n).localeCompare(String(b.n),"de"));
   if(PJSEL!==PJOHNE&&!(pj(PJSEL)&&pj(PJSEL).org===OC))PJSEL=V[0]?V[0].id:null;
-  const card=(id,n,sub,st)=>{const z=pjZahl(id,OC);return `<button class="pjc ${id===PJSEL?"on":""} ${st||""}" data-pj="${id}"><b>${esc(n)}</b><small>${sub}</small><span class="pjz">${z.offen?`<span class="pjo" title="offene Aufträge">● ${z.offen} offen</span>`:""}${z.wait?`<span class="pjw" title="warten auf dich">⏸ ${z.wait}</span>`:""}<span title="erledigte Aufträge (letzte 90 Tage)">✓ ${z.fertig}</span></span></button>`};
+  const card=(id,n,sub,st)=>{const z=pjZahl(id,OC);return `<button class="pjc ${id===PJSEL?"on":""} ${st||""}" data-pj="${id}"><b>${esc(n)}</b><small>${sub}</small><span class="pjz">${z.offen?`<span class="pjo" title="offene Aufträge">● ${z.offen} offen</span>`:""}${z.wait?`<span class="pjw" title="warten auf dich">⏸ ${z.wait}</span>`:""}<span title="erledigte Aufträge (letzte 90 Tage)">✓ ${z.fertig}</span>${(()=>{const v=vbSumme(pjJobs(id,OC));return v.n?`<span title="Laufzeit der KI-Sitzungen (gemessen)">⏱ ${fmtDauer(v.sek)}</span>`:""})()}</span></button>`};
   $("#pjl").innerHTML=`<div class="oorg" id="pjorg" style="margin-bottom:8px">${ORGS().map(o=>`<button data-pjo="${o.id}" class="${o.id===OC?"on":""}">${o.logo?`<img class="olg" src="${o.logo}" alt="">`:""}${esc(o.kurz||o.n)}</button>`).join("")}</div>
     <div class="seg" id="pjf" style="margin:0 0 8px">${[...PJST,["alle","Alle"]].map(([k,l])=>`<button data-pjf="${k}" class="${k===F?"on":""}">${l}<span class="n">${k==="alle"?L.length:cnt(k)}</span></button>`).join("")}</div>
     ${V.map(p=>card(p.id,p.n,[p.kunde,usr(p.verantw)&&usr(p.verantw).n,p.bk?"↔ "+(PN[p.bk.sys]||p.bk.sys):""].filter(Boolean).map(esc).join(" · ")||"&nbsp;",(p.st||"aktiv"))).join("")||`<div class="hint" style="margin:6px 0">${F==="aktiv"?"Noch keine aktiven Projekte in "+esc(O.kurz||O.n)+".":"Keine Projekte in dieser Auswahl."}</div>`}
@@ -2942,10 +2958,10 @@ function prj(){if(!orgById(OC))OC=ORGS()[0].id;const O=orgById(OC),F=UI.pjf||"ak
   pjDetail()}
 function pjDetail(){const C=$("#pjd"),o=OC;
   const L=pjJobs(PJSEL,o),off=L.filter(j=>!isEnd(j)),fer=L.filter(j=>isEnd(j)).sort((a,b)=>String(b.fertig||"").localeCompare(String(a.fertig||"")));
-  const row=j=>{const [c,l]=okTxt(j),W=jobWho(j);return `<div class="pjr" data-pjj="${j.id}"><span class="pjid">${esc(j.id)}</span><span class="pjt"><b>${esc(j.t||"Auftrag")}</b><small>${esc(W.n)}${teilTxt(j)?" · "+esc(teilTxt(j)):""}</small></span><span class="okb ${c}">${esc(j.st==="inbox"?"📥 gesammelt":isEnd(j)?doneTxt(j):l)}</span></div>`};
+  const row=j=>{const [c,l]=okTxt(j),W=jobWho(j);return `<div class="pjr" data-pjj="${j.id}"><span class="pjid">${esc(j.id)}</span><span class="pjt"><b>${esc(j.t||"Auftrag")}</b><small>${esc(W.n)}${teilTxt(j)?" · "+esc(teilTxt(j)):""}</small></span><span class="pjvb">${vbKurz(vbJob(j))}</span><span class="okb ${c}">${esc(j.st==="inbox"?"📥 gesammelt":isEnd(j)?doneTxt(j):l)}</span></div>`};
   const liste=`<div class="flabel">Offene Aufträge (${off.length})</div>${off.map(row).join("")||'<div class="hint" style="margin:0 0 6px">Keine offenen Aufträge.</div>'}
     <div class="flabel">Erledigt in den letzten 90 Tagen (${fer.length})</div>${fer.slice(0,40).map(row).join("")||'<div class="hint" style="margin:0">Noch nichts erledigt.</div>'}${fer.length>40?`<div class="hint">… und ${fer.length-40} weitere – vollständig unter „Aufträge & Verlauf“.</div>`:""}
-    <div class="flabel">Verbrauch</div><div class="hint" style="margin:0">Laufzeit der KI-Sitzungen und Tokens je Projekt folgen mit der nächsten Version.</div>`;
+    <div class="flabel">Verbrauch</div>${vbPjHtml(L)}`;
   if(PJSEL===PJOHNE){C.innerHTML=`<h2>Ohne Projekt <span class="hint" style="margin:0 0 0 8px;text-transform:none;letter-spacing:0;font-weight:400">${esc((orgById(o)||{}).kurz||"")}</span></h2><div class="hint" style="margin:0 0 6px">Aufträge, die keinem Projekt zugeordnet sind. Zuordnen kannst du im Ergebnisfenster eines Auftrags unter „Projekt“.</div>${liste}`;pjBindRows();return}
   const p=pj(PJSEL);if(!p){C.innerHTML=`<div class="empty"><b>Kein Projekt gewählt</b>Lege links ein Projekt an oder übernimm aktive Projekte aus Bodo.</div>`;return}
   C.innerHTML=`<h2 style="justify-content:space-between"><span>▣ ${esc(p.n)}</span><span><button class="btn sm p" id="pjgo" ${(p.st||"aktiv")!=="aktiv"?"disabled title=\"Nur aktive Projekte nehmen neue Aufträge an\"":""}>+ Auftrag in diesem Projekt</button></span></h2>
@@ -3000,6 +3016,33 @@ const pjBkVon=(r,m)=>({sys:"bodo",orgId:m.id,orgN:m.name,id:r.id,n:r.title||"",u
 // Kontext für Claude
 function pjKontext(j){const P=pj(j.prj);if(!P)return "";const B=P.bk;
   return "PROJEKT des Auftrags: „"+P.n+"“ (Company OS "+P.id+(P.kunde?", Kunde/Bezug: "+P.kunde:"")+")"+(B?". Verbunden mit "+(PN[B.sys]||B.sys)+"-Projekt „"+B.n+"“ (projectId "+B.id+", Mandant "+(B.orgN||"")+" = orgId "+B.orgId+", "+B.url+"). Alles, was du für diesen Auftrag in "+(PN[B.sys]||B.sys)+" anlegst (Aufgaben, Notizen, Termine, Dokumente), in diesem Projekt anlegen bzw. mit ihm verknüpfen; Mandant für diese Anlagen ist "+(B.orgN||B.orgId)+" (durch das Projekt eindeutig, keine Annahme). Im Ergebnis vermerken, dass am Projekt angelegt wurde.":". Noch nicht mit einem Backend-Projekt verbunden – nur zur Einordnung, Mandant wie sonst bestimmen.")}
+
+// ===== Verbrauch je Auftrag und Projekt (Etappe 4b, Teil 2) =====
+// Jede Claude-Sitzung misst vor ihrem letzten Schreibvorgang Laufzeit und Tokens aus ihrem eigenen Sitzungsprotokoll und hängt sie an j.verb an:
+// {sess, art, start, ende, sek, tin, tcw, tcr, tout, model} bzw. {sess, fehler}. Erfasst wird nur in Company OS, nichts wird ins Backend gebucht.
+const VBK=["sek","tin","tcw","tcr","tout"];
+const VB0=()=>({n:0,sek:0,tin:0,tcw:0,tcr:0,tout:0,jobs:0,mit:0});
+const vbOk=v=>v&&!v.fehler&&v.sek!=null;
+function vbJob(j,tief=true){const a=VB0();a.jobs=1;const L=(j.verb||[]).filter(vbOk);L.forEach(v=>{a.n++;VBK.forEach(k=>a[k]+=Math.max(0,+v[k]||0))});
+  if(!L.length&&j.vb){a.n=j.vb.n||0;VBK.forEach(k=>a[k]+=+j.vb[k]||0)}
+  if(tief)teileVon(j).filter(Boolean).forEach(k=>{const b=vbJob(k,false);a.n+=b.n;VBK.forEach(x=>a[x]+=b[x])});a.mit=a.n?1:0;return a}
+function vbSumme(L){const a=VB0();L.forEach(j=>{const b=vbJob(j);a.n+=b.n;a.jobs++;a.mit+=b.mit;VBK.forEach(k=>a[k]+=b[k])});return a}
+const vbTok=a=>a.tin+a.tcw+a.tcr+a.tout;
+const fmtDauer=s=>{s=Math.round(s||0);return s<60?s+" s":s<3600?Math.floor(s/60)+":"+String(s%60).padStart(2,"0")+" min":Math.floor(s/3600)+" h "+String(Math.round(s%3600/60)).padStart(2,"0")+" min"};
+const fmtTok=n=>n>=1e6?(n/1e6).toLocaleString("de-DE",{maximumFractionDigits:1})+" Mio.":n>=1e4?Math.round(n/1e3).toLocaleString("de-DE")+" Tsd.":Math.round(n).toLocaleString("de-DE");
+const vbKurz=a=>a.n?`⏱ ${fmtDauer(a.sek)} · ${fmtTok(vbTok(a))} Tokens`:"";
+const vbAuf=a=>`Eingabe ${fmtTok(a.tin)} · Cache geschrieben ${fmtTok(a.tcw)} · Cache gelesen ${fmtTok(a.tcr)} · Ausgabe ${fmtTok(a.tout)}`;
+const VBHINT="Gemessen von der jeweiligen Claude-Sitzung aus ihrem eigenen Protokoll; der letzte Schreibvorgang einer Sitzung ist nicht enthalten, die Werte sind daher leicht zu niedrig. Im Abo zählen Tokens gegen das Nutzungskontingent und werden nicht einzeln abgerechnet.";
+// Ergebnisfenster eines Auftrags
+function vbJobHtml(j){const a=vbJob(j),S=(j.sess||[]).length,F=(j.verb||[]).filter(v=>v&&v.fehler);if(!a.n&&!S)return "";
+  const tl=Array.isArray(j.teile)?" (mit Teilaufträgen)":"";
+  return `<div class="flabel" style="margin-top:10px">Verbrauch${tl}</div>${a.n?`<div class="vbbox"><b>${fmtDauer(a.sek)}</b> Laufzeit · <b>${fmtTok(vbTok(a))}</b> Tokens · ${a.n} Sitzung${a.n===1?"":"en"} gemessen<div class="hint" style="margin:2px 0 0">${vbAuf(a)}</div></div>`:`<div class="hint" style="margin:0">Nicht erfasst – Auftrag vor Version 59 oder die Sitzung hat keine Messung eingetragen.</div>`}${F.length?`<div class="hint" style="margin:2px 0 0">⚠ Messung nicht möglich: ${esc(F.map(v=>v.fehler).join("; "))}</div>`:""}`}
+// Projekt bzw. „ohne Projekt“
+function vbPjHtml(L){const a=vbSumme(L);if(!L.length)return `<div class="hint" style="margin:0">Noch keine Aufträge.</div>`;
+  return `<div class="vbgrid"><div><small>Laufzeit</small><b>${a.n?fmtDauer(a.sek):"–"}</b></div><div><small>Tokens</small><b>${a.n?fmtTok(vbTok(a)):"–"}</b></div><div><small>Sitzungen</small><b>${a.n}</b></div><div><small>Aufträge gemessen</small><b>${a.mit} von ${a.jobs}</b></div></div>
+    ${a.n?`<div class="hint" style="margin:4px 0 0">${vbAuf(a)}</div>`:""}<div class="hint" style="margin:4px 0 0">${VBHINT} Berücksichtigt sind die geladenen Aufträge (offen und erledigt der letzten 90 Tage); Teilaufträge zählen beim Hauptauftrag.</div>`}
+// Kurzfassung fürs Archiv
+const vbArchiv=j=>{const a=vbJob(j,false);return a.n?{n:a.n,sek:a.sek,tin:a.tin,tcw:a.tcw,tcr:a.tcr,tout:a.tout}:null};
 
 boot();
 // Breitenregler Ablauf-Eigenschaften (rechts)

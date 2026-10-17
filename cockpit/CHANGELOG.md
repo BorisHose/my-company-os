@@ -1,5 +1,12 @@
 # Änderungen – Cockpit
 
+## 59 · 17.10.2026 · Etappe 4b, Teil 2 „Verbrauch“ (Freigabe Boris)
+- Jede Claude-Sitzung misst vor ihrem letzten Schreibvorgang Laufzeit und Tokens (Eingabe, Cache geschrieben, Cache gelesen, Ausgabe) aus ihrem eigenen Sitzungsprotokoll und schreibt sie in den Auftrag (Feld verb). Anweisung beider geplanten Aufgaben ergänzt.
+- Anzeige im Ergebnisfenster (mit Teilaufträgen), je Auftrag in der Projektliste, Summe je Projekt und „Ohne Projekt“ (Laufzeit, Tokens, Sitzungen, gemessene Aufträge); Laufzeit auf der Projektkarte.
+- Nur in Company OS erfasst, keine Buchung ins Backend. Euro-Werte bewusst nicht berechnet (Abo: Tokens zählen gegen das Kontingent).
+- Archiv-Kurzfassung behält den Verbrauch.
+- Smoke-Test: 82 Prüfungen.
+
 ## 58 · 17.10.2026 · Etappe 4b, Teil 1 „Projekte“ (Freigabe Boris)
 - Neuer Reiter „Projekte“ (Leiste: Organigramm · Aufträge · Projekte · Prozesse · Agenten ▾): je Organigramm Übersicht nach Aktiv · Pausiert · Abgeschlossen mit offenen, wartenden und erledigten Aufträgen; Karte „Ohne Projekt“.
 - Projekte werden in Company OS angelegt (Sammlung projects): Name, Kunde/Bezug, Status, Verantwortlich, Beschreibung.
