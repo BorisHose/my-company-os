@@ -399,3 +399,18 @@ img.olg{height:18px;max-width:60px;object-fit:contain;margin-right:6px;vertical-
 .dkat{width:100%;border-collapse:collapse;font-size:12.5px}.dkat th,.dkat td{border:1px solid var(--line);padding:5px 7px;text-align:left;vertical-align:top}.dkat th{background:#f7f9fc;font-weight:600}
 @media(max-width:700px){.drow{grid-template-columns:1fr}.dzb,.dmsg{grid-column:1}.dkat{display:block;overflow-x:auto}}
 .spur{display:flex;flex-direction:column;gap:4px}.spr{display:flex;gap:8px;align-items:center;font-size:12.5px;padding:5px 8px;border:1px solid var(--line);border-radius:7px}.spr span:nth-child(2){flex:1}.sprd{font-weight:600;min-width:120px}.spr a{text-decoration:none}
+/* v61 Etappe 4c: Handy – Organigramm untereinander, Ansichten ohne seitliches Scrollen */
+@media(max-width:860px){main{grid-template-columns:minmax(0,1fr)!important}.panel{min-width:0}.panel h2{flex-wrap:wrap;gap:6px}.kb,.kb.two{grid-template-columns:minmax(0,1fr)}}
+@media(max-width:760px){
+  .orgwrap{overflow:visible;padding:4px 0 8px}
+  .otop{justify-content:flex-start}.obox{min-width:0;width:100%}
+  .otrunk{margin:0 0 0 18px;height:14px}
+  .orow{flex-direction:column;align-items:stretch;width:auto;min-width:0;gap:12px;padding:0 0 0 18px}
+  .orow::before{left:0!important;right:auto!important;top:0;bottom:18px;width:2px;height:auto}
+  .odept{width:auto}.odept::before{top:18px;left:-18px;width:18px;height:2px}
+  .odh{flex-wrap:wrap}.oact{flex-wrap:wrap}
+  .orgnew{width:auto}
+  .skf .seg,.kfilt .seg{overflow-x:auto;scrollbar-width:none}.skf .seg button,.kfilt .seg button{flex:none}
+  .eshead{flex-wrap:wrap;gap:6px}
+  table.map{display:block;overflow-x:auto;max-width:100%}
+}

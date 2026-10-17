@@ -299,9 +299,16 @@ const check = (name, ok, info = '') => { CHECKS.push({ name, ok }); console.log(
   await p.setViewportSize({ width: 390, height: 844 }); await p.evaluate(() => einst('dienste')); await p.waitForTimeout(200);
   check('Anbindungen: Handy ohne seitliches Scrollen', await p.evaluate(() => document.documentElement.scrollWidth <= innerWidth + 1));
   await p.setViewportSize({ width: 1440, height: 900 });
+  // ----- v61 Etappe 4c: Handy -----
+  await p.setViewportSize({ width: 360, height: 800 });
+  const m4c = await p.evaluate(async () => { const R = {}; for (const v of ['org', 'jobs', 'projects', 'flows', 'build', 'skills', 'matrix', 'users', 'settings']) { document.getElementById('modal').innerHTML = ''; show(v); await new Promise(r => setTimeout(r, 150)); R[v] = document.documentElement.scrollWidth } show('org'); await new Promise(r => setTimeout(r, 150));
+    const d = [...document.querySelectorAll('.odept')].map(e => e.getBoundingClientRect()); return { R, stacked: d.length > 1 && d[1].top > d[0].bottom - 1 && d.every(b => b.right <= innerWidth + 1), w: innerWidth } });
+  check('Handy (360 px): Organigramm untereinander, keine Ansicht scrollt seitlich', m4c.stacked && Object.values(m4c.R).every(x => x <= m4c.w + 1), JSON.stringify(m4c));
+  await p.setViewportSize({ width: 1440, height: 900 }); await p.evaluate(() => show('org'));
+  check('Breit: Organigramm bleibt nebeneinander', await p.evaluate(() => { const d = [...document.querySelectorAll('.odept')].map(e => e.getBoundingClientRect()); return d.length > 1 && Math.abs(d[1].top - d[0].top) < 2 }));
   check('keine Laufzeitfehler', errs.length === 0, errs.slice(0, 3).join(' | '));
   await b.close();
-  fs.unlinkSync(tmp);
+  if (process.env.KEEP) fs.copyFileSync(tmp, path.join(ROOT, 'tests', '.keep.html')); fs.unlinkSync(tmp);
   const bad = CHECKS.filter(c => !c.ok).length;
   console.log(bad ? `\n${bad} von ${CHECKS.length} Prüfungen fehlgeschlagen` : `\nalle ${CHECKS.length} Prüfungen bestanden`);
   process.exit(bad ? 1 : 0);

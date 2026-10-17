@@ -1,5 +1,11 @@
 # Änderungen – Cockpit
 
+## 61 · 17.10.2026 · Etappe 4c „Handy“ (Freigabe Boris)
+- Organigramm auf schmalen Bildschirmen (bis 760 px) untereinander statt als Baum: Geschäftsführung oben, Abteilungen darunter an einer senkrechten Linie, kein seitliches Scrollen mehr.
+- Alle Ansichten ohne seitliches Scrollen der Seite (gemessen bei 320, 390, 430 und 768 px): zweispaltige Ansichten werden einspaltig, Filterleisten (Skills, Aufträge) sind wischbar statt abgeschnitten, Systemtabelle beim Benutzer scrollt in sich, Kopfzeilen mit Knöpfen brechen um.
+- Bewusst seitlich verschiebbar bleiben: Prozess-Designer (Zeichenfläche), Matrix, Navigationsleiste.
+- Smoke-Test: 89 Prüfungen.
+
 ## 60 · 17.10.2026 · Etappe 4b, Teil 3 „Anbindungen“ (Freigabe Boris)
 - ⚙ Einstellungen › Anbindungen: je Organigramm vier Dienste – CRM, Auftragsmanagement (kommerzieller Auftrag), Projekt, Zeiterfassung – mit System, Mandant und Entität; mehrere Dienste dürfen auf dasselbe System zeigen, der Mandant wird für weitere Dienste desselben Systems vorgeschlagen.
 - Systemkatalog im Code (Bodo: contact, member, opportunity, lead, order, project, timeEntry; sellify: contact, person, sale, project; keine Zeiterfassung). Neues System = neuer Katalogeintrag.
