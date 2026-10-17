@@ -1807,7 +1807,7 @@ const COL=new Set();
 let PF="bodo",AF="bodo",GEN=false;
 const PK=[["bodo","Bodo"],["sellify","sellify"],["all","Andere"]];
 const PN={bodo:"Bodo",sellify:"sellify",all:"Andere",multi:"Bodo + sellify"};
-const VER="81";
+const VER="82";
 // Produktbereiche: fest im Programm hinterlegt (Entscheidung Boris 09.10.2026), keine Konfiguration in der Datenbank
 const PT={bodo:"Produktbereich Bodo (Bodo Solutions, Mitgliederverwaltung) – alles, was für Bodo-Kunden und das Bodo-System gebraucht wird. Fest im Programm hinterlegt.",sellify:"Produktbereich sellify (business//acts, CRM-Plattform) – alles, was für sellify-Kunden und das sellify-System gebraucht wird. Fest im Programm hinterlegt.",all:"Andere = produktunabhängig, z. B. Web-QA, E-Mail, Word/PDF. Fest im Programm hinterlegt."};
 let AFIL="all";
@@ -3598,7 +3598,7 @@ async function boot(){
     hydrate();const s0=snapshot();s0.forEach((v,k)=>LAST.set(k,v));if(migrateOrgs()){toast("Organisationen eingerichtet");schedule()}if(grMigrieren())schedule();if(nameMigrieren())schedule();[...GR,GR_OHNE].forEach(g=>COL.add(g.id));
     const f=agVis()[0];cur=f?f[1]:-1;fcur=FL.findIndex(x=>x.p===FF&&!x.frei);
     render();jobs();setSave("ok","Gespeichert");kiSubscribe();show("org");hdr();if(SET.inst&&SET.inst.n)document.title=SET.inst.n;if(umg)toast("Datenbestand auf Stand "+SCHEMA+" umgestellt");
-    archivieren().then(n=>{if(n)toast(n+" alte Aufträge ins Archiv verschoben")}).catch(e=>console.warn("Archiv",e));
+    archivieren().then(n=>{if(n)toast(n===1?"1 alter Auftrag ins Archiv verschoben":n+" alte Aufträge ins Archiv verschoben")}).catch(e=>console.warn("Archiv",e));
     if(!SK.length)emptyState("Noch keine Skills","Bitte Claude, die Startdaten einzuspielen – danach erscheinen hier deine Skills.");
   }catch(e){setSave("err","Laden fehlgeschlagen");emptyState("Laden fehlgeschlagen","Seite neu laden. Wenn es wieder passiert, Claude Bescheid geben.")}
 }

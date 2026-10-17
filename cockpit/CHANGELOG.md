@@ -1,5 +1,8 @@
 # Änderungen – Cockpit
 
+## 82 · 17.10.2026 · Fehlerbehebung Hinweistext
+- Archiv-Hinweis in der Einzahl korrekt: „1 alter Auftrag ins Archiv verschoben“.
+
 ## 81 · 17.10.2026 · Fehlerbehebung Benutzer-Zuordnung
 - „Welcher Benutzer in … ist …?“: Bei mehreren Treffern wird jetzt der gewählte Benutzer übernommen (vorher immer der erste, weil die Auswahl erst nach dem Schließen gelesen wurde).
 - Smoke-Test: 133 Prüfungen.

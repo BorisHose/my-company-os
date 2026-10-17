@@ -87,7 +87,7 @@ async function boot(){
     hydrate();const s0=snapshot();s0.forEach((v,k)=>LAST.set(k,v));if(migrateOrgs()){toast("Organisationen eingerichtet");schedule()}if(grMigrieren())schedule();if(nameMigrieren())schedule();[...GR,GR_OHNE].forEach(g=>COL.add(g.id));
     const f=agVis()[0];cur=f?f[1]:-1;fcur=FL.findIndex(x=>x.p===FF&&!x.frei);
     render();jobs();setSave("ok","Gespeichert");kiSubscribe();show("org");hdr();if(SET.inst&&SET.inst.n)document.title=SET.inst.n;if(umg)toast("Datenbestand auf Stand "+SCHEMA+" umgestellt");
-    archivieren().then(n=>{if(n)toast(n+" alte Aufträge ins Archiv verschoben")}).catch(e=>console.warn("Archiv",e));
+    archivieren().then(n=>{if(n)toast(n===1?"1 alter Auftrag ins Archiv verschoben":n+" alte Aufträge ins Archiv verschoben")}).catch(e=>console.warn("Archiv",e));
     if(!SK.length)emptyState("Noch keine Skills","Bitte Claude, die Startdaten einzuspielen – danach erscheinen hier deine Skills.");
   }catch(e){setSave("err","Laden fehlgeschlagen");emptyState("Laden fehlgeschlagen","Seite neu laden. Wenn es wieder passiert, Claude Bescheid geben.")}
 }
