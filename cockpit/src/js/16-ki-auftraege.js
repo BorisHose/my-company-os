@@ -22,25 +22,8 @@ async function kiCancel(j){const F=[...(j.erg||[]).map(e=>e&&e.t).filter(Boolean
   try{await Store.set("jobs/"+j.id,JSON.parse(jobSer(j)));LAST.set("jobs/"+j.id,jobSer(j))}catch(e){schedule()}
   for(const k of teileVon(j).filter(k=>k&&k.st==="inbox")){k.st="cancel";markDone(k);k.ok="nein";k.log.push([now(),"Mit dem Hauptauftrag "+j.id+" abgebrochen",1]);try{await Store.set("jobs/"+k.id,JSON.parse(jobSer(k)));LAST.set("jobs/"+k.id,jobSer(k))}catch(e){}}
   toast("Auftrag abgebrochen");return true}
-function resultModal(j){KINEW.delete(j.id);const [cls,lab]=okTxt(j),E=j.erg||[],W=j.st==="wait"&&j.q,Q=j.q||{};
-  const close=modalBox(`<div class="bhead"><h3>${istPlan(j)?"Vorschlag":"Ergebnis"}: ${esc(j.t)}</h3><span class="okb ${cls}">${lab}</span><button class="ic" id="mclose" title="Schließen" style="font-size:18px">✕</button></div>
-   <div class="hint" style="margin:0 0 10px">${esc(j.id)} · ${esc(jobLbl(j))}${(j.log||[]).length?" · zuletzt "+esc(j.log[j.log.length-1][0]):""}</div>${pjJobField(j)}
-   ${W&&istPlan(j)?planHtml(j)+`<div class="btns" style="margin:8px 0 6px"><button class="btn p" id="plgo">▶ Plan freigeben &amp; starten</button><button class="btn" id="rchg">Ändern …</button><button class="btn d" id="rcan">Abbrechen</button></div><div id="rchgbox" style="display:none;margin-top:8px"><textarea id="rchgt" placeholder="Was soll der Teamleiter anders planen? z. B. ohne Video, anderer Agent für Schritt 2 …" style="min-height:70px"></textarea><div class="btns" style="justify-content:flex-end"><button class="btn p" id="rchgok">Änderung an den Teamleiter senden</button></div></div>`:W?`<div class="qbox"><b>${esc(Q.kind||"Rückfrage")} von ${esc(Q.from||"Claude")}</b><p style="margin:6px 0;white-space:pre-wrap">${esc(Q.text||"")}</p>${Q.why?`<div class="hint" style="margin:0">${esc(Q.why)}</div>`:""}
-     <div class="btns">${(Q.opts||[]).filter(o=>!/^abbrechen/i.test(o.trim())).map((o,i)=>`<button class="btn ${i?'':'p'}" data-rans="${esc(o)}">${esc(o)}</button>`).join("")}<button class="btn" id="rchg">Ändern …</button><button class="btn d" id="rcan">Abbrechen</button></div>
-     <div id="rchgbox" style="display:none;margin-top:8px"><textarea id="rchgt" placeholder="Was soll anders sein? z. B. anderer Mandant, anderer Titel, Fälligkeit …" style="min-height:70px"></textarea><div class="btns" style="justify-content:flex-end"><button class="btn p" id="rchgok">Änderung an Claude senden</button></div></div></div>`:""}
-   ${teileHtml(j)}${anhHtml(j)}
-   ${j.sum?`<div class="kisum"><b>Rückmeldung von Claude:</b> ${esc(j.sum)}</div>`:isEnd(j)||W?"":`<div class="hint">Claude arbeitet noch – die Ansicht aktualisiert sich von selbst.</div>`}
-   ${E.length?`<div class="flabel">Ergebnisse (${E.length})</div>${E.map(e=>`<div class="ergit"><div class="ergh"><b>${esc(e.t||"Ergebnis")}</b>${e.art?`<span class="hint" style="margin:0">${esc(e.art)}</span>`:""}<span style="flex:1"></span>${e.url?`<a class="btn sm p" href="${esc(e.url)}" target="_blank" rel="noopener">Öffnen ↗</a>`:""}</div>${e.vorschau?`<div class="ergv">${esc(e.vorschau)}</div>`:""}${e.url?`<div class="hint" style="margin:4px 0 0;word-break:break-all">${esc(e.url)}</div>`:""}</div>`).join("")}`:istPlan(j)||Array.isArray(j.teile)?"":'<div class="hint">Noch keine Ergebnisse eingetragen.</div>'}
-   ${(j.sess||[]).length?`<div class="flabel" style="margin-top:10px">Claude-Sitzungen</div><div class="sessl">${j.sess.map((s,i)=>`<a href="${esc(s.url)}" target="_blank" rel="noopener">🔗 Sitzung ${i+1}${s.at?" · "+esc(new Date(s.at).toLocaleString("de-DE",{dateStyle:"short",timeStyle:"short"})):""}</a>`).join("")}</div>`:""}
-   ${spurHtml(j)}${vbJobHtml(j)}
-   <div class="btns" style="justify-content:flex-end;margin-top:12px"><button class="btn" id="rlog" title="Verlauf, Prozessgrafik, Sitzungen und weitere Aktionen">Details …</button><button class="btn p" id="rclose">Schließen</button></div>`,true);
-  anhBind(j);{const rp=$("#rprj");if(rp)rp.onchange=e=>pjSetJob(j,e.target.value)}$("#mclose").onclick=$("#rclose").onclick=()=>{close();if(!$("#projects").classList.contains("hide"))prj();else jobs()};$("#rlog").onclick=()=>{close();jobModalK(j)};
-  document.querySelectorAll("[data-plk]").forEach(e=>e.onclick=()=>{const k=AU.find(x=>x.id===e.dataset.plk);if(k){close();resultModal(k)}});
-  if(W&&istPlan(j))planBind(j,close);
-  if(W){document.querySelectorAll("[data-rans]").forEach(b=>b.onclick=()=>{close();kiAnswer(j,b.dataset.rans)});
-    $("#rchg").onclick=()=>{const bx=$("#rchgbox");bx.style.display=bx.style.display==="none"?"":"none";if(bx.style.display==="")$("#rchgt").focus()};
-    $("#rchgok").onclick=()=>{const t=$("#rchgt").value.trim();if(!t)return toast("Bitte die Änderung beschreiben");close();kiAnswer(j,(istPlan(j)?"Plan ändern: ":"Ändern: ")+t)};
-    $("#rcan").onclick=async()=>{if(await kiCancel(j)){close();jobs()}}}}
+// Ergebnis und Details zeigen seit v77 dasselbe Fenster (16a-auftrag-fenster.js)
+function resultModal(j){jobView(j)}
 let KIAT=null,KITMR=null;
 function kiPoll(){clearInterval(KITMR);KITMR=setInterval(()=>{if($("#jobs").classList.contains("hide")||$("#modal").innerHTML)return;if(AU.some(j=>j.ki&&j.st==="run"))kiReload(true).then(kiCheckRuns)},30000)}
 function kiContext(j){const f=j.f,L=[];if(!f)return "";const cur=j.path[j.path.length-1],c=nodeOf(f,cur);
@@ -169,50 +152,7 @@ function jobs(){
   waitCnt();
 }
 async function jobModalK(j){if(j.ki)await kiFresh(j);jobModal(j)}
-function jobModal(j){
-  const f=j.f,c=curN(j);
-  const opts=j.st==="wait"&&j.q?(c&&c.type==="human"&&!j.ki?f.E.filter(e=>e.f===c.id).map(e=>e.l||"weiter"):(j.q.opts||[])):[];
-  $("#modal").innerHTML=`<div class="modal"><div class="box wide"><div class="bhead"><h3>${esc(j.t)}</h3><span class="pb ${f.p}">${PN[f.p]}</span><button class="ic" id="mclose" style="font-size:18px">✕</button></div>
-   <div class="hint" style="margin:0 0 8px">${j.id} · ${esc(f.n)} · Eingabe: ${esc(j.in||"–")}</div>${anhHtml(j)}
-   ${j.ki?`<div class="flabel">Claude-Sitzungen</div><div class="sessl">${(j.sess||[]).map((s,i)=>`<a href="${esc(s.url)}" target="_blank" rel="noopener">🔗 Sitzung ${i+1} – ${s.art==="fortsetzen"?"Fortsetzung":s.art==="ohne Rückmeldung"?"⚠ ohne Rückmeldung im Auftrag":s.art==="abgelegt"?"abgelegt":"Start"}${s.at?" · "+esc(new Date(s.at).toLocaleString("de-DE",{dateStyle:"short",timeStyle:"short"})):""}</a>`).join("")||'<span class="hint" style="margin:0">Noch keine – Claude trägt die Sitzung beim Start hier ein (dauert 1–2 Minuten).</span>'}</div>
-     ${j.sum||(j.erg||[]).length?`<div class="btns" style="margin:0 0 10px"><span class="okb ${okTxt(j)[0]}">${okTxt(j)[1]}</span><button class="btn p" id="jres">Ergebnis ansehen${(j.erg||[]).length?" ("+j.erg.length+")":""}</button></div>`:""}`:""}
-   ${j.st==="wait"&&j.q?`<div class="qbox"><b>${esc(j.q.kind)} von ${esc(j.q.from)}${c&&c.type==="human"&&!j.ki?": "+esc(c.label):""}</b><p style="margin:6px 0;white-space:pre-wrap">${esc(j.q.text)}</p>${j.q.why?`<div class="hint" style="margin:0">${esc(j.q.why)}</div>`:""}
-     ${f&&f.nt?`<div class="hint" style="margin:4px 0 0">Benachrichtigt über: ${CH.filter((x,ci)=>f.nt.ev[j.q.kind==="Freigabe"?"hold":"ask"][ci]).join(" · ")}</div>`:""}
-     <div class="btns">${opts.map((o,i)=>`<button class="btn ${i?'':'p'}" data-ans="${esc(o)}">${esc(o)}</button>`).join("")}</div>
-     <input type="text" id="free" placeholder="… oder eigene Antwort schreiben und Enter" style="margin-top:8px"></div>`:""}
-   ${j.ki&&j.st==="run"?`<div class="pbox"><b>Claude arbeitet</b> <span class="hint" style="margin:0">Verlauf aktualisiert sich alle 30 Sekunden oder mit „⟳ Stand laden“.</span><div class="btns"><button class="btn" id="kirl2">⟳ Stand laden</button><button class="btn" id="kire">▶ Erneut anstoßen</button></div></div>`:""}
-   ${!j.ki&&!isEnd(j)?`<div class="btns" style="margin:0 0 10px"><button class="btn p" id="kigo" title="Diesen Auftrag ab dem aktuellen Schritt von Claude ausführen lassen">▶ Von Claude ausführen lassen</button></div>`:""}
-   ${j.st==="run"&&!j.ki?`<div class="pbox"><b>Fortschritt pflegen</b> <span class="hint" style="margin:0">aktuell: ${esc(nlabel(c))}</span>
-     <div class="btns">${f.E.map((e,i)=>[e,i]).filter(([e])=>e.f===c.id).map(([e,i])=>`<button class="btn ${e.back?'':'p'}" data-adv="${i}">${c.type==="dec"?"Entscheidung: "+esc(e.l||"weiter")+" → ":"✓ erledigt → "}${esc(nlabel(nodeOf(f,e.t)))}</button>`).join("")||'<span class="hint">Kein weiterer Schritt verbunden.</span>'}</div>
-     <div class="btns"><button class="btn" id="addQ">Rückfrage erfassen</button><button class="btn" id="addN">Notiz zum Verlauf</button></div></div>`:""}
-   <span class="flabel">Wo steht der Auftrag? <span class="legend"><i class="lg d"></i>erledigt <i class="lg c"></i>läuft <i class="lg w"></i>wartet auf dich <i class="lg o"></i>offen</span></span>
-   <div class="cv-wrap ro" id="jcv"></div>
-   <span class="flabel" style="margin-top:10px">Verlauf</span><div class="tl">${j.log.map(l=>`<div class="${l[2]?'me':''}"><time>${l[0]}</time>${esc(l[1])}</div>`).join("")}</div>
-   <div class="btns" style="margin-top:14px;justify-content:flex-end">${!isEnd(j)?'<button class="btn d" id="stop">Auftrag löschen</button>':''}<button class="btn" id="mx">Schließen</button></div></div></div>`;
-  anhBind(j);const P=new Set(j.path),pairs=new Set(j.path.slice(1).map((id,i)=>j.path[i]+">"+id));
-  const jo={ro:true,taken:e=>pairs.has(e.f+">"+e.t),state:n=>n.id===c.id&&!isEnd(j)?(j.st==="wait"?"cur wait":"cur"):P.has(n.id)||isEnd(j)?"done":"todo"};
-  const jw=$("#jcv");drawGraph(jw,f,jo);drawGraph(jw,f,{...jo,z:fitZ(jw,+jw.dataset.w,+jw.dataset.h,400)});
-  const close=()=>$("#modal").innerHTML="";$("#mclose").onclick=close;$("#mx").onclick=close;
-  const answer=async a=>{if(j.ki){close();kiAnswer(j,a);return}
-    j.log.push([now(),""+ICH()+": "+a,1]);j.st="run";
-    if(c.type==="human"){const e=f.E.find(e=>e.f===c.id&&(e.l||"weiter")===a);if(e){const t=nodeOf(f,e.t);j.path.push(t.id);j.log.push([now(),(e.back?"↩ zurück zu ":"weiter: ")+nlabel(t)]);if(t.type==="end"){j.st="done";markDone(j)}}}
-    else j.log.push([now(),nlabel(c)+" – macht weiter"]);
-    delete j.q;close();jobs();jobModal(j);toast("Antwort übermittelt")};
-  document.querySelectorAll("[data-ans]").forEach(b=>b.onclick=()=>answer(b.dataset.ans));
-  document.querySelectorAll("[data-adv]").forEach(b=>b.onclick=()=>{const e=f.E[+b.dataset.adv],t=nodeOf(f,e.t);j.path.push(t.id);
-    j.log.push([now(),(c.type==="dec"?"Entscheidung „"+(c.label||"")+"“ → "+(e.l||"weiter")+": ":e.back?"↩ zurück zu ":"weiter: ")+nlabel(t)]);
-    if(t.type==="human"){j.st="wait";j.q={kind:"Freigabe",from:c.a?.n||"Ablauf",text:t.label||"",why:"",opts:[]};j.log.push([now(),"wartet auf deine Entscheidung",1])}
-    else if(t.type==="end"){j.st="done";markDone(j);j.log.push([now(),"Auftrag fertig"])}
-    close();jobs();jobModal(j);schedule()});
-  const aq=$("#addQ");if(aq)aq.onclick=async()=>{const t=await askText("Rückfrage erfassen","",{mehrzeilig:1,bezug:"zu „"+j.t+"“ · der Auftrag wechselt auf „wartet auf dich“",ph:"Was ist offen? z. B. „Wartungsvertrag 3 oder 5 Jahre?“",ok:"Rückfrage speichern"});if(t){j.st="wait";j.q={kind:"Rückfrage",from:c.a?.n||"Ablauf",text:t,why:"",opts:[]};j.log.push([now(),"Rückfrage: "+t,1]);close();jobs();jobModal(j);schedule()}};
-  const an=$("#addN");if(an)an.onclick=async()=>{const t=await askText("Notiz zum Verlauf","",{mehrzeilig:1,bezug:"zu „"+j.t+"“",ok:"Notiz speichern"});if(t){j.log.push([now(),"Notiz: "+t]);close();jobModal(j);schedule()}};
-  const fr=$("#free");if(fr)fr.onkeydown=e=>{if(e.key==="Enter"&&fr.value.trim())answer(fr.value.trim())};
-  const jr=$("#jres");if(jr)jr.onclick=()=>{close();resultModal(j)};
-  const kg=$("#kigo");if(kg)kg.onclick=()=>{close();kiStart(j,"starten")};
-  const kr2=$("#kirl2");if(kr2)kr2.onclick=async()=>{await kiFresh(j);close();jobs();jobModal(j)};
-  const kre=$("#kire");if(kre)kre.onclick=()=>{close();kiStart(j,(j.sess||[]).length?"fortsetzen":"starten")};
-  const sb=$("#stop");if(sb)sb.onclick=async()=>{if(await askOk("Auftrag „"+j.t+"“ löschen?")){AU=AU.filter(x=>x!==j);close();jobs();schedule()}};
-}
+function jobModal(j){jobView(j)}
 $("#newJ").onclick=()=>{if(blocked())return;startModal(null)};$("#kifab").onclick=()=>{if(blocked())return;startModal(null)};
 $("#newF").onclick=()=>{if(blocked())return;const a=AG.find(x=>x.p===FF)||AG[0];
   FL.push({id:uid("fl"),n:"Neuer Ablauf",p:FF,goal:"",start:"",nt:NTD(),rec:"manuell",N:[{id:nid(),type:"start",x:20,y:120,label:"Start"}],E:[]});

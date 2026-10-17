@@ -15,7 +15,7 @@ function planHtml(j){const P=j.plan,S=P.steps,o=jobOrg(j),AGO=AG.filter(a=>inOrg
         <div>${esc(s.t||"")}${(s.nach||[]).length?` <span class="hint" style="margin:0">· startet nach ${s.nach.join(", ")}</span>`:""}${s.sk?` <span class="hint" style="margin:0">· Skill: ${esc(s.sk)}</span>`:""}</div>
         ${fremd?`<div class="plab">Abteilung ${esc((dept(PL(a,o).abt)||{}).n||"?")} · Zustimmung: ${esc(leitungTxt(PL(a,o).abt))} – mit deiner Freigabe erteilt</div>`:""}</div></div>`}).join("")}
     ${P.sum?`<div class="plsum"><b>Begründung:</b> ${esc(P.sum)}</div>`:""}</div>`}
-function planBind(j,close){document.querySelectorAll("[data-plag]").forEach(s=>s.onchange=()=>{j.plan.steps[+s.dataset.plag].aid=s.value;const sc=$("#box").scrollTop;resultModal(j);$("#box").scrollTop=sc});
+function planBind(j,close){document.querySelectorAll("[data-plag]").forEach(s=>s.onchange=()=>{j.plan.steps[+s.dataset.plag].aid=s.value;const m=document.querySelector("#modal .modal"),sc=m?m.scrollTop:0;resultModal(j);const m2=document.querySelector("#modal .modal");if(m2)m2.scrollTop=sc});
   const go=$("#plgo");if(go)go.onclick=async()=>{go.disabled=true;try{await planFreigeben(j);close();jobs()}catch(e){go.disabled=false;toast("Freigabe nicht möglich: "+((e&&e.message)||e))}}}
 async function planFreigeben(j){await kiFresh(j);if(!istPlan(j))throw {message:"Plan ist nicht mehr offen"};
   const S=j.plan.steps,o=jobOrg(j),F=FREE(),st=F&&F.N.find(n=>n.type==="start");if(!F||!st)throw {message:"Systemablauf „Freie Aufgabe“ fehlt"};

@@ -1,5 +1,13 @@
 # Änderungen – Cockpit
 
+## 77 · 17.10.2026 · Ein Fenster je Auftrag (Etappe 3)
+- „Ergebnis“ und „Details“ sind zusammengelegt (`16a-auftrag-fenster.js`, `jobView`); `resultModal` und `jobModal` leiten dorthin weiter, alle Einstiege bleiben gleich.
+- Links steht, was zu tun ist: Freigabe/Rückfrage mit allen Antwort-Optionen und den Ergebnissen direkt darin, Feld „Änderung wünschen“ (geht als „Ändern: …“ an Claude), Plan des KI-Teamleiters mit Agentenwahl je Schritt, „Claude arbeitet“ mit Stand laden/Erneut anstoßen, „Nächster Schritt“ bei manuellen Aufträgen, „Im Eingang“ mit „Jetzt starten“. Danach Rückmeldung, Ergebnisse, Teilaufträge und der formatierte Auftragstext mit Bildern.
+- Rechts: Fortschritt als Schrittliste (Ablaufbild aufklappbar, wird erst beim Aufklappen gezeichnet), Claude-Sitzungen, Verlauf (gekürzt, „alle Einträge“), Datenspur, Verbrauch.
+- Eine Antwort-Option „Abbrechen“ wird nicht mehr als Antwort an Claude angeboten; abgebrochen wird nur über „Auftrag abbrechen“ im Fuß (vorher je Fenster unterschiedlich).
+- „Auftrag löschen …“ im Menü ⋯ mit eigenem Bestätigungsfenster (was verloren geht, „nicht rückgängig“, „Endgültig löschen“ / „Behalten“).
+- Smoke-Test: 119 Prüfungen.
+
 ## 76 · 17.10.2026 · „Neuer Auftrag“ neu aufgebaut, Sammeln im selben Fenster, „Claude direkt“ (Etappe 2)
 - „Neuer Auftrag“ in zwei Spalten: links Kurzbezeichnung, großes Auftragsfeld mit Formatierungsleiste (fett, kursiv, Zwischenüberschrift, Aufzählung, Nummerierung, Link) und Bildablage; rechts „Wer erledigt den Auftrag?“ als Liste (Claude direkt · Abteilung · Bestimmter Agent · Prozess) mit dem jeweils passenden Feld (Team, Agent, Skill, Prozess, „Von Claude ausführen lassen“), „Wie gründlich?“ als Umschalter und „Freigabe“. Organisation und Projekt im Kopf, Zusammenfassung im Fuß.
 - Formatierter Auftragstext wird als einfaches Markdown im bisherigen Feld gespeichert (`17b-text-format.js`); alter Klartext bleibt gültig, eingefügter Text aus Word/Mail wird bereinigt, Claude bekommt den Text unverändert. Auftragskarten zeigen einen Klartext-Auszug.
