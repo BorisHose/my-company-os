@@ -96,7 +96,7 @@ function flows(){
   fedit();
 }
 function fedit(){
-  const f=FL[fcur];if(!f||f.p!==FF||f.frei){$("#fedit").innerHTML='<p class="hint">Kein Ablauf ausgewählt.</p>';return}
+  const f=FL[fcur];if(!f||f.p!==FF||f.frei){$("#fedit").innerHTML='<p class="hint">Kein Prozess ausgewählt.</p>';return}
   const fe=isEd("flow",f.id);if(!fe)SEL=null;$("#fedit").classList.toggle("editing",fe);
   $("#fedit").innerHTML=`<div class="fhead"><input type="text" id="fn" value="${esc(f.n)}" class="fname" ${fe?"":"disabled"}>${edBtns(fe,'id="fedbtn"')}${f.vorschlag?'<span class="mark">Vorschlag von Claude</span><button class="btn sm" id="takeF">Übernehmen</button>':''}</div>
    <div class="pal">${fe?"":'<span class="hint" style="margin:0">Nur lesen – zum Ändern „✎ Bearbeiten“.</span>'}<span class="hint ${fe?"":"hide"}" style="margin:0">Hinzufügen:</span>${fe?Object.entries(NS).map(([k,v])=>`<button class="btn" data-add="${k}"><span class="pi ${k}"></span>${v.l}</button>`).join(""):""}
@@ -107,7 +107,7 @@ function fedit(){
   drawGraph($("#cvw"),f);const w=$("#cvw");if(!ZM)ZM=Math.max(.75,fitZ(w,+w.dataset.w,+w.dataset.h));redraw(f);props(f);
   document.querySelectorAll("[data-z]").forEach(b=>b.onclick=()=>{const v=b.dataset.z;ZM=v==="fit"?fitZ(w,+w.dataset.w,+w.dataset.h):Math.max(.3,Math.min(1.6,Z()+(v==="+"?.1:-.1)));redraw(f)});
   $("#fn").oninput=e=>{f.n=e.target.value;const b=document.querySelector(`[data-fi="${fcur}"] b`);if(b)b.textContent=f.n};
-  const fb=$("#fedbtn");if(fb)fb.onclick=()=>{if(startEdit("flow",f.id,null,["flows/"+f.id]))fedit()};bindEd($("#fedit"),()=>flows());const tf=$("#takeF");if(tf)tf.onclick=()=>{f.vorschlag=false;fedit();schedule();toast("Ablauf übernommen")};
+  const fb=$("#fedbtn");if(fb)fb.onclick=()=>{if(startEdit("flow",f.id,null,["flows/"+f.id]))fedit()};bindEd($("#fedit"),()=>flows());const tf=$("#takeF");if(tf)tf.onclick=()=>{f.vorschlag=false;fedit();schedule();toast("Prozess übernommen")};
   document.querySelectorAll("[data-add]").forEach(b=>b.onclick=()=>{const t=b.dataset.add,w=$("#cvw");
     const n={id:nid(),type:t,x:Math.round((w.scrollLeft/Z()+60)/10)*10,y:Math.round((w.scrollTop/Z()+40)/10)*10,label:t==="dec"||t==="human"?"":t==="start"?"Start":t==="end"?"Ergebnis an dich":undefined};
     if(t==="task"){n.a=AG.find(a=>a.p===f.p)||AG[0];n.t="";n.o="";n.ho=[1,1,1,1]}
@@ -148,7 +148,7 @@ function props(f){props0(f);if(!isEd("flow",f.id)){const P=$("#props");P.innerHT
 function props0(f){
   const P=$("#props");
   if(!SEL){ // Ablauf-Einstellungen
-    P.innerHTML=`<h2>Ablauf-Einstellungen</h2>
+    P.innerHTML=`<h2>Prozess-Einstellungen</h2>
      <div class="field"><label>Bereich</label><select id="fp">${PK.map(([p,l])=>`<option value="${p}" ${f.p===p?'selected':''}>${l}</option>`).join("")}</select></div>
      <div class="field"><label>Start</label><select id="frec">${["manuell","täglich","wöchentlich","bei neuer Mail (später)"].map(r=>`<option ${f.rec===r?'selected':''}>${r}</option>`).join("")}</select></div>
      <div class="field"><label>Ziel – was ist am Ende erledigt?</label><textarea id="fg">${esc(f.goal)}</textarea></div>
@@ -158,18 +158,18 @@ function props0(f){
       <table class="nt"><thead><tr><th></th>${CH.map(c=>`<th title="${c}">${c.split(" ")[0]}</th>`).join("")}</tr></thead><tbody>
       ${EV.map(([k,l])=>`<tr><td>${l}</td>${CH.map((c,ci)=>`<td><input type="checkbox" data-ev="${k}" data-ch="${ci}" ${f.nt.ev[k][ci]?'checked':''}></td>`).join("")}</tr>`).join("")}</tbody></table>
       <div class="hint">📱 Handy · 💻 Cowork-App · ✉️ E-Mail</div></div>
-     <button class="btn d" id="delF">Ablauf löschen</button>
+     <button class="btn d" id="delF">Prozess löschen</button>
      <p class="hint">Tipp: Knoten oder Verbindung antippen, um sie zu bearbeiten.</p>`;
     $("#fp").onchange=e=>{f.p=e.target.value;FF=f.p;flows()};$("#frec").onchange=e=>f.rec=e.target.value;
     $("#fg").oninput=e=>f.goal=e.target.value;$("#fs").oninput=e=>f.start=e.target.value;$("#fmix").onchange=e=>f.nt.mix=e.target.checked?1:0;
     P.querySelectorAll("[data-ev]").forEach(e=>e.onchange=()=>f.nt.ev[e.dataset.ev][+e.dataset.ch]=e.checked?1:0);
-    $("#delF").onclick=async()=>{if(await askOk("Ablauf „"+f.n+"“ löschen?")){FL.splice(fcur,1);fcur=FL.findIndex(x=>x.p===FF&&!x.frei);flows()}};
+    $("#delF").onclick=async()=>{if(await askOk("Prozess „"+f.n+"“ löschen?")){FL.splice(fcur,1);fcur=FL.findIndex(x=>x.p===FF&&!x.frei);flows()}};
     return}
   if(SEL.k==="e"){const e=f.E[SEL.i];if(!e){SEL=null;return props(f)}const a=nodeOf(f,e.f),b=nodeOf(f,e.t);
     P.innerHTML=`<h2>Verbindung</h2><p class="hint" style="margin-top:0">${esc(nlabel(a))}<br>→ ${esc(nlabel(b))}</p>
      <div class="field"><label>Beschriftung ${a.type==="dec"||a.type==="human"?"(Antwort auf die Frage)":"(optional)"}</label><input type="text" id="el" value="${esc(e.l||"")}"></div>
      <label class="cb"><input type="checkbox" id="eb" ${e.back?'checked':''}> Rücksprung (zurück zu einem früheren Schritt)</label>
-     ${e.back?`<div class="field"><label>Höchstens so viele Runden, danach fragt der Ablauf dich</label><input type="text" id="em" value="${e.max||3}"></div>`:""}
+     ${e.back?`<div class="field"><label>Höchstens so viele Runden, danach fragt der Prozess dich</label><input type="text" id="em" value="${e.max||3}"></div>`:""}
      <button class="btn d" id="edel">Verbindung löschen</button>`;
     $("#el").oninput=ev=>{e.l=ev.target.value;redraw(f)};
     $("#eb").onchange=ev=>{e.back=ev.target.checked?1:0;if(e.back&&!e.max)e.max=3;redraw(f);props(f)};
@@ -188,7 +188,7 @@ function props0(f){
     <div class="field"><label>Woran erkennt der Agent die Antwort? (Kriterien)</label><textarea id="nc" placeholder="z. B. gleicher Bereich und gleiche Funktion in einem offenen Ticket">${esc(n.c||"")}</textarea></div>
     <div class="hint">Ist sich der Agent nicht sicher, kommt die Frage als Rückfrage zu dir.</div>`;
   if(n.type==="human")body=`<div class="field"><label>Frage an dich</label><textarea id="nl">${esc(n.label||"")}</textarea></div>
-    <div class="hint">Du bekommst sie laut Ablauf-Einstellungen aufs Handy und in die Cowork-App – die Ausgänge erscheinen dort als Antwortknöpfe.</div>`;
+    <div class="hint">Du bekommst sie laut Prozess-Einstellungen aufs Handy und in die Cowork-App – die Ausgänge erscheinen dort als Antwortknöpfe.</div>`;
   if(n.type==="start"||n.type==="end")body=`<div class="field"><label>Beschriftung</label><input type="text" id="nl" value="${esc(n.label||"")}"></div>`;
   P.innerHTML=`<h2>${NS[n.type].l}</h2>${body}${outHTML}<button class="btn d" id="ndel">Knoten löschen</button>`;
   const na=$("#na");if(na)na.onchange=e=>{if(e.target.value==="free"){n.a=null;n.aid=null;n.free=1;delete n.sk}else{n.a=AG[+e.target.value];delete n.free;if(n.sk&&!skOk(n))delete n.sk}redraw(f);props(f)};

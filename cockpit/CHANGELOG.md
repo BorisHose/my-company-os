@@ -1,5 +1,12 @@
 # Änderungen – Cockpit
 
+## 57 · 17.10.2026 · Kopfzeile aufgeräumt (Freigabe Boris)
+- Leiste: Organigramm · Aufträge · Prozesse · Agenten ▾; „Agenten ▾“ öffnet eine Unterleiste mit Agenten · Skills · Matrix, der zuletzt gewählte Reiter wird gemerkt. Platz für „Projekte“ kommt mit 4b.
+- Begriffe: „KI-Aufträge“ → „Aufträge“, „+ KI-Auftrag“ → „+ Auftrag“, „Neuer KI-Auftrag“ → „Neuer Auftrag“; „Abläufe“/„Ablauf“ → „Prozesse“/„Prozess“ in Leiste, Designer und Auftragsfenster (Texte für Claude bleiben unverändert).
+- Handy: Leiste waagerecht wischbar, Avatar und ⚙ bleiben sichtbar.
+- Behoben: Farbschema und „Angemeldet als“ wurden in v56 nicht dauerhaft im Browser gespeichert.
+- Smoke-Test: 72 Prüfungen.
+
 ## 56 · 17.10.2026 · Etappe 4a „Einstellungen“ (Freigabe Boris)
 - Kopfzeile: Datum und Uhrzeit, Avatar des angemeldeten Benutzers, Zahnrad ⚙ für die Einstellungen; „Benutzer“ ist aus der Leiste in die Einstellungen gewandert.
 - Einstellungen: Darstellung (Hell · Dunkel · Automatisch; angemeldeter Benutzer je Browser), Instanz (Name, Inhaber, Version), Organigramme (Name, Kurzname, Produkt, Geschäftsführung, Logo), Benutzer, Ausführung (Kennungen der geplanten Aufgaben), Anbindungen (Bodo-Mandanten; vier Dienste in Vorbereitung).

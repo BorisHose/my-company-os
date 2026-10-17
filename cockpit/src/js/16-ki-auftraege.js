@@ -28,7 +28,7 @@ function resultModal(j){KINEW.delete(j.id);const [cls,lab]=okTxt(j),E=j.erg||[],
    ${j.sum?`<div class="kisum"><b>Rückmeldung von Claude:</b> ${esc(j.sum)}</div>`:isEnd(j)||W?"":`<div class="hint">Claude arbeitet noch – die Ansicht aktualisiert sich von selbst.</div>`}
    ${E.length?`<div class="flabel">Ergebnisse (${E.length})</div>${E.map(e=>`<div class="ergit"><div class="ergh"><b>${esc(e.t||"Ergebnis")}</b>${e.art?`<span class="hint" style="margin:0">${esc(e.art)}</span>`:""}<span style="flex:1"></span>${e.url?`<a class="btn sm p" href="${esc(e.url)}" target="_blank" rel="noopener">Öffnen ↗</a>`:""}</div>${e.vorschau?`<div class="ergv">${esc(e.vorschau)}</div>`:""}${e.url?`<div class="hint" style="margin:4px 0 0;word-break:break-all">${esc(e.url)}</div>`:""}</div>`).join("")}`:istPlan(j)||Array.isArray(j.teile)?"":'<div class="hint">Noch keine Ergebnisse eingetragen.</div>'}
    ${(j.sess||[]).length?`<div class="flabel" style="margin-top:10px">Claude-Sitzungen</div><div class="sessl">${j.sess.map((s,i)=>`<a href="${esc(s.url)}" target="_blank" rel="noopener">🔗 Sitzung ${i+1}${s.at?" · "+esc(new Date(s.at).toLocaleString("de-DE",{dateStyle:"short",timeStyle:"short"})):""}</a>`).join("")}</div>`:""}
-   <div class="btns" style="justify-content:flex-end;margin-top:12px"><button class="btn" id="rlog" title="Verlauf, Ablaufgrafik, Sitzungen und weitere Aktionen">Details …</button><button class="btn p" id="rclose">Schließen</button></div>`,true);
+   <div class="btns" style="justify-content:flex-end;margin-top:12px"><button class="btn" id="rlog" title="Verlauf, Prozessgrafik, Sitzungen und weitere Aktionen">Details …</button><button class="btn p" id="rclose">Schließen</button></div>`,true);
   anhBind(j);$("#mclose").onclick=$("#rclose").onclick=()=>{close();jobs()};$("#rlog").onclick=()=>{close();jobModalK(j)};
   document.querySelectorAll("[data-plk]").forEach(e=>e.onclick=()=>{const k=AU.find(x=>x.id===e.dataset.plk);if(k){close();resultModal(k)}});
   if(W&&istPlan(j))planBind(j,close);
@@ -212,11 +212,13 @@ $("#newF").onclick=()=>{if(blocked())return;const a=AG.find(x=>x.p===FF)||AG[0];
   const f=FL[FL.length-1],t={id:nid(),type:"task",x:110,y:108,a,t:"",o:"",ho:[1,1,1,1]},e={id:nid(),type:"end",x:340,y:120,label:"Ergebnis an dich"};
   f.N.push(t,e);f.E.push({f:f.N[0].id,t:t.id,l:""},{f:t.id,t:e.id,l:""});fcur=FL.length-1;startEdit("flow",f.id,null,["flows/"+f.id],true);SEL=null;flows();$("#fn").focus();$("#fn").select()};
 
-function show(v){if(EDIT&&!$("#"+v).classList.contains("hide"))return;if(blocked())return;document.querySelectorAll("nav button").forEach(x=>x.classList.toggle("on",x.dataset.v===v));
+const AGRP=["build","skills","matrix"];
+function show(v){if(v==="agrp")v=AGRP.includes(UI.agv)?UI.agv:"build";if(EDIT&&!$("#"+v).classList.contains("hide"))return;if(blocked())return;document.querySelectorAll("nav button").forEach(x=>x.classList.toggle("on",x.dataset.v===v||(x.dataset.v==="agrp"&&AGRP.includes(v))));
+  {const sn=$("#subnav");if(sn){sn.hidden=!AGRP.includes(v);sn.querySelectorAll("[data-sv]").forEach(b=>b.classList.toggle("on",b.dataset.sv===v))}if(AGRP.includes(v)&&UI.agv!==v){UI.agv=v;saveUI()}}
   ["build","matrix","flows","jobs","users","org","skills","settings"].forEach(id=>$("#"+id).classList.toggle("hide",id!==v));{const g=$("#gear");if(g)g.classList.toggle("on",v==="settings"||v==="users")}if(v==="settings")einst();
   if(v==="skills")lib();
   if(v==="org")org();
   if(v==="users"){if(ucur<0&&US.length)ucur=0;users()}
   if(v==="build"||v==="matrix")render()
   if(v==="flows")flows();if(v==="jobs"){jobs();if(AU.some(j=>j.ki))kiReload(true).then(kiCheckRuns);kiPoll()}}
-document.querySelectorAll("nav button").forEach(b=>b.onclick=()=>show(b.dataset.v));
+document.querySelectorAll("nav button").forEach(b=>b.onclick=()=>show(b.dataset.v));document.querySelectorAll("#subnav [data-sv]").forEach(b=>b.onclick=()=>show(b.dataset.sv));

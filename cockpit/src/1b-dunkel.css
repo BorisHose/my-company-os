@@ -413,6 +413,9 @@
 :root[data-theme=dark] .setn.on{background:var(--navy);color:#fff}
 :root[data-theme=dark] .setorg{border:1px solid var(--line);border-radius:10px}
 :root[data-theme=dark] .sologo{border:1px dashed var(--line);border-radius:8px}
+:root[data-theme=dark] .subnav button{background:none;border:0;border-bottom:2px solid transparent;color:#ffffffcc}
+:root[data-theme=dark] .subnav button:hover{color:#fff}
+:root[data-theme=dark] .subnav button.on{color:#fff;border-bottom-color:#2b3442}
 :root[data-theme=dark] nav button.on{background:#2f6fdf;color:#fff}:root[data-theme=dark] body{background:var(--bg);color:var(--ink)}:root[data-theme=dark] input,:root[data-theme=dark] select,:root[data-theme=dark] textarea{background:#131a24;color:var(--ink);border-color:#3a4456}:root[data-theme=dark] .modal{background:#000000a6}:root[data-theme=dark] img.olg,:root[data-theme=dark] .av img{filter:none}
 @media (prefers-color-scheme:dark){:root[data-theme=auto]{color-scheme:dark;--bg:#0f141b;--panel:#171e29;--ink:#e4e8ef;--mut:#9aa4b4;--line:#2b3442;--acc:#5b8def;--accbg:#1c2b47;--warn:#f79009;--warnbg:#3a2615;--ok:#47cd89;--okbg:#12301f;--vio:#9b8afb;--viobg:#28213d;--teal:#36bffa;--tealbg:#11303a;--bodobg:#1d2939;--sellbg:#11303c}
 :root[data-theme=auto] body{background:var(--bg);color:var(--ink)}
@@ -828,4 +831,7 @@
 :root[data-theme=auto] .setn.on{background:var(--navy);color:#fff}
 :root[data-theme=auto] .setorg{border:1px solid var(--line);border-radius:10px}
 :root[data-theme=auto] .sologo{border:1px dashed var(--line);border-radius:8px}
+:root[data-theme=auto] .subnav button{background:none;border:0;border-bottom:2px solid transparent;color:#ffffffcc}
+:root[data-theme=auto] .subnav button:hover{color:#fff}
+:root[data-theme=auto] .subnav button.on{color:#fff;border-bottom-color:#2b3442}
 :root[data-theme=auto] nav button.on{background:#2f6fdf;color:#fff}:root[data-theme=auto] body{background:var(--bg);color:var(--ink)}:root[data-theme=auto] input,:root[data-theme=auto] select,:root[data-theme=auto] textarea{background:#131a24;color:var(--ink);border-color:#3a4456}:root[data-theme=auto] .modal{background:#000000a6}:root[data-theme=auto] img.olg,:root[data-theme=auto] .av img{filter:none}}

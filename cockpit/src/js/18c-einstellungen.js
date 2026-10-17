@@ -39,7 +39,7 @@ function einst(sec){if(sec)UI.sets=sec;if(!SETSEC.some(s=>s[0]===UI.sets))UI.set
     document.querySelectorAll("[data-sol]").forEach(i=>i.onchange=async()=>{const f=i.files&&i.files[0];if(!f)return;try{const u=await logoKlein(f);if(u.length>150000)return toast("Logo ist zu groß – bitte ein kleineres Bild wählen");O(i.dataset.sol).logo=u;schedule();einst()}catch(e){toast("Bild konnte nicht gelesen werden")}});
     document.querySelectorAll("[data-solx]").forEach(b=>b.onclick=()=>{delete O(b.dataset.solx).logo;schedule();einst()})}
   else if(S==="ausf"){const T=SET.trig||{};
-    C.innerHTML=`<h2>Ausführung</h2><div class="hint" style="margin:0 0 10px">KI-Aufträge laufen als Claude-Sitzungen über zwei geplante Aufgaben im Claude-Konto dieser Instanz.</div>
+    C.innerHTML=`<h2>Ausführung</h2><div class="hint" style="margin:0 0 10px">Aufträge laufen als Claude-Sitzungen über zwei geplante Aufgaben im Claude-Konto dieser Instanz.</div>
      ${Object.entries(RUNNERS).map(([k,R])=>`<div class="field"><label>${esc(R.l)} – Kennung der geplanten Aufgabe</label><input type="text" data-trg="${k}" value="${esc(T[k]||R.tid)}" placeholder="trig_…"></div>`).join("")}
      <div class="btns"><button class="btn sm" id="sruns">Letzten Lauf prüfen</button></div>`;
     document.querySelectorAll("[data-trg]").forEach(i=>i.onchange=()=>{const v=i.value.trim();SET.trig={...(SET.trig||{})};if(/^trig_\w+$/.test(v))SET.trig[i.dataset.trg]=v;else{delete SET.trig[i.dataset.trg];toast("Ungültige Kennung – Standard bleibt")}});

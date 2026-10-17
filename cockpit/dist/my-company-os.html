@@ -363,6 +363,10 @@ fieldset:disabled .ic,fieldset:disabled .ownadd,fieldset:disabled [data-r],field
 .setorg{display:flex;gap:14px;border:1px solid var(--line);border-radius:10px;padding:12px;margin-bottom:10px;align-items:flex-start}.sologo{width:120px;min-height:56px;flex:none;display:grid;place-items:center;border:1px dashed var(--line);border-radius:8px;padding:6px}.sologo img{max-width:108px;max-height:48px}.sof{flex:1;min-width:0}
 img.olg{height:18px;max-width:60px;object-fit:contain;margin-right:6px;vertical-align:-4px}img.olgb{height:40px;max-width:120px;object-fit:contain;margin-right:4px}
 @media(max-width:860px){#clock{display:none}.setorg{flex-direction:column}}
+/* v57: Kopfzeile aufgeräumt – Gruppe „Agenten“ mit Unterleiste */
+.subnav{flex-basis:100%;display:flex;gap:4px;justify-content:flex-end;margin-top:-4px}.subnav[hidden]{display:none}
+.subnav button{background:none;border:0;border-bottom:2px solid transparent;color:#ffffffcc;padding:4px 10px;font:inherit;font-size:13px;cursor:pointer}.subnav button:hover{color:#fff}.subnav button.on{color:#fff;border-bottom-color:#fff;font-weight:600}
+@media(max-width:860px){nav{order:3;flex-basis:100%;margin-left:0;overflow-x:auto;flex-wrap:nowrap;scrollbar-width:none;-webkit-overflow-scrolling:touch}nav::-webkit-scrollbar{display:none}nav button{flex:none}.hdr-r{margin-left:auto}.subnav{order:4;justify-content:flex-start;overflow-x:auto}}
 
 /* erzeugt von tools/dunkel.py – nicht von Hand ändern */
 :root[data-theme=dark]{color-scheme:dark;--bg:#0f141b;--panel:#171e29;--ink:#e4e8ef;--mut:#9aa4b4;--line:#2b3442;--acc:#5b8def;--accbg:#1c2b47;--warn:#f79009;--warnbg:#3a2615;--ok:#47cd89;--okbg:#12301f;--vio:#9b8afb;--viobg:#28213d;--teal:#36bffa;--tealbg:#11303a;--bodobg:#1d2939;--sellbg:#11303c}
@@ -779,6 +783,9 @@ img.olg{height:18px;max-width:60px;object-fit:contain;margin-right:6px;vertical-
 :root[data-theme=dark] .setn.on{background:var(--navy);color:#fff}
 :root[data-theme=dark] .setorg{border:1px solid var(--line);border-radius:10px}
 :root[data-theme=dark] .sologo{border:1px dashed var(--line);border-radius:8px}
+:root[data-theme=dark] .subnav button{background:none;border:0;border-bottom:2px solid transparent;color:#ffffffcc}
+:root[data-theme=dark] .subnav button:hover{color:#fff}
+:root[data-theme=dark] .subnav button.on{color:#fff;border-bottom-color:#2b3442}
 :root[data-theme=dark] nav button.on{background:#2f6fdf;color:#fff}:root[data-theme=dark] body{background:var(--bg);color:var(--ink)}:root[data-theme=dark] input,:root[data-theme=dark] select,:root[data-theme=dark] textarea{background:#131a24;color:var(--ink);border-color:#3a4456}:root[data-theme=dark] .modal{background:#000000a6}:root[data-theme=dark] img.olg,:root[data-theme=dark] .av img{filter:none}
 @media (prefers-color-scheme:dark){:root[data-theme=auto]{color-scheme:dark;--bg:#0f141b;--panel:#171e29;--ink:#e4e8ef;--mut:#9aa4b4;--line:#2b3442;--acc:#5b8def;--accbg:#1c2b47;--warn:#f79009;--warnbg:#3a2615;--ok:#47cd89;--okbg:#12301f;--vio:#9b8afb;--viobg:#28213d;--teal:#36bffa;--tealbg:#11303a;--bodobg:#1d2939;--sellbg:#11303c}
 :root[data-theme=auto] body{background:var(--bg);color:var(--ink)}
@@ -1194,12 +1201,16 @@ img.olg{height:18px;max-width:60px;object-fit:contain;margin-right:6px;vertical-
 :root[data-theme=auto] .setn.on{background:var(--navy);color:#fff}
 :root[data-theme=auto] .setorg{border:1px solid var(--line);border-radius:10px}
 :root[data-theme=auto] .sologo{border:1px dashed var(--line);border-radius:8px}
+:root[data-theme=auto] .subnav button{background:none;border:0;border-bottom:2px solid transparent;color:#ffffffcc}
+:root[data-theme=auto] .subnav button:hover{color:#fff}
+:root[data-theme=auto] .subnav button.on{color:#fff;border-bottom-color:#2b3442}
 :root[data-theme=auto] nav button.on{background:#2f6fdf;color:#fff}:root[data-theme=auto] body{background:var(--bg);color:var(--ink)}:root[data-theme=auto] input,:root[data-theme=auto] select,:root[data-theme=auto] textarea{background:#131a24;color:var(--ink);border-color:#3a4456}:root[data-theme=auto] .modal{background:#000000a6}:root[data-theme=auto] img.olg,:root[data-theme=auto] .av img{filter:none}}
 
 </style>
 <header>
   <h1>My Company OS</h1><span class="tag" id="save">Lädt …</span>
-  <button id="kifab" title="Neuer KI-Auftrag – von überall aus"><b>✦</b><small>KI</small><span class="n" style="display:none" title="Aufträge warten auf dich"></span></button><nav><button data-v="org" class="on">Organigramm</button><button data-v="jobs">KI-Aufträge<span class="cnt" id="wcnt"></span></button><button data-v="flows">Abläufe</button><button data-v="matrix">Matrix</button><button data-v="build">Agenten</button><button data-v="skills">Skills</button></nav><div class="hdr-r"><span id="clock"></span><button id="me" class="meav" title="Angemeldet"></button><button id="gear" class="gear" title="Einstellungen" aria-label="Einstellungen">⚙</button></div>
+  <button id="kifab" title="Neuer Auftrag – von überall aus"><b>✦</b><small>KI</small><span class="n" style="display:none" title="Aufträge warten auf dich"></span></button><nav><button data-v="org" class="on">Organigramm</button><button data-v="jobs">Aufträge<span class="cnt" id="wcnt"></span></button><button data-v="flows">Prozesse</button><button data-v="agrp" title="Agenten, Skills und Matrix">Agenten ▾</button></nav><div class="hdr-r"><span id="clock"></span><button id="me" class="meav" title="Angemeldet"></button><button id="gear" class="gear" title="Einstellungen" aria-label="Einstellungen">⚙</button></div>
+  <div id="subnav" class="subnav" hidden><button data-sv="build">Agenten</button><button data-sv="skills">Skills</button><button data-sv="matrix">Matrix</button></div>
 </header>
 
 <main id="build" class="nolib">
@@ -1229,13 +1240,13 @@ img.olg{height:18px;max-width:60px;object-fit:contain;margin-right:6px;vertical-
   <p class="hint">Orange Zähler = Skill wird von keinem Agenten genutzt. Die Matrix zeigt immer alle Skills des gewählten Bereichs.</p></section>
 </main>
 <main id="flows" class="hide" style="grid-template-columns:260px minmax(0,1fr)">
-  <section class="panel"><h2>Abläufe</h2><div class="seg" id="fseg" style="margin-top:0"></div><div id="flist"></div><button class="btn" id="newF" style="width:100%">+ Neuer Ablauf</button>
-  <div class="hint">Ein Ablauf ist eine Vorlage als Prozessdiagramm: Agenten-Schritte, Entscheidungen (durch Agent oder dich) und Rücksprünge.</div></section>
+  <section class="panel"><h2>Prozesse</h2><div class="seg" id="fseg" style="margin-top:0"></div><div id="flist"></div><button class="btn" id="newF" style="width:100%">+ Neuer Prozess</button>
+  <div class="hint">Ein Prozess ist eine Vorlage als Diagramm: Agenten-Schritte, Entscheidungen (durch Agent oder dich) und Rücksprünge.</div></section>
   <section class="panel" id="fedit"></section>
 </main>
 <main id="jobs" class="hide" style="grid-template-columns:1fr">
-  <section class="panel"><h2 style="justify-content:space-between"><span>KI-Aufträge <span id="exjobs"></span></span><button class="btn p" id="newJ" style="text-transform:none;letter-spacing:0">+ KI-Auftrag</button></h2><div class="kirun" id="kirun"></div><div class="kfilt" id="kfilt"></div><div class="kb" id="kb"></div>
-  <div class="hint" style="margin-top:8px">Auftrag antippen = Ergebnis mit Rückfrage/Freigabe; „Details …“ zeigt Verlauf, Ablauf und Sitzungen. Neue Aufträge legst du oben mit „+ KI-Auftrag“ an.</div></section>
+  <section class="panel"><h2 style="justify-content:space-between"><span>Aufträge <span id="exjobs"></span></span><button class="btn p" id="newJ" style="text-transform:none;letter-spacing:0">+ Auftrag</button></h2><div class="kirun" id="kirun"></div><div class="kfilt" id="kfilt"></div><div class="kb" id="kb"></div>
+  <div class="hint" style="margin-top:8px">Auftrag antippen = Ergebnis mit Rückfrage/Freigabe; „Details …“ zeigt Verlauf, Prozess und Sitzungen. Neue Aufträge legst du oben mit „+ Auftrag“ an.</div></section>
 </main>
 <main id="org" class="hide" style="grid-template-columns:1fr">
   <section class="panel"><h2 style="justify-content:space-between">Organigramm <span id="orged"></span></h2>
@@ -1256,7 +1267,7 @@ const COL=new Set();
 let PF="bodo",AF="bodo",GEN=false;
 const PK=[["bodo","Bodo"],["sellify","sellify"],["all","Andere"]];
 const PN={bodo:"Bodo",sellify:"sellify",all:"Andere",multi:"Bodo + sellify"};
-const VER="56";
+const VER="57";
 // Produktbereiche: fest im Programm hinterlegt (Entscheidung Boris 09.10.2026), keine Konfiguration in der Datenbank
 const PT={bodo:"Produktbereich Bodo (Bodo Solutions, Mitgliederverwaltung) – alles, was für Bodo-Kunden und das Bodo-System gebraucht wird. Fest im Programm hinterlegt.",sellify:"Produktbereich sellify (business//acts, CRM-Plattform) – alles, was für sellify-Kunden und das sellify-System gebraucht wird. Fest im Programm hinterlegt.",all:"Andere = produktunabhängig, z. B. Web-QA, E-Mail, Word/PDF. Fest im Programm hinterlegt."};
 let AFIL="all";
@@ -1321,7 +1332,7 @@ function bindEd(root,after){(root||document).querySelectorAll("[data-esave]").fo
 // ===== Oberflächen-Zustand (nur in diesem Browser) =====
 const UI=(()=>{try{return JSON.parse(localStorage.getItem("cos-ui")||"{}")}catch(e){return {}}})();
 const EOPEN=new Set(UI.eopen||["basis","skills"]);let LIBON=UI.lib!==false;
-function saveUI(){try{localStorage.setItem("cos-ui",JSON.stringify({eopen:[...EOPEN],lib:LIBON,agw:UI.agw,libw:UI.libw,kidone:UI.kidone,kiold:UI.kiold,pw:UI.pw,av:UI.av}))}catch(e){}}
+function saveUI(){try{localStorage.setItem("cos-ui",JSON.stringify({eopen:[...EOPEN],lib:LIBON,agw:UI.agw,libw:UI.libw,kidone:UI.kidone,kiold:UI.kiold,pw:UI.pw,av:UI.av,theme:UI.theme,me:UI.me,sets:UI.sets,agv:UI.agv}))}catch(e){}}
 function setLib(on){on=false;LIBON=on;$("#build").classList.toggle("nolib",!on);const b=$("#libtg");if(b)b.textContent=on?"Bibliothek ausblenden ▸":"◂ Bibliothek einblenden";saveUI()}
 // ===== Benutzer (Menschen) =====
 let US=[],ucur=-1,UOLD=false;
@@ -2076,7 +2087,7 @@ function flows(){
   fedit();
 }
 function fedit(){
-  const f=FL[fcur];if(!f||f.p!==FF||f.frei){$("#fedit").innerHTML='<p class="hint">Kein Ablauf ausgewählt.</p>';return}
+  const f=FL[fcur];if(!f||f.p!==FF||f.frei){$("#fedit").innerHTML='<p class="hint">Kein Prozess ausgewählt.</p>';return}
   const fe=isEd("flow",f.id);if(!fe)SEL=null;$("#fedit").classList.toggle("editing",fe);
   $("#fedit").innerHTML=`<div class="fhead"><input type="text" id="fn" value="${esc(f.n)}" class="fname" ${fe?"":"disabled"}>${edBtns(fe,'id="fedbtn"')}${f.vorschlag?'<span class="mark">Vorschlag von Claude</span><button class="btn sm" id="takeF">Übernehmen</button>':''}</div>
    <div class="pal">${fe?"":'<span class="hint" style="margin:0">Nur lesen – zum Ändern „✎ Bearbeiten“.</span>'}<span class="hint ${fe?"":"hide"}" style="margin:0">Hinzufügen:</span>${fe?Object.entries(NS).map(([k,v])=>`<button class="btn" data-add="${k}"><span class="pi ${k}"></span>${v.l}</button>`).join(""):""}
@@ -2087,7 +2098,7 @@ function fedit(){
   drawGraph($("#cvw"),f);const w=$("#cvw");if(!ZM)ZM=Math.max(.75,fitZ(w,+w.dataset.w,+w.dataset.h));redraw(f);props(f);
   document.querySelectorAll("[data-z]").forEach(b=>b.onclick=()=>{const v=b.dataset.z;ZM=v==="fit"?fitZ(w,+w.dataset.w,+w.dataset.h):Math.max(.3,Math.min(1.6,Z()+(v==="+"?.1:-.1)));redraw(f)});
   $("#fn").oninput=e=>{f.n=e.target.value;const b=document.querySelector(`[data-fi="${fcur}"] b`);if(b)b.textContent=f.n};
-  const fb=$("#fedbtn");if(fb)fb.onclick=()=>{if(startEdit("flow",f.id,null,["flows/"+f.id]))fedit()};bindEd($("#fedit"),()=>flows());const tf=$("#takeF");if(tf)tf.onclick=()=>{f.vorschlag=false;fedit();schedule();toast("Ablauf übernommen")};
+  const fb=$("#fedbtn");if(fb)fb.onclick=()=>{if(startEdit("flow",f.id,null,["flows/"+f.id]))fedit()};bindEd($("#fedit"),()=>flows());const tf=$("#takeF");if(tf)tf.onclick=()=>{f.vorschlag=false;fedit();schedule();toast("Prozess übernommen")};
   document.querySelectorAll("[data-add]").forEach(b=>b.onclick=()=>{const t=b.dataset.add,w=$("#cvw");
     const n={id:nid(),type:t,x:Math.round((w.scrollLeft/Z()+60)/10)*10,y:Math.round((w.scrollTop/Z()+40)/10)*10,label:t==="dec"||t==="human"?"":t==="start"?"Start":t==="end"?"Ergebnis an dich":undefined};
     if(t==="task"){n.a=AG.find(a=>a.p===f.p)||AG[0];n.t="";n.o="";n.ho=[1,1,1,1]}
@@ -2128,7 +2139,7 @@ function props(f){props0(f);if(!isEd("flow",f.id)){const P=$("#props");P.innerHT
 function props0(f){
   const P=$("#props");
   if(!SEL){ // Ablauf-Einstellungen
-    P.innerHTML=`<h2>Ablauf-Einstellungen</h2>
+    P.innerHTML=`<h2>Prozess-Einstellungen</h2>
      <div class="field"><label>Bereich</label><select id="fp">${PK.map(([p,l])=>`<option value="${p}" ${f.p===p?'selected':''}>${l}</option>`).join("")}</select></div>
      <div class="field"><label>Start</label><select id="frec">${["manuell","täglich","wöchentlich","bei neuer Mail (später)"].map(r=>`<option ${f.rec===r?'selected':''}>${r}</option>`).join("")}</select></div>
      <div class="field"><label>Ziel – was ist am Ende erledigt?</label><textarea id="fg">${esc(f.goal)}</textarea></div>
@@ -2138,18 +2149,18 @@ function props0(f){
       <table class="nt"><thead><tr><th></th>${CH.map(c=>`<th title="${c}">${c.split(" ")[0]}</th>`).join("")}</tr></thead><tbody>
       ${EV.map(([k,l])=>`<tr><td>${l}</td>${CH.map((c,ci)=>`<td><input type="checkbox" data-ev="${k}" data-ch="${ci}" ${f.nt.ev[k][ci]?'checked':''}></td>`).join("")}</tr>`).join("")}</tbody></table>
       <div class="hint">📱 Handy · 💻 Cowork-App · ✉️ E-Mail</div></div>
-     <button class="btn d" id="delF">Ablauf löschen</button>
+     <button class="btn d" id="delF">Prozess löschen</button>
      <p class="hint">Tipp: Knoten oder Verbindung antippen, um sie zu bearbeiten.</p>`;
     $("#fp").onchange=e=>{f.p=e.target.value;FF=f.p;flows()};$("#frec").onchange=e=>f.rec=e.target.value;
     $("#fg").oninput=e=>f.goal=e.target.value;$("#fs").oninput=e=>f.start=e.target.value;$("#fmix").onchange=e=>f.nt.mix=e.target.checked?1:0;
     P.querySelectorAll("[data-ev]").forEach(e=>e.onchange=()=>f.nt.ev[e.dataset.ev][+e.dataset.ch]=e.checked?1:0);
-    $("#delF").onclick=async()=>{if(await askOk("Ablauf „"+f.n+"“ löschen?")){FL.splice(fcur,1);fcur=FL.findIndex(x=>x.p===FF&&!x.frei);flows()}};
+    $("#delF").onclick=async()=>{if(await askOk("Prozess „"+f.n+"“ löschen?")){FL.splice(fcur,1);fcur=FL.findIndex(x=>x.p===FF&&!x.frei);flows()}};
     return}
   if(SEL.k==="e"){const e=f.E[SEL.i];if(!e){SEL=null;return props(f)}const a=nodeOf(f,e.f),b=nodeOf(f,e.t);
     P.innerHTML=`<h2>Verbindung</h2><p class="hint" style="margin-top:0">${esc(nlabel(a))}<br>→ ${esc(nlabel(b))}</p>
      <div class="field"><label>Beschriftung ${a.type==="dec"||a.type==="human"?"(Antwort auf die Frage)":"(optional)"}</label><input type="text" id="el" value="${esc(e.l||"")}"></div>
      <label class="cb"><input type="checkbox" id="eb" ${e.back?'checked':''}> Rücksprung (zurück zu einem früheren Schritt)</label>
-     ${e.back?`<div class="field"><label>Höchstens so viele Runden, danach fragt der Ablauf dich</label><input type="text" id="em" value="${e.max||3}"></div>`:""}
+     ${e.back?`<div class="field"><label>Höchstens so viele Runden, danach fragt der Prozess dich</label><input type="text" id="em" value="${e.max||3}"></div>`:""}
      <button class="btn d" id="edel">Verbindung löschen</button>`;
     $("#el").oninput=ev=>{e.l=ev.target.value;redraw(f)};
     $("#eb").onchange=ev=>{e.back=ev.target.checked?1:0;if(e.back&&!e.max)e.max=3;redraw(f);props(f)};
@@ -2168,7 +2179,7 @@ function props0(f){
     <div class="field"><label>Woran erkennt der Agent die Antwort? (Kriterien)</label><textarea id="nc" placeholder="z. B. gleicher Bereich und gleiche Funktion in einem offenen Ticket">${esc(n.c||"")}</textarea></div>
     <div class="hint">Ist sich der Agent nicht sicher, kommt die Frage als Rückfrage zu dir.</div>`;
   if(n.type==="human")body=`<div class="field"><label>Frage an dich</label><textarea id="nl">${esc(n.label||"")}</textarea></div>
-    <div class="hint">Du bekommst sie laut Ablauf-Einstellungen aufs Handy und in die Cowork-App – die Ausgänge erscheinen dort als Antwortknöpfe.</div>`;
+    <div class="hint">Du bekommst sie laut Prozess-Einstellungen aufs Handy und in die Cowork-App – die Ausgänge erscheinen dort als Antwortknöpfe.</div>`;
   if(n.type==="start"||n.type==="end")body=`<div class="field"><label>Beschriftung</label><input type="text" id="nl" value="${esc(n.label||"")}"></div>`;
   P.innerHTML=`<h2>${NS[n.type].l}</h2>${body}${outHTML}<button class="btn d" id="ndel">Knoten löschen</button>`;
   const na=$("#na");if(na)na.onchange=e=>{if(e.target.value==="free"){n.a=null;n.aid=null;n.free=1;delete n.sk}else{n.a=AG[+e.target.value];delete n.free;if(n.sk&&!skOk(n))delete n.sk}redraw(f);props(f)};
@@ -2217,17 +2228,17 @@ function startModal(f,keep){if(!keep)PEND=[];keep=keep||{};const SM=!!keep.sm;if
   const art=keep.art||(f&&!f.frei?"ablauf":"frei"),O=orgById(keep.org||OC)||ORGS()[0];
   const FLO=FL.filter(x=>!x.frei&&(x.p==="all"||!O.prod||x.p===O.prod));
   if(art==="ablauf"){f=f&&!f.frei&&FLO.includes(f)?f:FLO[0];if(!f){f=null}}else f=FREE();
-  if(!f)return toast(art==="ablauf"?"Für diese Organisation gibt es noch keinen Ablauf":"Systemablauf „Freie Aufgabe“ fehlt");
+  if(!f)return toast(art==="ablauf"?"Für diese Organisation gibt es noch keinen Prozess":"Systemablauf „Freie Aufgabe“ fehlt");
   const AGO=AG.filter(a=>inOrg(a,O)),ag=art==="agent"?(AGO.find(a=>a.id===keep.aid)||AGO[0]):null,PR=keep.prio||"n";
   const SKL=art==="agent"?(ag?ag.s.map(id=>sk(id)).filter(Boolean).filter(x=>!["vorschlag","entwurf"].includes(srcOf(x))):[]):skOrg(O);
   const skc=SKL.some(x=>x.id===keep.sk)?keep.sk:"";
   const s=f.N.find(n=>n.type==="start");
   const DPO=deptsOf(O.id),abt=art==="abteilung"||SM?(DPO.find(d=>d.id===keep.abt)||DPO[0]||null):null,TMS=abt?teamOpts(O.id,abt):[],TM=art==="abteilung"&&TMS.some(t=>t.id===keep.team)?keep.team:"",ABA=abt?tlAgents(O.id,abt.id,TM):[];
-  const ART=[["frei","Freie Aufgabe","Eine Aufgabe an Claude – ohne Prozess, optional mit einem bestimmten Skill"],["abteilung","Abteilung beauftragen","Der KI-Teamleiter der Abteilung wählt den passenden Agenten und erledigt die Aufgabe mit ihm"],["agent","Agent beauftragen","Ein Agent übernimmt die Aufgabe mit seinem Ziel, seinen Regeln und Skills – ohne Prozess"],["ablauf","Ablauf starten","Ein Prozess mit festen Schritten, Entscheidungen und Freigaben"]];
-  $("#modal").innerHTML=`<div class="modal"><div class="box"><div class="bhead"><h3>${SM?"📥 Aufgabe sammeln":"Neuer KI-Auftrag"}</h3><button class="ic" id="mclose" style="font-size:18px">✕</button></div>
+  const ART=[["frei","Freie Aufgabe","Eine Aufgabe an Claude – ohne Prozess, optional mit einem bestimmten Skill"],["abteilung","Abteilung beauftragen","Der KI-Teamleiter der Abteilung wählt den passenden Agenten und erledigt die Aufgabe mit ihm"],["agent","Agent beauftragen","Ein Agent übernimmt die Aufgabe mit seinem Ziel, seinen Regeln und Skills – ohne Prozess"],["ablauf","Prozess starten","Ein Prozess mit festen Schritten, Entscheidungen und Freigaben"]];
+  $("#modal").innerHTML=`<div class="modal"><div class="box"><div class="bhead"><h3>${SM?"📥 Aufgabe sammeln":"Neuer Auftrag"}</h3><button class="ic" id="mclose" style="font-size:18px">✕</button></div>
    <div class="field" style="margin-top:10px"><label>Organisation</label><div class="seg" id="jorg" style="margin:0">${ORGS().map(o=>`<button data-o="${o.id}" class="${o===O?'on':''}">${esc(o.kurz||o.n)}</button>`).join("")}</div></div>
    ${SM?"":`<div class="field"><label>Art des Auftrags</label><div class="seg" id="jart" style="margin:0">${ART.map(([k,l,t])=>`<button data-a="${k}" class="${k===art?'on':''}" title="${esc(t)}">${l}</button>`).join("")}</div><div class="hint">${esc(ART.find(x=>x[0]===art)[2])}</div></div>`}
-   ${art==="ablauf"?`<div class="field"><label>Ablauf</label><select id="jf">${PK.map(([p,l])=>{const L=FLO.filter(x=>x.p===p);return L.length?`<optgroup label="${esc(l)}">${L.map(x=>`<option value="${x.id}" ${x===f?'selected':''}>${esc(x.n)}</option>`).join("")}</optgroup>`:""}).join("")}</select>${f.goal?`<div class="hint">${esc(f.goal)}</div>`:""}${s?"":'<div class="warnbox">Dieser Ablauf hat noch keinen Start-Knoten – unter „Abläufe“ ergänzen.</div>'}</div>`:""}
+   ${art==="ablauf"?`<div class="field"><label>Prozess</label><select id="jf">${PK.map(([p,l])=>{const L=FLO.filter(x=>x.p===p);return L.length?`<optgroup label="${esc(l)}">${L.map(x=>`<option value="${x.id}" ${x===f?'selected':''}>${esc(x.n)}</option>`).join("")}</optgroup>`:""}).join("")}</select>${f.goal?`<div class="hint">${esc(f.goal)}</div>`:""}${s?"":'<div class="warnbox">Dieser Prozess hat noch keinen Start-Knoten – unter „Prozesse“ ergänzen.</div>'}</div>`:""}
    ${art==="agent"&&!SM?`<div class="field"><label>Agent</label>${AGO.length?`<select id="jag">${AGO.map(a=>`<option value="${a.id}" ${a===ag?'selected':''}>${esc(a.n)}</option>`).join("")}</select>${ag&&ag.r?`<div class="hint">${esc(ag.r)}</div>`:""}`:'<div class="warnbox">In dieser Organisation ist noch kein Agent platziert.</div>'}</div>`:""}
    ${art==="abteilung"||SM?`<div class="${SM?"row":""}"><div class="field"><label>Abteilung</label>${DPO.length?`<select id="jabt">${DPO.map(d=>`<option value="${d.id}" ${d===abt?'selected':''}>${esc(d.n)}</option>`).join("")}</select>${art==="abteilung"&&TMS.length?`<select id="jteam" style="margin-top:6px" aria-label="Team"><option value="">Ganze Abteilung – KI-Teamleiter der Abteilung</option>${TMS.map(t=>`<option value="${t.id}" ${t.id===TM?"selected":""}>Team ${esc(t.n)} – eigener KI-Teamleiter</option>`).join("")}</select>`:""}${SM?`</div><div class="field"><label>Zuweisung</label><select id="jzu"><option value="">✦ KI-Teamleiter wählt</option>${ABA.map(a=>`<option value="${a.id}" ${art==="agent"&&ag&&ag.id===a.id?"selected":""}>${esc(a.n)}</option>`).join("")}</select>`:""}<div class="hint">✦ Der KI-Teamleiter wählt aus: ${ABA.length?ABA.map(a=>esc(a.n)).join(", "):"– in dieser Abteilung ist noch kein Agent –"}</div>`:'<div class="warnbox">Diese Organisation hat noch keine Abteilungen.</div>'}</div></div>`:""}
    ${SM?`<div class="row"><div class="field"><label>Priorität</label><div class="seg" id="jprio" style="margin:0">${PRIO.map(([k,l])=>`<button data-p="${k}" class="${k===PR?"on":""}">${l}</button>`).join("")}</div></div><div class="field"><label>Fällig bis</label><input type="date" id="jdue" value="${esc(keep.due||"")}"></div></div>`:""}
@@ -2276,7 +2287,7 @@ function startModal(f,keep){if(!keep)PEND=[];keep=keep||{};const SM=!!keep.sm;if
       else if(e.key==="Tab"){if(openState)close()}};
     q.onblur=()=>setTimeout(()=>{if(document.activeElement!==q&&openState)close()},120);
     draw()}}
-  const go=async sofort=>{if(GOBUSY)return;if(!s)return toast("Der Ablauf braucht einen Start-Knoten");if(art==="agent"&&!ag)return toast("Bitte einen Agenten wählen");if((art==="abteilung"||SM)&&!abt)return toast("Bitte eine Abteilung wählen");if(art==="abteilung"&&!ABA.length)return toast("In dieser Abteilung ist noch kein Agent – bitte zuerst einen platzieren");
+  const go=async sofort=>{if(GOBUSY)return;if(!s)return toast("Der Prozess braucht einen Start-Knoten");if(art==="agent"&&!ag)return toast("Bitte einen Agenten wählen");if((art==="abteilung"||SM)&&!abt)return toast("Bitte eine Abteilung wählen");if(art==="abteilung"&&!ABA.length)return toast("In dieser Abteilung ist noch kein Agent – bitte zuerst einen platzieren");
     GOBUSY=true;let n;try{n=await nextJobNo()}finally{GOBUSY=false}const e=f.E.find(e=>e.f===s.id),nx=e&&nodeOf(f,e.t);
     const ki=art!=="ablauf"||$("#jki").checked,skv=$("#jsk")?$("#jsk").value:"";
     const j={id:"A-"+n,f,fid:f.id,art,org:O.id,...(SM?{prio:prio(),gesammelt:new Date().toISOString()}:{}),t:$("#jt").value||(art==="agent"?ag.n:art==="abteilung"?"Auftrag an "+tlName(O.id,abt.id,TM):art==="frei"?(skv&&sk(skv)?sk(skv).n:"Freie Aufgabe"):"Neuer Auftrag"),in:$("#ji").value,path:ki?[s.id]:[s.id].concat(nx?[nx.id]:[]),st:"run",log:ki?[[now(),"KI-Auftrag angelegt von "+ICH()+""+(art==="agent"?" – an "+ag.n:art==="abteilung"?" – an "+tlName(O.id,abt.id,TM)+" (KI-Teamleiter)":art==="frei"?" – freie Aufgabe":"")]]:[[now(),"Auftrag gestartet von "+ICH()+""],[now(),nx?nlabel(nx)+" – beginnt":"–"]]};
@@ -2319,7 +2330,7 @@ function resultModal(j){KINEW.delete(j.id);const [cls,lab]=okTxt(j),E=j.erg||[],
    ${j.sum?`<div class="kisum"><b>Rückmeldung von Claude:</b> ${esc(j.sum)}</div>`:isEnd(j)||W?"":`<div class="hint">Claude arbeitet noch – die Ansicht aktualisiert sich von selbst.</div>`}
    ${E.length?`<div class="flabel">Ergebnisse (${E.length})</div>${E.map(e=>`<div class="ergit"><div class="ergh"><b>${esc(e.t||"Ergebnis")}</b>${e.art?`<span class="hint" style="margin:0">${esc(e.art)}</span>`:""}<span style="flex:1"></span>${e.url?`<a class="btn sm p" href="${esc(e.url)}" target="_blank" rel="noopener">Öffnen ↗</a>`:""}</div>${e.vorschau?`<div class="ergv">${esc(e.vorschau)}</div>`:""}${e.url?`<div class="hint" style="margin:4px 0 0;word-break:break-all">${esc(e.url)}</div>`:""}</div>`).join("")}`:istPlan(j)||Array.isArray(j.teile)?"":'<div class="hint">Noch keine Ergebnisse eingetragen.</div>'}
    ${(j.sess||[]).length?`<div class="flabel" style="margin-top:10px">Claude-Sitzungen</div><div class="sessl">${j.sess.map((s,i)=>`<a href="${esc(s.url)}" target="_blank" rel="noopener">🔗 Sitzung ${i+1}${s.at?" · "+esc(new Date(s.at).toLocaleString("de-DE",{dateStyle:"short",timeStyle:"short"})):""}</a>`).join("")}</div>`:""}
-   <div class="btns" style="justify-content:flex-end;margin-top:12px"><button class="btn" id="rlog" title="Verlauf, Ablaufgrafik, Sitzungen und weitere Aktionen">Details …</button><button class="btn p" id="rclose">Schließen</button></div>`,true);
+   <div class="btns" style="justify-content:flex-end;margin-top:12px"><button class="btn" id="rlog" title="Verlauf, Prozessgrafik, Sitzungen und weitere Aktionen">Details …</button><button class="btn p" id="rclose">Schließen</button></div>`,true);
   anhBind(j);$("#mclose").onclick=$("#rclose").onclick=()=>{close();jobs()};$("#rlog").onclick=()=>{close();jobModalK(j)};
   document.querySelectorAll("[data-plk]").forEach(e=>e.onclick=()=>{const k=AU.find(x=>x.id===e.dataset.plk);if(k){close();resultModal(k)}});
   if(W&&istPlan(j))planBind(j,close);
@@ -2503,14 +2514,16 @@ $("#newF").onclick=()=>{if(blocked())return;const a=AG.find(x=>x.p===FF)||AG[0];
   const f=FL[FL.length-1],t={id:nid(),type:"task",x:110,y:108,a,t:"",o:"",ho:[1,1,1,1]},e={id:nid(),type:"end",x:340,y:120,label:"Ergebnis an dich"};
   f.N.push(t,e);f.E.push({f:f.N[0].id,t:t.id,l:""},{f:t.id,t:e.id,l:""});fcur=FL.length-1;startEdit("flow",f.id,null,["flows/"+f.id],true);SEL=null;flows();$("#fn").focus();$("#fn").select()};
 
-function show(v){if(EDIT&&!$("#"+v).classList.contains("hide"))return;if(blocked())return;document.querySelectorAll("nav button").forEach(x=>x.classList.toggle("on",x.dataset.v===v));
+const AGRP=["build","skills","matrix"];
+function show(v){if(v==="agrp")v=AGRP.includes(UI.agv)?UI.agv:"build";if(EDIT&&!$("#"+v).classList.contains("hide"))return;if(blocked())return;document.querySelectorAll("nav button").forEach(x=>x.classList.toggle("on",x.dataset.v===v||(x.dataset.v==="agrp"&&AGRP.includes(v))));
+  {const sn=$("#subnav");if(sn){sn.hidden=!AGRP.includes(v);sn.querySelectorAll("[data-sv]").forEach(b=>b.classList.toggle("on",b.dataset.sv===v))}if(AGRP.includes(v)&&UI.agv!==v){UI.agv=v;saveUI()}}
   ["build","matrix","flows","jobs","users","org","skills","settings"].forEach(id=>$("#"+id).classList.toggle("hide",id!==v));{const g=$("#gear");if(g)g.classList.toggle("on",v==="settings"||v==="users")}if(v==="settings")einst();
   if(v==="skills")lib();
   if(v==="org")org();
   if(v==="users"){if(ucur<0&&US.length)ucur=0;users()}
   if(v==="build"||v==="matrix")render()
   if(v==="flows")flows();if(v==="jobs"){jobs();if(AU.some(j=>j.ki))kiReload(true).then(kiCheckRuns);kiPoll()}}
-document.querySelectorAll("nav button").forEach(b=>b.onclick=()=>show(b.dataset.v));
+document.querySelectorAll("nav button").forEach(b=>b.onclick=()=>show(b.dataset.v));document.querySelectorAll("#subnav [data-sv]").forEach(b=>b.onclick=()=>show(b.dataset.sv));
 
 // ===== Dialoge (alert/confirm/prompt gibt es im Artefakt nicht) =====
 function dlg(html){return new Promise(res=>{const d=document.createElement("div");d.id="dlg";d.innerHTML=`<div class="modal" style="z-index:40"><div class="box">${html}</div></div>`;document.body.appendChild(d);
@@ -2828,7 +2841,7 @@ function einst(sec){if(sec)UI.sets=sec;if(!SETSEC.some(s=>s[0]===UI.sets))UI.set
     document.querySelectorAll("[data-sol]").forEach(i=>i.onchange=async()=>{const f=i.files&&i.files[0];if(!f)return;try{const u=await logoKlein(f);if(u.length>150000)return toast("Logo ist zu groß – bitte ein kleineres Bild wählen");O(i.dataset.sol).logo=u;schedule();einst()}catch(e){toast("Bild konnte nicht gelesen werden")}});
     document.querySelectorAll("[data-solx]").forEach(b=>b.onclick=()=>{delete O(b.dataset.solx).logo;schedule();einst()})}
   else if(S==="ausf"){const T=SET.trig||{};
-    C.innerHTML=`<h2>Ausführung</h2><div class="hint" style="margin:0 0 10px">KI-Aufträge laufen als Claude-Sitzungen über zwei geplante Aufgaben im Claude-Konto dieser Instanz.</div>
+    C.innerHTML=`<h2>Ausführung</h2><div class="hint" style="margin:0 0 10px">Aufträge laufen als Claude-Sitzungen über zwei geplante Aufgaben im Claude-Konto dieser Instanz.</div>
      ${Object.entries(RUNNERS).map(([k,R])=>`<div class="field"><label>${esc(R.l)} – Kennung der geplanten Aufgabe</label><input type="text" data-trg="${k}" value="${esc(T[k]||R.tid)}" placeholder="trig_…"></div>`).join("")}
      <div class="btns"><button class="btn sm" id="sruns">Letzten Lauf prüfen</button></div>`;
     document.querySelectorAll("[data-trg]").forEach(i=>i.onchange=()=>{const v=i.value.trim();SET.trig={...(SET.trig||{})};if(/^trig_\w+$/.test(v))SET.trig[i.dataset.trg]=v;else{delete SET.trig[i.dataset.trg];toast("Ungültige Kennung – Standard bleibt")}});

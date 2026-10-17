@@ -206,6 +206,24 @@ const check = (name, ok, info = '') => { CHECKS.push({ name, ok }); console.log(
   const nm = await p.evaluate(() => ICH());
   check('Angemeldeter Benutzer umschaltbar, Name wird übernommen', nm && nm !== 'Boris', nm);
   await p.evaluate(() => { UI.me = undefined; saveUI(); hdr(); show('org') });
+  // ----- v57: Kopfzeile aufgeräumt -----
+  const nv = await p.evaluate(() => [...document.querySelectorAll('nav button')].map(b => b.textContent.replace(/\d+$/, '').trim()));
+  check('Kopfzeile: Organigramm · Aufträge · Prozesse · Agenten ▾', JSON.stringify(nv) === JSON.stringify(['Organigramm', 'Aufträge', 'Prozesse', 'Agenten ▾']), JSON.stringify(nv));
+  await p.click('nav [data-v="agrp"]'); await p.waitForTimeout(200);
+  await p.click('#subnav [data-sv="skills"]'); await p.waitForTimeout(250);
+  const sn = await p.evaluate(() => ({ sub: !document.querySelector('#subnav').hidden, sk: !document.querySelector('#skills').classList.contains('hide'), on: document.querySelector('nav [data-v="agrp"]').classList.contains('on'), agv: JSON.parse(localStorage.getItem('cos-ui')).agv }));
+  check('Gruppe Agenten: Unterleiste, Skills sichtbar, Reiter gemerkt', sn.sub && sn.sk && sn.on && sn.agv === 'skills', JSON.stringify(sn));
+  if (SHOT) await p.screenshot({ path: SHOT + '/e5-kopf-skills.png' });
+  await p.evaluate(() => show('org')); await p.waitForTimeout(150);
+  check('Unterleiste ausgeblendet außerhalb der Gruppe; ▾ öffnet zuletzt gewählten Reiter', await p.evaluate(() => { const h = document.querySelector('#subnav').hidden; show('agrp'); return h && !document.querySelector('#skills').classList.contains('hide') }));
+  await p.evaluate(() => { themeSet('dark') });
+  check('Farbschema wird gespeichert', await p.evaluate(() => JSON.parse(localStorage.getItem('cos-ui')).theme === 'dark'));
+  await p.evaluate(() => { themeSet('light'); show('org') });
+  await p.setViewportSize({ width: 390, height: 844 }); await p.waitForTimeout(200);
+  const mob = await p.evaluate(() => ({ hdrH: document.querySelector('header').offsetHeight, over: [...document.querySelectorAll('header *')].filter(e => { const r = e.getBoundingClientRect(); return r.width && r.right > innerWidth + 1 && !e.closest('nav') }).length }));
+  check('Handy: Kopfzeile ohne Überlauf (Leiste wischbar)', mob.over === 0 && mob.hdrH < 140, JSON.stringify(mob));
+  if (SHOT) await p.screenshot({ path: SHOT + '/e5-kopf-mobil.png' });
+  await p.setViewportSize({ width: 1440, height: 900 });
   // ----- Datenstand 2 -----
   const st = await p.evaluate(() => { const S = window.__S, j = k => S['jobs/' + k] || null;
     return { schema: (S['meta/config'].settings || {}).schema, a190: j('A-190'), a191: j('A-191'), a150: j('A-150'), z: S['zaehler/auftrag'],
