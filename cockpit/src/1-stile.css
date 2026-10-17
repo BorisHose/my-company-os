@@ -344,3 +344,10 @@ fieldset:disabled .ic,fieldset:disabled .ownadd,fieldset:disabled [data-r],field
 .prio{font-size:11px;font-weight:700;border-radius:8px;padding:1px 7px;margin-left:4px;white-space:nowrap}.prio.d{background:#fdecec;color:#b42318}.prio.h{background:#fff4d6;color:#8a5a00}.prio.l{background:#eef0f4;color:#667085}
 .avsel{display:inline-flex;align-items:center;gap:5px;cursor:pointer}.avt tr.ib td{background:#fffdf7}
 #jprio button{flex:1}
+/* v54: Plan des KI-Teamleiters */
+.plbox{background:var(--viobg);border:1px solid #d9cdf5;border-radius:12px;padding:12px;margin:0 0 6px;display:flex;flex-direction:column;gap:8px}
+.plh{display:flex;align-items:center;gap:10px}.plh b{font-size:14.5px}.plic{width:32px;height:32px;border-radius:50%;background:var(--vio);color:#fff;display:grid;place-items:center;flex:none}
+.plstep{background:#fff;border:1px solid var(--line);border-radius:10px;padding:9px 10px;display:flex;gap:10px;align-items:flex-start}.plstep .av .kib{font-size:9px}
+.plt{flex:1;min-width:0;font-size:13px;display:flex;flex-direction:column;gap:3px}.plrow{display:flex;gap:8px;align-items:center}.plrow b{width:18px;text-align:center;color:var(--vio)}.plrow select{flex:1;min-width:0;font-weight:600}
+.plab{font-size:12px;color:#8a5a00;background:#fff4d6;border-radius:6px;padding:2px 8px;align-self:flex-start}
+.plsum{font-size:13px;color:#4a3a7a}.pltl{cursor:pointer}.pltl:hover{border-color:var(--acc)}

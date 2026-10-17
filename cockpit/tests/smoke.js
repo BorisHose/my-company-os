@@ -77,6 +77,30 @@ const check = (name, ok, info = '') => { CHECKS.push({ name, ok }); console.log(
   await p.fill('#modal #ji', 'Bitte Angebot für Herrn Beispiel vorbereiten'); await p.click('#modal #go'); await p.waitForTimeout(1200);
   const ja = await p.evaluate(d => { const j = AU.find(x => x.art === 'abteilung'); const t = (window.__CI || []).filter(x => x && x.text).map(x => x.text).pop() || ''; return { id: j && j.id, abt: j && j.abt, aid: j && j.aid, who: j && jobWho(j).n, ctx: t.includes('ABTEILUNG BEAUFTRAGT') && t.includes('KI-TEAMLEITER'), d }; }, dab);
   check('Auftrag an Abteilung: abt gesetzt, noch kein Agent, Kontext für den Teamleiter', ja.id && ja.abt === ja.d && !ja.aid && ja.who === '✦ KI-Teamleiter' && ja.ctx, JSON.stringify(ja));
+  // ----- Etappe 3: Plan des KI-Teamleiters -----
+  const pl = await p.evaluate(async () => { const j = AU.find(x => x.art === 'abteilung' && x.st === 'run'); const o = jobOrg(j);
+    const own = AG.filter(a => inOrg(a, o) && PL(a, o).abt === j.abt), other = AG.find(a => inOrg(a, o) && PL(a, o).abt && PL(a, o).abt !== j.abt);
+    await Store.update('jobs/' + j.id, { st: 'wait', plan: { sum: 'Testbegründung', steps: [{ t: 'Kontakte anlegen', aid: own[0].id, sk: '', nach: [] }, { t: 'Angebot erstellen', aid: own[0].id, nach: [1] }, { t: 'Reklamation prüfen', aid: other.id, nach: [] }] },
+      q: { kind: 'Plan', from: 'KI-Teamleiter', text: '1 · …', why: 'Test', opts: ['Plan freigeben & starten'] }, log: [...j.log, ['17.10. 09:00', 'Plan erstellt (3 Teilaufträge)', 1]] });
+    return { id: j.id, other: other.id }; });
+  await p.waitForTimeout(1200);
+  await p.evaluate(id => resultModal(AU.find(j => j.id === id)), pl.id); await p.waitForTimeout(300);
+  const pv = await p.evaluate(() => ({ steps: document.querySelectorAll('#modal .plstep').length, sel: document.querySelectorAll('#modal [data-plag]').length, ab: document.querySelectorAll('#modal .plab').length, go: !!document.querySelector('#plgo'), lab: (document.querySelector('#modal .okb') || {}).textContent }));
+  check('Plan-Fenster: 3 Schritte mit Agentenwahl, fremde Abteilung markiert, Freigabe-Knopf', pv.steps === 3 && pv.sel === 3 && pv.ab === 1 && pv.go && /Plan/.test(pv.lab), JSON.stringify(pv));
+  if (SHOT) await p.screenshot({ path: SHOT + '/e3-plan.png' });
+  const fz0 = await p.evaluate(() => __C.filter(t => t === 'fire_trigger').length);
+  await p.click('#plgo'); await p.waitForTimeout(2000);
+  const pf = await p.evaluate(id => { const P = AU.find(j => j.id === id), K = (P.teile || []).map(t => AU.find(x => x.id === t)); return { st: P.st, n: K.length, kst: K.map(k => k.st), nach: K[1] && K[1].nach, par: K.every(k => k.parent === id && k.art === 'agent'), saved: K.every(k => !!window.__S['jobs/' + k.id]), fired: __C.filter(t => t === 'fire_trigger').length, log: P.log.slice(-2).map(l => l[1]) }; }, pl.id);
+  check('Freigabe: 3 Teilaufträge angelegt, unabhängige gestartet, abhängiger wartet', pf.st === 'run' && pf.n === 3 && pf.par && pf.saved && pf.kst[0] === 'run' && pf.kst[1] === 'inbox' && pf.kst[2] === 'run' && pf.fired === fz0 + 2 && /Zustimmung/.test(pf.log.join('|')), JSON.stringify(pf));
+  await p.evaluate(async id => { const P = AU.find(j => j.id === id); await Store.update('jobs/' + P.teile[0], { st: 'done', ok: 'ja', fertig: new Date().toISOString(), sum: 'Kontakte angelegt.', erg: [{ t: 'Liste', url: 'https://example.org/l' }] }); }, pl.id);
+  await p.waitForTimeout(2200);
+  const pw = await p.evaluate(id => { const P = AU.find(j => j.id === id), k = AU.find(x => x.id === P.teile[1]); return { st: k.st, inV: /Ergebnisse der Vorschritte/.test(k.in), fired: __C.filter(t => t === 'fire_trigger').length }; }, pl.id);
+  check('Nach Vorschritt: abhängiger Teil startet automatisch mit dessen Ergebnis', pw.st === 'run' && pw.inV && pw.fired === fz0 + 3, JSON.stringify(pw));
+  await p.evaluate(async id => { const P = AU.find(j => j.id === id); for (const t of P.teile.slice(1)) await Store.update('jobs/' + t, { st: 'done', ok: 'ja', fertig: new Date().toISOString(), sum: 'ok' }); }, pl.id);
+  await p.waitForTimeout(2200);
+  const pe = await p.evaluate(id => { const P = AU.find(j => j.id === id); return { st: P.st, ok: P.ok, sum: P.sum, erg: (P.erg || []).length, db: window.__S['jobs/' + id].st }; }, pl.id);
+  check('Alle Teile fertig: Hauptauftrag erledigt mit Zusammenfassung', pe.st === 'done' && pe.ok === 'ja' && pe.db === 'done' && /3 erledigt/.test(pe.sum) && pe.erg === 1, JSON.stringify(pe));
+  await p.evaluate(() => { document.getElementById('modal').innerHTML = '' });
   // ----- Etappe 2: Sammeln und Eingang -----
   await p.evaluate(() => show('org')); await p.waitForTimeout(200);
   check('Organigramm: „📥 n“ und „+ Sammeln“ je Abteilung', (await p.$$('[data-oin]')).length > 0 && (await p.$$('[data-osm]')).length === (await p.$$('[data-oin]')).length);

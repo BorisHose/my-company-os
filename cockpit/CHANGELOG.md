@@ -1,5 +1,13 @@
 # Änderungen – Cockpit
 
+## 54 · 17.10.2026 · Etappe 3 „KI-Teamleiter mit Plan“
+- Bei „Abteilung beauftragen“ darf der KI-Teamleiter statt einer Einzelwahl einen Plan vorschlagen: bis zu 6 Teilaufträge mit Agent, optional Skill, Reihenfolge („startet nach …“) und Begründung; Agenten anderer Abteilungen nur, wenn fachlich nötig.
+- Fenster „Vorschlag“: Plan mit Agentenwahl je Schritt, Hinweis bei fremder Abteilung (Zustimmung der Leitung, ohne Leitung Boris), „▶ Plan freigeben & starten“, „Ändern …“ (geht an den Teamleiter zurück), „Abbrechen“.
+- Nach der Freigabe legt das Cockpit die Teilaufträge an (art „agent“, `parent`, `step`, `nach`), startet unabhängige sofort und abhängige automatisch, sobald die Vorschritte erledigt sind – mit deren Ergebnissen im Auftrag. Ist ein Vorschritt nicht erledigt, wartet der Folgeschritt im Eingang auf Boris.
+- Der Hauptauftrag zeigt die Teilaufträge mit Stand und endet, wenn alle Teile beendet sind (erledigt / teilweise / nicht erledigt, Ergebnisse gesammelt). Abbrechen des Hauptauftrags bricht noch wartende Teile mit ab.
+- Überwachung der Sitzungen: gleichzeitig laufende Aufträge auf derselben geplanten Aufgabe werden über die Sitzungskennung auseinandergehalten (vorher konnte ein späterer Lauf einen früheren fälschlich als „beendet“ melden).
+- Anweisungstext beider geplanten Aufgaben um den Plan ergänzt. Smoke-Test: 58 Prüfungen.
+
 ## 53 · 16.10.2026 · Etappe 2 „Sammeln und Eingang“
 - Organigramm je Abteilung: „📥 n“ (Eingang) und „+ Sammeln“ neben „▶ Abteilung beauftragen“ und „🕘 Verlauf“.
 - Fenster „📥 Aufgabe sammeln“: Abteilung, Zuweisung („✦ KI-Teamleiter wählt“ oder ein Agent der Abteilung), Priorität (Dringend · Hoch · Normal · Niedrig), fällig bis, Anhänge, Tempo; Knöpfe „📥 Sammeln“ und „▶ Sammeln & sofort starten“.

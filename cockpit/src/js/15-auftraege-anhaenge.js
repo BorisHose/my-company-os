@@ -25,7 +25,7 @@ const PRIO=[["d","Dringend"],["h","Hoch"],["n","Normal"],["l","Niedrig"]],PRN={d
 const skOrg=(o)=>SK.filter(x=>!["vorschlag","entwurf"].includes(srcOf(x))&&(!o||!o.prod||x.p===o.prod||x.p==="all"||x.p==="multi"));
 const grName=g=>(g!=null&&g!==""&&GR[+g]!=null)?GR[+g]:(typeof g==="string"&&isNaN(+g)?g:"Ohne Gruppe");
 function skOpts(L,cur){const G=[...new Set(L.map(x=>x.g))].sort((a,b)=>(+a)-(+b));return G.map(g=>`<optgroup label="${esc(grName(g))}">${L.filter(x=>x.g===g).map(x=>`<option value="${esc(x.id)}" ${x.id===cur?'selected':''}>${esc(x.n)}</option>`).join("")}</optgroup>`).join("")}
-function jobLbl(j){if(!j.f)return "–";if(!j.f.frei)return j.f.n;const a=j.aid&&AG.find(x=>x.id===j.aid),S=j.sk&&sk(j.sk);return (j.art==="agent"&&a?a.n:"Freie Aufgabe")+(S?" · "+S.n:j.sk?" · "+j.sk:"")}
+function jobLbl(j){if(!j.f)return "–";if(!j.f.frei)return j.f.n;const a=j.aid&&AG.find(x=>x.id===j.aid),S=j.sk&&sk(j.sk);return (j.art==="agent"&&a?a.n:j.art==="abteilung"?"Abteilung "+((dept(j.abt)||{}).n||"")+(a?" · "+a.n:" · KI-Teamleiter"):"Freie Aufgabe")+(S?" · "+S.n:j.sk?" · "+j.sk:"")}
 function startModal(f,keep){if(!keep)PEND=[];keep=keep||{};const SM=!!keep.sm;if(SM)keep.art=keep.art==="agent"&&keep.aid?"agent":"abteilung";
   const art=keep.art||(f&&!f.frei?"ablauf":"frei"),O=orgById(keep.org||OC)||ORGS()[0];
   const FLO=FL.filter(x=>!x.frei&&(x.p==="all"||!O.prod||x.p===O.prod));
