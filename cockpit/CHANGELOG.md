@@ -1,5 +1,9 @@
 # Änderungen – Cockpit
 
+## 81 · 17.10.2026 · Fehlerbehebung Benutzer-Zuordnung
+- „Welcher Benutzer in … ist …?“: Bei mehreren Treffern wird jetzt der gewählte Benutzer übernommen (vorher immer der erste, weil die Auswahl erst nach dem Schließen gelesen wurde).
+- Smoke-Test: 133 Prüfungen.
+
 ## 80 · 17.10.2026 · Nachbesserungen nach Code-Prüfung (Etappe 6)
 - Formatierter Text: Zeilen wie „17. Oktober …“ oder „2024. …“ werden nicht mehr als nummerierte Liste gelesen (Listen nur ab 1 und fortlaufend); „5 * 3 * 2“ bleibt unverändert; Einfügen aus Outlook/Word/Webseiten ohne falsche Zeilenumbrüche, Tabellenzellen mit „|“ getrennt.
 - Rückfragen von Claude ohne Antwort-Optionen: eigenes Feld „Antwort senden“ (geht ohne „Ändern:“ an Claude), daneben weiter „Änderung senden“.

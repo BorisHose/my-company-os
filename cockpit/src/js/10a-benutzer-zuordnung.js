@@ -29,8 +29,10 @@ async function uSuchen(u,key,btn){const [sys,id]=key.split("|"),f=uSoll(u).find(
   try{const H=uFrei(f,u,await uSeats(f,u));
     if(H.length===1){(u.maps=u.maps||[]).push(uMapVon(f,H[0]));schedule();users();toast("Zugeordnet: "+(H[0].name||u.n)+" in "+f.name);return}
     if(!H.length){users();toast("In „"+f.name+"“ nicht gefunden"+(f.sys==="bodo"?" – über „In weiteren Bodo-Mandanten anlegen …“ anlegen":" – bitte den Benutzer in "+sysName(f.sys)+" anlegen bzw. Name/E-Mail angleichen"));return}
-    const v=await dlg(`<h3 style="margin:0 0 10px;font-size:15px">Welcher Benutzer in „${esc(f.name)}“ ist ${esc(u.n)}?</h3>${H.map((h,i)=>`<label class="cb"><input type="radio" name="usel" value="${i}" ${i?"":"checked"}> ${esc(h.name||"")} · ${esc(h.email||h.userId||"")} <span class="hint" style="margin:0">${esc(ST[h.status]||h.status||"")}</span></label>`).join("")}<div class="btns" style="margin-top:12px;justify-content:flex-end"><button class="btn" data-no>Abbrechen</button><button class="btn p" data-yes>Zuordnen</button></div>`);
-    if(v==null){users();return}const i=+((document.querySelector('[name="usel"]:checked')||{}).value||0);(u.maps=u.maps||[]).push(uMapVon(f,H[i]));schedule();users();toast("Zugeordnet")}
+    let sel=0;const pd=dlg(`<h3 style="margin:0 0 10px;font-size:15px">Welcher Benutzer in „${esc(f.name)}“ ist ${esc(u.n)}?</h3>${H.map((h,i)=>`<label class="cb"><input type="radio" name="usel" value="${i}" ${i?"":"checked"}> ${esc(h.name||"")} · ${esc(h.email||h.userId||"")} <span class="hint" style="margin:0">${esc(ST[h.status]||h.status||"")}</span></label>`).join("")}<div class="btns" style="margin-top:12px;justify-content:flex-end"><button class="btn" data-no>Abbrechen</button><button class="btn p" data-yes>Zuordnen</button></div>`);
+    // Auswahl merken, solange das Fenster offen ist (nach dem Schließen ist es entfernt)
+    document.querySelectorAll('#dlg [name="usel"]').forEach(r=>r.onchange=()=>{if(r.checked)sel=+r.value});
+    const v=await pd;if(v==null){users();return}(u.maps=u.maps||[]).push(uMapVon(f,H[sel]));schedule();users();toast("Zugeordnet")}
   catch(e){users();toast(uErr(f,e))}}
 
 // „Abgleichen“: bestehende Zuordnungen neu lesen und fehlende eindeutige ergänzen

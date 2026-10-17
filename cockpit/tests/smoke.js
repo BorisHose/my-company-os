@@ -599,6 +599,12 @@ const check = (name, ok, info = '') => { CHECKS.push({ name, ok }); console.log(
   const t7 = await p.evaluate(id => ({ weg: !VL.some(x => x.id === id), schnell: !((SET.schnell || {})['og-bodo'] || []).includes(id), db: !window.__S['vorlagen/' + id], auftrag: AU.some(j => j.vorlage === id) }), t1.id);
   check('Vorlagen: Löschen nur nach Bestätigung, aus Schnellwahl entfernt, Aufträge bleiben', t7a && t7.weg && t7.schnell && t7.db && t7.auftrag, JSON.stringify([t7a, t7]));
   await p.evaluate(() => show('org'));
+  // Benutzer-Zuordnung bei mehreren Treffern: die gewählte Zeile wird übernommen (Fehler bis v80: immer die erste)
+  const bz = p.evaluate(async () => { const u = US[0], alt = ADAPTER.bodo; ADAPTER.bodo = { ...alt, benutzerSuchen: async () => [{ membershipId: 'mz1', userId: 'uz1', name: 'Erster Treffer', email: 'a@x.example' }, { membershipId: 'mz2', userId: 'uz2', name: 'Zweiter Treffer', email: 'b@x.example' }] };
+    const n0 = (u.maps || []).length; const pr = uSuchen(u, 'bodo|org-zuordnungstest'); await pr; const m = (u.maps || [])[n0]; ADAPTER.bodo = alt; u.maps = (u.maps || []).slice(0, n0); return m && m.extId });
+  await p.waitForTimeout(400); await p.check('#dlg [name="usel"][value="1"]'); await p.click('#dlg [data-yes]');
+  check('Benutzer-Zuordnung: bei mehreren Treffern wird der gewählte übernommen', (await bz) === 'mz2');
+  await p.evaluate(() => { show('org') });
   await p.setViewportSize({ width: 390, height: 844 }); await p.waitForTimeout(150);
   const vmob = await p.evaluate(async () => { const W = innerWidth, out = {}; const leer = () => { document.getElementById('modal').innerHTML = '';['dlg', 'vlw', 'vlsa'].forEach(i => { const d = document.getElementById(i); if (d) d.remove() }) };
     const zu = () => [...document.querySelectorAll('#modal *,#vlw *,#vlsa *,#dlg *')].filter(e => { const b = e.getBoundingClientRect(); return b.width && (b.right > W + 1 || b.left < -1) && !e.closest('.avtw') && !e.closest('.cv-wrap') }).length;
