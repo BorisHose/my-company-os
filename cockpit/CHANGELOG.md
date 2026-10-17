@@ -1,5 +1,11 @@
 # Änderungen – Cockpit
 
+## 75 · 17.10.2026 · Dialog-Bausteine und neue kleine Rückfragen (Etappe 1)
+- Neue gemeinsame Stile für die Auftrags-Dialoge (`.dx-*` in `1-stile.css`, Dunkel-Regeln über `tools/dunkel.py`): Kopf mit Status, Fuß mit Zusammenfassung, zwei Spalten (unter 860 px einspaltig), Statuspillen, Schrittliste, Karten, Menüs, Chips.
+- Kleine Rückfragen (`askOk`, `askText`) mit Titelzeile, Erklärung und eindeutigen Knöpfen; Rückgabewerte unverändert, gilt an allen rund 40 Stellen. Gefährliche Aktionen mit rotem Knopf.
+- „Auftrag abbrechen?“: Folgen als Liste, Knöpfe „Weiterlaufen lassen“ / „Ja, abbrechen“. Rückfrage und Notiz mit mehrzeiligem Feld und Bezug zum Auftrag (Strg+Enter speichert).
+- Smoke-Test: 118 Prüfungen.
+
 ## 74 · 17.10.2026 · Sicherheitsnetz für den Dialog-Umbau (Plan „Dialoge rund um Aufträge“, Etappe 0)
 - Vor dem Umbau gesichert: Git-Tag `sicherung-vor-dialog-umbau-v73`, Datenbank-Export und Live-Seite unter `05 Datensicherung 2026-10-17`.
 - Smoke-Test um 12 Verhaltens-Prüfungen erweitert, die nicht vom Aussehen abhängen: Auftrag je Art (Claude direkt mit Skill/Tempo/Freigabe/Projekt, Abteilung mit Team, Agent mit Skill, Prozess mit und ohne Claude), Art wechseln behält Titel und Text, Sammeln mit Priorität und Fälligkeit, Antwort-Option, Änderungswunsch, Abbrechen, Fortschritt pflegen, Löschen nur nach Bestätigung.

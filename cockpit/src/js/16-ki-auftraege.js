@@ -16,7 +16,8 @@ let KIEDIT=null,ORGRUN="";
 const KINEW=new Set();
 const okTxt=j=>istPlan(j)?["wait","✦ Plan zur Freigabe"]:j.st==="inbox"?["wait","📥 Gesammelt"]:j.st==="cancel"?["no","✕ Abgebrochen"]:j.st==="done"?(j.ok==="nein"?["no","✗ Nicht erledigt"]:j.ok==="teilweise"?["part","◐ Teilweise erledigt"]:["ok","✓ Erledigt"]):j.st==="wait"?["wait","⏸ Wartet auf dich"]:["run","▶ Läuft"];
 async function kiAnswer(j,a){await kiFresh(j);const Q=j.q||{};j.ans=[...(j.ans||[]),{q:Q.text||"",a,at:new Date().toISOString()}];j.log.push([now(),""+ICH()+": "+a,1]);delete j.q;kiStart(j,"fortsetzen",{a,q:Q.text,kind:Q.kind,from:Q.from})}
-async function kiCancel(j){if(!await askOk("Auftrag „"+j.t+"“ abbrechen? Claude führt nichts mehr aus; bereits Angelegtes bleibt bestehen.","Ja, abbrechen"))return false;await kiFresh(j);
+async function kiCancel(j){const F=[...(j.erg||[]).map(e=>e&&e.t).filter(Boolean),...teileVon(j).filter(k=>k&&!isEnd(k)).map(k=>"Teilauftrag "+k.id+" „"+k.t+"“ wird mit abgebrochen")];
+  if(!await askOk("Auftrag „"+j.t+"“ abbrechen?","Ja, abbrechen",{text:"Claude führt danach nichts mehr aus. Bereits Angelegtes bleibt bestehen"+(F.length?":":"."),folgen:F,nein:"Weiterlaufen lassen"}))return false;await kiFresh(j);
   j.st="cancel";markDone(j);j.ok="nein";delete j.q;j.log.push([now(),"Auftrag abgebrochen von "+ICH()+"",1]);j.sum=(j.sum?j.sum+" ":"")+"Von "+ICH()+" abgebrochen – nichts weiter ausgeführt.";
   try{await Store.set("jobs/"+j.id,JSON.parse(jobSer(j)));LAST.set("jobs/"+j.id,jobSer(j))}catch(e){schedule()}
   for(const k of teileVon(j).filter(k=>k&&k.st==="inbox")){k.st="cancel";markDone(k);k.ok="nein";k.log.push([now(),"Mit dem Hauptauftrag "+j.id+" abgebrochen",1]);try{await Store.set("jobs/"+k.id,JSON.parse(jobSer(k)));LAST.set("jobs/"+k.id,jobSer(k))}catch(e){}}
@@ -203,8 +204,8 @@ function jobModal(j){
     if(t.type==="human"){j.st="wait";j.q={kind:"Freigabe",from:c.a?.n||"Ablauf",text:t.label||"",why:"",opts:[]};j.log.push([now(),"wartet auf deine Entscheidung",1])}
     else if(t.type==="end"){j.st="done";markDone(j);j.log.push([now(),"Auftrag fertig"])}
     close();jobs();jobModal(j);schedule()});
-  const aq=$("#addQ");if(aq)aq.onclick=async()=>{const t=await askText("Rückfrage erfassen – was ist offen?","");if(t){j.st="wait";j.q={kind:"Rückfrage",from:c.a?.n||"Ablauf",text:t,why:"",opts:[]};j.log.push([now(),"Rückfrage: "+t,1]);close();jobs();jobModal(j);schedule()}};
-  const an=$("#addN");if(an)an.onclick=async()=>{const t=await askText("Notiz zum Verlauf","");if(t){j.log.push([now(),"Notiz: "+t]);close();jobModal(j);schedule()}};
+  const aq=$("#addQ");if(aq)aq.onclick=async()=>{const t=await askText("Rückfrage erfassen","",{mehrzeilig:1,bezug:"zu „"+j.t+"“ · der Auftrag wechselt auf „wartet auf dich“",ph:"Was ist offen? z. B. „Wartungsvertrag 3 oder 5 Jahre?“",ok:"Rückfrage speichern"});if(t){j.st="wait";j.q={kind:"Rückfrage",from:c.a?.n||"Ablauf",text:t,why:"",opts:[]};j.log.push([now(),"Rückfrage: "+t,1]);close();jobs();jobModal(j);schedule()}};
+  const an=$("#addN");if(an)an.onclick=async()=>{const t=await askText("Notiz zum Verlauf","",{mehrzeilig:1,bezug:"zu „"+j.t+"“",ok:"Notiz speichern"});if(t){j.log.push([now(),"Notiz: "+t]);close();jobModal(j);schedule()}};
   const fr=$("#free");if(fr)fr.onkeydown=e=>{if(e.key==="Enter"&&fr.value.trim())answer(fr.value.trim())};
   const jr=$("#jres");if(jr)jr.onclick=()=>{close();resultModal(j)};
   const kg=$("#kigo");if(kg)kg.onclick=()=>{close();kiStart(j,"starten")};
