@@ -258,7 +258,7 @@ const check = (name, ok, info = '') => { CHECKS.push({ name, ok }); console.log(
   // ----- v58 Projekte -----
   await p.evaluate(() => { document.getElementById('modal').innerHTML = ''; OC = ORGS()[0].id; show('projects') }); await p.waitForTimeout(300);
   check('Projekte: Reiter sichtbar mit „Ohne Projekt“', await p.evaluate(() => !document.querySelector('#projects').classList.contains('hide') && !!document.querySelector('[data-pj="_ohne"]')));
-  await p.evaluate(() => pjBodoDlg(null)); await p.waitForTimeout(500);
+  await p.evaluate(() => pjBackendDlg(null)); await p.waitForTimeout(500);
   check('Projekte: Bodo-Projekte werden gelistet', (await p.$$('#modal [data-pbc]')).length === 2);
   await p.evaluate(() => { document.querySelectorAll('#modal [data-pbc]').forEach(c => { c.checked = true; c.dispatchEvent(new Event('change')) }); document.querySelector('#pbok').click() }); await p.waitForTimeout(1200);
   const pjI = await p.evaluate(() => ({ n: PJ.length, bk: PJ.every(x => x.bk && x.bk.sys === 'bodo' && x.bk.orgId), db: Object.keys(window.__S).filter(k => k.startsWith('projects/')).length, cards: document.querySelectorAll('#pjl [data-pj]').length, inp: (window.__CI || []).filter(x => x && x.resourceType === 'project').pop() }));
@@ -308,24 +308,24 @@ const check = (name, ok, info = '') => { CHECKS.push({ name, ok }); console.log(
   await p.setViewportSize({ width: 1440, height: 900 }); await p.evaluate(() => show('org'));
   check('Breit: Organigramm bleibt nebeneinander', await p.evaluate(() => { const d = [...document.querySelectorAll('.odept')].map(e => e.getBoundingClientRect()); return d.length > 1 && Math.abs(d[1].top - d[0].top) < 2 }));
   // ----- v62 sellify-Projekte -----
-  await p.evaluate(() => { document.getElementById('modal').innerHTML = ''; show('projects'); pjBodoDlg(null, 'sellify') }); await p.waitForTimeout(500);
+  await p.evaluate(() => { document.getElementById('modal').innerHTML = ''; show('projects'); pjBackendDlg(null, 'sellify') }); await p.waitForTimeout(500);
   check('sellify-Projekte: Liste aus sellify, kein Mandant nötig', await p.evaluate(() => document.querySelectorAll('#modal [data-pbc]').length === 2 && /kein Mandant/.test(document.querySelector('#pbmf').textContent)));
   await p.evaluate(() => { document.querySelectorAll('#modal [data-pbc]').forEach(c => { c.checked = true; c.dispatchEvent(new Event('change')) }); document.querySelector('#pbok').click() }); await p.waitForTimeout(800);
   const sfp = await p.evaluate(() => { const x = PJ.find(q => q.bk && q.bk.sys === 'sellify'); const j = { prj: x && x.id }; return { n: PJ.filter(q => q.bk && q.bk.sys === 'sellify').length, id: x && x.bk.id, ctx: x ? pjKontext(j) : '', inp: (window.__CI || []).filter(i => i && i.action === 'list').pop() } });
   check('sellify-Projekte: übernommen, verbunden, Kontext nennt sellify-Projekt-Id', sfp.n === 2 && sfp.id === '3' && sfp.ctx.includes('sellify-Projekt') && sfp.ctx.includes('Projekt-Id 3') && sfp.inp.params.done === false, JSON.stringify(sfp));
-  await p.evaluate(() => { pjBodoDlg(null, 'sellify') }); await p.waitForTimeout(500);
+  await p.evaluate(() => { pjBackendDlg(null, 'sellify') }); await p.waitForTimeout(500);
   check('sellify-Projekte: bereits verbundene sind gesperrt', await p.evaluate(() => [...document.querySelectorAll('#modal [data-pbc]')].every(c => c.disabled)));
   const sfc = await p.evaluate(async () => { document.getElementById('modal').innerHTML = ''; const o = ORGS()[0]; o.dienste.projekt = { sys: 'sellify', ent: 'project' }; const r = await dienstPruefen(o); return r.erg.projekt });
   check('Anbindungen: sellify-Projekt wird geprüft', sfc.st === 'ok', JSON.stringify(sfc));
   // ----- v63 Seitenweise laden -----
-  await p.evaluate(() => { document.getElementById('modal').innerHTML = ''; pjBodoDlg(null, 'sellify') }); await p.waitForTimeout(400);
+  await p.evaluate(() => { document.getElementById('modal').innerHTML = ''; pjBackendDlg(null, 'sellify') }); await p.waitForTimeout(400);
   await p.fill('#pbq', 'viele'); await p.waitForTimeout(900);
   const pg1 = await p.evaluate(() => ({ n: document.querySelectorAll('#modal [data-pbc]').length, more: !!document.querySelector('#pbmore'), inp: (window.__CI || []).filter(i => i && i.params && i.params.q === 'viele').pop() }));
   check('Paging: erste Seite 25, neueste zuerst (sort -registered), „Weitere laden“', pg1.n === 25 && pg1.more && pg1.inp.params.limit === 25 && pg1.inp.params.sort === '-registered' && pg1.inp.params.offset === 0, JSON.stringify(pg1));
   await p.evaluate(() => { const c = document.querySelector('#modal [data-pbc]'); c.checked = true; c.dispatchEvent(new Event('change')); document.querySelector('#pbmore').click() }); await p.waitForTimeout(500);
   const pg2 = await p.evaluate(() => ({ n: document.querySelectorAll('#modal [data-pbc]').length, more: !!document.querySelector('#pbmore'), keep: document.querySelector('#modal [data-pbc]').checked, txt: document.querySelector('.pbfoot').textContent, off: (window.__CI || []).filter(i => i && i.params && i.params.q === 'viele').pop().params.offset }));
   check('Paging: zweite Seite angehängt, Auswahl bleibt, Ende erkannt', pg2.n === 30 && !pg2.more && pg2.keep && pg2.off === 25 && pg2.txt.includes('30 von 30'), JSON.stringify(pg2));
-  await p.evaluate(() => { document.getElementById('modal').innerHTML = ''; pjBodoDlg(null, 'bodo') }); await p.waitForTimeout(500);
+  await p.evaluate(() => { document.getElementById('modal').innerHTML = ''; pjBackendDlg(null, 'bodo') }); await p.waitForTimeout(500);
   check('Paging Bodo: 25 je Abruf, Hinweis zur Reihenfolge', await p.evaluate(() => { const i = (window.__CI || []).filter(x => x && x.resourceType === 'project').pop(); return i.limit === 25 && !i.cursor && /alphabetisch/.test(document.querySelector('.pbfoot').textContent) }));
   await p.evaluate(() => { document.getElementById('modal').innerHTML = '' });
   // ----- v64 Projekt: Ansicht und Bearbeiten -----
@@ -374,6 +374,25 @@ const check = (name, ok, info = '') => { CHECKS.push({ name, ok }); console.log(
     const inp = (window.__CI || []).filter(i => i && i.action === 'list' && i.params && i.params.q === 'Hose').pop(); R.suche = !!inp;
     u.maps = []; await syncUser(u); R.abgleich = u.maps.some(x => x.sys === 'sellify') && u.maps.some(x => x.sys === 'bodo'); u.maps = []; users(); return R });
   check('sellify-Benutzer: fehlende Zuordnung sichtbar, Suche über sellify, Abgleich ergänzt Bodo und sellify', Object.values(sfu).every(Boolean), JSON.stringify(sfu));
+  // ----- v70 Adapter -----
+  const BER = JSON.parse(fs.readFileSync(path.join(ROOT, 'berechtigungen.json'), 'utf8'));
+  const ad = await p.evaluate(async (ber) => { const R = {};
+    const L = adapterListe(); R.anzahl = L.length >= 2 && L.map(a => a.id).join() === 'bodo,sellify';
+    R.vertrag = L.every(a => ADAPTER_PFLICHT.every(k => k in a) && DIENSTE.every(([k]) => Array.isArray(a.ent[k])) && Object.isFrozen(a));
+    R.unvollstaendig = (() => { try { adapterRegistrieren({ id: 'x' }); return false } catch (e) { return /unvollständig/.test(e.message) && !adapter('x') } })();
+    R.berechtigt = adapterWerkzeuge().every(w => { const s = ber.mcp.servers.find(x => x.server === w.server); return s && w.tools.every(t => s.tools.includes(t)) });
+    R.namen = sysName('bodo') === 'Bodo' && sysName('sellify') === 'sellify' && sysName('andere') === 'Anderes System';
+    const M = ADAPTER.bodo.mandanten()[0];
+    const pb = await ADAPTER.bodo.projekte({ mand: M, q: '', alle: false, next: null }); R.bodoPj = pb.items.length === 2 && pb.items[0].id === 'bp1' && pb.items[0].st === 'aktiv' && pb.items[0].owner === 'Boris Hose' && !pb.neuZuerst && pb.next === null;
+    const ps = await ADAPTER.sellify.projekte({ q: '', alle: false, next: null }); R.sfPj = ps.items.length === 2 && ps.items[0].title === 'Prozessoptimierung Muster (10019)' && ps.items[0].owner === 'Boris Hose' && ps.neuZuerst && ps.total === 2;
+    const bs = await ADAPTER.bodo.benutzerSuchen({ mand: M, name: 'Boris Hose', mail: '' }); R.bodoU = bs.length === 1 && bs[0].status === 'active';
+    const ss = await ADAPTER.sellify.benutzerSuchen({ name: 'Boris Hose', mail: '' }); R.sfU = ss.length === 1 && ss[0].membershipId === '429' && ss[0].roleNames[0] === 'Full access';
+    const ctx = {}; const c1 = await ADAPTER.bodo.pruefen({ sys: 'bodo', orgId: M.id, orgN: M.name, ent: 'project' }, 'projekt', ctx); R.bodoPruef = c1.st === 'ok' && Array.isArray(ctx.bodoOrgs);
+    R.sfPruef = (await ADAPTER.sellify.pruefen({ sys: 'sellify', ent: 'project' }, 'projekt', {})).st === 'ok' && (await ADAPTER.sellify.pruefen({ sys: 'sellify', ent: 'sale' }, 'crm', {})).st === 'info';
+    R.fehler = /Konnektoren „sellify“/.test(ADAPTER.sellify.fehler({ code: 'server_not_connected' })) && /„bodo solutions“/.test(ADAPTER.bodo.fehler({ code: 'server_not_connected' }));
+    const kb = ADAPTER.bodo.projektKontext({ sys: 'bodo', id: 'bp1', n: 'X', orgId: 'o1', orgN: 'Muster', url: 'u' }); R.kontext = /projectId bp1/.test(kb.wo) && /Mandant für diese Anlagen ist Muster/.test(kb.ziel);
+    return R }, BER);
+  check('Adapter: Vertrag vollständig, Berechtigungen passen, Projekte/Benutzer/Prüfung/Fehler/Kontext je System richtig', Object.values(ad).every(Boolean), JSON.stringify(ad));
   check('keine Laufzeitfehler', errs.length === 0, errs.slice(0, 3).join(' | '));
   await b.close();
   if (process.env.KEEP) fs.copyFileSync(tmp, path.join(ROOT, 'tests', '.keep.html')); fs.unlinkSync(tmp);

@@ -1,0 +1,10 @@
+{
+  "_hinweis": "Berechtigungen (capabilities) der veröffentlichten Seite. Quelle für Veröffentlichung und Installation; tests/smoke.js prüft, dass jeder Adapter hier mit allen Werkzeugen steht.",
+  "db": {"rules": [{"path": "", "read": "view", "write": "owner"}]},
+  "mcp": {"servers": [
+    {"server": "bodo solutions", "tools": ["bodo_list_orgs", "bodo_search", "bodo_action"]},
+    {"server": "Claude Code Remote", "tools": ["fire_trigger", "list_triggers"]},
+    {"server": "sellify_mcp", "tools": ["sellify_project", "sellify_user"]}
+  ]},
+  "sample": {"images": true}
+}

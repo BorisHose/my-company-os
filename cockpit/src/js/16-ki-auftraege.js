@@ -1,6 +1,7 @@
 // ===== KI-Aufträge: Ausführung durch Claude über die geplante Aufgabe „Company OS – KI-Auftrag ausführen“ (Abo, keine API) =====
 const RUNNERS={schnell:{get tid(){return (SET.trig&&SET.trig.schnell)||"trig_01KVgWuBkveHDgWXWRsLvMjw"},n:"Company OS – KI-Auftrag ausführen (schnell)",l:"⚡ Schnell (Sonnet)"},gruendlich:{get tid(){return (SET.trig&&SET.trig.gruendlich)||"trig_01ThbM4bYY6h31M3hVDg4fDf"},n:"Company OS – KI-Auftrag ausführen (gründlich)",l:"🔍 Gründlich (Opus)"}};const RUNNER=j=>RUNNERS[(j&&j.tempo)||"gruendlich"]||RUNNERS.gruendlich;const CCR="Claude Code Remote";
-async function ccr(tool,input){await mcpP;if(!MCP)throw {code:"not_granted",message:"Claude-Anbindung auf dieser Seite nicht verfügbar"};const r=await MCP.callTool(CCR,tool,input,{cache:false});let p=r.payload;if(typeof p==="string"){try{p=JSON.parse(p)}catch(x){}}return p}
+// Aufrufe an die geplanten Aufgaben laufen über dieselbe MCP-Verbindung wie die Adapter (07a-adapter-basis.js)
+const ccr=(tool,input)=>mcpRufe(CCR,tool,input,{cache:false},"Claude");
 function jobSer(j){const {f,...r}=j;return JSON.stringify({...r,fid:f?f.id:r.fid})}
 async function kiFresh(j){if(!DB)return j;try{const o=await Store.get("jobs/"+j.id);if(!o)return j;Object.keys(j).forEach(k=>{if(k!=="f")delete j[k]});Object.assign(j,o);j.f=FL.find(f=>f.id===j.fid);LAST.set("jobs/"+j.id,jobSer(j))}catch(e){}return j}
 async function kiReload(quiet){if(!DB)return;try{kiApply(await jobsLaden(),quiet)}catch(e){if(!quiet)toast("Laden nicht möglich")}}
@@ -60,7 +61,7 @@ function kiContext(j){const f=j.f,L=[];if(!f)return "";const cur=j.path[j.path.l
   A.forEach(a=>L.push("Agent „"+a.n+"“ ("+a.id+", Produkt "+PN[a.p]+"): Ziel: "+(a.r||"–")+(a.own&&a.own.length?" · Regeln: "+a.own.join("; "):"")+" · Skills: "+a.s.map(id=>sk(id)?sk(id).n+" ["+(KS(sk(id)).join(", ")||"nur Cockpit")+"]":id).join(", ")+(a.mcp&&a.mcp.length?" · Systeme: "+a.mcp.join(", "):"")));
   if((j.anh||[]).length)L.push("ANHÄNGE – "+j.anh.length+" Bild(er) von "+ICH()+", gehören zum Auftrag und sind für die Aufgabe maßgeblich: "+j.anh.map((a,i)=>"Bild "+(i+1)+" „"+a.name+"“ ("+a.w+"×"+a.h+"): Sammlung anhaenge, Dokumente "+Array.from({length:a.n},(_,k)=>a.aid+"_"+k).join(", ")).join(" | ")+". So lesen: die Dokumente mit ArtifactData get (out_dir) holen, Feld data in Reihenfolge i aneinanderhängen, Base64 zu einer .jpg-Datei dekodieren und mit Read ansehen.");
   if(GLOBAL.length)L.push("Allgemeine Vorgaben: "+GLOBAL.join("; "));
-  L.push("Eigene Bodo-Mandanten (orgId): "+ownOrgs().map(o=>o.name+" = "+o.id).join("; ")+".");
+  adapterListe().filter(a=>a.mand).forEach(a=>L.push("Eigene "+a.n+"-Mandanten (orgId): "+a.mandanten().map(o=>o.name+" = "+o.id).join("; ")+"."));
   L.push("Organisationen: "+ORGS().map(o=>o.n+(o.prod?" → Produkt "+PN[o.prod]:"")).join("; "));
   return L.join("\n")}
 function kiStart(j,mode,ans){const R=RUNNER(j),cut=(s,n)=>(s=String(s||"")).length>n?s.slice(0,n)+" …":s;
@@ -141,7 +142,7 @@ function jobCard(j){const W=jobWho(j),comp=!KOPEN.has(j.id),[oc,ot]=okTxt(j),neu
   else box=`<div class="kbox ${oc}"><b>${esc(ot.replace(/^[^ ]+ /,""))}</b><div>${esc(j.sum||"")}</div>${(j.erg||[]).filter(e=>e&&/^https?:\/\//.test(e.url||"")).length?`<div class="klinks">${j.erg.filter(e=>e&&/^https?:\/\//.test(e.url||"")).map(e=>`<a class="kopen" href="${esc(e.url)}" target="_blank" rel="noopener" title="${esc(e.url)}">↗ Öffnen: ${esc(e.t||"Ergebnis")}</a>`).join("")}</div>`:""}<div class="kact"><button class="btn sm" data-res="${j.id}">Ergebnis ansehen${(j.erg||[]).length?" ("+j.erg.length+")":""}</button><button class="lnk" data-kx="${j.id}" aria-expanded="true">Weniger ▴</button></div></div>`;
   return `<div class="jcard kc ${neu?'neu':''}" data-j="${j.id}">${head}${qt}${steps}${box}${stamp}</div>`}
 function jobs(){
-  $("#kirun").innerHTML=`<span class="dot ${MCP?'':'off'}"></span><span>Ausführung durch Claude über geplante Aufgaben – <b>⚡ schnell</b> (Sonnet) oder <b>🔍 gründlich</b> (Opus), Sitzungen in deinem Abo${KIAT?" · Stand von "+KIAT.toLocaleTimeString("de-DE",{hour:"2-digit",minute:"2-digit"}):""}</span><span style="flex:1"></span><button class="btn sm" id="kirl">⟳ Stand laden</button><button class="btn sm" id="kiruns">Letzten Lauf prüfen</button>`;
+  $("#kirun").innerHTML=`<span class="dot ${mcpBereit()?'':'off'}"></span><span>Ausführung durch Claude über geplante Aufgaben – <b>⚡ schnell</b> (Sonnet) oder <b>🔍 gründlich</b> (Opus), Sitzungen in deinem Abo${KIAT?" · Stand von "+KIAT.toLocaleTimeString("de-DE",{hour:"2-digit",minute:"2-digit"}):""}</span><span style="flex:1"></span><button class="btn sm" id="kirl">⟳ Stand laden</button><button class="btn sm" id="kiruns">Letzten Lauf prüfen</button>`;
   $("#kirl").onclick=()=>kiReload().then(kiCheckRuns);$("#kiruns").onclick=kiRuns;
   const ex=AU.filter(j=>j.beispiel).length;$("#exjobs").innerHTML=ex?`<span class="mark">${ex} Beispiel-Aufträge</span> <button class="btn sm" id="delEx">Beispiele löschen</button>`:"";
   const de=$("#delEx");if(de)de.onclick=async()=>{if(await askOk("Alle "+ex+" Beispiel-Aufträge löschen?")){AU=AU.filter(j=>!j.beispiel);jobs();schedule()}};

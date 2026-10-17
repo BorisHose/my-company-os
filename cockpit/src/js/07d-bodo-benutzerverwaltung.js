@@ -1,42 +1,20 @@
-// ===== Bodo-Anbindung (MCP) =====
-const BODO="bodo solutions";
-const DEF_ORGS=[]; // eigene Mandanten stehen in den Einstellungen (settings.bodoOrgs)
-const ownOrgs=()=>(SET.bodoOrgs&&SET.bodoOrgs.length?SET.bodoOrgs:DEF_ORGS);
-let MCP;const mcpP=(window.claude?window.claude.use("mcp"):Promise.resolve(null)).then(m=>MCP=m).catch(()=>MCP=null);
-const ST={active:"aktiv",unclaimed:"ohne Zugang",invited:"eingeladen",suspended:"gesperrt",left:"ausgetreten"};
-const stBadge=m=>(m.sys!=="bodo"&&m.sys!=="sellify")||!m.status?"":`<span class="stb ${m.status}">${ST[m.status]||esc(m.status)}</span>`;
-function mcpMsg(e){const c=e&&e.code;return c==="server_not_connected"?"Bodo-Verbindung nicht gefunden – in claude.ai unter Einstellungen → Konnektoren „bodo solutions“ hinzufügen."
-  :c==="needs_reauth"?"Bodo-Verbindung abgelaufen – in claude.ai unter Einstellungen → Konnektoren neu verbinden."
-  :c==="not_in_manifest"||c==="not_granted"||c==="consent_required"?"Der Zugriff auf Bodo wurde für diese Seite nicht erlaubt (Berechtigungen der Seite)."
-  :c==="approval_required"?"Der Aufruf braucht deine Freigabe – bitte erneut versuchen und erlauben."
-  :c==="selection_required"?"Mehrere Bodo-Verbindungen vorhanden – bitte in claude.ai eine auswählen."
-  :c==="server_unavailable"?"Bodo antwortet gerade nicht – kurz warten und erneut versuchen."
-  :c==="tool_error"?"Bodo hat abgelehnt: "+(e.message||""):"Fehler bei Bodo ("+(c||"unbekannt")+"): "+(e&&e.message||"")}
-async function bodo(tool,input,write){await mcpP;if(!MCP)throw {code:"not_granted",message:"Bodo-Anbindung auf dieser Seite nicht verfügbar"};
-  const r=await MCP.callTool(BODO,tool,input,write?{cache:false}:undefined);let p=r.payload;if(typeof p==="string"){try{p=JSON.parse(p)}catch(x){}}return p}
-const SELLIFY="sellify_mcp";
-async function sellify(tool,input){await mcpP;if(!MCP)throw {code:"not_granted",message:"sellify-Anbindung auf dieser Seite nicht verfügbar"};
-  const r=await MCP.callTool(SELLIFY,tool,input);let p=r.payload;if(typeof p==="string"){try{p=JSON.parse(p)}catch(x){}}return p}
-const sfMsg=e=>mcpMsg(e).replace(/„bodo solutions“/g,"„sellify“").replace(/Bodo/g,"sellify");
-async function findSeats(orgId,mail,name){const q=async s=>{const p=await bodo("bodo_search",{resourceType:"benutzer",orgId,query:s,limit:50});return (p&&p.items||[]).map(x=>x.data||{})};
-  const L=[];const add=a=>a.forEach(x=>{if(!L.some(y=>y.membershipId===x.membershipId))L.push(x)});
-  if(mail)add(await q(mail));if(name)add(await q(name));
-  const m=(mail||"").toLowerCase(),nn=(name||"").toLowerCase();
-  return L.filter(x=>x.status!=="left"&&((m&&(x.email||"").toLowerCase()===m)||(nn&&(x.name||"").toLowerCase()===nn)))}
+// ===== Bodo-Benutzerverwaltung (systemeigene Oberfläche des Bodo-Adapters) =====
+// Eigene Bodo-Mandanten festlegen, Benutzer-Assistent (Benutzer in Bodo-Mandanten anlegen oder übernehmen) und Einladen.
+// Spricht Bodo ausschließlich über den Adapter an (BODO_A.rufe / .fehler / .benutzerSuchen).
+const BODO_A=ADAPTER.bodo;
 // zweistufig: erster Aufruf, ggf. Vorschau mit confirmToken -> confirmFn entscheidet
 async function bodoAction(orgId,action,fields,confirmFn){const base={resourceType:"benutzer",action,orgId,fields};
-  let r=await bodo("bodo_action",base,1);
-  if(r&&r.vollzug!=="ausgefuehrt"&&r.confirmToken){if(!await confirmFn(r))return {abgebrochen:true};r=await bodo("bodo_action",{...base,confirmToken:r.confirmToken},1)}
+  let r=await BODO_A.rufe("bodo_action",base,1);
+  if(r&&r.vollzug!=="ausgefuehrt"&&r.confirmToken){if(!await confirmFn(r))return {abgebrochen:true};r=await BODO_A.rufe("bodo_action",{...base,confirmToken:r.confirmToken},1)}
   if(!r||r.vollzug!=="ausgefuehrt")throw {code:"tool_error",message:(r&&(r.meldung||r.message||r.vollzug))||"nicht ausgeführt"};return r}
 const confirmBodo=(titel)=>r=>dlg(`<h3 style="margin:0 0 10px;font-size:15px">${esc(titel)}</h3><p style="margin:0 0 8px">Bodo verlangt für diese Aktion eine Bestätigung.</p>${r.vorschau&&r.vorschau.wirkung?`<div class="infobox">${esc(r.vorschau.wirkung)}</div>`:""}<div class="btns" style="justify-content:flex-end"><button class="btn" data-no>Abbrechen</button><button class="btn p" data-yes>In Bodo bestätigen</button></div>`).then(v=>!!v);
-function modalBox(html,wide){$("#modal").innerHTML=`<div class="modal"><div class="box wz ${wide?'wide':''}" id="box">${html}</div></div>`;return ()=>$("#modal").innerHTML=""}
 // Eigene Mandanten festlegen
 async function ownOrgsDlg(){const close=modalBox(`<div class="bhead"><h3>Eigene Bodo-Mandanten</h3><button class="ic" id="mclose" style="font-size:18px">✕</button></div><p class="hint" style="margin:0 0 10px">Nur diese Mandanten bietet der Benutzer-Assistent an. Kundensysteme bleiben außen vor.</p><div id="olist" class="hint">Lade Mandanten aus Bodo …</div><div class="btns" style="margin-top:12px;justify-content:flex-end"><button class="btn" id="mx">Abbrechen</button><button class="btn p" id="ms" disabled>Speichern</button></div>`);
   $("#mclose").onclick=close;$("#mx").onclick=close;
-  try{const p=await bodo("bodo_list_orgs",{});const O=(p&&p.orgs)||[],sel=new Set(ownOrgs().map(o=>o.id));
+  try{const p=await BODO_A.rufe("bodo_list_orgs",{});const O=(p&&p.orgs)||[],sel=new Set(ownOrgs().map(o=>o.id));
     $("#olist").innerHTML=O.map(o=>`<label class="cb"><input type="checkbox" data-o="${o.orgId}" data-n="${esc(o.name)}" ${sel.has(o.orgId)?'checked':''}> ${esc(o.name)}${o.instanzArt?` <span class="badge">${esc(o.instanzArt)}</span>`:""}</label>`).join("");$("#ms").disabled=false;
     $("#ms").onclick=()=>{SET.bodoOrgs=[...document.querySelectorAll("[data-o]:checked")].map(c=>({id:c.dataset.o,name:c.dataset.n}));schedule();close();toast("Eigene Mandanten gespeichert")}}
-  catch(e){$("#olist").innerHTML=`<div class="warnbox">${esc(mcpMsg(e))}</div>`}}
+  catch(e){$("#olist").innerHTML=`<div class="warnbox">${esc(BODO_A.fehler(e))}</div>`}}
 // Assistent Neuer Benutzer / weitere Mandanten
 function wizard(exist){
   const W={step:exist?2:1,vn:"",nn:"",n:exist?exist.n:"",kz:exist?(exist.kz||""):"",mail:exist?(exist.mail||""):"",rolle:exist?(exist.rolle||""):"",orgs:new Set(),chk:{},dec:{},err:""};
@@ -87,7 +65,7 @@ function wizard(exist){
     if(W.step===2){document.querySelectorAll("[data-wo]").forEach(c=>c.onchange=()=>{c.checked?W.orgs.add(c.dataset.wo):W.orgs.delete(c.dataset.wo);render()});
       const wb=g("wb");if(wb)wb.onclick=()=>{W.step=1;render()};
       g("wn").onclick=async()=>{if(!W.orgs.size){W.step=4;return render()}W.step=3;W.chk={};render();
-        await Promise.all([...W.orgs].map(async id=>{try{const hits=await findSeats(id,W.mail,nm());W.chk[id]={hits};W.dec[id]=W.dec[id]||(hits[0]?"use:"+hits[0].membershipId:"new")}catch(e){W.chk[id]={err:mcpMsg(e)};W.dec[id]="skip"}if(W.step===3)render()}))}}
+        await Promise.all([...W.orgs].map(async id=>{try{const hits=await BODO_A.benutzerSuchen({mand:{id:id},name:nm(),mail:W.mail});W.chk[id]={hits};W.dec[id]=W.dec[id]||(hits[0]?"use:"+hits[0].membershipId:"new")}catch(e){W.chk[id]={err:BODO_A.fehler(e)};W.dec[id]="skip"}if(W.step===3)render()}))}}
     if(W.step===3){document.querySelectorAll("input[type=radio]").forEach(r=>r.onchange=()=>{W.dec[r.name.slice(2)]=r.value});g("wb").onclick=()=>{W.step=2;render()};g("wn").onclick=()=>{W.step=4;render()}}
     if(W.step===4){g("wb").onclick=()=>{W.step=W.orgs.size?3:2;render()};
       g("wgo").onclick=async()=>{g("wgo").disabled=true;W.err="";const log=t=>{const l=g("wlog");if(l)l.innerHTML+=esc(t)+"<br>"};
@@ -98,10 +76,10 @@ function wizard(exist){
           try{let h;
             if(d==="new"){const f={name:nm()};if(W.vn)f.vorname=W.vn;if(W.nn)f.nachname=W.nn;if(W.kz)f.kuerzel=W.kz;if(W.mail)f.email=W.mail;
               const r=await bodoAction(id,"sitz_anlegen",f,confirmBodo("Benutzer ohne Zugang in „"+o.name+"“ anlegen"));if(r.abgebrochen){fail.push(o.name+": abgebrochen");continue}
-              h=(await findSeats(id,W.mail,nm())).find(x=>x.status==="unclaimed")||{name:nm(),email:W.mail,status:"unclaimed"};log(o.name+": Benutzer ohne Zugang angelegt")}
+              h=(await BODO_A.benutzerSuchen({mand:{id:id},name:nm(),mail:W.mail})).find(x=>x.status==="unclaimed")||{name:nm(),email:W.mail,status:"unclaimed"};log(o.name+": Benutzer ohne Zugang angelegt")}
             else{h=W.chk[id].hits.find(x=>"use:"+x.membershipId===d);log(o.name+": vorhandenen Benutzer übernommen")}
             u.maps.push({sys:"bodo",inst:o.name,instId:id,ext:h.name||nm(),mail:h.email||W.mail||"",extId:h.membershipId||"",userId:h.userId||"",status:h.status||"",rollen:(h.roleNames||[]).join(", "),quelle:q})}
-          catch(e){fail.push(o.name+": "+mcpMsg(e))}}
+          catch(e){fail.push(o.name+": "+BODO_A.fehler(e))}}
         ucur=US.indexOf(u);schedule();users();
         if(fail.length){W.err="Nicht alles hat geklappt – "+fail.join(" · ")+". Der Rest ist gespeichert.";render()}else{close();toast(exist?"Zuordnungen ergänzt":"Benutzer angelegt")}}}
   };
@@ -114,18 +92,11 @@ async function inviteDlg(u,m){const close=modalBox(`<div class="bhead"><h3>${esc
    <div class="warnbox" style="font-size:13px"><b>Bodo schickt sofort eine Einladungs-Mail</b> an die angegebene Adresse.</div><div id="ierr"></div>
    <div class="btns" style="margin-top:14px;justify-content:flex-end"><button class="btn" id="mx">Abbrechen</button><button class="btn p" id="igo" disabled>Einladung senden</button></div>`);
   $("#mclose").onclick=close;$("#mx").onclick=close;
-  try{const p=await bodo("bodo_search",{resourceType:"rolle",orgId:m.instId,achsen:{aktiv:true}});const R=((p&&p.items)||[]).map(x=>x.data||{}).filter(r=>r.key!=="owner");
+  try{const p=await BODO_A.rufe("bodo_search",{resourceType:"rolle",orgId:m.instId,achsen:{aktiv:true}});const R=((p&&p.items)||[]).map(x=>x.data||{}).filter(r=>r.key!=="owner");
     $("#irol").innerHTML=R.map(r=>`<label class="cb"><input type="checkbox" data-r="${r._id}" data-rn="${esc(r.name)}"> ${esc(r.name)}</label>`).join("")||"Keine vergebbaren Rollen gefunden.";
     const chk=()=>$("#igo").disabled=!document.querySelector("#irol [data-r]:checked");document.querySelectorAll("#irol [data-r]").forEach(c=>c.onchange=chk);
     $("#igo").onclick=async()=>{$("#igo").disabled=true;const rollen=[...document.querySelectorAll("#irol [data-r]:checked")].map(c=>c.dataset.r),rn=[...document.querySelectorAll("#irol [data-r]:checked")].map(c=>c.dataset.rn);
       try{const r=await bodoAction(m.instId,"einladen",{sitzId:m.extId,rollen,name:u.n},confirmBodo("Einladung an "+u.n+" senden"));if(r.abgebrochen){$("#igo").disabled=false;return}
         m.status="invited";m.rollen=rn.join(", ");m.eingeladen=new Date().toISOString().slice(0,10);schedule();close();users();toast("Einladung verschickt")}
-      catch(e){$("#ierr").innerHTML=`<div class="warnbox">${esc(mcpMsg(e))}</div>`;$("#igo").disabled=false}}}
-  catch(e){$("#irol").innerHTML=`<div class="warnbox">${esc(mcpMsg(e))}</div>`}}
-// Abgleich: Status/IDs aus Bodo nachziehen
-async function syncUser(u){const B=(u.maps||[]).filter(m=>(m.sys==="bodo"&&m.instId)||m.sys==="sellify"),FE=uFehlt(u);if(!B.length&&!FE.length)return toast("Keine Systeme zum Abgleichen");toast("Gleiche ab …");let n=0,neu=0,f=[];
-  for(const x of FE){try{const H=uFrei(x,u,await uSeats(x,u));if(H.length===1){(u.maps=u.maps||[]).push(uMapVon(x,H[0]));neu++}else f.push(x.name+": "+(H.length?H.length+" Treffer – bitte „In "+SYS[x.sys]+" suchen“":"nicht gefunden"))}catch(e){f.push(x.name+": "+uErr(x,e))}}
-  for(const m of B){try{const H=m.sys==="sellify"?await sfSeats(m.ext||u.n,m.mail||u.mail):await findSeats(m.instId,m.mail||u.mail,m.ext||u.n);const h=H.find(x=>x.membershipId===m.extId)||(m.sys==="bodo"?(H.find(x=>x.status==="active")||H[0]):null);
-      if(h){Object.assign(m,{ext:h.name,mail:h.email||m.mail,extId:h.membershipId,userId:h.userId||m.userId||"",status:h.status,rollen:(h.roleNames||[]).join(", "),quelle:"aus "+SYS[m.sys]+" gelesen",at:new Date().toISOString()});if(m.status==="unclaimed"&&h.offeneEinladung)m.status="invited";n++}else f.push((m.inst||SYS[m.sys])+": nicht gefunden")}
-    catch(e){f.push((m.inst||SYS[m.sys])+": "+(m.sys==="sellify"?sfMsg(e):mcpMsg(e)))}}
-  schedule();users();toast(n+" Zuordnung(en) abgeglichen"+(neu?", "+neu+" neu zugeordnet":"")+(f.length?" · "+f.join(" · "):""))}
+      catch(e){$("#ierr").innerHTML=`<div class="warnbox">${esc(BODO_A.fehler(e))}</div>`;$("#igo").disabled=false}}}
+  catch(e){$("#irol").innerHTML=`<div class="warnbox">${esc(BODO_A.fehler(e))}</div>`}}

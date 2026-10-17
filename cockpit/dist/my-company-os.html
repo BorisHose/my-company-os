@@ -1422,7 +1422,7 @@ const COL=new Set();
 let PF="bodo",AF="bodo",GEN=false;
 const PK=[["bodo","Bodo"],["sellify","sellify"],["all","Andere"]];
 const PN={bodo:"Bodo",sellify:"sellify",all:"Andere",multi:"Bodo + sellify"};
-const VER="69";
+const VER="70";
 // Produktbereiche: fest im Programm hinterlegt (Entscheidung Boris 09.10.2026), keine Konfiguration in der Datenbank
 const PT={bodo:"Produktbereich Bodo (Bodo Solutions, Mitgliederverwaltung) – alles, was für Bodo-Kunden und das Bodo-System gebraucht wird. Fest im Programm hinterlegt.",sellify:"Produktbereich sellify (business//acts, CRM-Plattform) – alles, was für sellify-Kunden und das sellify-System gebraucht wird. Fest im Programm hinterlegt.",all:"Andere = produktunabhängig, z. B. Web-QA, E-Mail, Word/PDF. Fest im Programm hinterlegt."};
 let AFIL="all";
@@ -1491,7 +1491,6 @@ function saveUI(){try{localStorage.setItem("cos-ui",JSON.stringify({eopen:[...EO
 function setLib(on){on=false;LIBON=on;$("#build").classList.toggle("nolib",!on);const b=$("#libtg");if(b)b.textContent=on?"Bibliothek ausblenden ▸":"◂ Bibliothek einblenden";saveUI()}
 // ===== Benutzer (Menschen) =====
 let US=[],ucur=-1,UOLD=false;
-const SYS={bodo:"Bodo",sellify:"sellify",andere:"Anderes System"};
 const usr=id=>US.find(u=>u.id===id);
 const ini=n=>String(n||"?").replace(/^(Dr\.|Prof\.)\s*/,"").split(/\s+/).filter(Boolean).map(x=>x[0]).slice(0,2).join("").toUpperCase()||"?";
 const hue=s=>{let h=0;for(const c of String(s))h=(h*31+c.charCodeAt(0))%360;return h};
@@ -1519,45 +1518,143 @@ function migrateOrgs(){if(SET.orgMig)return false;SET.orgMig=1;ORGS();const map=
 const usersSel=(id,val,leer)=>`<select id="${id}"><option value="">${leer}</option>${US.filter(u=>u.aktiv!==false||u.id===val).map(u=>`<option value="${u.id}" ${u.id===val?'selected':''}>${esc(u.n)}${u.aktiv===false?' (ausgeschieden)':''}</option>`).join("")}</select>`;
 function shrink(file){return new Promise((res,rej)=>{const r=new FileReader();r.onload=()=>{const im=new Image();im.onload=()=>{const S=160,c=document.createElement("canvas");c.width=c.height=S;const x=c.getContext("2d"),m=Math.min(im.width,im.height);
   x.drawImage(im,(im.width-m)/2,(im.height-m)/2,m,m,0,0,S,S);res(c.toDataURL("image/jpeg",.85))};im.onerror=rej;im.src=r.result};r.onerror=rej;r.readAsDataURL(file)})}
-// ===== Bodo-Anbindung (MCP) =====
-const BODO="bodo solutions";
-const DEF_ORGS=[]; // eigene Mandanten stehen in den Einstellungen (settings.bodoOrgs)
-const ownOrgs=()=>(SET.bodoOrgs&&SET.bodoOrgs.length?SET.bodoOrgs:DEF_ORGS);
-let MCP;const mcpP=(window.claude?window.claude.use("mcp"):Promise.resolve(null)).then(m=>MCP=m).catch(()=>MCP=null);
-const ST={active:"aktiv",unclaimed:"ohne Zugang",invited:"eingeladen",suspended:"gesperrt",left:"ausgetreten"};
-const stBadge=m=>(m.sys!=="bodo"&&m.sys!=="sellify")||!m.status?"":`<span class="stb ${m.status}">${ST[m.status]||esc(m.status)}</span>`;
-function mcpMsg(e){const c=e&&e.code;return c==="server_not_connected"?"Bodo-Verbindung nicht gefunden – in claude.ai unter Einstellungen → Konnektoren „bodo solutions“ hinzufügen."
-  :c==="needs_reauth"?"Bodo-Verbindung abgelaufen – in claude.ai unter Einstellungen → Konnektoren neu verbinden."
-  :c==="not_in_manifest"||c==="not_granted"||c==="consent_required"?"Der Zugriff auf Bodo wurde für diese Seite nicht erlaubt (Berechtigungen der Seite)."
+// ===== Adapter-Basis: Anbindung an Backend-Systeme über claude.ai-Konnektoren (MCP) =====
+// Grundsatz: Kein Teil von Company OS spricht ein Backend-System direkt an. Projekte, Benutzer-Zuordnung und Anbindungen
+// rufen ausschließlich die Funktionen eines Adapters auf. Ein neues System = eine neue Adapter-Datei (07x-adapter-<system>.js),
+// die sich mit adapterRegistrieren() anmeldet. Die Reihenfolge der Registrierung ist die Anzeigereihenfolge.
+//
+// Vertrag eines Adapters (alle Felder Pflicht, Funktionen asynchron, wo angegeben):
+//   id            Kennung im Datenbestand (z. B. "bodo"); nie ändern, steht in gespeicherten Zuordnungen und Projekten
+//   n             Anzeigename
+//   server        Name des claude.ai-Konnektors für Aufrufe aus der Seite
+//   connector     Name des Konnektors in Hinweistexten
+//   werkzeuge     Werkzeuge des Konnektors, die die Seite aufruft (= Berechtigungen der Seite, Grundlage für die Installation)
+//   mand          true, wenn das System Mandanten kennt (dann gehört zu jeder Anbindung eine orgId)
+//   kiUser        true, wenn das System KI-Benutzer (Agent als eigener, nicht-physischer Benutzer) kennt
+//   neuZuerst     true, wenn Projektlisten nach Anlagedatum (neueste zuerst) geliefert werden
+//   ent           je Dienst (crm, auftrag, projekt, zeit) die Entitäten als [[kennung, anzeigename], …]; leer = Dienst nicht verfügbar
+//   rufe(tool, input, schreiben)      → Rohaufruf eines Konnektor-Werkzeugs (nur im Adapter selbst und in systemeigenen Oberflächen,
+//                                       z. B. der Bodo-Benutzerverwaltung; schreiben = true umgeht den Zwischenspeicher)
+//   fehler(e)                         → Fehlertext für die Oberfläche
+//   mandanten()                       → [{id, name}] der eigenen Mandanten (leer, wenn mand = false)
+//   pruefen(d, dienst, ctx)           → {st: "ok"|"err"|"info", t}  (d = Anbindung {sys, orgId, orgN, ent}; ctx = Zwischenspeicher je Prüflauf)
+//   projekte({mand, q, alle, next})   → {items:[{id, title, n, url, st, owner, descr}], next, total, neuZuerst}  (eine Seite)
+//   benutzerSuchen({mand, name, mail})→ [{name, email, membershipId, userId, status, roleNames}]  (nur eindeutige Treffer nach Name/E-Mail)
+//   projektKontext(bk)                → {wo, ziel}  Texte für die Claude-Sitzung zu einem verbundenen Projekt
+//   abgleichErsatz                    true: findet der Abgleich die gespeicherte Benutzer-Id nicht mehr, darf er einen anderen Treffer übernehmen
+//   mandantenDlg                      optional: Funktion, die die eigenen Mandanten pflegen lässt (Knopf unter ⚙ Anbindungen)
+//   pruefHinweis                      optional: Hinweistext, was die Seite bei diesem System nicht selbst prüfen kann
+
+const LISTE_SEITE=25; // Grundsatz Backend-Listen (Boris 17.10.2026): seitenweise, 25 je Abruf, neueste zuerst wo möglich
+const DIENSTE=[["crm","CRM","Kontakte, Organisationen, Verkaufschancen"],["auftrag","Auftragsmanagement","der kommerzielle Auftrag – in der Regel über das Projekt geführt"],["projekt","Projekt","Klammer für Aufgaben, Notizen und Termine eines Auftrags"],["zeit","Zeiterfassung","Zeiteinträge, z. B. für die Laufzeit der KI-Sitzungen"]];
+
+// --- MCP-Verbindung der Seite (eine für alle Konnektoren) ---
+let MCP=null;const mcpP=(window.claude?window.claude.use("mcp"):Promise.resolve(null)).then(m=>MCP=m).catch(()=>MCP=null);
+const mcpBereit=()=>!!MCP;
+// Aufruf eines Konnektor-Werkzeugs; liefert die Nutzlast (JSON wird ausgepackt). opts wird unverändert an callTool gegeben.
+async function mcpRufe(server,tool,input,opts,name){await mcpP;if(!MCP)throw {code:"not_granted",message:(name||server)+"-Anbindung auf dieser Seite nicht verfügbar"};
+  const r=await MCP.callTool(server,tool,input,opts);let p=r.payload;if(typeof p==="string"){try{p=JSON.parse(p)}catch(x){}}return p}
+// Fehlertext für Konnektor-Fehler; name = Systemname in der Meldung, connector = Konnektorname in claude.ai
+function mcpFehlerText(e,name,connector){const c=e&&e.code;
+  return c==="server_not_connected"?name+"-Verbindung nicht gefunden – in claude.ai unter Einstellungen → Konnektoren „"+connector+"“ hinzufügen."
+  :c==="needs_reauth"?name+"-Verbindung abgelaufen – in claude.ai unter Einstellungen → Konnektoren neu verbinden."
+  :c==="not_in_manifest"||c==="not_granted"||c==="consent_required"?"Der Zugriff auf "+name+" wurde für diese Seite nicht erlaubt (Berechtigungen der Seite)."
   :c==="approval_required"?"Der Aufruf braucht deine Freigabe – bitte erneut versuchen und erlauben."
-  :c==="selection_required"?"Mehrere Bodo-Verbindungen vorhanden – bitte in claude.ai eine auswählen."
-  :c==="server_unavailable"?"Bodo antwortet gerade nicht – kurz warten und erneut versuchen."
-  :c==="tool_error"?"Bodo hat abgelehnt: "+(e.message||""):"Fehler bei Bodo ("+(c||"unbekannt")+"): "+(e&&e.message||"")}
-async function bodo(tool,input,write){await mcpP;if(!MCP)throw {code:"not_granted",message:"Bodo-Anbindung auf dieser Seite nicht verfügbar"};
-  const r=await MCP.callTool(BODO,tool,input,write?{cache:false}:undefined);let p=r.payload;if(typeof p==="string"){try{p=JSON.parse(p)}catch(x){}}return p}
-const SELLIFY="sellify_mcp";
-async function sellify(tool,input){await mcpP;if(!MCP)throw {code:"not_granted",message:"sellify-Anbindung auf dieser Seite nicht verfügbar"};
-  const r=await MCP.callTool(SELLIFY,tool,input);let p=r.payload;if(typeof p==="string"){try{p=JSON.parse(p)}catch(x){}}return p}
-const sfMsg=e=>mcpMsg(e).replace(/„bodo solutions“/g,"„sellify“").replace(/Bodo/g,"sellify");
-async function findSeats(orgId,mail,name){const q=async s=>{const p=await bodo("bodo_search",{resourceType:"benutzer",orgId,query:s,limit:50});return (p&&p.items||[]).map(x=>x.data||{})};
-  const L=[];const add=a=>a.forEach(x=>{if(!L.some(y=>y.membershipId===x.membershipId))L.push(x)});
-  if(mail)add(await q(mail));if(name)add(await q(name));
-  const m=(mail||"").toLowerCase(),nn=(name||"").toLowerCase();
-  return L.filter(x=>x.status!=="left"&&((m&&(x.email||"").toLowerCase()===m)||(nn&&(x.name||"").toLowerCase()===nn)))}
+  :c==="selection_required"?"Mehrere "+name+"-Verbindungen vorhanden – bitte in claude.ai eine auswählen."
+  :c==="server_unavailable"?name+" antwortet gerade nicht – kurz warten und erneut versuchen."
+  :c==="tool_error"?name+" hat abgelehnt: "+(e.message||""):"Fehler bei "+name+" ("+(c||"unbekannt")+"): "+(e&&e.message||"")}
+
+// --- Register ---
+const ADAPTER={};
+const ADAPTER_PFLICHT=["id","n","server","connector","werkzeuge","mand","kiUser","neuZuerst","ent","rufe","fehler","mandanten","pruefen","projekte","benutzerSuchen","projektKontext","abgleichErsatz"];
+function adapterRegistrieren(a){const fehlt=ADAPTER_PFLICHT.filter(k=>!(k in a));if(fehlt.length)throw new Error("Adapter "+(a.id||"?")+" unvollständig: "+fehlt.join(", "));
+  DIENSTE.forEach(([k])=>{if(!Array.isArray(a.ent[k]))throw new Error("Adapter "+a.id+": Entitäten für Dienst "+k+" fehlen")});ADAPTER[a.id]=Object.freeze(a)}
+const adapter=id=>ADAPTER[id]||null;
+const adapterListe=()=>Object.values(ADAPTER);
+const sysName=id=>ADAPTER[id]?ADAPTER[id].n:id==="andere"?"Anderes System":String(id||"");
+const entN=(s,d,e)=>((ADAPTER[s]&&ADAPTER[s].ent[d]||[]).find(x=>x[0]===e)||[e,e])[1];
+// Berechtigungen der Seite, wie sie die Adapter brauchen (für Installation und Prüfung; Claude Code Remote kommt aus der Ausführung dazu)
+const adapterWerkzeuge=()=>adapterListe().map(a=>({server:a.server,tools:[...a.werkzeuge]}));
+
+// ===== Adapter Bodo (Konnektor „bodo solutions“) =====
+// Bodo kennt Mandanten (orgId). Eigene Mandanten stehen in den Einstellungen (settings.bodoOrgs) und werden in ⚙ Anbindungen gepflegt.
+const ownOrgs=()=>(SET.bodoOrgs&&SET.bodoOrgs.length?SET.bodoOrgs:[]);
+adapterRegistrieren((()=>{
+  const N="Bodo",SERVER="bodo solutions";
+  const rufe=(tool,input,schreiben)=>mcpRufe(SERVER,tool,input,schreiben?{cache:false}:undefined,N);
+  const fehler=e=>mcpFehlerText(e,N,SERVER);
+  const pjStatus=s=>s==="active"?"aktiv":s==="paused"?"pausiert":"abgeschlossen";
+  return {id:"bodo",n:N,server:SERVER,connector:SERVER,werkzeuge:["bodo_list_orgs","bodo_search","bodo_action"],
+    mand:true,kiUser:false,neuZuerst:false,abgleichErsatz:true,
+    ent:{crm:[["contact","Kontakt/Firma"],["member","Vertragsinhaber"],["opportunity","Verkaufschance"],["lead","Vertriebsanfrage"]],auftrag:[["order","Auftrag"],["opportunity","Verkaufschance"]],projekt:[["project","Projekt"]],zeit:[["timeEntry","Zeiteintrag"]]},
+    rufe,fehler,mandanten:ownOrgs,mandantenDlg:()=>ownOrgsDlg(),
+    // Mandant erreichbar, KI-Zugang aktiv, Entität lesbar; die Mandantenliste wird je Prüflauf nur einmal geholt (ctx)
+    async pruefen(d,dienst,ctx){
+      if(!ctx.bodoOrgs)ctx.bodoOrgs=((await rufe("bodo_list_orgs",{}))||{}).orgs||[];const m=ctx.bodoOrgs.find(x=>x.orgId===d.orgId);
+      if(!m)return {st:"err",t:"Mandant „"+(d.orgN||d.orgId)+"“ ist für dieses Konto nicht erreichbar"};
+      if(m.mcpAccess&&m.mcpAccess.allowed===false)return {st:"err",t:m.mcpAccess.message||"KI-Zugang im Mandanten gesperrt"};
+      await rufe("bodo_search",{resourceType:d.ent,orgId:d.orgId,limit:1,fields:["_id"]});
+      return {st:"ok",t:"Mandant „"+m.name+"“ erreichbar, "+entN("bodo",dienst,d.ent)+" lesbar"}},
+    // Eine Seite Projekte; Bodo sortiert alphabetisch (keine Sortierung nach Anlagedatum in der Schnittstelle)
+    async projekte({mand,q,alle,next}){const inp={resourceType:"project",orgId:mand.id,achsen:{status:alle?"alle":"aktiv"},limit:LISTE_SEITE};if(q)inp.query=q;if(next)inp.cursor=next;
+      const r=await rufe("bodo_search",inp);
+      return {items:((r&&r.items)||[]).map(x=>{const d=x.data||{};return {id:String(x.id),title:x.title||d.name||"",n:x.title||d.name||"",url:x.url||"",st:pjStatus(d.projectStatus),owner:d.ownerName||"",descr:d.description||""}}),
+        next:r&&r.hasMore&&r.nextCursor||null,total:null,neuZuerst:false}},
+    // Benutzer (Sitze) im Mandanten nach E-Mail und Name; nur exakte Treffer, ausgetretene nicht
+    async benutzerSuchen({mand,name,mail}){const orgId=mand&&mand.id;const q=async s=>{const p=await rufe("bodo_search",{resourceType:"benutzer",orgId,query:s,limit:50});return (p&&p.items||[]).map(x=>x.data||{})};
+      const L=[];const add=a=>a.forEach(x=>{if(!L.some(y=>y.membershipId===x.membershipId))L.push(x)});
+      if(mail)add(await q(mail));if(name)add(await q(name));
+      const m=(mail||"").toLowerCase(),nn=(name||"").toLowerCase();
+      return L.filter(x=>x.status!=="left"&&((m&&(x.email||"").toLowerCase()===m)||(nn&&(x.name||"").toLowerCase()===nn)))},
+    projektKontext:B=>({wo:"Bodo-Projekt „"+B.n+"“ (projectId "+B.id+", Mandant "+(B.orgN||"")+" = orgId "+B.orgId+", "+B.url+")",
+      ziel:"Mandant für diese Anlagen ist "+(B.orgN||B.orgId)+" (durch das Projekt eindeutig, keine Annahme)"})}})());
+
+// ===== Adapter sellify (Konnektor „sellify_mcp“) =====
+// sellify ist ein System ohne Mandanten. Die Seite liest Projekte und Benutzer; alles Weitere erreicht die Claude-Sitzung über ihren Konnektor.
+adapterRegistrieren((()=>{
+  const N="sellify",SERVER="sellify_mcp",CONNECTOR="sellify";
+  const rufe=(tool,input,schreiben)=>mcpRufe(SERVER,tool,input,schreiben?{cache:false}:undefined,N);
+  const fehler=e=>mcpFehlerText(e,N,CONNECTOR);
+  const pjStatus=x=>x.done?"abgeschlossen":/paus|ruht|hold/i.test(((x.status||{}).name||{})["de-DE"]||"")?"pausiert":"aktiv";
+  const mail=p=>{const e=p&&p.emailAddress;return typeof e==="string"?e:e?(e.address||e.value||e.email||""):""};
+  return {id:"sellify",n:N,server:SERVER,connector:CONNECTOR,werkzeuge:["sellify_project","sellify_user"],
+    mand:false,kiUser:false,neuZuerst:true,abgleichErsatz:false,
+    ent:{crm:[["contact","Organisation"],["person","Person"],["sale","Chance"]],auftrag:[["sale","Chance"],["project","Projekt"]],projekt:[["project","Projekt"]],zeit:[]},
+    rufe,fehler,mandanten:()=>[],
+    pruefHinweis:"Bei sellify prüft die Seite nur die Projekte; die übrigen Bereiche erreicht die Claude-Sitzung über ihren Connector.",
+    // Prüfbar ist aus der Seite nur die Entität Projekt (Werkzeug sellify_project)
+    async pruefen(d,dienst){if(d.ent!=="project")return {st:"info",t:N+" ist aus dieser Seite nicht prüfbar – die Claude-Sitzung nutzt den Connector „"+CONNECTOR+"“."};
+      await rufe("sellify_project",{action:"list",params:{limit:1}});return {st:"ok",t:N+" erreichbar, "+entN("sellify",dienst,d.ent)+" lesbar"}},
+    // Eine Seite Projekte, neueste zuerst (sort -registered), mit Gesamtzahl
+    async projekte({q,alle,next}){const params={limit:LISTE_SEITE,offset:next||0,sort:"-registered"};if(!alle)params.done=false;if(q)params.q=q;
+      const r=await rufe("sellify_project",{action:"list",params});
+      return {items:((r&&r.items)||[]).map(x=>{const o=x.responsible||{};return {id:String(x.id),title:(x.name||"")+(x.number?" ("+x.number+")":""),n:x.name||"",url:x.webUrl||"",st:pjStatus(x),owner:[o.firstName,o.lastName].filter(Boolean).join(" "),descr:x.description||""}}),
+        next:r&&r.hasMore?(r.nextOffset||(next||0)+LISTE_SEITE):null,total:r&&r.total!=null?r.total:null,neuZuerst:true}},
+    // Benutzer nach Nachname suchen; Treffer nur bei gleichem vollen Namen oder gleicher E-Mail, gelöschte nicht
+    async benutzerSuchen({name,mail:m}){const nn=String(name||"").trim().toLowerCase(),mm=String(m||"").trim().toLowerCase(),q=String(name||"").trim().split(/\s+/).pop()||"";if(!q)return [];
+      const r=await rufe("sellify_user",{action:"list",params:{q,limit:25}});
+      return ((r&&r.items)||[]).filter(x=>!x.deleted).map(x=>{const p=x.person||{};return {name:[p.firstName,p.lastName].filter(Boolean).join(" "),email:mail(p),membershipId:String(x.id),userId:x.login||"",status:x.retired||(p.retired)?"left":x.canLogin===false?"unclaimed":"active",roleNames:(x.roles||[]).filter(r=>!r.deleted).map(r=>r.name)}})
+        .filter(h=>(mm&&h.email.toLowerCase()===mm)||(nn&&h.name.toLowerCase()===nn))},
+    projektKontext:B=>({wo:"sellify-Projekt „"+B.n+"“ (Projekt-Id "+B.id+", Werkzeug sellify_project bzw. Bezug project, "+B.url+")",
+      ziel:"Zielsystem ist damit sellify (durch das Projekt eindeutig, keine Annahme)"})}})());
+
+// ===== Bodo-Benutzerverwaltung (systemeigene Oberfläche des Bodo-Adapters) =====
+// Eigene Bodo-Mandanten festlegen, Benutzer-Assistent (Benutzer in Bodo-Mandanten anlegen oder übernehmen) und Einladen.
+// Spricht Bodo ausschließlich über den Adapter an (BODO_A.rufe / .fehler / .benutzerSuchen).
+const BODO_A=ADAPTER.bodo;
 // zweistufig: erster Aufruf, ggf. Vorschau mit confirmToken -> confirmFn entscheidet
 async function bodoAction(orgId,action,fields,confirmFn){const base={resourceType:"benutzer",action,orgId,fields};
-  let r=await bodo("bodo_action",base,1);
-  if(r&&r.vollzug!=="ausgefuehrt"&&r.confirmToken){if(!await confirmFn(r))return {abgebrochen:true};r=await bodo("bodo_action",{...base,confirmToken:r.confirmToken},1)}
+  let r=await BODO_A.rufe("bodo_action",base,1);
+  if(r&&r.vollzug!=="ausgefuehrt"&&r.confirmToken){if(!await confirmFn(r))return {abgebrochen:true};r=await BODO_A.rufe("bodo_action",{...base,confirmToken:r.confirmToken},1)}
   if(!r||r.vollzug!=="ausgefuehrt")throw {code:"tool_error",message:(r&&(r.meldung||r.message||r.vollzug))||"nicht ausgeführt"};return r}
 const confirmBodo=(titel)=>r=>dlg(`<h3 style="margin:0 0 10px;font-size:15px">${esc(titel)}</h3><p style="margin:0 0 8px">Bodo verlangt für diese Aktion eine Bestätigung.</p>${r.vorschau&&r.vorschau.wirkung?`<div class="infobox">${esc(r.vorschau.wirkung)}</div>`:""}<div class="btns" style="justify-content:flex-end"><button class="btn" data-no>Abbrechen</button><button class="btn p" data-yes>In Bodo bestätigen</button></div>`).then(v=>!!v);
-function modalBox(html,wide){$("#modal").innerHTML=`<div class="modal"><div class="box wz ${wide?'wide':''}" id="box">${html}</div></div>`;return ()=>$("#modal").innerHTML=""}
 // Eigene Mandanten festlegen
 async function ownOrgsDlg(){const close=modalBox(`<div class="bhead"><h3>Eigene Bodo-Mandanten</h3><button class="ic" id="mclose" style="font-size:18px">✕</button></div><p class="hint" style="margin:0 0 10px">Nur diese Mandanten bietet der Benutzer-Assistent an. Kundensysteme bleiben außen vor.</p><div id="olist" class="hint">Lade Mandanten aus Bodo …</div><div class="btns" style="margin-top:12px;justify-content:flex-end"><button class="btn" id="mx">Abbrechen</button><button class="btn p" id="ms" disabled>Speichern</button></div>`);
   $("#mclose").onclick=close;$("#mx").onclick=close;
-  try{const p=await bodo("bodo_list_orgs",{});const O=(p&&p.orgs)||[],sel=new Set(ownOrgs().map(o=>o.id));
+  try{const p=await BODO_A.rufe("bodo_list_orgs",{});const O=(p&&p.orgs)||[],sel=new Set(ownOrgs().map(o=>o.id));
     $("#olist").innerHTML=O.map(o=>`<label class="cb"><input type="checkbox" data-o="${o.orgId}" data-n="${esc(o.name)}" ${sel.has(o.orgId)?'checked':''}> ${esc(o.name)}${o.instanzArt?` <span class="badge">${esc(o.instanzArt)}</span>`:""}</label>`).join("");$("#ms").disabled=false;
     $("#ms").onclick=()=>{SET.bodoOrgs=[...document.querySelectorAll("[data-o]:checked")].map(c=>({id:c.dataset.o,name:c.dataset.n}));schedule();close();toast("Eigene Mandanten gespeichert")}}
-  catch(e){$("#olist").innerHTML=`<div class="warnbox">${esc(mcpMsg(e))}</div>`}}
+  catch(e){$("#olist").innerHTML=`<div class="warnbox">${esc(BODO_A.fehler(e))}</div>`}}
 // Assistent Neuer Benutzer / weitere Mandanten
 function wizard(exist){
   const W={step:exist?2:1,vn:"",nn:"",n:exist?exist.n:"",kz:exist?(exist.kz||""):"",mail:exist?(exist.mail||""):"",rolle:exist?(exist.rolle||""):"",orgs:new Set(),chk:{},dec:{},err:""};
@@ -1608,7 +1705,7 @@ function wizard(exist){
     if(W.step===2){document.querySelectorAll("[data-wo]").forEach(c=>c.onchange=()=>{c.checked?W.orgs.add(c.dataset.wo):W.orgs.delete(c.dataset.wo);render()});
       const wb=g("wb");if(wb)wb.onclick=()=>{W.step=1;render()};
       g("wn").onclick=async()=>{if(!W.orgs.size){W.step=4;return render()}W.step=3;W.chk={};render();
-        await Promise.all([...W.orgs].map(async id=>{try{const hits=await findSeats(id,W.mail,nm());W.chk[id]={hits};W.dec[id]=W.dec[id]||(hits[0]?"use:"+hits[0].membershipId:"new")}catch(e){W.chk[id]={err:mcpMsg(e)};W.dec[id]="skip"}if(W.step===3)render()}))}}
+        await Promise.all([...W.orgs].map(async id=>{try{const hits=await BODO_A.benutzerSuchen({mand:{id:id},name:nm(),mail:W.mail});W.chk[id]={hits};W.dec[id]=W.dec[id]||(hits[0]?"use:"+hits[0].membershipId:"new")}catch(e){W.chk[id]={err:BODO_A.fehler(e)};W.dec[id]="skip"}if(W.step===3)render()}))}}
     if(W.step===3){document.querySelectorAll("input[type=radio]").forEach(r=>r.onchange=()=>{W.dec[r.name.slice(2)]=r.value});g("wb").onclick=()=>{W.step=2;render()};g("wn").onclick=()=>{W.step=4;render()}}
     if(W.step===4){g("wb").onclick=()=>{W.step=W.orgs.size?3:2;render()};
       g("wgo").onclick=async()=>{g("wgo").disabled=true;W.err="";const log=t=>{const l=g("wlog");if(l)l.innerHTML+=esc(t)+"<br>"};
@@ -1619,10 +1716,10 @@ function wizard(exist){
           try{let h;
             if(d==="new"){const f={name:nm()};if(W.vn)f.vorname=W.vn;if(W.nn)f.nachname=W.nn;if(W.kz)f.kuerzel=W.kz;if(W.mail)f.email=W.mail;
               const r=await bodoAction(id,"sitz_anlegen",f,confirmBodo("Benutzer ohne Zugang in „"+o.name+"“ anlegen"));if(r.abgebrochen){fail.push(o.name+": abgebrochen");continue}
-              h=(await findSeats(id,W.mail,nm())).find(x=>x.status==="unclaimed")||{name:nm(),email:W.mail,status:"unclaimed"};log(o.name+": Benutzer ohne Zugang angelegt")}
+              h=(await BODO_A.benutzerSuchen({mand:{id:id},name:nm(),mail:W.mail})).find(x=>x.status==="unclaimed")||{name:nm(),email:W.mail,status:"unclaimed"};log(o.name+": Benutzer ohne Zugang angelegt")}
             else{h=W.chk[id].hits.find(x=>"use:"+x.membershipId===d);log(o.name+": vorhandenen Benutzer übernommen")}
             u.maps.push({sys:"bodo",inst:o.name,instId:id,ext:h.name||nm(),mail:h.email||W.mail||"",extId:h.membershipId||"",userId:h.userId||"",status:h.status||"",rollen:(h.roleNames||[]).join(", "),quelle:q})}
-          catch(e){fail.push(o.name+": "+mcpMsg(e))}}
+          catch(e){fail.push(o.name+": "+BODO_A.fehler(e))}}
         ucur=US.indexOf(u);schedule();users();
         if(fail.length){W.err="Nicht alles hat geklappt – "+fail.join(" · ")+". Der Rest ist gespeichert.";render()}else{close();toast(exist?"Zuordnungen ergänzt":"Benutzer angelegt")}}}
   };
@@ -1635,21 +1732,15 @@ async function inviteDlg(u,m){const close=modalBox(`<div class="bhead"><h3>${esc
    <div class="warnbox" style="font-size:13px"><b>Bodo schickt sofort eine Einladungs-Mail</b> an die angegebene Adresse.</div><div id="ierr"></div>
    <div class="btns" style="margin-top:14px;justify-content:flex-end"><button class="btn" id="mx">Abbrechen</button><button class="btn p" id="igo" disabled>Einladung senden</button></div>`);
   $("#mclose").onclick=close;$("#mx").onclick=close;
-  try{const p=await bodo("bodo_search",{resourceType:"rolle",orgId:m.instId,achsen:{aktiv:true}});const R=((p&&p.items)||[]).map(x=>x.data||{}).filter(r=>r.key!=="owner");
+  try{const p=await BODO_A.rufe("bodo_search",{resourceType:"rolle",orgId:m.instId,achsen:{aktiv:true}});const R=((p&&p.items)||[]).map(x=>x.data||{}).filter(r=>r.key!=="owner");
     $("#irol").innerHTML=R.map(r=>`<label class="cb"><input type="checkbox" data-r="${r._id}" data-rn="${esc(r.name)}"> ${esc(r.name)}</label>`).join("")||"Keine vergebbaren Rollen gefunden.";
     const chk=()=>$("#igo").disabled=!document.querySelector("#irol [data-r]:checked");document.querySelectorAll("#irol [data-r]").forEach(c=>c.onchange=chk);
     $("#igo").onclick=async()=>{$("#igo").disabled=true;const rollen=[...document.querySelectorAll("#irol [data-r]:checked")].map(c=>c.dataset.r),rn=[...document.querySelectorAll("#irol [data-r]:checked")].map(c=>c.dataset.rn);
       try{const r=await bodoAction(m.instId,"einladen",{sitzId:m.extId,rollen,name:u.n},confirmBodo("Einladung an "+u.n+" senden"));if(r.abgebrochen){$("#igo").disabled=false;return}
         m.status="invited";m.rollen=rn.join(", ");m.eingeladen=new Date().toISOString().slice(0,10);schedule();close();users();toast("Einladung verschickt")}
-      catch(e){$("#ierr").innerHTML=`<div class="warnbox">${esc(mcpMsg(e))}</div>`;$("#igo").disabled=false}}}
-  catch(e){$("#irol").innerHTML=`<div class="warnbox">${esc(mcpMsg(e))}</div>`}}
-// Abgleich: Status/IDs aus Bodo nachziehen
-async function syncUser(u){const B=(u.maps||[]).filter(m=>(m.sys==="bodo"&&m.instId)||m.sys==="sellify"),FE=uFehlt(u);if(!B.length&&!FE.length)return toast("Keine Systeme zum Abgleichen");toast("Gleiche ab …");let n=0,neu=0,f=[];
-  for(const x of FE){try{const H=uFrei(x,u,await uSeats(x,u));if(H.length===1){(u.maps=u.maps||[]).push(uMapVon(x,H[0]));neu++}else f.push(x.name+": "+(H.length?H.length+" Treffer – bitte „In "+SYS[x.sys]+" suchen“":"nicht gefunden"))}catch(e){f.push(x.name+": "+uErr(x,e))}}
-  for(const m of B){try{const H=m.sys==="sellify"?await sfSeats(m.ext||u.n,m.mail||u.mail):await findSeats(m.instId,m.mail||u.mail,m.ext||u.n);const h=H.find(x=>x.membershipId===m.extId)||(m.sys==="bodo"?(H.find(x=>x.status==="active")||H[0]):null);
-      if(h){Object.assign(m,{ext:h.name,mail:h.email||m.mail,extId:h.membershipId,userId:h.userId||m.userId||"",status:h.status,rollen:(h.roleNames||[]).join(", "),quelle:"aus "+SYS[m.sys]+" gelesen",at:new Date().toISOString()});if(m.status==="unclaimed"&&h.offeneEinladung)m.status="invited";n++}else f.push((m.inst||SYS[m.sys])+": nicht gefunden")}
-    catch(e){f.push((m.inst||SYS[m.sys])+": "+(m.sys==="sellify"?sfMsg(e):mcpMsg(e)))}}
-  schedule();users();toast(n+" Zuordnung(en) abgeglichen"+(neu?", "+neu+" neu zugeordnet":"")+(f.length?" · "+f.join(" · "):""))}
+      catch(e){$("#ierr").innerHTML=`<div class="warnbox">${esc(BODO_A.fehler(e))}</div>`;$("#igo").disabled=false}}}
+  catch(e){$("#irol").innerHTML=`<div class="warnbox">${esc(BODO_A.fehler(e))}</div>`}}
+
 // ===== Bild zuschneiden: Kopf automatisch mittig =====
 let SAMPLE;const sampleP=(window.claude?window.claude.use("sample"):Promise.resolve(null)).then(s=>SAMPLE=s).catch(()=>SAMPLE=null);
 const loadImg=f=>new Promise((res,rej)=>{const r=new FileReader();r.onload=()=>{const im=new Image();im.onload=()=>res(im);im.onerror=rej;im.src=r.result};r.onerror=rej;r.readAsDataURL(f)});
@@ -1783,12 +1874,12 @@ function uedit(){
    </fieldset>
    <div class="field" style="margin-top:12px"><span class="flabel">Vertreten in Zielsystemen <span class="hint" style="font-weight:400">– nur systemseitig, nicht von Hand änderbar</span></span>
     <div class="mapw"><table class="map"><thead><tr><th>System</th><th>Instanz / Mandant</th><th>Benutzer dort</th><th>E-Mail dort</th><th>Status</th><th>Kennungen</th><th></th></tr></thead><tbody>
-    ${(u.maps||[]).map((m,i)=>`<tr><td>${esc(SYS[m.sys]||m.sys||"")}</td><td>${esc(m.inst||"")}</td><td>${esc(m.ext||"")}</td><td>${esc(m.mail||"")}</td><td style="white-space:nowrap">${stBadge(m)}${m.rollen?`<div class="hint" style="margin:2px 0 0">${esc(m.rollen)}</div>`:""}</td><td class="mids" title="${esc("Instanz-ID: "+(m.instId||"–")+"\nBenutzer-ID: "+(m.extId||"–")+(m.userId?"\nKonto-ID: "+m.userId:""))}"><code>${esc(String(m.instId||"–").slice(0,8))}…</code> / <code>${esc(String(m.extId||"–").slice(0,8))}…</code>${m.quelle?`<div class="hint" style="margin:2px 0 0">${esc(m.quelle)}${m.at?" · "+esc(new Date(m.at).toLocaleDateString("de-DE")):""}</div>`:""}</td><td>${ue?`<button class="ic" data-mx="${i}" title="Zuordnung lösen">×</button>`:""}</td></tr>`).join("")}
-    ${uFehlt(u).map(f=>`<tr class="mfehlt"><td>${esc(SYS[f.sys]||f.sys)}</td><td>${esc(f.name)}</td><td colspan="3" class="hint">noch nicht zugeordnet</td><td colspan="2">${ue?"":`<button class="btn sm" data-mfind="${esc(f.sys+"|"+f.id)}">In ${esc(SYS[f.sys]||f.sys)} suchen</button>`}</td></tr>`).join("")}
+    ${(u.maps||[]).map((m,i)=>`<tr><td>${esc(sysName(m.sys))}</td><td>${esc(m.inst||"")}</td><td>${esc(m.ext||"")}</td><td>${esc(m.mail||"")}</td><td style="white-space:nowrap">${stBadge(m)}${m.rollen?`<div class="hint" style="margin:2px 0 0">${esc(m.rollen)}</div>`:""}</td><td class="mids" title="${esc("Instanz-ID: "+(m.instId||"–")+"\nBenutzer-ID: "+(m.extId||"–")+(m.userId?"\nKonto-ID: "+m.userId:""))}"><code>${esc(String(m.instId||"–").slice(0,8))}…</code> / <code>${esc(String(m.extId||"–").slice(0,8))}…</code>${m.quelle?`<div class="hint" style="margin:2px 0 0">${esc(m.quelle)}${m.at?" · "+esc(new Date(m.at).toLocaleDateString("de-DE")):""}</div>`:""}</td><td>${ue?`<button class="ic" data-mx="${i}" title="Zuordnung lösen">×</button>`:""}</td></tr>`).join("")}
+    ${uFehlt(u).map(f=>`<tr class="mfehlt"><td>${esc(sysName(f.sys))}</td><td>${esc(f.name)}</td><td colspan="3" class="hint">noch nicht zugeordnet</td><td colspan="2">${ue?"":`<button class="btn sm" data-mfind="${esc(f.sys+"|"+f.id)}">In ${esc(sysName(f.sys))} suchen</button>`}</td></tr>`).join("")}
     ${!(u.maps||[]).length&&!uFehlt(u).length?`<tr><td colspan="7" class="hint">Noch keine Zuordnung.</td></tr>`:""}
     </tbody></table></div>
     ${ue?"":(u.maps||[]).map((m,i)=>m.sys==="bodo"&&m.instId&&m.extId&&m.status==="unclaimed"?`<div class="hint" style="margin:6px 0 0">${esc(m.inst)}: Benutzer ohne Zugang – <button class="btn sm" data-inv="${i}" title="Einladung mit Mail aus Bodo schicken">Einladen …</button></div>`:"").join("")}
-    ${ue?"":`<div class="btns" style="margin-top:6px"><button class="btn sm" id="mwiz">In weiteren Bodo-Mandanten anlegen …</button><button class="btn sm" id="msync" title="Zuordnungen in Bodo und sellify neu lesen und fehlende eindeutige ergänzen">Abgleichen</button></div>`}
+    ${ue?"":`<div class="btns" style="margin-top:6px"><button class="btn sm" id="mwiz">In weiteren Bodo-Mandanten anlegen …</button><button class="btn sm" id="msync" title="${esc("Zuordnungen in "+adapterListe().map(a=>a.n).join(" und ")+" neu lesen und fehlende eindeutige ergänzen")}">Abgleichen</button></div>`}
     <div class="hint">Je Benutzer gehört in jeden Bodo-Mandanten seiner Organigramme (⚙ Anbindungen) und – wenn eines davon sellify nutzt – in sellify genau eine Zuordnung. Sie entsteht nur systemseitig: „Abgleichen“ liest bestehende Zuordnungen neu und ergänzt fehlende, wenn der Benutzer im Mandanten eindeutig gefunden wird; sonst „In … suchen“ bzw. „In weiteren Bodo-Mandanten anlegen …“. Von Hand geänderte Kennungen würden die Zuordnung zerstören und sind daher gesperrt.</div></div>
    <div class="field"><span class="flabel">Verantwortlich für</span>${ags.length?ags.map(a=>`<span class="chip" style="display:inline-flex;margin:0 6px 6px 0">${esc(a.n)}</span>`).join(""):'<span class="hint">noch keinen Agenten</span>'}${dep.length?`<div class="hint">Vertretung für: ${dep.map(a=>esc(a.n)).join(", ")}</div>`:""}</div>
    <div class="btns" style="border-top:1px solid var(--line);padding-top:12px"><button class="btn p" id="uak">${u.aktiv===false?'Wieder aktiv setzen':'Als ausgeschieden markieren'}</button>
@@ -1802,7 +1893,7 @@ function uedit(){
   const ix=$("#uimgx");if(ix)ix.onclick=()=>{delete u.img;up()};
   document.querySelectorAll("[data-uorg]").forEach(c=>c.onchange=()=>{const s=new Set(u.orgs||[]);c.checked?s.add(c.dataset.uorg):s.delete(c.dataset.uorg);u.orgs=ORGS().map(o=>o.id).filter(x=>s.has(x));users()});
   document.querySelectorAll("[data-mfind]").forEach(b=>b.onclick=()=>uSuchen(u,b.dataset.mfind,b));
-  document.querySelectorAll("[data-mx]").forEach(b=>b.onclick=async()=>{const m=u.maps[+b.dataset.mx];if(await askOk("Zuordnung „"+(SYS[m.sys]||m.sys)+(m.inst?" · "+m.inst:"")+"“ lösen? Der Benutzer im Zielsystem bleibt unverändert; neu zuordnen geht nur über „Mit Bodo abgleichen“ oder „In Bodo suchen“. Wirksam mit „Speichern“.","Zuordnung lösen")){u.maps.splice(+b.dataset.mx,1);users()}});
+  document.querySelectorAll("[data-mx]").forEach(b=>b.onclick=async()=>{const m=u.maps[+b.dataset.mx];if(await askOk("Zuordnung „"+sysName(m.sys)+(m.inst?" · "+m.inst:"")+"“ lösen? Der Benutzer im Zielsystem bleibt unverändert; neu zuordnen geht nur über „Abgleichen“ oder „In … suchen“. Wirksam mit „Speichern“.","Zuordnung lösen")){u.maps.splice(+b.dataset.mx,1);users()}});
   const mw=$("#mwiz");if(mw){mw.onclick=()=>wizard(u);$("#msync").onclick=()=>syncUser(u)}
   const ub=$("#uedbtn");if(ub)ub.onclick=()=>{if(startEdit("user",u.id,null,["users/"+u.id]))users()};bindEd($("#uedit"),()=>users());
   document.querySelectorAll("[data-inv]").forEach(b=>b.onclick=()=>inviteDlg(u,u.maps[+b.dataset.inv]));
@@ -1819,31 +1910,52 @@ function uedit(){
     d.querySelector("[data-d]").onclick=()=>{close();US.splice(ucur,1);ucur=-1;up();toast("Benutzer gelöscht")}};
 }
 
-// Soll-Zuordnungen: je Bodo-Mandant, den die Organigramme des Benutzers unter ⚙ Anbindungen nutzen (ohne Anbindungen: die eigenen Bodo-Mandanten),
-// dazu sellify (ein System ohne Mandant), wenn eines seiner Organigramme sellify anbindet oder das Produkt sellify hat
-function uSoll(u){const S=new Map();let sf=false;(u.orgs||[]).forEach(oid=>{const o=orgById(oid);if(!o)return;if(o.prod==="sellify")sf=true;
-    DIENSTE.forEach(([k])=>{const d=dienstVon(o,k);if(!d)return;if(d.sys==="bodo"&&d.orgId)S.set(d.orgId,d.orgN||d.orgId);if(d.sys==="sellify")sf=true})});
-  if(!S.size)ownOrgs().forEach(m=>S.set(m.id,m.name));const L=[...S].map(([id,name])=>({sys:"bodo",id,name}));if(sf)L.push({sys:"sellify",id:"sellify",name:"sellify"});return L}
-const uHat=(u,f)=>(u.maps||[]).some(m=>m.sys===f.sys&&(f.sys==="sellify"||m.instId===f.id));
+// ===== Benutzer-Zuordnung zu den Zielsystemen (systemseitig, nie von Hand) =====
+// Eine Zuordnung u.maps[i] = {sys, inst, instId, ext, mail, extId, userId, status, rollen, quelle, at} verbindet einen Company-OS-Benutzer
+// mit seinem Benutzer in einem System bzw. Mandanten. Gesucht und gelesen wird ausschließlich über die Adapter.
+const ST={active:"aktiv",unclaimed:"ohne Zugang",invited:"eingeladen",suspended:"gesperrt",left:"ausgetreten"};
+const stBadge=m=>!adapter(m.sys)||!m.status?"":`<span class="stb ${m.status}">${ST[m.status]||esc(m.status)}</span>`;
+
+// Soll je Benutzer, je System:
+// – Systeme mit Mandanten: jeder Mandant, den die Organigramme des Benutzers unter ⚙ Anbindungen nutzen; ohne solche Anbindung die eigenen Mandanten des Systems.
+// – Systeme ohne Mandanten: einmal, wenn eines seiner Organigramme das System anbindet oder als Produkt hat.
+// Ergebnis: [{sys, id, name}] (bei Systemen ohne Mandanten ist id = sys).
+function uSoll(u){const L=[];
+  adapterListe().forEach(a=>{const M=new Map();let genutzt=false;
+    (u.orgs||[]).forEach(oid=>{const o=orgById(oid);if(!o)return;if(o.prod===a.id)genutzt=true;
+      DIENSTE.forEach(([k])=>{const d=dienstVon(o,k);if(!d||d.sys!==a.id)return;genutzt=true;if(a.mand&&d.orgId)M.set(d.orgId,d.orgN||d.orgId)})});
+    if(a.mand){if(!M.size)a.mandanten().forEach(m=>M.set(m.id,m.name));M.forEach((name,id)=>L.push({sys:a.id,id,name}))}
+    else if(genutzt)L.push({sys:a.id,id:a.id,name:a.n})});
+  return L}
+const uGleich=(m,f)=>m.sys===f.sys&&(!adapter(f.sys)||!adapter(f.sys).mand||m.instId===f.id);
+const uHat=(u,f)=>(u.maps||[]).some(m=>uGleich(m,f));
 const uFehlt=u=>uSoll(u).filter(f=>!uHat(u,f));
-const uMapVon=(f,h)=>({sys:f.sys,inst:f.name,instId:f.id,ext:h.name||"",mail:h.email||"",extId:h.membershipId,userId:h.userId||"",status:h.status||"",rollen:(h.roleNames||[]).join(", "),quelle:"aus "+SYS[f.sys]+" gelesen",at:new Date().toISOString()});
-const sfMail=p=>{const e=p&&p.emailAddress;return typeof e==="string"?e:e?(e.address||e.value||e.email||""):""};
-// sellify-Benutzer nach Name (und E-Mail) suchen; Treffer in der Form von findSeats
-async function sfSeats(name,mail){const nn=String(name||"").trim().toLowerCase(),mm=String(mail||"").trim().toLowerCase(),q=String(name||"").trim().split(/\s+/).pop()||"";if(!q)return [];
-  const r=await sellify("sellify_user",{action:"list",params:{q,limit:25}});
-  return ((r&&r.items)||[]).filter(x=>!x.deleted).map(x=>{const p=x.person||{};return {name:[p.firstName,p.lastName].filter(Boolean).join(" "),email:sfMail(p),membershipId:String(x.id),userId:x.login||"",status:x.retired||(p.retired)?"left":x.canLogin===false?"unclaimed":"active",roleNames:(x.roles||[]).filter(r=>!r.deleted).map(r=>r.name)}})
-    .filter(h=>(mm&&h.email.toLowerCase()===mm)||(nn&&h.name.toLowerCase()===nn))}
-const uSeats=(f,u)=>f.sys==="sellify"?sfSeats(u.n,u.mail):findSeats(f.id,u.mail,u.n);
-const uFrei=(f,u,H)=>H.filter(h=>!US.some(x=>x!==u&&(x.maps||[]).some(m=>m.sys===f.sys&&(f.sys==="sellify"||m.instId===f.id)&&m.extId===h.membershipId)));
-const uErr=(f,e)=>f.sys==="sellify"?sfMsg(e):mcpMsg(e);
-// Systemseitig zuordnen: eindeutiger Treffer wird übernommen, mehrere zur Auswahl, keiner → Hinweis
+const uMapVon=(f,h)=>({sys:f.sys,inst:f.name,instId:f.id,ext:h.name||"",mail:h.email||"",extId:h.membershipId,userId:h.userId||"",status:h.status||"",rollen:(h.roleNames||[]).join(", "),quelle:"aus "+sysName(f.sys)+" gelesen",at:new Date().toISOString()});
+const uSeats=(f,u)=>adapter(f.sys).benutzerSuchen({mand:{id:f.id,name:f.name},name:u.n,mail:u.mail});
+// Treffer, die schon einem anderen Company-OS-Benutzer im selben System/Mandanten zugeordnet sind, nicht anbieten
+const uFrei=(f,u,H)=>H.filter(h=>!US.some(x=>x!==u&&(x.maps||[]).some(m=>uGleich(m,f)&&m.extId===h.membershipId)));
+const uErr=(f,e)=>adapter(f.sys)?adapter(f.sys).fehler(e):String(e&&e.message||e);
+
+// „In … suchen“: eindeutiger Treffer wird übernommen, mehrere zur Auswahl, keiner → Hinweis
 async function uSuchen(u,key,btn){const [sys,id]=key.split("|"),f=uSoll(u).find(x=>x.sys===sys&&x.id===id)||{sys,id,name:id};if(btn){btn.disabled=true;btn.textContent="sucht …"}
   try{const H=uFrei(f,u,await uSeats(f,u));
     if(H.length===1){(u.maps=u.maps||[]).push(uMapVon(f,H[0]));schedule();users();toast("Zugeordnet: "+(H[0].name||u.n)+" in "+f.name);return}
-    if(!H.length){users();toast("In „"+f.name+"“ nicht gefunden"+(f.sys==="bodo"?" – über „In weiteren Bodo-Mandanten anlegen …“ anlegen":" – bitte den Benutzer in sellify anlegen bzw. Name/E-Mail angleichen"));return}
+    if(!H.length){users();toast("In „"+f.name+"“ nicht gefunden"+(f.sys==="bodo"?" – über „In weiteren Bodo-Mandanten anlegen …“ anlegen":" – bitte den Benutzer in "+sysName(f.sys)+" anlegen bzw. Name/E-Mail angleichen"));return}
     const v=await dlg(`<h3 style="margin:0 0 10px;font-size:15px">Welcher Benutzer in „${esc(f.name)}“ ist ${esc(u.n)}?</h3>${H.map((h,i)=>`<label class="cb"><input type="radio" name="usel" value="${i}" ${i?"":"checked"}> ${esc(h.name||"")} · ${esc(h.email||h.userId||"")} <span class="hint" style="margin:0">${esc(ST[h.status]||h.status||"")}</span></label>`).join("")}<div class="btns" style="margin-top:12px;justify-content:flex-end"><button class="btn" data-no>Abbrechen</button><button class="btn p" data-yes>Zuordnen</button></div>`);
     if(v==null){users();return}const i=+((document.querySelector('[name="usel"]:checked')||{}).value||0);(u.maps=u.maps||[]).push(uMapVon(f,H[i]));schedule();users();toast("Zugeordnet")}
   catch(e){users();toast(uErr(f,e))}}
+
+// „Abgleichen“: bestehende Zuordnungen neu lesen und fehlende eindeutige ergänzen
+async function syncUser(u){const B=(u.maps||[]).filter(m=>{const a=adapter(m.sys);return a&&(!a.mand||m.instId)}),FE=uFehlt(u);
+  if(!B.length&&!FE.length)return toast("Keine Systeme zum Abgleichen");toast("Gleiche ab …");let n=0,neu=0;const f=[];
+  for(const x of FE){try{const H=uFrei(x,u,await uSeats(x,u));if(H.length===1){(u.maps=u.maps||[]).push(uMapVon(x,H[0]));neu++}else f.push(x.name+": "+(H.length?H.length+" Treffer – bitte „In "+sysName(x.sys)+" suchen“":"nicht gefunden"))}catch(e){f.push(x.name+": "+uErr(x,e))}}
+  for(const m of B){const a=adapter(m.sys);
+    try{const H=await a.benutzerSuchen({mand:{id:m.instId,name:m.inst},name:m.ext||u.n,mail:m.mail||u.mail});
+      const h=H.find(x=>x.membershipId===m.extId)||(a.abgleichErsatz?(H.find(x=>x.status==="active")||H[0]):null);
+      if(h){Object.assign(m,{ext:h.name,mail:h.email||m.mail,extId:h.membershipId,userId:h.userId||m.userId||"",status:h.status,rollen:(h.roleNames||[]).join(", "),quelle:"aus "+sysName(m.sys)+" gelesen",at:new Date().toISOString()});if(m.status==="unclaimed"&&h.offeneEinladung)m.status="invited";n++}
+      else f.push((m.inst||sysName(m.sys))+": nicht gefunden")}
+    catch(e){f.push((m.inst||sysName(m.sys))+": "+a.fehler(e))}}
+  schedule();users();toast(n+" Zuordnung(en) abgeglichen"+(neu?", "+neu+" neu zugeordnet":"")+(f.length?" · "+f.join(" · "):""))}
 
 // aus Boris' gespeicherten Vorgaben (gekürzt)
 let GLOBAL=[],SET={autoApprove:true};
@@ -2072,7 +2184,7 @@ function editor(){
     <div class="drop" id="drop">${a.s.map(id=>`<span class="chip ${bad(a,sk(id))?'bad':''}" title="${bad(a,sk(id))?'Gehört zu '+PN[sk(id).p]+' – passt nicht zum Produkt dieses Agenten':id}"><span data-gosk="${esc(id)}" style="cursor:pointer">${bad(a,sk(id))?'⚠ ':''}${esc(sk(id)?.n||id)}</span>${profOf(a,sk(id))?` <small class="prf">· ${profOf(a,sk(id))}</small>`:""}${isEd("agent",a.id,"skills")?`<button class="ic" data-r="${id}" title="entfernen">×</button>`:""}</span>`).join("")||'<span class="hint">noch keine Skills</span>'}</div>
     ${isEd("agent",a.id,"skills")?'<button class="btn" id="skadd" style="margin-top:8px">+ Skills hinzufügen …</button>':'<div class="hint" style="margin:6px 0 0">Zum Hinzufügen oder Entfernen oben „✎ Bearbeiten“ · Skill antippen = in der Skill-Übersicht öffnen</div>'}`)}
   ${sec("regeln","Verbindungen & Leitplanken",(a.mcp.length?a.mcp.join(", "):"keine Verbindung")+" · "+inh.length+" geerbt · "+a.own.length+" eigene",`
-    <div class="field"><label>Verbindungen (MCP)</label><div style="display:flex;gap:16px">${["Bodo","sellify"].map(m=>`<label class="cb"><input type="checkbox" data-m="${m}" ${a.mcp.includes(m)?'checked':''}> ${m}</label>`).join("")}</div></div>
+    <div class="field"><label>Verbindungen (MCP)</label><div style="display:flex;gap:16px">${adapterListe().map(x=>x.n).map(m=>`<label class="cb"><input type="checkbox" data-m="${m}" ${a.mcp.includes(m)?'checked':''}> ${m}</label>`).join("")}</div></div>
     <div class="field"><span class="flabel">Leitplanken – woher sie kommen</span><div class="lpwrap">
     <div class="lpsec"><h4>1 · Aus den Skills geerbt <span class="badge lp">${inh.length}</span><span class="hint" style="margin:0;font-weight:400">automatisch, nur im Skill änderbar</span></h4>
       ${inh.map(([r,srcs])=>`<div class="lprule"><span class="txt">${esc(r)}</span>${srcs.map(x=>`<span class="src" title="${x.s.id}" data-edit="${x.s.id}">⛨ ${esc(x.l)}</span>`).join(" ")}</div>`).join("")||'<div class="hint">Die gewählten Skills bringen keine Leitplanken mit.</div>'}</div>
@@ -2489,7 +2601,8 @@ function startModal(f,keep){if(!keep)PEND=[];keep=keep||{};const SM=!!keep.sm;if
 const curN=j=>nodeOf(j.f,j.path[j.path.length-1]);
 // ===== KI-Aufträge: Ausführung durch Claude über die geplante Aufgabe „Company OS – KI-Auftrag ausführen“ (Abo, keine API) =====
 const RUNNERS={schnell:{get tid(){return (SET.trig&&SET.trig.schnell)||"trig_01KVgWuBkveHDgWXWRsLvMjw"},n:"Company OS – KI-Auftrag ausführen (schnell)",l:"⚡ Schnell (Sonnet)"},gruendlich:{get tid(){return (SET.trig&&SET.trig.gruendlich)||"trig_01ThbM4bYY6h31M3hVDg4fDf"},n:"Company OS – KI-Auftrag ausführen (gründlich)",l:"🔍 Gründlich (Opus)"}};const RUNNER=j=>RUNNERS[(j&&j.tempo)||"gruendlich"]||RUNNERS.gruendlich;const CCR="Claude Code Remote";
-async function ccr(tool,input){await mcpP;if(!MCP)throw {code:"not_granted",message:"Claude-Anbindung auf dieser Seite nicht verfügbar"};const r=await MCP.callTool(CCR,tool,input,{cache:false});let p=r.payload;if(typeof p==="string"){try{p=JSON.parse(p)}catch(x){}}return p}
+// Aufrufe an die geplanten Aufgaben laufen über dieselbe MCP-Verbindung wie die Adapter (07a-adapter-basis.js)
+const ccr=(tool,input)=>mcpRufe(CCR,tool,input,{cache:false},"Claude");
 function jobSer(j){const {f,...r}=j;return JSON.stringify({...r,fid:f?f.id:r.fid})}
 async function kiFresh(j){if(!DB)return j;try{const o=await Store.get("jobs/"+j.id);if(!o)return j;Object.keys(j).forEach(k=>{if(k!=="f")delete j[k]});Object.assign(j,o);j.f=FL.find(f=>f.id===j.fid);LAST.set("jobs/"+j.id,jobSer(j))}catch(e){}return j}
 async function kiReload(quiet){if(!DB)return;try{kiApply(await jobsLaden(),quiet)}catch(e){if(!quiet)toast("Laden nicht möglich")}}
@@ -2549,7 +2662,7 @@ function kiContext(j){const f=j.f,L=[];if(!f)return "";const cur=j.path[j.path.l
   A.forEach(a=>L.push("Agent „"+a.n+"“ ("+a.id+", Produkt "+PN[a.p]+"): Ziel: "+(a.r||"–")+(a.own&&a.own.length?" · Regeln: "+a.own.join("; "):"")+" · Skills: "+a.s.map(id=>sk(id)?sk(id).n+" ["+(KS(sk(id)).join(", ")||"nur Cockpit")+"]":id).join(", ")+(a.mcp&&a.mcp.length?" · Systeme: "+a.mcp.join(", "):"")));
   if((j.anh||[]).length)L.push("ANHÄNGE – "+j.anh.length+" Bild(er) von "+ICH()+", gehören zum Auftrag und sind für die Aufgabe maßgeblich: "+j.anh.map((a,i)=>"Bild "+(i+1)+" „"+a.name+"“ ("+a.w+"×"+a.h+"): Sammlung anhaenge, Dokumente "+Array.from({length:a.n},(_,k)=>a.aid+"_"+k).join(", ")).join(" | ")+". So lesen: die Dokumente mit ArtifactData get (out_dir) holen, Feld data in Reihenfolge i aneinanderhängen, Base64 zu einer .jpg-Datei dekodieren und mit Read ansehen.");
   if(GLOBAL.length)L.push("Allgemeine Vorgaben: "+GLOBAL.join("; "));
-  L.push("Eigene Bodo-Mandanten (orgId): "+ownOrgs().map(o=>o.name+" = "+o.id).join("; ")+".");
+  adapterListe().filter(a=>a.mand).forEach(a=>L.push("Eigene "+a.n+"-Mandanten (orgId): "+a.mandanten().map(o=>o.name+" = "+o.id).join("; ")+"."));
   L.push("Organisationen: "+ORGS().map(o=>o.n+(o.prod?" → Produkt "+PN[o.prod]:"")).join("; "));
   return L.join("\n")}
 function kiStart(j,mode,ans){const R=RUNNER(j),cut=(s,n)=>(s=String(s||"")).length>n?s.slice(0,n)+" …":s;
@@ -2630,7 +2743,7 @@ function jobCard(j){const W=jobWho(j),comp=!KOPEN.has(j.id),[oc,ot]=okTxt(j),neu
   else box=`<div class="kbox ${oc}"><b>${esc(ot.replace(/^[^ ]+ /,""))}</b><div>${esc(j.sum||"")}</div>${(j.erg||[]).filter(e=>e&&/^https?:\/\//.test(e.url||"")).length?`<div class="klinks">${j.erg.filter(e=>e&&/^https?:\/\//.test(e.url||"")).map(e=>`<a class="kopen" href="${esc(e.url)}" target="_blank" rel="noopener" title="${esc(e.url)}">↗ Öffnen: ${esc(e.t||"Ergebnis")}</a>`).join("")}</div>`:""}<div class="kact"><button class="btn sm" data-res="${j.id}">Ergebnis ansehen${(j.erg||[]).length?" ("+j.erg.length+")":""}</button><button class="lnk" data-kx="${j.id}" aria-expanded="true">Weniger ▴</button></div></div>`;
   return `<div class="jcard kc ${neu?'neu':''}" data-j="${j.id}">${head}${qt}${steps}${box}${stamp}</div>`}
 function jobs(){
-  $("#kirun").innerHTML=`<span class="dot ${MCP?'':'off'}"></span><span>Ausführung durch Claude über geplante Aufgaben – <b>⚡ schnell</b> (Sonnet) oder <b>🔍 gründlich</b> (Opus), Sitzungen in deinem Abo${KIAT?" · Stand von "+KIAT.toLocaleTimeString("de-DE",{hour:"2-digit",minute:"2-digit"}):""}</span><span style="flex:1"></span><button class="btn sm" id="kirl">⟳ Stand laden</button><button class="btn sm" id="kiruns">Letzten Lauf prüfen</button>`;
+  $("#kirun").innerHTML=`<span class="dot ${mcpBereit()?'':'off'}"></span><span>Ausführung durch Claude über geplante Aufgaben – <b>⚡ schnell</b> (Sonnet) oder <b>🔍 gründlich</b> (Opus), Sitzungen in deinem Abo${KIAT?" · Stand von "+KIAT.toLocaleTimeString("de-DE",{hour:"2-digit",minute:"2-digit"}):""}</span><span style="flex:1"></span><button class="btn sm" id="kirl">⟳ Stand laden</button><button class="btn sm" id="kiruns">Letzten Lauf prüfen</button>`;
   $("#kirl").onclick=()=>kiReload().then(kiCheckRuns);$("#kiruns").onclick=kiRuns;
   const ex=AU.filter(j=>j.beispiel).length;$("#exjobs").innerHTML=ex?`<span class="mark">${ex} Beispiel-Aufträge</span> <button class="btn sm" id="delEx">Beispiele löschen</button>`:"";
   const de=$("#delEx");if(de)de.onclick=async()=>{if(await askOk("Alle "+ex+" Beispiel-Aufträge löschen?")){AU=AU.filter(j=>!j.beispiel);jobs();schedule()}};
@@ -2734,6 +2847,9 @@ const askOk=(t,l)=>dlg(`<p style="margin:0 0 12px">${esc(t)}</p><div class="btns
 async function copyText(t,msg){try{await navigator.clipboard.writeText(t);toast(msg)}catch(e){const p=$("#pv");if(p){p.closest("details").open=true;const r=document.createRange();r.selectNodeContents(p);const s=getSelection();s.removeAllRanges();s.addRange(r)}toast("Kopieren nicht möglich – Text ist markiert")}}
 const now=()=>{const d=new Date();return d.toLocaleDateString("de-DE",{day:"2-digit",month:"2-digit"})+" "+d.toLocaleTimeString("de-DE",{hour:"2-digit",minute:"2-digit"})};
 const uid=p=>p+"-"+Date.now().toString(36)+Math.random().toString(36).slice(2,6);
+// Großes Fenster (Assistenten, Auswahllisten); liefert die Schließen-Funktion
+function modalBox(html,wide){$("#modal").innerHTML=`<div class="modal"><div class="box wz ${wide?'wide':''}" id="box">${html}</div></div>`;return ()=>$("#modal").innerHTML=""}
+
 // ===== Speicher (db) =====
 let DB=null,RO=false;const LAST=new Map();let tmr=null,busy=false,again=false;
 // ===== Datenschicht: jeder Datenbankzugriff läuft über Store (eine Stelle für Abfragen, Sperren, spätere Umzüge) =====
@@ -3066,7 +3182,7 @@ const PJOHNE="_ohne";
 function pjJobs(id,o){return AU.filter(j=>j.f&&!j.parent&&(id===PJOHNE?(!j.prj||!pj(j.prj))&&jobOrg(j)===o:j.prj===id))}
 function pjZahl(id,o){const L=pjJobs(id,o);return {offen:L.filter(j=>!isEnd(j)).length,wait:L.filter(j=>j.st==="wait").length,fertig:L.filter(j=>j.st==="done").length,alle:L.length,
   zuletzt:L.map(j=>j.fertig||(j.sess||[]).map(s=>s.at).filter(Boolean).pop()||j.gesammelt||"").filter(Boolean).sort().pop()||""}}
-const pjBk=p=>p&&p.bk?`<a class="pjbk" href="${esc(p.bk.url||"#")}" target="_blank" rel="noopener" title="Im Backend öffnen">${esc(PN[p.bk.sys]||p.bk.sys)}${p.bk.orgN?" · "+esc(p.bk.orgN):""} ↗</a>`:"";
+const pjBk=p=>p&&p.bk?`<a class="pjbk" href="${esc(p.bk.url||"#")}" target="_blank" rel="noopener" title="Im Backend öffnen">${esc(sysName(p.bk.sys))}${p.bk.orgN?" · "+esc(p.bk.orgN):""} ↗</a>`:"";
 const pjOpts=(o,v)=>{const A=pjOrg(o).filter(p=>(p.st||"aktiv")==="aktiv"||p.id===v);return `<option value="">– ohne Projekt –</option>`+A.map(p=>`<option value="${p.id}" ${p.id===v?"selected":""}>${esc(p.n)}${(p.st||"aktiv")!=="aktiv"?" ("+esc(p.st)+")":""}</option>`).join("")};
 function prj(){if(!orgById(OC))OC=ORGS()[0].id;const O=orgById(OC),F=UI.pjf||"aktiv";
   const L=pjOrg(OC),cnt=k=>L.filter(p=>(p.st||"aktiv")===k).length,V=L.filter(p=>F==="alle"||(p.st||"aktiv")===F).sort((a,b)=>String(a.n).localeCompare(String(b.n),"de"));
@@ -3074,7 +3190,7 @@ function prj(){if(!orgById(OC))OC=ORGS()[0].id;const O=orgById(OC),F=UI.pjf||"ak
   const card=(id,n,sub,st)=>{const z=pjZahl(id,OC);return `<button class="pjc ${id===PJSEL?"on":""} ${st||""}" data-pj="${id}"><b>${esc(n)}</b><small>${sub}</small><span class="pjz">${z.offen?`<span class="pjo" title="offene Aufträge">● ${z.offen} offen</span>`:""}${z.wait?`<span class="pjw" title="warten auf dich">⏸ ${z.wait}</span>`:""}<span title="erledigte Aufträge (letzte 90 Tage)">✓ ${z.fertig}</span>${(()=>{const v=vbSumme(pjJobs(id,OC));return v.n?`<span title="Laufzeit der KI-Sitzungen (gemessen)">⏱ ${fmtDauer(v.sek)}</span>`:""})()}</span></button>`};
   $("#pjl").innerHTML=`<div class="oorg" id="pjorg" style="margin-bottom:8px">${ORGS().map(o=>`<button data-pjo="${o.id}" class="${o.id===OC?"on":""}">${o.logo?`<img class="olg" src="${o.logo}" alt="">`:""}${esc(o.kurz||o.n)}</button>`).join("")}</div>
     <div class="seg" id="pjf" style="margin:0 0 8px">${[...PJST,["alle","Alle"]].map(([k,l])=>`<button data-pjf="${k}" class="${k===F?"on":""}">${l}<span class="n">${k==="alle"?L.length:cnt(k)}</span></button>`).join("")}</div>
-    ${V.map(p=>card(p.id,p.n,[p.kunde,usr(p.verantw)&&usr(p.verantw).n,p.bk?"↔ "+(PN[p.bk.sys]||p.bk.sys):""].filter(Boolean).map(esc).join(" · ")||"&nbsp;",(p.st||"aktiv"))).join("")||`<div class="hint" style="margin:6px 0">${F==="aktiv"?"Noch keine aktiven Projekte in "+esc(O.kurz||O.n)+".":"Keine Projekte in dieser Auswahl."}</div>`}
+    ${V.map(p=>card(p.id,p.n,[p.kunde,usr(p.verantw)&&usr(p.verantw).n,p.bk?"↔ "+sysName(p.bk.sys):""].filter(Boolean).map(esc).join(" · ")||"&nbsp;",(p.st||"aktiv"))).join("")||`<div class="hint" style="margin:6px 0">${F==="aktiv"?"Noch keine aktiven Projekte in "+esc(O.kurz||O.n)+".":"Keine Projekte in dieser Auswahl."}</div>`}
     ${card(PJOHNE,"Ohne Projekt","Aufträge ohne Projektzuordnung","ohne")}
     <div class="btns" style="margin-top:10px"><button class="btn p" id="pjnew">+ Neues Projekt</button><button class="btn" id="pjimp" title="Aktive Projekte aus Bodo oder sellify übernehmen und verbinden">⇣ Aus Backend übernehmen …</button></div>
     <div class="hint">Projekte gehören zu ${esc(O.kurz||O.n)} und werden in Company OS geführt. Verbunden mit einem Bodo- oder sellify-Projekt legt Claude Aufgaben und Notizen eines Auftrags dort am Projekt an.</div>`;
@@ -3082,7 +3198,7 @@ function prj(){if(!orgById(OC))OC=ORGS()[0].id;const O=orgById(OC),F=UI.pjf||"ak
   document.querySelectorAll("[data-pjf]").forEach(b=>b.onclick=()=>{if(blocked())return;UI.pjf=b.dataset.pjf;saveUI();PJSEL=null;prj()});
   document.querySelectorAll("[data-pj]").forEach(b=>b.onclick=()=>{if(b.dataset.pj!==PJSEL&&blocked())return;PJSEL=b.dataset.pj;prj()});
   $("#pjnew").onclick=()=>{if(blocked())return;const p={id:uid("pj"),org:OC,n:"Neues Projekt",st:"aktiv",verantw:(ME()||{}).id||null,angelegt:new Date().toISOString()};PJ.push(p);PJSEL=p.id;UI.pjf="aktiv";saveUI();startEdit("projekt",p.id,null,["projects/"+p.id],true);prj();const n=$("#pjn");if(n){n.focus();n.select()}};
-  $("#pjimp").onclick=()=>{if(blocked())return;pjBodoDlg(null)};
+  $("#pjimp").onclick=()=>{if(blocked())return;pjBackendDlg(null)};
   pjDetail()}
 function pjDetail(){const C=$("#pjd"),o=OC;
   const L=pjJobs(PJSEL,o),off=L.filter(j=>!isEnd(j)),fer=L.filter(j=>isEnd(j)).sort((a,b)=>String(b.fertig||"").localeCompare(String(a.fertig||"")));
@@ -3093,7 +3209,7 @@ function pjDetail(){const C=$("#pjd"),o=OC;
   if(PJSEL===PJOHNE){C.innerHTML=`<h2>Ohne Projekt <span class="hint" style="margin:0 0 0 8px;text-transform:none;letter-spacing:0;font-weight:400">${esc((orgById(o)||{}).kurz||"")}</span></h2><div class="hint" style="margin:0 0 6px">Aufträge, die keinem Projekt zugeordnet sind. Zuordnen kannst du im Ergebnisfenster eines Auftrags unter „Projekt“.</div>${liste}`;pjBindRows();return}
   const p=pj(PJSEL);if(!p){C.innerHTML=`<div class="empty"><b>Kein Projekt gewählt</b>Lege links ein Projekt an oder übernimm aktive Projekte aus Bodo oder sellify.</div>`;return}
   const pe=isEd("projekt",p.id),U=usr(p.verantw),stl=(PJST.find(x=>x[0]===(p.st||"aktiv"))||[,"Aktiv"])[1];
-  const bkTxt=p.bk?`Verbunden mit <b>${esc(PN[p.bk.sys]||p.bk.sys)}-Projekt „${esc(p.bk.n||"")}“</b>${p.bk.orgId?" im Mandanten "+esc(p.bk.orgN||p.bk.orgId):""}`:"";
+  const bkTxt=p.bk?`Verbunden mit <b>${esc(sysName(p.bk.sys))}-Projekt „${esc(p.bk.n||"")}“</b>${p.bk.orgId?" im Mandanten "+esc(p.bk.orgN||p.bk.orgId):""}`:"";
   const kopf=`<h2 style="justify-content:space-between"><span>▣ ${esc(p.n)}</span><span class="pjhb">${pe?"":`<button class="btn sm p" id="pjgo" ${(p.st||"aktiv")!=="aktiv"?"disabled title=\"Nur aktive Projekte nehmen neue Aufträge an\"":""}>+ Auftrag in diesem Projekt</button>`}${edBtns(pe,'id="pjed"')}</span></h2>`;
   const ansicht=`<div class="pjview"><div class="row"><div class="field"><label>Kunde / Bezug</label><div class="pjv">${esc(p.kunde||"–")}</div></div><div class="field"><label>Status</label><div class="pjv"><span class="pjst ${esc(p.st||"aktiv")}">${esc(stl)}</span></div></div></div>
     <div class="row"><div class="field"><label>Verantwortlich</label><div class="pjv pjvu">${U?av(U,26)+" "+esc(U.n):"– offen –"}</div></div><div class="field"><label>Angelegt</label><div class="pjv">${p.angelegt?esc(new Date(p.angelegt).toLocaleDateString("de-DE")):"–"}</div></div></div>
@@ -3114,8 +3230,8 @@ function pjDetail(){const C=$("#pjd"),o=OC;
     $("#pjk").oninput=e=>{p.kunde=e.target.value.trim()};$("#pjb").oninput=e=>{p.beschr=e.target.value};
     $("#pjv").onchange=e=>{p.verantw=e.target.value||null};
     document.querySelectorAll("[data-pst]").forEach(b=>b.onclick=()=>{p.st=b.dataset.pst;document.querySelectorAll("[data-pst]").forEach(x=>x.classList.toggle("on",x===b))});
-    const un=$("#pjun");if(un)un.onclick=async()=>{if(await askOk("Verbindung zum "+(PN[p.bk.sys]||p.bk.sys)+"-Projekt „"+p.bk.n+"“ lösen? Das Projekt dort bleibt unverändert. Wirksam mit „Speichern“.","Verbindung lösen")){delete p.bk;pjDetail()}};
-    const ln=$("#pjln");if(ln)ln.onclick=()=>pjBodoDlg(p);
+    const un=$("#pjun");if(un)un.onclick=async()=>{if(await askOk("Verbindung zum "+sysName(p.bk.sys)+"-Projekt „"+p.bk.n+"“ lösen? Das Projekt dort bleibt unverändert. Wirksam mit „Speichern“.","Verbindung lösen")){delete p.bk;pjDetail()}};
+    const ln=$("#pjln");if(ln)ln.onclick=()=>pjBackendDlg(p);
     $("#pjdel").onclick=async()=>{const n=AU.filter(j=>j.prj===p.id).length;if(!await askOk(n?"Projekt „"+p.n+"“ löschen? "+n+" Aufträge verlieren die Zuordnung und erscheinen unter „Ohne Projekt“.":"Projekt „"+p.n+"“ löschen?"))return;
       for(const j of AU.filter(x=>x.prj===p.id)){delete j.prj;try{await Store.update("jobs/"+j.id,{prj:null});LAST.set("jobs/"+j.id,jobSer(j))}catch(e){}}
       EDIT=null;PJ=PJ.filter(x=>x!==p);PJSEL=null;schedule();prj();toast("Projekt gelöscht")}}
@@ -3126,57 +3242,51 @@ async function pjSetJob(j,id){if(id)j.prj=id;else delete j.prj;try{await Store.u
   for(const k of teileVon(j).filter(Boolean)){if(id)k.prj=id;else delete k.prj;try{await Store.update("jobs/"+k.id,{prj:id||null});LAST.set("jobs/"+k.id,jobSer(k))}catch(e){}}
   toast(id?"Projekt „"+pj(id).n+"“ zugeordnet":"Projektzuordnung entfernt")}
 function pjJobField(j){const o=jobOrg(j);if(j.parent)return "";return `<div class="pjsel"><label for="rprj">Projekt</label><select id="rprj">${pjOpts(o,j.prj&&pj(j.prj)?j.prj:"")}</select></div>`}
-// Backend-Projekte (Bodo oder sellify) suchen: zum Verbinden eines Projekts (p) oder zum Übernehmen mehrerer (p = null)
-const bodoPjSt=s=>s==="active"?"aktiv":s==="paused"?"pausiert":"abgeschlossen";
-const sfPjSt=x=>x.done?"abgeschlossen":/paus|ruht|hold/i.test(((x.status||{}).name||{})["de-DE"]||"")?"pausiert":"aktiv";
-const PJSYS=["bodo","sellify"];
-// Grundsatz Backend-Listen (Vorgabe Boris 17.10.2026): immer seitenweise laden (PJSEITE je Abruf) und, wo die Schnittstelle es kann, die zuletzt angelegten zuerst.
-// Eine Seite = {items:[{id, title, n, url, st, owner, descr}], next: Fortsetzungsmarke oder null, total: Gesamtzahl falls bekannt, neuZuerst: true/false}
-const PJSEITE=25;
-async function pjSeite(sys,om,q,alle,next){
-  if(sys==="bodo"){const inp={resourceType:"project",orgId:om.id,achsen:{status:alle?"alle":"aktiv"},limit:PJSEITE};if(q)inp.query=q;if(next)inp.cursor=next;
-    const r=await bodo("bodo_search",inp);
-    return {items:((r&&r.items)||[]).map(x=>{const d=x.data||{};return {id:String(x.id),title:x.title||d.name||"",n:x.title||d.name||"",url:x.url||"",st:bodoPjSt(d.projectStatus),owner:d.ownerName||"",descr:d.description||""}}),next:r&&r.hasMore&&r.nextCursor||null,total:null,neuZuerst:false}}
-  const params={limit:PJSEITE,offset:next||0,sort:"-registered"};if(!alle)params.done=false;if(q)params.q=q;
-  const r=await sellify("sellify_project",{action:"list",params});
-  return {items:((r&&r.items)||[]).map(x=>{const o=x.responsible||{};return {id:String(x.id),title:(x.name||"")+(x.number?" ("+x.number+")":""),n:x.name||"",url:x.webUrl||"",st:sfPjSt(x),owner:[o.firstName,o.lastName].filter(Boolean).join(" "),descr:x.description||""}}),next:r&&r.hasMore?(r.nextOffset||(next||0)+PJSEITE):null,total:r&&r.total!=null?r.total:null,neuZuerst:true}}
-function pjBodoDlg(p,sys0){const O=orgById(OC),M=ownOrgs(),dp=dienstVon(O,"projekt");
-  let sys=sys0||(dp&&PJSYS.includes(dp.sys)?dp.sys:O.pjSys||(O.prod==="sellify"?"sellify":"bodo"));
-  let om=M.find(m=>m.id===(dp&&dp.sys==="bodo"&&dp.orgId?dp.orgId:(O.pjBodo||"")))||M[0],q="",alle=false,R=[],busy=false,err="",nxt=null,tot=null,neu=true;const SEL=new Set();
+// Backend-Projekte suchen – zum Verbinden eines Projekts (p) oder zum Übernehmen mehrerer (p = null).
+// Gelesen wird ausschließlich über den Adapter des Systems (a.projekte); zur Wahl stehen alle Systeme mit der Entität Projekt.
+// Grundsatz Backend-Listen (Vorgabe Boris 17.10.2026): seitenweise (LISTE_SEITE je Abruf), wo möglich neueste zuerst.
+const pjSysteme=()=>adapterListe().filter(a=>a.ent.projekt.length).map(a=>a.id);
+// Zuletzt gewählter Mandant je System; O.pjBodo ist die frühere Ablage für Bodo und wird weiter gelesen
+const pjMandVon=(O,sys)=>(O.pjMand&&O.pjMand[sys])||(sys==="bodo"?O.pjBodo:"")||"";
+function pjBackendDlg(p,sys0){const O=orgById(OC),dp=dienstVon(O,"projekt"),PS=pjSysteme();if(!PS.length)return toast("Kein angebundenes System bietet Projekte an");
+  let sys=sys0&&PS.includes(sys0)?sys0:dp&&PS.includes(dp.sys)?dp.sys:PS.includes(O.pjSys)?O.pjSys:PS.includes(O.prod)?O.prod:PS[0];
+  let a=adapter(sys),M=[],om=null,q="",alle=false,R=[],busy=false,err="",nxt=null,tot=null,neu=true;const SEL=new Set();
+  const mandWahl=()=>{M=a.mand?a.mandanten():[];const w=dp&&dp.sys===sys&&dp.orgId?dp.orgId:pjMandVon(O,sys);om=a.mand?(M.find(m=>m.id===w)||M[0]||null):null};mandWahl();
   const close=modalBox(`<div class="bhead"><h3>${p?"„"+esc(p.n)+"“ mit Backend-Projekt verbinden":"Projekte aus dem Backend übernehmen"}</h3><button class="ic" id="mclose" style="font-size:18px">✕</button></div>
-    <div class="row"><div class="field"><label>System</label><div class="seg" id="pbs" style="margin:0">${PJSYS.map(k=>`<button data-pbs="${k}" class="${k===sys?"on":""}">${esc(SYSKAT[k].n)}</button>`).join("")}</div></div><div class="field" id="pbmf"></div></div>
+    <div class="row"><div class="field"><label>System</label><div class="seg" id="pbs" style="margin:0">${PS.map(k=>`<button data-pbs="${k}" class="${k===sys?"on":""}">${esc(sysName(k))}</button>`).join("")}</div></div><div class="field" id="pbmf"></div></div>
     <div class="field"><label>Suche</label><input type="search" id="pbq" placeholder="Projektname …"></div>
     <label class="cb" style="margin:0 0 8px"><input type="checkbox" id="pba"> auch pausierte und abgeschlossene Projekte</label>
     <div id="pbl" class="pbl"></div>
     <div class="btns" style="margin-top:12px;justify-content:flex-end"><button class="btn" id="pbx">Abbrechen</button>${p?"":'<button class="btn p" id="pbok" disabled>Ausgewählte übernehmen</button>'}</div>`,true);
   $("#mclose").onclick=$("#pbx").onclick=close;
-  const mand=()=>{const f=$("#pbmf");if(sys!=="bodo"){f.innerHTML=`<label>Mandant</label><div class="hint" style="margin:6px 0 0">sellify: ein System, kein Mandant</div>`;return}
-    f.innerHTML=M.length?`<label>Bodo-Mandant</label><select id="pbm">${M.map(m=>`<option value="${m.id}" ${m===om?"selected":""}>${esc(m.name)}</option>`).join("")}</select>`:`<label>Bodo-Mandant</label><div class="warnbox">Keine eigenen Bodo-Mandanten hinterlegt – ⚙ Einstellungen › Anbindungen</div>`;
+  const mand=()=>{const f=$("#pbmf");if(!a.mand){f.innerHTML=`<label>Mandant</label><div class="hint" style="margin:6px 0 0">${esc(a.n)}: ein System, kein Mandant</div>`;return}
+    f.innerHTML=M.length?`<label>${esc(a.n)}-Mandant</label><select id="pbm">${M.map(m=>`<option value="${m.id}" ${m===om?"selected":""}>${esc(m.name)}</option>`).join("")}</select>`:`<label>${esc(a.n)}-Mandant</label><div class="warnbox">Keine eigenen ${esc(a.n)}-Mandanten hinterlegt – ⚙ Einstellungen › Anbindungen</div>`;
     const s=$("#pbm");if(s)s.onchange=e=>{om=M.find(m=>m.id===e.target.value);load()}};
   const verb=r=>PJ.find(x=>x.bk&&x.bk.sys===sys&&String(x.bk.id)===r.id);
-  const draw=()=>{const b=$("#pbl");if(!b)return;if(busy&&!R.length){b.innerHTML=`<div class="hint">Lade Projekte aus ${esc(SYSKAT[sys].n)} …</div>`;return}if(err&&!R.length){b.innerHTML=`<div class="warnbox">${esc(err)}</div>`;return}
-    b.innerHTML=R.length?R.map(r=>{const v=verb(r);return `<label class="pbr ${v?"dis":""}">${p?`<button class="btn sm" data-pbp="${esc(r.id)}" ${v?"disabled":""}>Verbinden</button>`:`<input type="checkbox" data-pbc="${esc(r.id)}" ${v?"disabled":""} ${!v&&SEL.has(r.id)?"checked":""}>`}<span><b>${esc(r.title)}</b><small>${esc(r.st)}${r.owner?" · "+esc(r.owner):""}${v?" · bereits verbunden mit „"+esc(v.n)+"“":""}</small></span><a href="${esc(r.url||"#")}" target="_blank" rel="noopener" title="In ${esc(SYSKAT[sys].n)} öffnen">↗</a></label>`}).join(""):'<div class="hint">Keine Projekte gefunden.</div>';
-    if(R.length)b.innerHTML+=`<div class="pbfoot"><span class="hint" style="margin:0">${R.length}${tot!=null?" von "+tot:""} geladen · ${neu?"neueste zuerst":"Reihenfolge von "+esc(SYSKAT[sys].n)+" (alphabetisch) – nach Anlagedatum sortieren bietet die Schnittstelle noch nicht"}</span>${err?`<span class="warnbox" style="margin:0">${esc(err)}</span>`:""}${nxt?`<button class="btn sm" id="pbmore" ${busy?"disabled":""}>${busy?"lädt …":"Weitere "+PJSEITE+" laden"}</button>`:""}</div>`;
+  const draw=()=>{const b=$("#pbl");if(!b)return;if(busy&&!R.length){b.innerHTML=`<div class="hint">Lade Projekte aus ${esc(a.n)} …</div>`;return}if(err&&!R.length){b.innerHTML=`<div class="warnbox">${esc(err)}</div>`;return}
+    b.innerHTML=R.length?R.map(r=>{const v=verb(r);return `<label class="pbr ${v?"dis":""}">${p?`<button class="btn sm" data-pbp="${esc(r.id)}" ${v?"disabled":""}>Verbinden</button>`:`<input type="checkbox" data-pbc="${esc(r.id)}" ${v?"disabled":""} ${!v&&SEL.has(r.id)?"checked":""}>`}<span><b>${esc(r.title)}</b><small>${esc(r.st)}${r.owner?" · "+esc(r.owner):""}${v?" · bereits verbunden mit „"+esc(v.n)+"“":""}</small></span><a href="${esc(r.url||"#")}" target="_blank" rel="noopener" title="In ${esc(a.n)} öffnen">↗</a></label>`}).join(""):'<div class="hint">Keine Projekte gefunden.</div>';
+    if(R.length)b.innerHTML+=`<div class="pbfoot"><span class="hint" style="margin:0">${R.length}${tot!=null?" von "+tot:""} geladen · ${neu?"neueste zuerst":"Reihenfolge von "+esc(a.n)+" (alphabetisch) – nach Anlagedatum sortieren bietet die Schnittstelle noch nicht"}</span>${err?`<span class="warnbox" style="margin:0">${esc(err)}</span>`:""}${nxt?`<button class="btn sm" id="pbmore" ${busy?"disabled":""}>${busy?"lädt …":"Weitere "+LISTE_SEITE+" laden"}</button>`:""}</div>`;
     {const m=$("#pbmore");if(m)m.onclick=e=>{e.preventDefault();load(true)}}
-    document.querySelectorAll("[data-pbp]").forEach(x=>x.onclick=e=>{e.preventDefault();const r=R.find(y=>y.id===x.dataset.pbp);p.bk=pjBkVon(r,sys,om);if(!p.beschr&&r.descr)p.beschr=r.descr;merk();schedule();close();prj();toast("Mit "+SYSKAT[sys].n+"-Projekt verbunden")});
+    document.querySelectorAll("[data-pbp]").forEach(x=>x.onclick=e=>{e.preventDefault();const r=R.find(y=>y.id===x.dataset.pbp);p.bk=pjBkVon(r,sys,om);if(!p.beschr&&r.descr)p.beschr=r.descr;merk();schedule();close();prj();toast("Mit "+a.n+"-Projekt verbunden")});
     document.querySelectorAll("[data-pbc]").forEach(x=>x.onchange=()=>{x.checked?SEL.add(x.dataset.pbc):SEL.delete(x.dataset.pbc);$("#pbok").disabled=!SEL.size});const ok0=$("#pbok");if(ok0)ok0.disabled=!SEL.size};
-  const merk=()=>{O.pjSys=sys;if(sys==="bodo"&&om)O.pjBodo=om.id};
-  let tq=null,lauf=0;const load=async(weiter)=>{const n=++lauf;busy=true;err="";if(!weiter){R=[];nxt=null;tot=null}draw();if(sys==="bodo"&&!om){busy=false;draw();return}
-    try{const P=await pjSeite(sys,om,q,alle,weiter?nxt:null);if(n!==lauf)return;const ids=new Set(R.map(x=>x.id));R=R.concat(P.items.filter(x=>!ids.has(x.id)));nxt=P.next;tot=P.total;neu=P.neuZuerst}catch(e){if(n!==lauf)return;err=sys==="bodo"?mcpMsg(e):sfMsg(e)}busy=false;draw()};
-  document.querySelectorAll("[data-pbs]").forEach(b=>b.onclick=()=>{sys=b.dataset.pbs;SEL.clear();document.querySelectorAll("[data-pbs]").forEach(x=>x.classList.toggle("on",x===b));mand();load()});
+  const merk=()=>{O.pjSys=sys;if(a.mand&&om)O.pjMand={...(O.pjMand||{}),[sys]:om.id}};
+  let tq=null,lauf=0;const load=async(weiter)=>{const n=++lauf;busy=true;err="";if(!weiter){R=[];nxt=null;tot=null}draw();if(a.mand&&!om){busy=false;draw();return}
+    try{const P=await a.projekte({mand:om,q,alle,next:weiter?nxt:null});if(n!==lauf)return;const ids=new Set(R.map(x=>x.id));R=R.concat(P.items.filter(x=>!ids.has(x.id)));nxt=P.next;tot=P.total;neu=P.neuZuerst}catch(e){if(n!==lauf)return;err=a.fehler(e)}busy=false;draw()};
+  document.querySelectorAll("[data-pbs]").forEach(b=>b.onclick=()=>{sys=b.dataset.pbs;a=adapter(sys);mandWahl();SEL.clear();document.querySelectorAll("[data-pbs]").forEach(x=>x.classList.toggle("on",x===b));mand();load()});
   $("#pba").onchange=e=>{alle=e.target.checked;load()};
   $("#pbq").oninput=e=>{clearTimeout(tq);tq=setTimeout(()=>{q=e.target.value.trim();load()},400)};
   const ok=$("#pbok");if(ok)ok.onclick=()=>{const S=[...SEL].map(id=>R.find(r=>r.id===id)).filter(Boolean);
     S.forEach(r=>{const u=US.find(x=>x.aktiv!==false&&r.owner&&x.n===r.owner);PJ.push({id:uid("pj"),org:OC,n:r.n||r.title||"Projekt",st:r.st,beschr:r.descr||"",verantw:u?u.id:null,bk:pjBkVon(r,sys,om),angelegt:new Date().toISOString()})});
-    merk();schedule();close();PJSEL=null;prj();toast(S.length+" Projekt"+(S.length===1?"":"e")+" aus "+SYSKAT[sys].n+" übernommen")};
+    merk();schedule();close();PJSEL=null;prj();toast(S.length+" Projekt"+(S.length===1?"":"e")+" aus "+a.n+" übernommen")};
   mand();load()}
-const pjBkVon=(r,sys,m)=>sys==="bodo"?{sys:"bodo",orgId:m.id,orgN:m.name,id:r.id,n:r.n||r.title||"",url:r.url||"",at:new Date().toISOString()}:{sys,id:r.id,n:r.n||r.title||"",url:r.url||"",at:new Date().toISOString()};
+// Verbindung zu einem Backend-Projekt; bei Systemen mit Mandanten gehört der Mandant dazu
+const pjBkVon=(r,sys,m)=>{const b={sys,id:r.id,n:r.n||r.title||"",url:r.url||"",at:new Date().toISOString()};if(adapter(sys)&&adapter(sys).mand&&m){b.orgId=m.id;b.orgN=m.name}return b};
 // Kontext für Claude
-function pjKontext(j){const P=pj(j.prj);if(!P)return "";const B=P.bk,S=B&&(PN[B.sys]||B.sys);
+function pjKontext(j){const P=pj(j.prj);if(!P)return "";const B=P.bk;
   const kopf="PROJEKT des Auftrags: „"+P.n+"“ (Company OS "+P.id+(P.kunde?", Kunde/Bezug: "+P.kunde:"")+")";
   if(!B)return kopf+". Noch nicht mit einem Backend-Projekt verbunden – nur zur Einordnung, System und Mandant wie sonst bestimmen.";
-  const wo=B.sys==="bodo"?"Bodo-Projekt „"+B.n+"“ (projectId "+B.id+", Mandant "+(B.orgN||"")+" = orgId "+B.orgId+", "+B.url+")":"sellify-Projekt „"+B.n+"“ (Projekt-Id "+B.id+", Werkzeug sellify_project bzw. Bezug project, "+B.url+")";
-  return kopf+". Verbunden mit "+wo+". Alles, was du für diesen Auftrag in "+S+" anlegst (Aufgaben, Notizen, Termine, Dokumente), in diesem Projekt anlegen bzw. mit ihm verknüpfen"+(B.sys==="bodo"?"; Mandant für diese Anlagen ist "+(B.orgN||B.orgId)+" (durch das Projekt eindeutig, keine Annahme)":"; Zielsystem ist damit sellify (durch das Projekt eindeutig, keine Annahme)")+". Im Ergebnis vermerken, dass am Projekt angelegt wurde."}
+  const a=adapter(B.sys),k=a?a.projektKontext(B):{wo:sysName(B.sys)+"-Projekt „"+B.n+"“ (Id "+B.id+", "+B.url+")",ziel:"Zielsystem ist damit "+sysName(B.sys)};
+  return kopf+". Verbunden mit "+k.wo+". Alles, was du für diesen Auftrag in "+sysName(B.sys)+" anlegst (Aufgaben, Notizen, Termine, Dokumente), in diesem Projekt anlegen bzw. mit ihm verknüpfen; "+k.ziel+". Im Ergebnis vermerken, dass am Projekt angelegt wurde."}
 
 // ===== Verbrauch je Auftrag und Projekt (Etappe 4b, Teil 2) =====
 // Jede Claude-Sitzung misst vor ihrem letzten Schreibvorgang Laufzeit und Tokens aus ihrem eigenen Sitzungsprotokoll und hängt sie an j.verb an:
@@ -3207,52 +3317,45 @@ const vbArchiv=j=>{const a=vbJob(j,false);return a.n?{n:a.n,sek:a.sek,tin:a.tin,
 
 // ===== Anbindungen: vier Dienste je Organigramm (Etappe 4b, Teil 3) =====
 // Je Organigramm o.dienste = {crm|auftrag|projekt|zeit: {sys, orgId, orgN, ent}}; Prüfergebnis o.chk = {at, erg:{dienst:{st:"ok"|"err"|"info", t}}}.
-// Der Systemkatalog beschreibt, welche Dienste ein System mit welchen Entitäten anbietet. Neues System = neuer Katalogeintrag.
-const DIENSTE=[["crm","CRM","Kontakte, Organisationen, Verkaufschancen"],["auftrag","Auftragsmanagement","der kommerzielle Auftrag – in der Regel über das Projekt geführt"],["projekt","Projekt","Klammer für Aufgaben, Notizen und Termine eines Auftrags"],["zeit","Zeiterfassung","Zeiteinträge, z. B. für die Laufzeit der KI-Sitzungen"]];
-const SYSKAT={
-  bodo:{n:"Bodo",mcp:"bodo solutions",mand:true,pruefbar:true,kiUser:false,ent:{crm:[["contact","Kontakt/Firma"],["member","Vertragsinhaber"],["opportunity","Verkaufschance"],["lead","Vertriebsanfrage"]],auftrag:[["order","Auftrag"],["opportunity","Verkaufschance"]],projekt:[["project","Projekt"]],zeit:[["timeEntry","Zeiteintrag"]]}},
-  sellify:{n:"sellify",mcp:"sellify",mand:false,pruefbar:false,pruefEnt:{project:"sellify_project"},kiUser:false,ent:{crm:[["contact","Organisation"],["person","Person"],["sale","Chance"]],auftrag:[["sale","Chance"],["project","Projekt"]],projekt:[["project","Projekt"]],zeit:[]}}};
-const ZEITTIP=s=>"Zeiterfassung ist mit "+SYSKAT[s].n+" nicht möglich. Soll ein anderes System für die Zeiterfassung angebunden werden? Bitte sprich uns als Hersteller an.";
-const entN=(s,d,e)=>((SYSKAT[s]&&SYSKAT[s].ent[d]||[]).find(x=>x[0]===e)||[e,e])[1];
-const dienstVon=(o,k)=>{o=typeof o==="string"?orgById(o):o;const d=o&&o.dienste&&o.dienste[k];return d&&d.sys&&SYSKAT[d.sys]?d:null};
-function dienstEinst(C){const O=ORGS(),M=ownOrgs();
-  const zeile=(o,[k,l,h])=>{const d=(o.dienste||{})[k]||{},S=SYSKAT[d.sys],E=S?S.ent[k]:[],c=o.chk&&o.chk.erg&&o.chk.erg[k];
-    const sysOpt=`<option value="">– keins –</option>`+Object.entries(SYSKAT).map(([id,x])=>{const kann=x.ent[k].length>0;return `<option value="${id}" ${id===d.sys?"selected":""} ${kann?"":"disabled"} title="${kann?"":esc(ZEITTIP(id))}">${esc(x.n)}${kann?"":" – nicht verfügbar"}</option>`}).join("");
+// Welche Systeme mit welchen Entitäten je Dienst zur Wahl stehen, beschreiben die Adapter (07a-adapter-basis.js); DIENSTE steht dort.
+const ZEITTIP=s=>"Zeiterfassung ist mit "+sysName(s)+" nicht möglich. Soll ein anderes System für die Zeiterfassung angebunden werden? Bitte sprich uns als Hersteller an.";
+// Hinweis unter dem Systemkatalog: KI-Benutzer-Stand und was die Seite je System nicht selbst prüfen kann
+function kiHinweis(AL){const ohne=AL.filter(a=>!a.kiUser).map(a=>a.n),und=L=>L.length>1?L.slice(0,-1).join(", ")+" und "+L[L.length-1]:L.join("");
+  return "KI-Benutzer: Agenten sollen künftig als eigener, nicht-physischer Benutzer im Backend buchen."+(ohne.length?" "+und(ohne)+(ohne.length>1?" unterstützen":" unterstützt")+" das noch nicht – vorbereitet, nicht umgesetzt.":"")+AL.filter(a=>a.pruefHinweis).map(a=>" "+a.pruefHinweis).join("")}
+const dienstVon=(o,k)=>{o=typeof o==="string"?orgById(o):o;const d=o&&o.dienste&&o.dienste[k];return d&&d.sys&&adapter(d.sys)?d:null};
+function dienstEinst(C){const O=ORGS(),AL=adapterListe();
+  const zeile=(o,[k,l,h])=>{const d=(o.dienste||{})[k]||{},S=adapter(d.sys),E=S?S.ent[k]:[],M=S&&S.mand?S.mandanten():[],c=o.chk&&o.chk.erg&&o.chk.erg[k];
+    const sysOpt=`<option value="">– keins –</option>`+AL.map(x=>{const id=x.id,kann=x.ent[k].length>0;return `<option value="${id}" ${id===d.sys?"selected":""} ${kann?"":"disabled"} title="${kann?"":esc(ZEITTIP(id))}">${esc(x.n)}${kann?"":" – nicht verfügbar"}</option>`}).join("");
     const mand=S&&S.mand?`<select data-dm="${o.id}|${k}" aria-label="Mandant">${(M.some(m=>m.id===d.orgId)||!d.orgId?"":`<option value="${esc(d.orgId)}" selected>${esc(d.orgN||d.orgId)}</option>`)+`<option value="">– Mandant wählen –</option>`+M.map(m=>`<option value="${m.id}" ${m.id===d.orgId?"selected":""}>${esc(m.name)}</option>`).join("")}</select>`:S?`<span class="hint" style="margin:0">ein System, kein Mandant</span>`:"";
     const ent=S?`<select data-de="${o.id}|${k}" aria-label="Entität">${E.map(([e,n])=>`<option value="${e}" ${e===d.ent?"selected":""}>${esc(n)} (${e})</option>`).join("")}</select>`:"";
     const st=c?`<span class="dst ${c.st}" title="${esc(c.t)}">${c.st==="ok"?"✓":c.st==="err"?"⚠":"ⓘ"}</span>`:"";
-    const zeit=k==="zeit"?`<label class="cb dzb" title="${esc(S&&!S.ent.zeit.length?ZEITTIP(d.sys):"Vorbereitet – die Laufzeit der KI-Sitzungen wird vorerst nur in Company OS erfasst (Entscheidung 17.10.2026).")}"><input type="checkbox" disabled> Laufzeit der KI-Sitzungen hier buchen</label>${(()=>{const so=!d.sys&&Object.values(o.dienste||{}).map(x=>x&&x.sys).find(s=>s&&SYSKAT[s]&&!SYSKAT[s].ent.zeit.length);return so?`<div class="hint dmsg">ⓘ ${esc(ZEITTIP(so))}</div>`:""})()}`:"";
+    const zeit=k==="zeit"?`<label class="cb dzb" title="${esc(S&&!S.ent.zeit.length?ZEITTIP(d.sys):"Vorbereitet – die Laufzeit der KI-Sitzungen wird vorerst nur in Company OS erfasst (Entscheidung 17.10.2026).")}"><input type="checkbox" disabled> Laufzeit der KI-Sitzungen hier buchen</label>${(()=>{const so=!d.sys&&Object.values(o.dienste||{}).map(x=>x&&x.sys).find(s=>s&&adapter(s)&&!adapter(s).ent.zeit.length);return so?`<div class="hint dmsg">ⓘ ${esc(ZEITTIP(so))}</div>`:""})()}`:"";
     return `<div class="drow"><div class="dlab"><b>${l}</b><small>${esc(h)}</small></div><div class="dsel"><select data-ds="${o.id}|${k}" aria-label="System für ${l}">${sysOpt}</select>${mand}${ent}${st}</div>${zeit}${c&&c.st!=="ok"?`<div class="hint dmsg">${esc(c.t)}</div>`:""}</div>`};
   C.innerHTML=`<h2>Anbindungen</h2><div class="hint" style="margin:0 0 10px">Je Organigramm vier Dienste. Mehrere oder alle dürfen auf dasselbe System zeigen. Claude nutzt diese Zuordnung als Standard, wenn ein Auftrag kein System nennt; Projekte werden im Mandanten des Dienstes „Projekt“ gesucht.</div>
     ${O.map(o=>`<div class="dorg"><div class="dhd"><b>${o.logo?`<img class="olg" src="${o.logo}" alt="">`:""}${esc(o.n)}</b><span style="flex:1"></span>${o.chk?`<span class="hint" style="margin:0">geprüft ${esc(new Date(o.chk.at).toLocaleString("de-DE",{dateStyle:"short",timeStyle:"short"}))}</span>`:""}<button class="btn sm" data-dchk="${o.id}">Verbindung prüfen</button></div>${DIENSTE.map(x=>zeile(o,x)).join("")}</div>`).join("")}
-    <div class="flabel">Systemkatalog</div><table class="dkat"><thead><tr><th>System</th>${DIENSTE.map(d=>`<th>${d[1]}</th>`).join("")}<th>KI-Benutzer</th></tr></thead><tbody>${Object.values(SYSKAT).map(S=>`<tr><td><b>${esc(S.n)}</b></td>${DIENSTE.map(([k])=>`<td>${S.ent[k].length?S.ent[k].map(e=>esc(e[1])).join(", "):'<span class="hint" style="margin:0" title="'+esc(ZEITTIP(Object.keys(SYSKAT).find(x=>SYSKAT[x]===S)))+'">–</span>'}</td>`).join("")}<td>${S.kiUser?"ja":'<span class="hint" style="margin:0">noch nicht</span>'}</td></tr>`).join("")}</tbody></table>
-    <div class="hint">KI-Benutzer: Agenten sollen künftig als eigener, nicht-physischer Benutzer im Backend buchen. Bodo und sellify unterstützen das noch nicht – vorbereitet, nicht umgesetzt. Bei sellify prüft die Seite nur die Projekte; die übrigen Bereiche erreicht die Claude-Sitzung über ihren Connector.</div>
-    <div class="btns"><button class="btn sm" id="sbodo">⚙ Eigene Bodo-Mandanten</button></div>`;
+    <div class="flabel">Systemkatalog</div><table class="dkat"><thead><tr><th>System</th>${DIENSTE.map(d=>`<th>${d[1]}</th>`).join("")}<th>KI-Benutzer</th></tr></thead><tbody>${AL.map(S=>`<tr><td><b>${esc(S.n)}</b></td>${DIENSTE.map(([k])=>`<td>${S.ent[k].length?S.ent[k].map(e=>esc(e[1])).join(", "):'<span class="hint" style="margin:0" title="'+esc(ZEITTIP(S.id))+'">–</span>'}</td>`).join("")}<td>${S.kiUser?"ja":'<span class="hint" style="margin:0">noch nicht</span>'}</td></tr>`).join("")}</tbody></table>
+    <div class="hint">${esc(kiHinweis(AL))}</div>
+    <div class="btns">${AL.filter(a=>a.mandantenDlg).map(a=>`<button class="btn sm" data-mdlg="${a.id}">⚙ Eigene ${esc(a.n)}-Mandanten</button>`).join("")}</div>`;
   const D=(v)=>{const [oid,k]=v.split("|"),o=orgById(oid);o.dienste={...(o.dienste||{})};o.dienste[k]={...(o.dienste[k]||{})};return [o,k,o.dienste[k]]};
-  document.querySelectorAll("[data-ds]").forEach(s=>s.onchange=()=>{const [o,k,d]=D(s.dataset.ds);if(!s.value){delete o.dienste[k]}else{d.sys=s.value;d.ent=SYSKAT[s.value].ent[k][0][0];if(!SYSKAT[s.value].mand){delete d.orgId;delete d.orgN}
+  document.querySelectorAll("[data-ds]").forEach(s=>s.onchange=()=>{const [o,k,d]=D(s.dataset.ds);if(!s.value){delete o.dienste[k]}else{d.sys=s.value;d.ent=adapter(s.value).ent[k][0][0];if(!adapter(s.value).mand){delete d.orgId;delete d.orgN}
       else if(!d.orgId){const andere=Object.values(o.dienste).find(x=>x&&x.sys===s.value&&x.orgId);if(andere){d.orgId=andere.orgId;d.orgN=andere.orgN}}}
     if(o.chk&&o.chk.erg)delete o.chk.erg[k];schedule();einst()});
-  document.querySelectorAll("[data-dm]").forEach(s=>s.onchange=()=>{const [o,k,d]=D(s.dataset.dm);const m=M.find(x=>x.id===s.value);if(m){d.orgId=m.id;d.orgN=m.name}else{delete d.orgId;delete d.orgN}if(o.chk&&o.chk.erg)delete o.chk.erg[k];schedule();einst()});
+  document.querySelectorAll("[data-dm]").forEach(s=>s.onchange=()=>{const [o,k,d]=D(s.dataset.dm);const m=adapter(d.sys).mandanten().find(x=>x.id===s.value);if(m){d.orgId=m.id;d.orgN=m.name}else{delete d.orgId;delete d.orgN}if(o.chk&&o.chk.erg)delete o.chk.erg[k];schedule();einst()});
   document.querySelectorAll("[data-de]").forEach(s=>s.onchange=()=>{const [o,k,d]=D(s.dataset.de);d.ent=s.value;if(o.chk&&o.chk.erg)delete o.chk.erg[k];schedule();einst()});
   document.querySelectorAll("[data-dchk]").forEach(b=>b.onclick=async()=>{b.disabled=true;b.textContent="prüfe …";await dienstPruefen(orgById(b.dataset.dchk));einst()});
-  $("#sbodo").onclick=ownOrgsDlg}
-async function dienstPruefen(o){const r={at:new Date().toISOString(),erg:{}};let orgs=null;
-  for(const [k] of DIENSTE){const d=dienstVon(o,k);if(!d)continue;const S=SYSKAT[d.sys];
-    if(!S.pruefbar&&S.pruefEnt&&S.pruefEnt[d.ent]){try{await sellify(S.pruefEnt[d.ent],{action:"list",params:{limit:1}});r.erg[k]={st:"ok",t:S.n+" erreichbar, "+entN(d.sys,k,d.ent)+" lesbar"}}catch(e){r.erg[k]={st:"err",t:sfMsg(e)}}continue}
-    if(!S.pruefbar){r.erg[k]={st:"info",t:S.n+" ist aus dieser Seite nicht prüfbar – die Claude-Sitzung nutzt den Connector „"+S.mcp+"“."};continue}
-    if(S.mand&&!d.orgId){r.erg[k]={st:"err",t:"Kein Mandant gewählt"};continue}
-    try{if(!orgs)orgs=((await bodo("bodo_list_orgs",{}))||{}).orgs||[];const m=orgs.find(x=>x.orgId===d.orgId);
-      if(!m){r.erg[k]={st:"err",t:"Mandant „"+(d.orgN||d.orgId)+"“ ist für dieses Konto nicht erreichbar"};continue}
-      if(m.mcpAccess&&m.mcpAccess.allowed===false){r.erg[k]={st:"err",t:m.mcpAccess.message||"KI-Zugang im Mandanten gesperrt"};continue}
-      await bodo("bodo_search",{resourceType:d.ent,orgId:d.orgId,limit:1,fields:["_id"]});r.erg[k]={st:"ok",t:"Mandant „"+m.name+"“ erreichbar, "+entN(d.sys,k,d.ent)+" lesbar"}}
-    catch(e){r.erg[k]={st:"err",t:mcpMsg(e)}}}
+  document.querySelectorAll("[data-mdlg]").forEach(b=>b.onclick=()=>adapter(b.dataset.mdlg).mandantenDlg())}
+// Prüft je Dienst über den Adapter des Systems; ctx hält Zwischenergebnisse eines Prüflaufs (z. B. die Mandantenliste)
+async function dienstPruefen(o){const r={at:new Date().toISOString(),erg:{}},ctx={};
+  for(const [k] of DIENSTE){const d=dienstVon(o,k);if(!d)continue;const a=adapter(d.sys);
+    if(a.mand&&!d.orgId){r.erg[k]={st:"err",t:"Kein Mandant gewählt"};continue}
+    try{r.erg[k]=await a.pruefen(d,k,ctx)}catch(e){r.erg[k]={st:"err",t:a.fehler(e)}}}
   o.chk=r;schedule();const n=Object.values(r.erg).filter(x=>x.st==="err").length;toast(Object.keys(r.erg).length?(n?n+" Dienst"+(n===1?"":"e")+" mit Problem":"Alle Dienste erreichbar"):"Keine Dienste zugeordnet");return r}
 // Kontext für Claude: Standard-Zielsysteme des Organigramms
-function dienstKontext(o){if(!o||!o.dienste)return "";const L=DIENSTE.map(([k,l])=>{const d=dienstVon(o,k);return d?l+" = "+SYSKAT[d.sys].n+(d.orgId?" (Mandant "+(d.orgN||"")+", orgId "+d.orgId+")":"")+", Entität "+d.ent:null}).filter(Boolean);
+function dienstKontext(o){if(!o||!o.dienste)return "";const L=DIENSTE.map(([k,l])=>{const d=dienstVon(o,k);return d?l+" = "+sysName(d.sys)+(d.orgId?" (Mandant "+(d.orgN||"")+", orgId "+d.orgId+")":"")+", Entität "+d.ent:null}).filter(Boolean);
   return L.length?"ANBINDUNGEN des Organigramms (Standard, wenn der Auftrag kein System oder keinen Mandanten nennt; nennt der Auftrag ausdrücklich etwas anderes, gilt der Auftrag, bei Widerspruch nachfragen): "+L.join("; ")+".":""}
 // Datenspur eines Auftrags (von Claude geschrieben: spur = [{dienst, sys, orgId, ent, id, url, akt}])
 function spurHtml(j){const S=(j.spur||[]).filter(Boolean);if(!S.length)return "";const dn=k=>(DIENSTE.find(d=>d[0]===k)||[k,k==="sonst"?"Sonstiges":k||"–"])[1];
-  return `<div class="flabel" style="margin-top:10px">Datenspur (${S.length})</div><div class="spur">${S.map(s=>`<div class="spr"><span class="sprd">${esc(dn(s.dienst))}</span><span>${esc((SYSKAT[s.sys]||{n:s.sys||""}).n)}${s.orgN?" · "+esc(s.orgN):""} · ${esc(s.ent||"")} ${s.akt?"· "+esc(s.akt):""}</span>${s.url?`<a href="${esc(s.url)}" target="_blank" rel="noopener">↗</a>`:""}</div>`).join("")}</div>`}
+  return `<div class="flabel" style="margin-top:10px">Datenspur (${S.length})</div><div class="spur">${S.map(s=>`<div class="spr"><span class="sprd">${esc(dn(s.dienst))}</span><span>${esc(sysName(s.sys))}${s.orgN?" · "+esc(s.orgN):""} · ${esc(s.ent||"")} ${s.akt?"· "+esc(s.akt):""}</span>${s.url?`<a href="${esc(s.url)}" target="_blank" rel="noopener">↗</a>`:""}</div>`).join("")}</div>`}
 
 boot();
 // Breitenregler Ablauf-Eigenschaften (rechts)

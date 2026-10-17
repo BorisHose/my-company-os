@@ -7,3 +7,5 @@ const askOk=(t,l)=>dlg(`<p style="margin:0 0 12px">${esc(t)}</p><div class="btns
 async function copyText(t,msg){try{await navigator.clipboard.writeText(t);toast(msg)}catch(e){const p=$("#pv");if(p){p.closest("details").open=true;const r=document.createRange();r.selectNodeContents(p);const s=getSelection();s.removeAllRanges();s.addRange(r)}toast("Kopieren nicht möglich – Text ist markiert")}}
 const now=()=>{const d=new Date();return d.toLocaleDateString("de-DE",{day:"2-digit",month:"2-digit"})+" "+d.toLocaleTimeString("de-DE",{hour:"2-digit",minute:"2-digit"})};
 const uid=p=>p+"-"+Date.now().toString(36)+Math.random().toString(36).slice(2,6);
+// Großes Fenster (Assistenten, Auswahllisten); liefert die Schließen-Funktion
+function modalBox(html,wide){$("#modal").innerHTML=`<div class="modal"><div class="box wz ${wide?'wide':''}" id="box">${html}</div></div>`;return ()=>$("#modal").innerHTML=""}

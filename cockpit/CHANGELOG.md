@@ -1,5 +1,14 @@
 # Änderungen – Cockpit
 
+## 70 · 17.10.2026 · Adapter-Umbau (Architektur, ohne sichtbare Änderung)
+- Backend-Systeme hängen jetzt an je einem Adapter mit festem Vertrag: `07a-adapter-basis.js` (Verbindung, Fehlertexte, Register, Vertrag), `07b-adapter-bodo.js`, `07c-adapter-sellify.js`. Ein weiteres System = eine weitere Adapter-Datei.
+- Projekte (Übernehmen/Verbinden, Kontext für Claude), Anbindungen (Systemauswahl, Mandanten, Verbindung prüfen), Benutzer-Zuordnung (Suchen, Abgleichen) und KI-Kontext fragen nur noch den Adapter; feste Unterscheidungen „bodo/sellify“ im Code entfallen.
+- Aufgeteilt: Bodo-Benutzerverwaltung (Mandanten pflegen, Assistent, Einladen) in `07d-bodo-benutzerverwaltung.js`, Benutzer-Zuordnung in `10a-benutzer-zuordnung.js`, `modalBox` zu den Dialogen; `07-bodo-anbindung.js` entfällt. Doppelte Systemlisten (SYS, SYSKAT, PJSYS) entfallen.
+- Projektdialog heißt `pjBackendDlg`; der zuletzt gewählte Mandant wird je System gemerkt (`pjMand`), der bisherige Bodo-Wert wird weiter gelesen.
+- Neu `berechtigungen.json`: Berechtigungen der Seite als Datei im Repo.
+- Texte korrigiert: Hinweis beim Lösen einer Zuordnung nennt die heutigen Knöpfe („Abgleichen“, „In … suchen“).
+- Geprüft: Smoke-Test 103 Prüfungen (neu: Adapter-Vertrag, Berechtigungen, Projekte/Benutzer/Prüfung/Fehler/Kontext je System); zusätzlich Vergleich mit Version 69: Anbindungen, Prüfergebnisse, Projekt-Kontext, KI-Kontext, Projekt- und Benutzeransicht inhaltsgleich.
+
 ## 69 · 17.10.2026 · sellify-Benutzer zuordnen (Wunsch Boris)
 - Nutzt ein Organigramm des Benutzers sellify (Anbindung oder Produkt), gehört auch eine sellify-Zuordnung zum Soll; fehlt sie, erscheint „In sellify suchen“.
 - Suche über den sellify-Connector (Benutzerliste, Suche nach Nachname, Treffer bei gleichem vollen Namen oder gleicher E-Mail); gelöschte Benutzer werden nicht angeboten, bereits anderen Benutzern zugeordnete ebenfalls.

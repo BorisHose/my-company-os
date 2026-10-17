@@ -1,6 +1,5 @@
 // ===== Benutzer (Menschen) =====
 let US=[],ucur=-1,UOLD=false;
-const SYS={bodo:"Bodo",sellify:"sellify",andere:"Anderes System"};
 const usr=id=>US.find(u=>u.id===id);
 const ini=n=>String(n||"?").replace(/^(Dr\.|Prof\.)\s*/,"").split(/\s+/).filter(Boolean).map(x=>x[0]).slice(0,2).join("").toUpperCase()||"?";
 const hue=s=>{let h=0;for(const c of String(s))h=(h*31+c.charCodeAt(0))%360;return h};
