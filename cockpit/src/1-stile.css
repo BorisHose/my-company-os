@@ -362,9 +362,7 @@ fieldset:disabled .ic,fieldset:disabled .ownadd,fieldset:disabled [data-r],field
 img.olg{height:18px;max-width:60px;object-fit:contain;margin-right:6px;vertical-align:-4px}img.olgb{height:40px;max-width:120px;object-fit:contain;margin-right:4px}
 @media(max-width:860px){#clock{display:none}.setorg{flex-direction:column}}
 /* v57: Kopfzeile aufgeräumt – Gruppe „Agenten“ mit Unterleiste */
-.subnav{flex-basis:100%;display:flex;gap:4px;justify-content:flex-end;margin-top:-4px}.subnav[hidden]{display:none}
-.subnav button{background:none;border:0;border-bottom:2px solid transparent;color:#ffffffcc;padding:4px 10px;font:inherit;font-size:13px;cursor:pointer}.subnav button:hover{color:#fff}.subnav button.on{color:#fff;border-bottom-color:#fff;font-weight:600}
-@media(max-width:860px){nav{order:3;flex-basis:100%;margin-left:0;overflow-x:auto;flex-wrap:nowrap;scrollbar-width:none;-webkit-overflow-scrolling:touch}nav::-webkit-scrollbar{display:none}nav button{flex:none}.hdr-r{margin-left:auto}.subnav{order:4;justify-content:flex-start;overflow-x:auto}}
+@media(max-width:860px){nav{order:3;flex-basis:100%;margin-left:0;overflow-x:auto;flex-wrap:nowrap;scrollbar-width:none;-webkit-overflow-scrolling:touch}nav::-webkit-scrollbar{display:none}nav button{flex:none}.hdr-r{margin-left:auto}}
 
 /* v58 Projekte */
 #projects{grid-template-columns:340px minmax(0,1fr)}@media(max-width:860px){#projects{grid-template-columns:1fr}}
@@ -422,3 +420,8 @@ img.olg{height:18px;max-width:60px;object-fit:contain;margin-right:6px;vertical-
 .pjst{display:inline-block;padding:2px 9px;border-radius:999px;font-size:12px;font-weight:600;background:#e7f6ee;color:#067647}.pjst.pausiert{background:#fff4d6;color:#8a5a00}.pjst.abgeschlossen{background:#eef0f4;color:#475467}
 .pjhb{display:flex;gap:6px;flex-wrap:wrap;text-transform:none;letter-spacing:0}
 #pjd.editing{background:#fffdf5}
+
+/* v65 Menü „Agenten ▾“ als Auswahlliste */
+.ndm{position:fixed;z-index:60;min-width:180px;background:#fff;border:1px solid var(--line);border-radius:10px;box-shadow:0 12px 32px -12px rgba(15,34,53,.45);padding:5px;display:flex;flex-direction:column;gap:2px}.ndm[hidden]{display:none}
+.ndm button{text-align:left;background:none;border:0;border-radius:7px;padding:9px 12px 9px 30px;font:inherit;font-size:14px;color:var(--ink,#101828);cursor:pointer;position:relative}
+.ndm button:hover,.ndm button:focus-visible{background:#f3f5f9;outline:none}.ndm button.on{font-weight:600;color:var(--navy)}.ndm button.on::before{content:"✓";position:absolute;left:11px}

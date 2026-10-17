@@ -217,7 +217,7 @@ $("#newF").onclick=()=>{if(blocked())return;const a=AG.find(x=>x.p===FF)||AG[0];
 
 const AGRP=["build","skills","matrix"];
 function show(v){if(v==="agrp")v=AGRP.includes(UI.agv)?UI.agv:"build";if(EDIT&&!$("#"+v).classList.contains("hide"))return;if(blocked())return;document.querySelectorAll("nav button").forEach(x=>x.classList.toggle("on",x.dataset.v===v||(x.dataset.v==="agrp"&&AGRP.includes(v))));
-  {const sn=$("#subnav");if(sn){sn.hidden=!AGRP.includes(v);sn.querySelectorAll("[data-sv]").forEach(b=>b.classList.toggle("on",b.dataset.sv===v))}if(AGRP.includes(v)&&UI.agv!==v){UI.agv=v;saveUI()}}
+  {agMenu(false);$("#agmenu").querySelectorAll("[data-sv]").forEach(b=>{const on=b.dataset.sv===v;b.classList.toggle("on",on);b.setAttribute("aria-checked",on?"true":"false")});if(AGRP.includes(v)&&UI.agv!==v){UI.agv=v;saveUI()}}
   ["build","matrix","flows","jobs","projects","users","org","skills","settings"].forEach(id=>$("#"+id).classList.toggle("hide",id!==v));{const g=$("#gear");if(g)g.classList.toggle("on",v==="settings"||v==="users")}if(v==="settings")einst();
   if(v==="skills")lib();
   if(v==="org")org();
@@ -225,4 +225,14 @@ function show(v){if(v==="agrp")v=AGRP.includes(UI.agv)?UI.agv:"build";if(EDIT&&!
   if(v==="users"){if(ucur<0&&US.length)ucur=0;users()}
   if(v==="build"||v==="matrix")render()
   if(v==="flows")flows();if(v==="jobs"){jobs();if(AU.some(j=>j.ki))kiReload(true).then(kiCheckRuns);kiPoll()}}
-document.querySelectorAll("nav button").forEach(b=>b.onclick=()=>show(b.dataset.v));document.querySelectorAll("#subnav [data-sv]").forEach(b=>b.onclick=()=>show(b.dataset.sv));
+// Menü „Agenten ▾“: Klick öffnet eine Auswahlliste (Agenten · Skills · Matrix) unter dem Knopf
+function agMenu(auf){const m=$("#agmenu"),b=$("#agbtn");if(!m||!b)return;if(auf==null)auf=m.hidden;
+  if(auf){const r=b.getBoundingClientRect();m.style.top=Math.round(r.bottom+6)+"px";m.style.left=Math.round(Math.max(8,Math.min(r.left,innerWidth-m.offsetWidth-8,innerWidth-188)))+"px";m.hidden=false;b.setAttribute("aria-expanded","true");(m.querySelector(".on")||m.querySelector("button")).focus()}
+  else{m.hidden=true;b.setAttribute("aria-expanded","false")}}
+document.querySelectorAll("nav button[data-v]").forEach(b=>b.onclick=e=>{if(b.dataset.v==="agrp"){e.stopPropagation();agMenu();return}show(b.dataset.v)});
+document.querySelectorAll("#agmenu [data-sv]").forEach(b=>b.onclick=e=>{e.stopPropagation();agMenu(false);show(b.dataset.sv);$("#agbtn").focus()});
+document.addEventListener("click",e=>{const m=$("#agmenu");if(m&&!m.hidden&&!m.contains(e.target))agMenu(false)});
+document.addEventListener("keydown",e=>{const m=$("#agmenu");if(!m||m.hidden)return;const L=[...m.querySelectorAll("button")],i=L.indexOf(document.activeElement);
+  if(e.key==="Escape"){e.preventDefault();agMenu(false);$("#agbtn").focus()}else if(e.key==="ArrowDown"){e.preventDefault();L[(i+1)%L.length].focus()}else if(e.key==="ArrowUp"){e.preventDefault();L[(i-1+L.length)%L.length].focus()}else if(e.key==="Tab")agMenu(false)});
+addEventListener("resize",()=>agMenu(false));
+document.querySelector("nav").addEventListener("scroll",()=>agMenu(false),{passive:true});

@@ -1,5 +1,11 @@
 # Änderungen – Cockpit
 
+## 65 · 17.10.2026 · „Agenten ▾“ als Auswahlliste (Wunsch Boris)
+- Klick auf „Agenten ▾“ öffnet eine Auswahlliste direkt unter dem Knopf: Agenten · Skills · Matrix, der aktuelle Reiter mit ✓. Die zweite Leiste unter der Navigation entfällt, die Kopfzeile bleibt gleich hoch.
+- Schließen per Auswahl, Klick daneben, Escape, Tab, Scrollen der Leiste oder Größenänderung; Pfeiltasten wählen in der Liste.
+- Handy: Liste erscheint unter dem Knopf und bleibt ganz im Bild.
+- Smoke-Test: 98 Prüfungen.
+
 ## 64 · 17.10.2026 · Projekt-Detail mit Bearbeitungsmodus (Wunsch Boris)
 - Die Projekt-Detailansicht startet im reinen Ansichtsmodus (Kunde, Status, Verantwortlich, Angelegt, Beschreibung, Backend-Verbindung, Aufträge, Verbrauch).
 - „✎ Bearbeiten“ wie in den übrigen Bereichen: erst dann Felder, Status, Backend verbinden/lösen und „Projekt löschen“; „Speichern“ schreibt, „Abbrechen“ verwirft. Während der Bearbeitung sind Projektwechsel, Organigrammwechsel und Übernahme gesperrt.
