@@ -21,10 +21,10 @@ function einst(sec){if(sec)UI.sets=sec;if(!SETSEC.some(s=>s[0]===UI.sets))UI.set
     document.querySelectorAll("[data-thm]").forEach(b=>b.onclick=()=>{themeSet(b.dataset.thm);einst()});
     $("#sme").onchange=e=>{UI.me=e.target.value||undefined;saveUI();hdr();einst()}}
   else if(S==="inst"){const I=SET.inst||{};
-    C.innerHTML=`<h2>Instanz</h2><div class="field"><label>Name der Instanz</label><input type="text" id="sin" value="${esc(I.n||"")}" placeholder="z. B. Company OS business//acts"></div>
+    C.innerHTML=`<h2>Instanz</h2><div class="field"><label>Name der Instanz</label><input type="text" id="sin" value="${esc(I.n||"")}" placeholder="z. B. Organigraph business//acts"></div>
      <div class="field"><label>Inhaber</label><select id="sinh">${uopt(SET.inhaber||"","– noch nicht festgelegt –")}</select><div class="hint">Wer die Instanz verantwortet und Aufträge freigibt. Jede Instanz gehört genau einem Kunden und hat ihre eigene Datenbank.</div></div>
-     <div class="field"><label>Version</label><div class="hint" style="margin:0">Company OS ${esc(String(VER))} · Datenstand ${esc(String(SET.schema||"–"))}</div></div>`;
-    $("#sin").oninput=e=>{SET.inst={...(SET.inst||{}),n:e.target.value.trim()};document.title=(SET.inst.n||"My Company OS")};
+     <div class="field"><label>Version</label><div class="hint" style="margin:0">Organigraph ${esc(String(VER))} · Datenstand ${esc(String(SET.schema||"–"))}</div></div>`;
+    $("#sin").oninput=e=>{SET.inst={...(SET.inst||{}),n:e.target.value.trim()};document.title=(SET.inst.n||"Organigraph")};
     $("#sinh").onchange=e=>{SET.inhaber=e.target.value||undefined;hdr()}}
   else if(S==="orgs"){
     C.innerHTML=`<h2>Organigramme</h2><div class="hint" style="margin:0 0 10px">Je Organigramm Name, Kurzname für den Umschalter und Logo. Abteilungen, Teams und Agenten bearbeitest du im Organigramm über „✎ Bearbeiten“.</div>

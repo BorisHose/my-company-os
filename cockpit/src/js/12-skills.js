@@ -101,7 +101,7 @@ function syncModal(){
   const close=modalBox(`<div class="bhead"><h3>⟳ Abgleich mit dem Konto</h3><button class="ic" id="mclose" title="Schließen" style="font-size:18px">✕</button></div>
    <div class="field"><label>Anbieter (Konnektor)</label><div class="provrow">${PROV.map(([k,l,on])=>`<button data-pv="${k}" class="${pv===k?'on':''}" ${on?'':'disabled title="Konnektor kommt später"'}>${l}${on?'':' · später'}</button>`).join("")}</div></div>
    <p style="margin:0 0 8px">Das Cockpit kann die Skills im ${esc(provName(pv))}-Konto nicht selbst lesen oder ändern. Den Abgleich macht deshalb ${esc(provName(pv))} in einer Sitzung – auf Zuruf oder per geplanter Aufgabe.</p>
-   <div class="warnbox" style="margin:0 0 10px"><b>So geht's:</b> In Cowork sagen: <i>„Company OS abgleichen“</i>. Claude liest dann deine Skills und Plugins, zeigt die Unterschiede, legt deine Entwürfe als echte Skills an, überträgt die hier <b>freigegebenen</b> Änderungen – jeweils erst nach deiner Freigabekarte – und trägt das Ergebnis hier ein. Nicht freigegebene Änderungen bleiben nur im Cockpit.</div>
+   <div class="warnbox" style="margin:0 0 10px"><b>So geht's:</b> In Cowork sagen: <i>„Organigraph abgleichen“</i>. Claude liest dann deine Skills und Plugins, zeigt die Unterschiede, legt deine Entwürfe als echte Skills an, überträgt die hier <b>freigegebenen</b> Änderungen – jeweils erst nach deiner Freigabekarte – und trägt das Ergebnis hier ein. Nicht freigegebene Änderungen bleiben nur im Cockpit.</div>
    <div class="hint"><b>Letzter Abgleich:</b> ${S.at?esc(new Date(S.at).toLocaleString("de-DE",{dateStyle:"short",timeStyle:"short"}))+(S.note?" – "+esc(S.note):""):"noch keiner"}</div>
    ${S.changes&&S.changes.length?`<ul class="synclist">${S.changes.map(c=>`<li>${esc(c)}</li>`).join("")}</ul>`:""}
    <div class="hint" style="margin-top:10px"><b>Wartende Entwürfe (${dr.length}):</b> ${dr.length?dr.map(s=>esc(s.n)).join(", "):"keine"}</div>
@@ -110,7 +110,7 @@ function syncModal(){
    <div class="btns" style="justify-content:flex-end;margin-top:14px"><button class="btn" id="sclose">Schließen</button><button class="btn p" id="scopy">Auftrag kopieren</button></div>`);
   $("#mclose").onclick=$("#sclose").onclick=close;
   document.querySelectorAll("[data-pv]").forEach(b=>b.onclick=()=>{SET.prov=b.dataset.pv;schedule();syncModal()});
-  $("#scopy").onclick=()=>copyText("Company OS abgleichen","Auftrag kopiert – in Cowork einfügen");
+  $("#scopy").onclick=()=>copyText("Organigraph abgleichen","Auftrag kopiert – in Cowork einfügen");
   const PL2=provList();document.querySelectorAll("[data-pvshow]").forEach(b=>b.onclick=()=>{close();provConfirm([PL2[+b.dataset.pvshow]])});
   document.querySelectorAll("[data-pvback]").forEach(b=>b.onclick=async()=>{const [c,o]=PL2[+b.dataset.pvback];if(!await askOk("Änderungen an „"+o.n+"“ zurücknehmen? Das Cockpit erhält wieder den Stand von Claude ("+Object.keys(o.prov.alt).map(f=>PFLD[c][f]||f).join(", ")+").","Ja, zurücknehmen"))return;
     Object.entries(o.prov.alt).forEach(([f,v])=>{if(v===null)delete o[f];else o[f]=v});delete o.prov;render();schedule();syncModal();toast("Zurückgenommen")})}

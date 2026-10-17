@@ -4,7 +4,7 @@
 const { chromium } = require('playwright');
 const fs = require('fs'), path = require('path');
 const ROOT = path.join(__dirname, '..');
-const html = fs.readFileSync(path.join(ROOT, 'dist', 'my-company-os.html'), 'utf8');
+const html = fs.readFileSync(path.join(ROOT, 'dist', 'organigraph.html'), 'utf8');
 const data = JSON.parse(fs.readFileSync(path.join(__dirname, 'testdaten.json'), 'utf8'));
 // Zusätzliche Fälle für Datenstand 2: abgebrochen ohne Datum, erledigt ohne Datum, alter Auftrag fürs Archiv
 const tage = n => new Date(Date.now() - n * 864e5).toISOString();
@@ -460,6 +460,16 @@ const check = (name, ok, info = '') => { CHECKS.push({ name, ok }); console.log(
     R.sucheAuf = document.querySelectorAll('#pkt [data-pks]').length >= 1; $q('#pkno').click();
     return R });
   check('Skill-Gruppen: Umstellung auf feste Ids und gespeichert, Gruppen auf-/zuklappbar, Einstellungen (ordnen, umbenennen, verwerfen, entfernen, anlegen, speichern), Suche öffnet Gruppen', Object.values(gr).every(Boolean), JSON.stringify(gr));
+  // ----- v73 Produktname „Organigraph“ -----
+  const pn = await p.evaluate(() => { const R = {}; R.h1 = document.querySelector('header h1').textContent === 'Organigraph';
+    R.titel = document.title.startsWith('Organigraph'); R.org = document.querySelector('#orged').parentElement.textContent.includes('Unternehmensorganigramm');
+    R.navKurz = document.querySelector('nav [data-v="org"]').textContent === 'Organigramm';
+    R.inst = window.__S['meta/config'].settings.inst.n === 'Organigraph business//acts';
+    const alt = SET.inst; SET.inst = { n: 'Company OS business//acts' }; R.umbenannt = nameMigrieren() === true && SET.inst.n === 'Organigraph business//acts';
+    SET.inst = { n: 'My Company OS' }; R.my = nameMigrieren() && SET.inst.n === 'Organigraph'; R.zweimal = nameMigrieren() === false; SET.inst = alt;
+    R.absender = SYSFROM('Company OS') && SYSFROM('Organigraph') && !SYSFROM('Boris');
+    R.kein = !document.body.innerText.includes('Company OS'); return R });
+  check('Produktname Organigraph: Titel, Kopfzeile, Seitenüberschrift, Instanzname umgestellt, alte Absender erkannt', Object.values(pn).every(Boolean), JSON.stringify(pn));
   check('keine Laufzeitfehler', errs.length === 0, errs.slice(0, 3).join(' | '));
   await b.close();
   if (process.env.KEEP) fs.copyFileSync(tmp, path.join(ROOT, 'tests', '.keep.html')); fs.unlinkSync(tmp);

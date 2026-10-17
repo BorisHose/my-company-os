@@ -1,5 +1,5 @@
 // ===== Adapter-Basis: Anbindung an Backend-Systeme über claude.ai-Konnektoren (MCP) =====
-// Grundsatz: Kein Teil von Company OS spricht ein Backend-System direkt an. Projekte, Benutzer-Zuordnung und Anbindungen
+// Grundsatz: Kein Teil des Organigraph spricht ein Backend-System direkt an. Projekte, Benutzer-Zuordnung und Anbindungen
 // rufen ausschließlich die Funktionen eines Adapters auf. Ein neues System = eine neue Adapter-Datei (07x-adapter-<system>.js),
 // die sich mit adapterRegistrieren() anmeldet. Die Reihenfolge der Registrierung ist die Anzeigereihenfolge.
 //

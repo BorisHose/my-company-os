@@ -15,7 +15,7 @@ const skPasst=(s,p)=>p==="all"||s.p===p||s.p==="all"||s.p==="multi";
 // Liefert [{id, warum}] nur mit Skills aus dem Katalog, die zum Produkt passen. Fehler werden als {code} weitergereicht.
 async function agSkillVorschlag(E,O,opts){await sampleP;if(!SAMPLE)throw {code:"not_granted"};
   const K=SK.filter(s=>skPasst(s,E.p)),d=dept(PL(E,O.id).abt);
-  const prompt=["Du hilfst, einen KI-Agenten in „My Company OS“ zusammenzustellen. Wähle aus dem Skill-Katalog die Skills, die der Agent für sein Ziel braucht – lieber wenige passende als viele.",
+  const prompt=["Du hilfst, einen KI-Agenten im „Organigraph“ zusammenzustellen. Wähle aus dem Skill-Katalog die Skills, die der Agent für sein Ziel braucht – lieber wenige passende als viele.",
     "AGENT","Name: "+E.n,"Ziel: "+(E.r||"(nicht angegeben)"),"Organisation: "+O.n+(d?" · Abteilung: "+d.n:""),"Produkt: "+PN[E.p],
     "SKILL-KATALOG (id | Name | Gruppe | Beschreibung)",...K.map(s=>s.id+" | "+s.n+" | "+grName(s.g)+" | "+String(s.d||"").replace(/\s+/g," ").slice(0,220)),
     'Antworte nur mit JSON: {"vorschlaege":[{"id":"<id aus dem Katalog>","warum":"<ein kurzer Satz auf Deutsch>"}]} – höchstens 6 Einträge, die wichtigsten zuerst, nur ids aus dem Katalog.'].join("\n");

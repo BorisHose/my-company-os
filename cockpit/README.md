@@ -1,6 +1,6 @@
-# Cockpit – My Company OS
+# Cockpit – Organigraph
 
-Quelltext der Live-Seite „My Company OS“ (claude.ai-Artefakt EAd2LV81xPn1ZHoAkGEfKE).
+Quelltext der Live-Seite „Organigraph“ (vormals „My Company OS“) (claude.ai-Artefakt EAd2LV81xPn1ZHoAkGEfKE).
 Ab Version 49 gilt: **Die Seite wird nur noch aus diesem Ordner gebaut und veröffentlicht.**
 
 ## Aufbau
@@ -15,7 +15,7 @@ cockpit/
   anweisung/ki-auftrag.txt   Anweisungstext der geplanten Aufgaben (schnell + gründlich)
   tests/smoke.js             Smoke-Test mit nachgebildeter Datenbank
   tests/testdaten.json       erfundene Testdaten (keine echten Kundendaten)
-  build.py                   setzt src/ zu dist/my-company-os.html zusammen
+  build.py                   setzt src/ zu dist/organigraph.html zusammen
   berechtigungen.json        Berechtigungen (Fähigkeiten) der veröffentlichten Seite – Quelle für Veröffentlichung und Installation
   VERSION, CHANGELOG.md
 ```
@@ -25,7 +25,7 @@ cockpit/
 2. `python3 build.py`
 3. `node tests/smoke.js` – muss „alle Prüfungen bestanden“ melden.
 4. `VERSION` und `CHANGELOG.md` fortschreiben, committen, Tag `cockpit-v<N>`.
-5. `dist/my-company-os.html` veröffentlichen (Claude, Artefakt EAd2LV81xPn1ZHoAkGEfKE). Fähigkeiten nur mitgeben, wenn sich `berechtigungen.json` geändert hat – dann genau diese.
+5. `dist/organigraph.html` veröffentlichen (Claude, Artefakt EAd2LV81xPn1ZHoAkGEfKE). Fähigkeiten nur mitgeben, wenn sich `berechtigungen.json` geändert hat – dann genau diese.
 
 ## Regeln (Architektur, Stand 16.10.2026)
 - Nur die Speicher-Schicht spricht mit der Datenbank (Umbau in Etappe 0.2).

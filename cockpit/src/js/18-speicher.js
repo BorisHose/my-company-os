@@ -36,10 +36,12 @@ async function migrieren(){const m=await Store.get("meta/config"),s=(m&&m.settin
     if(Object.keys(p).length)await Store.update("jobs/"+j.id,p)}
   const z=await Store.get("zaehler/auftrag");if(!z||(z.n||0)<max)await Store.set("zaehler/auftrag",{n:max});
   if(m)await Store.update("meta/config",{settings:{schema:2}});else await Store.set("meta/config",{settings:{schema:2}});await umzug3(await Store.get("meta/config"),s);return true}
+// Produktname (v73): Instanzname „(My) Company OS …“ einmalig in „Organigraph …“ umbenennen
+const nameMigrieren=()=>{const n=SET.inst&&SET.inst.n;if(!n||!/(My )?Company OS/.test(n))return false;SET.inst={...SET.inst,n:n.replace(/(My )?Company OS/,"Organigraph")};return true};
 // Datenstand 3: bisher fest im Code hinterlegte Werte der Instanz von Boris in die Einstellungen übernehmen
 async function umzug3(m,s){const alt=(s.orgs||[]).some(o=>o.id==="og-bodo"),p={schema:3};
   if(alt){if(!(s.bodoOrgs||[]).length)p.bodoOrgs=[{id:"k57bshnkdpahzs3fv4hvq6wz1s8aq2pm",name:"Bodo Solutions"},{id:"k5717wnvya5c7g26kr5jmgsx3x88edd1",name:"business//GmbH GmbH"}];
-    if(!s.inhaber)p.inhaber="us-boris-hose";if(!s.inst)p.inst={n:"Company OS business//acts"}}
+    if(!s.inhaber)p.inhaber="us-boris-hose";if(!s.inst)p.inst={n:"Organigraph business//acts"}}
   const R="„business//acts“, „Business Acts“, „BusinessActs“ u. ä. meint in Bodo den Mandanten business//GmbH GmbH (eindeutig, keine Annahme); „Bodo“ ohne Mandant meint Bodo Solutions",G=(m&&m.globals)||[];
   const upd={settings:p};if(alt&&!G.some(g=>g.includes("BusinessActs")))upd.globals=[...G,R];
   if(m)await Store.update("meta/config",upd);else await Store.set("meta/config",upd)}
@@ -82,7 +84,7 @@ async function boot(){
     const D=await Promise.all([Store.list("skills"),Store.list("agents"),Store.list("flows"),jobsLaden(),Store.list("users"),Store.list("depts"),Store.list("projects")]);
     [SK,AG,FL,AU,US,DP,PJ]=D;DP.sort((a,b)=>(a.ord??0)-(b.ord??0));US.sort((a,b)=>(a.ord??0)-(b.ord??0));if(m){const c=m;GR=[...(c.groups||[])];GLOBAL=[...(c.globals||[])];SET={...SET,...(c.settings||{})}}
     SK.sort((a,b)=>(a.ord??0)-(b.ord??0));AG.sort((a,b)=>(a.ord??0)-(b.ord??0));FL.sort((a,b)=>(a.ord??0)-(b.ord??0));AU.sort((a,b)=>(+b.id.slice(2)||0)-(+a.id.slice(2)||0));
-    hydrate();const s0=snapshot();s0.forEach((v,k)=>LAST.set(k,v));if(migrateOrgs()){toast("Organisationen eingerichtet");schedule()}if(grMigrieren())schedule();[...GR,GR_OHNE].forEach(g=>COL.add(g.id));
+    hydrate();const s0=snapshot();s0.forEach((v,k)=>LAST.set(k,v));if(migrateOrgs()){toast("Organisationen eingerichtet");schedule()}if(grMigrieren())schedule();if(nameMigrieren())schedule();[...GR,GR_OHNE].forEach(g=>COL.add(g.id));
     const f=agVis()[0];cur=f?f[1]:-1;fcur=FL.findIndex(x=>x.p===FF&&!x.frei);
     render();jobs();setSave("ok","Gespeichert");kiSubscribe();show("org");hdr();if(SET.inst&&SET.inst.n)document.title=SET.inst.n;if(umg)toast("Datenbestand auf Stand "+SCHEMA+" umgestellt");
     archivieren().then(n=>{if(n)toast(n+" alte Aufträge ins Archiv verschoben")}).catch(e=>console.warn("Archiv",e));

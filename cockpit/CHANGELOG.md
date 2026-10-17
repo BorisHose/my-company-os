@@ -1,5 +1,14 @@
 # Änderungen – Cockpit
 
+## 73 · 17.10.2026 · Produktname „Organigraph“ (Entscheidung Boris)
+- Seitentitel, Kopfzeile, Hinweise, Einstellungen und Texte für Claude heißen jetzt „Organigraph“ statt „My Company OS“/„Company OS“.
+- Instanzname „(My) Company OS …“ wird beim Laden einmalig in „Organigraph …“ umbenannt und gespeichert (`nameMigrieren`); neue Instanzen starten mit „Organigraph business//acts“.
+- Seitenüberschrift des Organigramms: „Unternehmensorganigramm“; der Menüpunkt bleibt kurz „Organigramm“.
+- Kontextblock an Claude heißt „KONTEXT AUS ORGANIGRAPH“, eigene Rückfragen tragen den Absender „Organigraph“; ältere Aufträge mit Absender „Company OS“ werden weiter erkannt (`SYSFROM`). Anweisung `anweisung/ki-auftrag.txt` entsprechend angepasst.
+- Hinweis „Organigraph abgleichen“ in den Skills; Plugin-Name in der Rückgabe: `organigraph-agenten`.
+- Build-Datei heißt jetzt `dist/organigraph.html`. Adresse der Live-Seite, Datenbank und interne Kennungen bleiben unverändert.
+- Smoke-Test: 106 Prüfungen (neu: Produktname).
+
 ## 72 · 17.10.2026 · Agenten-Assistent nach Feedback, Skill-Gruppen (Freigabe Boris)
 - Assistent: Produkt (aus der Organisation) und Platz (aus dem Knopf) stehen fest und werden nur angezeigt.
 - Skills-Schritt in voller Breite: oben **Vorschläge von Claude** aus Name und Ziel (einzeln oder alle übernehmen, „Neu vorschlagen“; läuft beim ersten Öffnen bzw. nach Änderung von Name oder Ziel automatisch, über das Abo), darunter die Auswahl als Leiste und der Katalog in aufklappbaren Gruppen (zu Beginn zu, Suche öffnet Gruppen mit Treffern, „Alle auf/zu“).

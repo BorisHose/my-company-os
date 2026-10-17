@@ -1,6 +1,6 @@
 // ===== Rückgabe an den Heimat-Anbieter (Claude): erst speichern, dann ausdrücklich freigeben =====
 const PFLD={agents:{w:"Wann einsetzen?",bsp:"Beispielsätze",r:"Ziel",s:"Skills",own:"Regeln",m:"Modell",n:"Name"},skills:{d:"Beschreibung",lp:"Leitplanken",body:"Inhalt (SKILL.md)",prof:"Profile Bodo/sellify"}};
-const provHome=(c,o)=>c==="agents"?(o.id==="ag-schulungsbegleiter"?"Plugin bodo-schulung":"Plugin company-os-agenten"):(["konto","plugin"].includes(srcOf(o))?(srcOf(o)==="plugin"?"Plugin-Skill ":"Konto-Skill ")+KS(o).join(" + "):null);
+const provHome=(c,o)=>c==="agents"?(o.id==="ag-schulungsbegleiter"?"Plugin bodo-schulung":"Plugin organigraph-agenten"):(["konto","plugin"].includes(srcOf(o))?(srcOf(o)==="plugin"?"Plugin-Skill ":"Konto-Skill ")+KS(o).join(" + "):null);
 const provVal=(c,f,v)=>{if(v==null||v==="")return "–";if(c==="agents"&&f==="s")return v.map(id=>sk(id)?sk(id).n:id).join(", ")||"–";if(Array.isArray(v))return v.join(" · ")||"–";if(typeof v==="object")return JSON.stringify(v).slice(0,300);return String(v)};
 function markProv(c,o,old){if(!old||!provHome(c,o))return false;const F=Object.keys(PFLD[c]),pv=o.prov?{...o.prov,alt:{...o.prov.alt}}:{alt:{}};
   F.forEach(f=>{const a=JSON.stringify(old[f]??null),n=JSON.stringify(o[f]??null);if(a===n)return;if(!(f in pv.alt))pv.alt[f]=old[f]??null;if(JSON.stringify(pv.alt[f])===n)delete pv.alt[f]});

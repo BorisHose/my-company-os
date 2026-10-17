@@ -1,6 +1,6 @@
 // ===== Verbrauch je Auftrag und Projekt (Etappe 4b, Teil 2) =====
 // Jede Claude-Sitzung misst vor ihrem letzten Schreibvorgang Laufzeit und Tokens aus ihrem eigenen Sitzungsprotokoll und hängt sie an j.verb an:
-// {sess, art, start, ende, sek, tin, tcw, tcr, tout, model} bzw. {sess, fehler}. Erfasst wird nur in Company OS, nichts wird ins Backend gebucht.
+// {sess, art, start, ende, sek, tin, tcw, tcr, tout, model} bzw. {sess, fehler}. Erfasst wird nur im Organigraph, nichts wird ins Backend gebucht.
 const VBK=["sek","tin","tcw","tcr","tout"];
 const VB0=()=>({n:0,sek:0,tin:0,tcw:0,tcr:0,tout:0,jobs:0,mit:0});
 const vbOk=v=>v&&!v.fehler&&v.sek!=null;

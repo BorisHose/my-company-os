@@ -28,14 +28,14 @@ function wizard(exist){
     if(W.step===1){
       b=`<div class="row"><div class="field"><label>Vorname</label><input type="text" id="wvn" value="${esc(W.vn)}"></div><div class="field"><label>Nachname</label><input type="text" id="wnn" value="${esc(W.nn)}"></div></div>
        <div class="row"><div class="field"><label>E-Mail</label><input type="text" id="wm" value="${esc(W.mail)}" placeholder="vorname.nachname@businessacts.de"></div><div class="field"><label>Kürzel (optional, in Bodo je Mandant eindeutig)</label><input type="text" id="wkz" value="${esc(W.kz)}"></div></div>
-       <div class="field"><label>Rolle / Funktion in Company OS (optional)</label><input type="text" id="wr" value="${esc(W.rolle)}"></div>
+       <div class="field"><label>Rolle / Funktion im Organigraph (optional)</label><input type="text" id="wr" value="${esc(W.rolle)}"></div>
        <div id="wdup"></div>`;
       foot=`<button class="btn" id="wx">Abbrechen</button><button class="btn p" id="wn">Weiter</button>`}
     if(W.step===2){
       const O=ownOrgs();
       b=`<p class="hint" style="margin:0 0 10px">In welchen Bodo-Mandanten soll ${esc(nm())} vertreten sein? Es werden nur deine eigenen Mandanten angeboten (⚙ Eigene Bodo-Mandanten).</p>
        ${O.map(o=>`<label class="cb"><input type="checkbox" data-wo="${o.id}" ${W.orgs.has(o.id)?'checked':''} ${has(o)?'disabled':''}> ${esc(o.name)}${has(o)?' <span class="hint" style="margin:0">– bereits zugeordnet</span>':''}</label>`).join("")}
-       <div class="hint" style="margin-top:10px">Ohne Auswahl wird ${exist?"nichts geändert":"der Benutzer nur in Company OS angelegt"}.</div>`;
+       <div class="hint" style="margin-top:10px">Ohne Auswahl wird ${exist?"nichts geändert":"der Benutzer nur im Organigraph angelegt"}.</div>`;
       foot=`${exist?"":'<button class="btn" id="wb" style="margin-right:auto">Zurück</button>'}<button class="btn" id="wx">Abbrechen</button><button class="btn p" id="wn">${W.orgs.size?"In Bodo prüfen":"Weiter"}</button>`}
     if(W.step===3){
       b=`<p class="hint" style="margin:0 0 10px">Dublettenprüfung je Mandant nach E-Mail und Name. Es wird noch nichts angelegt.</p>`+[...W.orgs].map(id=>{const o=ownOrgs().find(x=>x.id===id),c=W.chk[id];
@@ -49,7 +49,7 @@ function wizard(exist){
     if(W.step===4){
       const rows=[...W.orgs].map(id=>{const o=ownOrgs().find(x=>x.id===id),d=W.dec[id]||"skip",h=d.startsWith("use:")&&W.chk[id].hits.find(x=>"use:"+x.membershipId===d);
         return `<tr><td>${esc(o.name)}</td><td>${d==="new"?"Benutzer ohne Zugang anlegen (keine Mail)":h?"vorhandenen Benutzer übernehmen ("+esc(h.name)+")":"auslassen"}</td></tr>`}).join("");
-      b=`<table class="nt" style="margin-bottom:12px"><tbody><tr><td><b>Company OS</b></td><td>${exist?"Benutzer bleibt, Zuordnungen werden ergänzt":"Benutzer anlegen: <b>"+esc(nm())+"</b>"+(W.mail?" · "+esc(W.mail):"")+(W.kz?" · Kürzel "+esc(W.kz):"")+(W.rolle?" · "+esc(W.rolle):"")}</td></tr>${rows}</tbody></table>
+      b=`<table class="nt" style="margin-bottom:12px"><tbody><tr><td><b>Organigraph</b></td><td>${exist?"Benutzer bleibt, Zuordnungen werden ergänzt":"Benutzer anlegen: <b>"+esc(nm())+"</b>"+(W.mail?" · "+esc(W.mail):"")+(W.kz?" · Kürzel "+esc(W.kz):"")+(W.rolle?" · "+esc(W.rolle):"")}</td></tr>${rows}</tbody></table>
         <div class="infobox">Es geht keine Einladung und keine Mail raus. Einladen kannst du später im Benutzer je Mandant mit „Einladen …“.</div>${W.err?`<div class="warnbox">${esc(W.err)}</div>`:""}<div id="wlog" class="hint"></div>`;
       foot=`<button class="btn" id="wb" style="margin-right:auto">Zurück</button><button class="btn" id="wx">Abbrechen</button><button class="btn p" id="wgo">Anlegen</button>`}
     const html=head()+b+`<div class="btns" style="margin-top:14px;justify-content:flex-end">${foot}</div>`;
@@ -58,7 +58,7 @@ function wizard(exist){
     const g=id=>document.getElementById(id);
     if(W.step===1){["wvn","wnn","wm","wkz","wr"].forEach(id=>g(id).oninput=()=>{W.vn=g("wvn").value.trim();W.nn=g("wnn").value.trim();W.mail=g("wm").value.trim();W.kz=g("wkz").value.trim();W.rolle=g("wr").value.trim()});
       const dupc=()=>{const dup=US.filter(u=>(nm()&&u.n.toLowerCase()===nm().toLowerCase())||(W.mail&&(u.mail||"").toLowerCase()===W.mail.toLowerCase()));
-        g("wdup").innerHTML=dup.length?`<div class="warnbox">Mögliche Dublette in Company OS: ${dup.map(u=>esc(u.n)+(u.aktiv===false?" (ausgeschieden)":"")).join(", ")} – bitte prüfen. Für weitere Mandanten eines bestehenden Benutzers dort „In weiteren Bodo-Mandanten anlegen“ nutzen.</div>`:""};
+        g("wdup").innerHTML=dup.length?`<div class="warnbox">Mögliche Dublette im Organigraph: ${dup.map(u=>esc(u.n)+(u.aktiv===false?" (ausgeschieden)":"")).join(", ")} – bitte prüfen. Für weitere Mandanten eines bestehenden Benutzers dort „In weiteren Bodo-Mandanten anlegen“ nutzen.</div>`:""};
       ["wvn","wnn","wm"].forEach(id=>g(id).addEventListener("input",dupc));dupc();
       g("wn").onclick=()=>{W.vn=g("wvn").value.trim();W.nn=g("wnn").value.trim();W.mail=g("wm").value.trim();W.kz=g("wkz").value.trim();W.rolle=g("wr").value.trim();
         if(!W.vn||!W.nn)return toast("Bitte Vor- und Nachnamen angeben");if(W.mail&&!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(W.mail))return toast("E-Mail-Adresse prüfen");W.n="";W.step=2;render()}}
@@ -69,7 +69,7 @@ function wizard(exist){
     if(W.step===3){document.querySelectorAll("input[type=radio]").forEach(r=>r.onchange=()=>{W.dec[r.name.slice(2)]=r.value});g("wb").onclick=()=>{W.step=2;render()};g("wn").onclick=()=>{W.step=4;render()}}
     if(W.step===4){g("wb").onclick=()=>{W.step=W.orgs.size?3:2;render()};
       g("wgo").onclick=async()=>{g("wgo").disabled=true;W.err="";const log=t=>{const l=g("wlog");if(l)l.innerHTML+=esc(t)+"<br>"};
-        let u=exist;if(!u){u={id:uid("us"),n:nm(),kz:W.kz,rolle:W.rolle,mail:W.mail,aktiv:true,maps:[],ord:US.length};US.push(u);log("Company OS: Benutzer angelegt")}
+        let u=exist;if(!u){u={id:uid("us"),n:nm(),kz:W.kz,rolle:W.rolle,mail:W.mail,aktiv:true,maps:[],ord:US.length};US.push(u);log("Organigraph: Benutzer angelegt")}
         u.maps=u.maps||[];const fail=[];
         for(const id of W.orgs){const o=ownOrgs().find(x=>x.id===id),d=W.dec[id]||"skip";if(d==="skip")continue;
           const q="Bodo per Assistent am "+new Date().toLocaleDateString("de-DE");

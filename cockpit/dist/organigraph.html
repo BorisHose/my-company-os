@@ -1,4 +1,4 @@
-<title>My Company OS</title>
+<title>Organigraph</title>
 <style>
 :root{color-scheme:light;--bg:#f5f6f8;--panel:#fff;--ink:#1b2333;--mut:#667085;--line:#e3e6ec;--navy:#1f3a5f;--acc:#2f6fdf;--accbg:#e8f0fd;--warn:#b54708;--warnbg:#fef0e6;--ok:#067647;--okbg:#e7f6ee;--vio:#6941c6;--viobg:#f1ecfb;--teal:#0e7090;--tealbg:#e6f6fb;--bodo:#1f3a5f;--bodobg:#e3eaf4;--sell:#30ABE2;--sellbg:#e3f4fb;--selltxt:#1576a3}
 *{box-sizing:border-box}body{margin:0;font:14px/1.45 system-ui,-apple-system,Segoe UI,sans-serif;background:var(--bg);color:var(--ink)}
@@ -1423,7 +1423,7 @@ img.olg{height:18px;max-width:60px;object-fit:contain;margin-right:6px;vertical-
 
 </style>
 <header>
-  <h1>My Company OS</h1><span class="tag" id="save">Lädt …</span>
+  <h1>Organigraph</h1><span class="tag" id="save">Lädt …</span>
   <button id="kifab" title="Neuer Auftrag – von überall aus"><b>✦</b><small>KI</small><span class="n" style="display:none" title="Aufträge warten auf dich"></span></button><nav><button data-v="org" class="on">Organigramm</button><button data-v="jobs">Aufträge<span class="cnt" id="wcnt"></span></button><button data-v="projects">Projekte</button><button data-v="flows">Prozesse</button><button data-v="agrp" id="agbtn" title="Agenten, Skills und Matrix" aria-haspopup="menu" aria-expanded="false" aria-controls="agmenu">Agenten ▾</button></nav><div class="hdr-r"><span id="clock"></span><button id="me" class="meav" title="Angemeldet"></button><button id="gear" class="gear" title="Einstellungen" aria-label="Einstellungen">⚙</button></div>
   <div id="agmenu" class="ndm" role="menu" aria-label="Agenten, Skills und Matrix" hidden><button data-sv="build" role="menuitemradio">Agenten</button><button data-sv="skills" role="menuitemradio">Skills</button><button data-sv="matrix" role="menuitemradio">Matrix</button></div>
 </header>
@@ -1464,14 +1464,14 @@ img.olg{height:18px;max-width:60px;object-fit:contain;margin-right:6px;vertical-
   <div class="hint" style="margin-top:8px">Auftrag antippen = Ergebnis mit Rückfrage/Freigabe; „Details …“ zeigt Verlauf, Prozess und Sitzungen. Neue Aufträge legst du oben mit „+ Auftrag“ an.</div></section>
 </main>
 <main id="org" class="hide" style="grid-template-columns:1fr">
-  <section class="panel"><h2 style="justify-content:space-between">Organigramm <span id="orged"></span></h2>
+  <section class="panel"><h2 style="justify-content:space-between">Unternehmensorganigramm <span id="orged"></span></h2>
    <div class="orgbar"><div class="oorg" id="oseg"></div><span class="hint" id="ohint" style="margin:0"></span><label class="cb" style="margin:0"><input type="checkbox" id="oskills" checked> Skills zeigen</label></div>
    <div id="orgv"></div></section>
 </main>
 <main id="projects" class="hide"><section class="panel"><h2>Projekte</h2><div id="pjl"></div></section><section class="panel" id="pjd"></section></main>
 <main id="settings" class="hide" style="grid-template-columns:220px minmax(0,1fr)"><section class="panel"><h2>⚙ Einstellungen</h2><div id="setnav"></div></section><section class="panel" id="setc"></section><div id="setu" class="setu" hidden>
   <section class="panel" id="ulp"><h2>Benutzer</h2><div class="opts" style="margin-bottom:8px"><label><input type="checkbox" id="uold"> Ausgeschiedene zeigen</label></div><div id="ulist"></div><button class="btn p" id="newU" style="width:100%">+ Neuer Benutzer …</button><button class="btn sm" id="ownOrgs" style="width:100%;margin-top:6px">⚙ Eigene Bodo-Mandanten</button>
-  <div class="hint">Menschen, die in My Company OS handeln – z. B. als Verantwortliche für Agenten. Je Benutzer lässt sich hinterlegen, wer er in Bodo, sellify oder anderen Systemen ist.</div></section>
+  <div class="hint">Menschen, die im Organigraph handeln – z. B. als Verantwortliche für Agenten. Je Benutzer lässt sich hinterlegen, wer er in Bodo, sellify oder anderen Systemen ist.</div></section>
   <section class="panel" id="uedit"></section>
 </div></main>
 
@@ -1483,7 +1483,7 @@ const COL=new Set();
 let PF="bodo",AF="bodo",GEN=false;
 const PK=[["bodo","Bodo"],["sellify","sellify"],["all","Andere"]];
 const PN={bodo:"Bodo",sellify:"sellify",all:"Andere",multi:"Bodo + sellify"};
-const VER="72";
+const VER="73";
 // Produktbereiche: fest im Programm hinterlegt (Entscheidung Boris 09.10.2026), keine Konfiguration in der Datenbank
 const PT={bodo:"Produktbereich Bodo (Bodo Solutions, Mitgliederverwaltung) – alles, was für Bodo-Kunden und das Bodo-System gebraucht wird. Fest im Programm hinterlegt.",sellify:"Produktbereich sellify (business//acts, CRM-Plattform) – alles, was für sellify-Kunden und das sellify-System gebraucht wird. Fest im Programm hinterlegt.",all:"Andere = produktunabhängig, z. B. Web-QA, E-Mail, Word/PDF. Fest im Programm hinterlegt."};
 let AFIL="all";
@@ -1515,7 +1515,7 @@ function blocked(){if(!EDIT)return false;toast("Erst den Bereich in Bearbeitung 
 function startEdit(kind,id,sec,keys,neu,newc){if(blocked())return false;const o=new Map();keys.forEach(k=>o.set(k,neu?null:curJSON(k)));EDIT={kind,id,sec,orig:o,newc:newc||[]};return true}
 // ===== Rückgabe an den Heimat-Anbieter (Claude): erst speichern, dann ausdrücklich freigeben =====
 const PFLD={agents:{w:"Wann einsetzen?",bsp:"Beispielsätze",r:"Ziel",s:"Skills",own:"Regeln",m:"Modell",n:"Name"},skills:{d:"Beschreibung",lp:"Leitplanken",body:"Inhalt (SKILL.md)",prof:"Profile Bodo/sellify"}};
-const provHome=(c,o)=>c==="agents"?(o.id==="ag-schulungsbegleiter"?"Plugin bodo-schulung":"Plugin company-os-agenten"):(["konto","plugin"].includes(srcOf(o))?(srcOf(o)==="plugin"?"Plugin-Skill ":"Konto-Skill ")+KS(o).join(" + "):null);
+const provHome=(c,o)=>c==="agents"?(o.id==="ag-schulungsbegleiter"?"Plugin bodo-schulung":"Plugin organigraph-agenten"):(["konto","plugin"].includes(srcOf(o))?(srcOf(o)==="plugin"?"Plugin-Skill ":"Konto-Skill ")+KS(o).join(" + "):null);
 const provVal=(c,f,v)=>{if(v==null||v==="")return "–";if(c==="agents"&&f==="s")return v.map(id=>sk(id)?sk(id).n:id).join(", ")||"–";if(Array.isArray(v))return v.join(" · ")||"–";if(typeof v==="object")return JSON.stringify(v).slice(0,300);return String(v)};
 function markProv(c,o,old){if(!old||!provHome(c,o))return false;const F=Object.keys(PFLD[c]),pv=o.prov?{...o.prov,alt:{...o.prov.alt}}:{alt:{}};
   F.forEach(f=>{const a=JSON.stringify(old[f]??null),n=JSON.stringify(o[f]??null);if(a===n)return;if(!(f in pv.alt))pv.alt[f]=old[f]??null;if(JSON.stringify(pv.alt[f])===n)delete pv.alt[f]});
@@ -1580,7 +1580,7 @@ const usersSel=(id,val,leer)=>`<select id="${id}"><option value="">${leer}</opti
 function shrink(file){return new Promise((res,rej)=>{const r=new FileReader();r.onload=()=>{const im=new Image();im.onload=()=>{const S=160,c=document.createElement("canvas");c.width=c.height=S;const x=c.getContext("2d"),m=Math.min(im.width,im.height);
   x.drawImage(im,(im.width-m)/2,(im.height-m)/2,m,m,0,0,S,S);res(c.toDataURL("image/jpeg",.85))};im.onerror=rej;im.src=r.result};r.onerror=rej;r.readAsDataURL(file)})}
 // ===== Adapter-Basis: Anbindung an Backend-Systeme über claude.ai-Konnektoren (MCP) =====
-// Grundsatz: Kein Teil von Company OS spricht ein Backend-System direkt an. Projekte, Benutzer-Zuordnung und Anbindungen
+// Grundsatz: Kein Teil des Organigraph spricht ein Backend-System direkt an. Projekte, Benutzer-Zuordnung und Anbindungen
 // rufen ausschließlich die Funktionen eines Adapters auf. Ein neues System = eine neue Adapter-Datei (07x-adapter-<system>.js),
 // die sich mit adapterRegistrieren() anmeldet. Die Reihenfolge der Registrierung ist die Anzeigereihenfolge.
 //
@@ -1729,14 +1729,14 @@ function wizard(exist){
     if(W.step===1){
       b=`<div class="row"><div class="field"><label>Vorname</label><input type="text" id="wvn" value="${esc(W.vn)}"></div><div class="field"><label>Nachname</label><input type="text" id="wnn" value="${esc(W.nn)}"></div></div>
        <div class="row"><div class="field"><label>E-Mail</label><input type="text" id="wm" value="${esc(W.mail)}" placeholder="vorname.nachname@businessacts.de"></div><div class="field"><label>Kürzel (optional, in Bodo je Mandant eindeutig)</label><input type="text" id="wkz" value="${esc(W.kz)}"></div></div>
-       <div class="field"><label>Rolle / Funktion in Company OS (optional)</label><input type="text" id="wr" value="${esc(W.rolle)}"></div>
+       <div class="field"><label>Rolle / Funktion im Organigraph (optional)</label><input type="text" id="wr" value="${esc(W.rolle)}"></div>
        <div id="wdup"></div>`;
       foot=`<button class="btn" id="wx">Abbrechen</button><button class="btn p" id="wn">Weiter</button>`}
     if(W.step===2){
       const O=ownOrgs();
       b=`<p class="hint" style="margin:0 0 10px">In welchen Bodo-Mandanten soll ${esc(nm())} vertreten sein? Es werden nur deine eigenen Mandanten angeboten (⚙ Eigene Bodo-Mandanten).</p>
        ${O.map(o=>`<label class="cb"><input type="checkbox" data-wo="${o.id}" ${W.orgs.has(o.id)?'checked':''} ${has(o)?'disabled':''}> ${esc(o.name)}${has(o)?' <span class="hint" style="margin:0">– bereits zugeordnet</span>':''}</label>`).join("")}
-       <div class="hint" style="margin-top:10px">Ohne Auswahl wird ${exist?"nichts geändert":"der Benutzer nur in Company OS angelegt"}.</div>`;
+       <div class="hint" style="margin-top:10px">Ohne Auswahl wird ${exist?"nichts geändert":"der Benutzer nur im Organigraph angelegt"}.</div>`;
       foot=`${exist?"":'<button class="btn" id="wb" style="margin-right:auto">Zurück</button>'}<button class="btn" id="wx">Abbrechen</button><button class="btn p" id="wn">${W.orgs.size?"In Bodo prüfen":"Weiter"}</button>`}
     if(W.step===3){
       b=`<p class="hint" style="margin:0 0 10px">Dublettenprüfung je Mandant nach E-Mail und Name. Es wird noch nichts angelegt.</p>`+[...W.orgs].map(id=>{const o=ownOrgs().find(x=>x.id===id),c=W.chk[id];
@@ -1750,7 +1750,7 @@ function wizard(exist){
     if(W.step===4){
       const rows=[...W.orgs].map(id=>{const o=ownOrgs().find(x=>x.id===id),d=W.dec[id]||"skip",h=d.startsWith("use:")&&W.chk[id].hits.find(x=>"use:"+x.membershipId===d);
         return `<tr><td>${esc(o.name)}</td><td>${d==="new"?"Benutzer ohne Zugang anlegen (keine Mail)":h?"vorhandenen Benutzer übernehmen ("+esc(h.name)+")":"auslassen"}</td></tr>`}).join("");
-      b=`<table class="nt" style="margin-bottom:12px"><tbody><tr><td><b>Company OS</b></td><td>${exist?"Benutzer bleibt, Zuordnungen werden ergänzt":"Benutzer anlegen: <b>"+esc(nm())+"</b>"+(W.mail?" · "+esc(W.mail):"")+(W.kz?" · Kürzel "+esc(W.kz):"")+(W.rolle?" · "+esc(W.rolle):"")}</td></tr>${rows}</tbody></table>
+      b=`<table class="nt" style="margin-bottom:12px"><tbody><tr><td><b>Organigraph</b></td><td>${exist?"Benutzer bleibt, Zuordnungen werden ergänzt":"Benutzer anlegen: <b>"+esc(nm())+"</b>"+(W.mail?" · "+esc(W.mail):"")+(W.kz?" · Kürzel "+esc(W.kz):"")+(W.rolle?" · "+esc(W.rolle):"")}</td></tr>${rows}</tbody></table>
         <div class="infobox">Es geht keine Einladung und keine Mail raus. Einladen kannst du später im Benutzer je Mandant mit „Einladen …“.</div>${W.err?`<div class="warnbox">${esc(W.err)}</div>`:""}<div id="wlog" class="hint"></div>`;
       foot=`<button class="btn" id="wb" style="margin-right:auto">Zurück</button><button class="btn" id="wx">Abbrechen</button><button class="btn p" id="wgo">Anlegen</button>`}
     const html=head()+b+`<div class="btns" style="margin-top:14px;justify-content:flex-end">${foot}</div>`;
@@ -1759,7 +1759,7 @@ function wizard(exist){
     const g=id=>document.getElementById(id);
     if(W.step===1){["wvn","wnn","wm","wkz","wr"].forEach(id=>g(id).oninput=()=>{W.vn=g("wvn").value.trim();W.nn=g("wnn").value.trim();W.mail=g("wm").value.trim();W.kz=g("wkz").value.trim();W.rolle=g("wr").value.trim()});
       const dupc=()=>{const dup=US.filter(u=>(nm()&&u.n.toLowerCase()===nm().toLowerCase())||(W.mail&&(u.mail||"").toLowerCase()===W.mail.toLowerCase()));
-        g("wdup").innerHTML=dup.length?`<div class="warnbox">Mögliche Dublette in Company OS: ${dup.map(u=>esc(u.n)+(u.aktiv===false?" (ausgeschieden)":"")).join(", ")} – bitte prüfen. Für weitere Mandanten eines bestehenden Benutzers dort „In weiteren Bodo-Mandanten anlegen“ nutzen.</div>`:""};
+        g("wdup").innerHTML=dup.length?`<div class="warnbox">Mögliche Dublette im Organigraph: ${dup.map(u=>esc(u.n)+(u.aktiv===false?" (ausgeschieden)":"")).join(", ")} – bitte prüfen. Für weitere Mandanten eines bestehenden Benutzers dort „In weiteren Bodo-Mandanten anlegen“ nutzen.</div>`:""};
       ["wvn","wnn","wm"].forEach(id=>g(id).addEventListener("input",dupc));dupc();
       g("wn").onclick=()=>{W.vn=g("wvn").value.trim();W.nn=g("wnn").value.trim();W.mail=g("wm").value.trim();W.kz=g("wkz").value.trim();W.rolle=g("wr").value.trim();
         if(!W.vn||!W.nn)return toast("Bitte Vor- und Nachnamen angeben");if(W.mail&&!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(W.mail))return toast("E-Mail-Adresse prüfen");W.n="";W.step=2;render()}}
@@ -1770,7 +1770,7 @@ function wizard(exist){
     if(W.step===3){document.querySelectorAll("input[type=radio]").forEach(r=>r.onchange=()=>{W.dec[r.name.slice(2)]=r.value});g("wb").onclick=()=>{W.step=2;render()};g("wn").onclick=()=>{W.step=4;render()}}
     if(W.step===4){g("wb").onclick=()=>{W.step=W.orgs.size?3:2;render()};
       g("wgo").onclick=async()=>{g("wgo").disabled=true;W.err="";const log=t=>{const l=g("wlog");if(l)l.innerHTML+=esc(t)+"<br>"};
-        let u=exist;if(!u){u={id:uid("us"),n:nm(),kz:W.kz,rolle:W.rolle,mail:W.mail,aktiv:true,maps:[],ord:US.length};US.push(u);log("Company OS: Benutzer angelegt")}
+        let u=exist;if(!u){u={id:uid("us"),n:nm(),kz:W.kz,rolle:W.rolle,mail:W.mail,aktiv:true,maps:[],ord:US.length};US.push(u);log("Organigraph: Benutzer angelegt")}
         u.maps=u.maps||[];const fail=[];
         for(const id of W.orgs){const o=ownOrgs().find(x=>x.id===id),d=W.dec[id]||"skip";if(d==="skip")continue;
           const q="Bodo per Assistent am "+new Date().toLocaleDateString("de-DE");
@@ -1934,7 +1934,7 @@ const skPasst=(s,p)=>p==="all"||s.p===p||s.p==="all"||s.p==="multi";
 // Liefert [{id, warum}] nur mit Skills aus dem Katalog, die zum Produkt passen. Fehler werden als {code} weitergereicht.
 async function agSkillVorschlag(E,O,opts){await sampleP;if(!SAMPLE)throw {code:"not_granted"};
   const K=SK.filter(s=>skPasst(s,E.p)),d=dept(PL(E,O.id).abt);
-  const prompt=["Du hilfst, einen KI-Agenten in „My Company OS“ zusammenzustellen. Wähle aus dem Skill-Katalog die Skills, die der Agent für sein Ziel braucht – lieber wenige passende als viele.",
+  const prompt=["Du hilfst, einen KI-Agenten im „Organigraph“ zusammenzustellen. Wähle aus dem Skill-Katalog die Skills, die der Agent für sein Ziel braucht – lieber wenige passende als viele.",
     "AGENT","Name: "+E.n,"Ziel: "+(E.r||"(nicht angegeben)"),"Organisation: "+O.n+(d?" · Abteilung: "+d.n:""),"Produkt: "+PN[E.p],
     "SKILL-KATALOG (id | Name | Gruppe | Beschreibung)",...K.map(s=>s.id+" | "+s.n+" | "+grName(s.g)+" | "+String(s.d||"").replace(/\s+/g," ").slice(0,220)),
     'Antworte nur mit JSON: {"vorschlaege":[{"id":"<id aus dem Katalog>","warum":"<ein kurzer Satz auf Deutsch>"}]} – höchstens 6 Einträge, die wichtigsten zuerst, nur ids aus dem Katalog.'].join("\n");
@@ -2097,7 +2097,7 @@ function uedit(){
 }
 
 // ===== Benutzer-Zuordnung zu den Zielsystemen (systemseitig, nie von Hand) =====
-// Eine Zuordnung u.maps[i] = {sys, inst, instId, ext, mail, extId, userId, status, rollen, quelle, at} verbindet einen Company-OS-Benutzer
+// Eine Zuordnung u.maps[i] = {sys, inst, instId, ext, mail, extId, userId, status, rollen, quelle, at} verbindet einen Organigraph-Benutzer
 // mit seinem Benutzer in einem System bzw. Mandanten. Gesucht und gelesen wird ausschließlich über die Adapter.
 const ST={active:"aktiv",unclaimed:"ohne Zugang",invited:"eingeladen",suspended:"gesperrt",left:"ausgetreten"};
 const stBadge=m=>!adapter(m.sys)||!m.status?"":`<span class="stb ${m.status}">${ST[m.status]||esc(m.status)}</span>`;
@@ -2118,7 +2118,7 @@ const uHat=(u,f)=>(u.maps||[]).some(m=>uGleich(m,f));
 const uFehlt=u=>uSoll(u).filter(f=>!uHat(u,f));
 const uMapVon=(f,h)=>({sys:f.sys,inst:f.name,instId:f.id,ext:h.name||"",mail:h.email||"",extId:h.membershipId,userId:h.userId||"",status:h.status||"",rollen:(h.roleNames||[]).join(", "),quelle:"aus "+sysName(f.sys)+" gelesen",at:new Date().toISOString()});
 const uSeats=(f,u)=>adapter(f.sys).benutzerSuchen({mand:{id:f.id,name:f.name},name:u.n,mail:u.mail});
-// Treffer, die schon einem anderen Company-OS-Benutzer im selben System/Mandanten zugeordnet sind, nicht anbieten
+// Treffer, die schon einem anderen Organigraph-Benutzer im selben System/Mandanten zugeordnet sind, nicht anbieten
 const uFrei=(f,u,H)=>H.filter(h=>!US.some(x=>x!==u&&(x.maps||[]).some(m=>uGleich(m,f)&&m.extId===h.membershipId)));
 const uErr=(f,e)=>adapter(f.sys)?adapter(f.sys).fehler(e):String(e&&e.message||e);
 
@@ -2287,7 +2287,7 @@ function syncModal(){
   const close=modalBox(`<div class="bhead"><h3>⟳ Abgleich mit dem Konto</h3><button class="ic" id="mclose" title="Schließen" style="font-size:18px">✕</button></div>
    <div class="field"><label>Anbieter (Konnektor)</label><div class="provrow">${PROV.map(([k,l,on])=>`<button data-pv="${k}" class="${pv===k?'on':''}" ${on?'':'disabled title="Konnektor kommt später"'}>${l}${on?'':' · später'}</button>`).join("")}</div></div>
    <p style="margin:0 0 8px">Das Cockpit kann die Skills im ${esc(provName(pv))}-Konto nicht selbst lesen oder ändern. Den Abgleich macht deshalb ${esc(provName(pv))} in einer Sitzung – auf Zuruf oder per geplanter Aufgabe.</p>
-   <div class="warnbox" style="margin:0 0 10px"><b>So geht's:</b> In Cowork sagen: <i>„Company OS abgleichen“</i>. Claude liest dann deine Skills und Plugins, zeigt die Unterschiede, legt deine Entwürfe als echte Skills an, überträgt die hier <b>freigegebenen</b> Änderungen – jeweils erst nach deiner Freigabekarte – und trägt das Ergebnis hier ein. Nicht freigegebene Änderungen bleiben nur im Cockpit.</div>
+   <div class="warnbox" style="margin:0 0 10px"><b>So geht's:</b> In Cowork sagen: <i>„Organigraph abgleichen“</i>. Claude liest dann deine Skills und Plugins, zeigt die Unterschiede, legt deine Entwürfe als echte Skills an, überträgt die hier <b>freigegebenen</b> Änderungen – jeweils erst nach deiner Freigabekarte – und trägt das Ergebnis hier ein. Nicht freigegebene Änderungen bleiben nur im Cockpit.</div>
    <div class="hint"><b>Letzter Abgleich:</b> ${S.at?esc(new Date(S.at).toLocaleString("de-DE",{dateStyle:"short",timeStyle:"short"}))+(S.note?" – "+esc(S.note):""):"noch keiner"}</div>
    ${S.changes&&S.changes.length?`<ul class="synclist">${S.changes.map(c=>`<li>${esc(c)}</li>`).join("")}</ul>`:""}
    <div class="hint" style="margin-top:10px"><b>Wartende Entwürfe (${dr.length}):</b> ${dr.length?dr.map(s=>esc(s.n)).join(", "):"keine"}</div>
@@ -2296,7 +2296,7 @@ function syncModal(){
    <div class="btns" style="justify-content:flex-end;margin-top:14px"><button class="btn" id="sclose">Schließen</button><button class="btn p" id="scopy">Auftrag kopieren</button></div>`);
   $("#mclose").onclick=$("#sclose").onclick=close;
   document.querySelectorAll("[data-pv]").forEach(b=>b.onclick=()=>{SET.prov=b.dataset.pv;schedule();syncModal()});
-  $("#scopy").onclick=()=>copyText("Company OS abgleichen","Auftrag kopiert – in Cowork einfügen");
+  $("#scopy").onclick=()=>copyText("Organigraph abgleichen","Auftrag kopiert – in Cowork einfügen");
   const PL2=provList();document.querySelectorAll("[data-pvshow]").forEach(b=>b.onclick=()=>{close();provConfirm([PL2[+b.dataset.pvshow]])});
   document.querySelectorAll("[data-pvback]").forEach(b=>b.onclick=async()=>{const [c,o]=PL2[+b.dataset.pvback];if(!await askOk("Änderungen an „"+o.n+"“ zurücknehmen? Das Cockpit erhält wieder den Stand von Claude ("+Object.keys(o.prov.alt).map(f=>PFLD[c][f]||f).join(", ")+").","Ja, zurücknehmen"))return;
     Object.entries(o.prov.alt).forEach(([f,v])=>{if(v===null)delete o[f];else o[f]=v});delete o.prov;render();schedule();syncModal();toast("Zurückgenommen")})}
@@ -2823,8 +2823,10 @@ function startModal(f,keep){if(!keep)PEND=[];keep=keep||{};const SM=!!keep.sm;if
   $("#go").onclick=()=>go(false);const gn=$("#gonow");if(gn)gn.onclick=()=>go(true);
 }
 const curN=j=>nodeOf(j.f,j.path[j.path.length-1]);
-// ===== KI-Aufträge: Ausführung durch Claude über die geplante Aufgabe „Company OS – KI-Auftrag ausführen“ (Abo, keine API) =====
-const RUNNERS={schnell:{get tid(){return (SET.trig&&SET.trig.schnell)||"trig_01KVgWuBkveHDgWXWRsLvMjw"},n:"Company OS – KI-Auftrag ausführen (schnell)",l:"⚡ Schnell (Sonnet)"},gruendlich:{get tid(){return (SET.trig&&SET.trig.gruendlich)||"trig_01ThbM4bYY6h31M3hVDg4fDf"},n:"Company OS – KI-Auftrag ausführen (gründlich)",l:"🔍 Gründlich (Opus)"}};const RUNNER=j=>RUNNERS[(j&&j.tempo)||"gruendlich"]||RUNNERS.gruendlich;const CCR="Claude Code Remote";
+// ===== KI-Aufträge: Ausführung durch Claude über die geplante Aufgabe „Organigraph – KI-Auftrag ausführen“ (Abo, keine API) =====
+// Absender eigener Rückfragen: „Organigraph“, bei älteren Aufträgen noch „Company OS“ (bis v72)
+const SYSFROM=f=>f==="Organigraph"||f==="Company OS";
+const RUNNERS={schnell:{get tid(){return (SET.trig&&SET.trig.schnell)||"trig_01KVgWuBkveHDgWXWRsLvMjw"},n:"Organigraph – KI-Auftrag ausführen (schnell)",l:"⚡ Schnell (Sonnet)"},gruendlich:{get tid(){return (SET.trig&&SET.trig.gruendlich)||"trig_01ThbM4bYY6h31M3hVDg4fDf"},n:"Organigraph – KI-Auftrag ausführen (gründlich)",l:"🔍 Gründlich (Opus)"}};const RUNNER=j=>RUNNERS[(j&&j.tempo)||"gruendlich"]||RUNNERS.gruendlich;const CCR="Claude Code Remote";
 // Aufrufe an die geplanten Aufgaben laufen über dieselbe MCP-Verbindung wie die Adapter (07a-adapter-basis.js)
 const ccr=(tool,input)=>mcpRufe(CCR,tool,input,{cache:false},"Claude");
 function jobSer(j){const {f,...r}=j;return JSON.stringify({...r,fid:f?f.id:r.fid})}
@@ -2866,10 +2868,10 @@ function resultModal(j){KINEW.delete(j.id);const [cls,lab]=okTxt(j),E=j.erg||[],
 let KIAT=null,KITMR=null;
 function kiPoll(){clearInterval(KITMR);KITMR=setInterval(()=>{if($("#jobs").classList.contains("hide")||$("#modal").innerHTML)return;if(AU.some(j=>j.ki&&j.st==="run"))kiReload(true).then(kiCheckRuns)},30000)}
 function kiContext(j){const f=j.f,L=[];if(!f)return "";const cur=j.path[j.path.length-1],c=nodeOf(f,cur);
-  L.push("KONTEXT AUS COMPANY OS (aktuell – nicht erneut aus der Datenbank lesen):");
+  L.push("KONTEXT AUS ORGANIGRAPH (aktuell – nicht erneut aus der Datenbank lesen):");
   const JO=j.org&&orgById(j.org),JA=j.aid&&AG.find(a=>a.id===j.aid),JS=j.sk&&sk(j.sk);
   const JD=j.art==="abteilung"&&j.abt&&dept(j.abt),DA=JD?tlAgents(JO?JO.id:j.org,JD.id,j.team||""):[],JDN=JD?tlName(JO?JO.id:j.org,JD.id,j.team||""):"";
-  if(f.frei&&JD)L.push(JA?"ABTEILUNG BEAUFTRAGT – "+JDN+": Der KI-Teamleiter hat „"+JA.n+"“ ("+JA.id+") gewählt. Handle weiter als dieser Agent (Angaben unten) und erledige die Aufgabe direkt; Freigaben vor Außenwirkung wie immer.":"ABTEILUNG BEAUFTRAGT – kein Prozess, "+JDN+": Du bist zuerst KI-TEAMLEITER von "+JDN+". Wähle aus den Agenten unten den EINEN, dessen Ziel, Regeln und Skills am besten zur Aufgabe passen. Im Start-Schreibvorgang zusätzlich aid = ID des gewählten Agenten und einen log-Eintrag „Teamleiter: an <Agentenname>“ mitschreiben, dann als dieser Agent handeln und die Aufgabe erledigen; Freigaben vor Außenwirkung wie immer. Passt keiner oder ist die Wahl unklar: nicht raten, sondern Rückfrage (q, kind „Rückfrage“, from „KI-Teamleiter“) mit den 2–3 passendsten Agenten als Antwortoptionen. Agenten dieser Abteilung: "+(DA.map(a=>a.n+" ("+a.id+")").join(", ")||"keine")+". PLAN STATT EINZELWAHL: Braucht die Aufgabe mehrere Arbeitsschritte oder mehrere Agenten, führe NICHTS aus, sondern schreibe in einem Schreibvorgang plan = {sum: Begründung in 1–3 Sätzen, steps: [{t: Teilauftrag in einem konkreten Satz, aid: Agenten-ID, sk: Skill-Name oder leer, nach: [Nummern der Schritte, die vorher fertig sein müssen, sonst leer]}]} (höchstens 6 Schritte, nur so viele wie nötig; Agenten bevorzugt aus dieser Abteilung, andere Abteilungen nur wenn fachlich nötig – Liste ALLE AGENTEN), st = \"wait\", q = {kind: \"Plan\", from: \"KI-Teamleiter "+JDN+"\", text: je Schritt eine Zeile „n · Agent · Teilauftrag“, why: Begründung, opts: [\"Plan freigeben & starten\"]} und log-Eintrag „Plan erstellt (n Teilaufträge)“ mit 1 – dann Ende. Die Teilaufträge legt Company OS nach "+ICH()+"' Freigabe selbst an und startet sie; du legst KEINE weiteren Aufträge in der Datenbank an. Beginnt "+ICH()+"' Antwort mit „Plan ändern:“, den Plan entsprechend neu schreiben (wieder als Plan).");
+  if(f.frei&&JD)L.push(JA?"ABTEILUNG BEAUFTRAGT – "+JDN+": Der KI-Teamleiter hat „"+JA.n+"“ ("+JA.id+") gewählt. Handle weiter als dieser Agent (Angaben unten) und erledige die Aufgabe direkt; Freigaben vor Außenwirkung wie immer.":"ABTEILUNG BEAUFTRAGT – kein Prozess, "+JDN+": Du bist zuerst KI-TEAMLEITER von "+JDN+". Wähle aus den Agenten unten den EINEN, dessen Ziel, Regeln und Skills am besten zur Aufgabe passen. Im Start-Schreibvorgang zusätzlich aid = ID des gewählten Agenten und einen log-Eintrag „Teamleiter: an <Agentenname>“ mitschreiben, dann als dieser Agent handeln und die Aufgabe erledigen; Freigaben vor Außenwirkung wie immer. Passt keiner oder ist die Wahl unklar: nicht raten, sondern Rückfrage (q, kind „Rückfrage“, from „KI-Teamleiter“) mit den 2–3 passendsten Agenten als Antwortoptionen. Agenten dieser Abteilung: "+(DA.map(a=>a.n+" ("+a.id+")").join(", ")||"keine")+". PLAN STATT EINZELWAHL: Braucht die Aufgabe mehrere Arbeitsschritte oder mehrere Agenten, führe NICHTS aus, sondern schreibe in einem Schreibvorgang plan = {sum: Begründung in 1–3 Sätzen, steps: [{t: Teilauftrag in einem konkreten Satz, aid: Agenten-ID, sk: Skill-Name oder leer, nach: [Nummern der Schritte, die vorher fertig sein müssen, sonst leer]}]} (höchstens 6 Schritte, nur so viele wie nötig; Agenten bevorzugt aus dieser Abteilung, andere Abteilungen nur wenn fachlich nötig – Liste ALLE AGENTEN), st = \"wait\", q = {kind: \"Plan\", from: \"KI-Teamleiter "+JDN+"\", text: je Schritt eine Zeile „n · Agent · Teilauftrag“, why: Begründung, opts: [\"Plan freigeben & starten\"]} und log-Eintrag „Plan erstellt (n Teilaufträge)“ mit 1 – dann Ende. Die Teilaufträge legt der Organigraph nach "+ICH()+"' Freigabe selbst an und startet sie; du legst KEINE weiteren Aufträge in der Datenbank an. Beginnt "+ICH()+"' Antwort mit „Plan ändern:“, den Plan entsprechend neu schreiben (wieder als Plan).");
   if(f.frei&&JD&&!JA){const AO=AG.filter(a=>inOrg(a,JO||j.org));L.push("ALLE AGENTEN der Organisation (nur für Pläne): "+AO.map(a=>a.n+" ("+a.id+", Abteilung "+((dept(PL(a,JO?JO.id:j.org).abt)||{}).n||"ohne")+"): "+String(a.r||"–").slice(0,140)).join(" | "))}
   else if(f.frei)L.push(j.art==="agent"&&JA?"AGENT BEAUFTRAGT – kein Prozess: Handle als Agent „"+JA.n+"“ (Angaben unten) und erledige die Aufgabe direkt."+(JS?"":" Passenden Skill des Agenten selbst wählen.")+" Freigaben vor Außenwirkung wie immer. Den einen Schritt des Systemablaufs nur zum Fortschreiben von path nutzen.":"FREIE AUFGABE – kein Prozess: die Eingabe direkt erledigen (Frage beantworten, recherchieren oder eine einzelne Aktion)."+(JS?"":" Passenden Skill aus dem Konto selbst wählen.")+" Freigaben vor Außenwirkung wie immer.");
   if(JS)L.push("SKILL VERWENDEN: „"+JS.n+"“ – im Konto: "+(KS(JS).join(", ")||"nur im Cockpit, kein Konto-Skill")+(JS.d?" · "+JS.d:""));
@@ -2909,9 +2911,9 @@ async function kiCheckRuns(){const P=AU.filter(j=>j.ki&&j.fired&&!Array.isArray(
     const wrote=(j.sess||[]).some(s=>s.at&&Date.parse(s.at)>=Date.parse(j.fired)-15000);
     if(fin&&j.st==="run"){j.st="wait";if(!wrote)j.sess=[...(j.sess||[]),{url,at:lr.fired_at,art:"ohne Rückmeldung"}];
       j.log.push([now(),(!ok?"⚠ Claude-Sitzung fehlgeschlagen ("+(lr.failure_reason||lr.status||"?")+")":wrote?"⚠ Claude-Sitzung beendet, bevor sie den Auftrag abgeschlossen hat":"⚠ Claude-Sitzung beendet, ohne den Auftrag zu aktualisieren")+" – Sitzung öffnen und Ergebnis im Zielsystem prüfen",1]);
-      j.q={kind:"Rückfrage",from:"Company OS",text:(wrote?"Die Claude-Sitzung hat angefangen, ist aber beendet, ohne das Ende des Auftrags einzutragen. Möglicherweise wurde die Aktion trotzdem ausgeführt – bitte im Zielsystem prüfen.":"Die Claude-Sitzung ist beendet, hat aber nichts in diesen Auftrag geschrieben.")+" Was dort passiert ist, siehst du in der Sitzung (Link unter „Claude-Sitzungen“).",why:"Sitzung beendet, Auftrag nicht abgeschlossen.",opts:["Erneut anstoßen: Stand prüfen und Auftrag abschließen","Ich prüfe das selbst"]}}
+      j.q={kind:"Rückfrage",from:"Organigraph",text:(wrote?"Die Claude-Sitzung hat angefangen, ist aber beendet, ohne das Ende des Auftrags einzutragen. Möglicherweise wurde die Aktion trotzdem ausgeführt – bitte im Zielsystem prüfen.":"Die Claude-Sitzung ist beendet, hat aber nichts in diesen Auftrag geschrieben.")+" Was dort passiert ist, siehst du in der Sitzung (Link unter „Claude-Sitzungen“).",why:"Sitzung beendet, Auftrag nicht abgeschlossen.",opts:["Erneut anstoßen: Stand prüfen und Auftrag abschließen","Ich prüfe das selbst"]}}
     if(JSON.stringify(j.run)===prev&&j.st===stPrev)continue;
-    try{const pat=j.st==="wait"&&j.q&&j.q.from==="Company OS"?{run:j.run,st:j.st,q:j.q,log:j.log,sess:j.sess||[]}:{run:j.run};await Store.update("jobs/"+j.id,pat);LAST.set("jobs/"+j.id,jobSer(j))}catch(e){}}
+    try{const pat=j.st==="wait"&&j.q&&SYSFROM(j.q.from)?{run:j.run,st:j.st,q:j.q,log:j.log,sess:j.sess||[]}:{run:j.run};await Store.update("jobs/"+j.id,pat);LAST.set("jobs/"+j.id,jobSer(j))}catch(e){}}
   if(!$("#jobs").classList.contains("hide"))jobs()}
 async function kiRuns(){try{const p=await ccr("list_triggers",{limit:50,include_completed:false});const L=(p&&p.data)||[];const out=Object.values(RUNNERS).map(R=>{const t=L.find(x=>x.id===R.tid);if(!t)return R.l+": nicht gefunden";const r=t.last_run;return R.l+": "+(r?(String(r.status||"?").replace("ROUTINE_RUN_STATUS_","").toLowerCase())+" · "+(r.fired_at?new Date(r.fired_at).toLocaleString("de-DE",{dateStyle:"short",timeStyle:"short"}):""):"noch kein Lauf")});toast(out.join("  |  "))}catch(e){toast("Abfrage nicht möglich: "+((e&&e.message)||(e&&e.code)||""))}}
 function doneAt(j){if(j.fertig)return new Date(j.fertig);const L=j.log||[];for(let i=L.length-1;i>=0;i--){const m=/^(\d\d)\.(\d\d)\.\s+(\d\d):(\d\d)/.exec(L[i][0]||"");if(m){const n=new Date();let d=new Date(n.getFullYear(),+m[2]-1,+m[1],+m[3],+m[4]);if(d-n>864e5)d.setFullYear(d.getFullYear()-1);return d}}
@@ -3112,10 +3114,12 @@ async function migrieren(){const m=await Store.get("meta/config"),s=(m&&m.settin
     if(Object.keys(p).length)await Store.update("jobs/"+j.id,p)}
   const z=await Store.get("zaehler/auftrag");if(!z||(z.n||0)<max)await Store.set("zaehler/auftrag",{n:max});
   if(m)await Store.update("meta/config",{settings:{schema:2}});else await Store.set("meta/config",{settings:{schema:2}});await umzug3(await Store.get("meta/config"),s);return true}
+// Produktname (v73): Instanzname „(My) Company OS …“ einmalig in „Organigraph …“ umbenennen
+const nameMigrieren=()=>{const n=SET.inst&&SET.inst.n;if(!n||!/(My )?Company OS/.test(n))return false;SET.inst={...SET.inst,n:n.replace(/(My )?Company OS/,"Organigraph")};return true};
 // Datenstand 3: bisher fest im Code hinterlegte Werte der Instanz von Boris in die Einstellungen übernehmen
 async function umzug3(m,s){const alt=(s.orgs||[]).some(o=>o.id==="og-bodo"),p={schema:3};
   if(alt){if(!(s.bodoOrgs||[]).length)p.bodoOrgs=[{id:"k57bshnkdpahzs3fv4hvq6wz1s8aq2pm",name:"Bodo Solutions"},{id:"k5717wnvya5c7g26kr5jmgsx3x88edd1",name:"business//GmbH GmbH"}];
-    if(!s.inhaber)p.inhaber="us-boris-hose";if(!s.inst)p.inst={n:"Company OS business//acts"}}
+    if(!s.inhaber)p.inhaber="us-boris-hose";if(!s.inst)p.inst={n:"Organigraph business//acts"}}
   const R="„business//acts“, „Business Acts“, „BusinessActs“ u. ä. meint in Bodo den Mandanten business//GmbH GmbH (eindeutig, keine Annahme); „Bodo“ ohne Mandant meint Bodo Solutions",G=(m&&m.globals)||[];
   const upd={settings:p};if(alt&&!G.some(g=>g.includes("BusinessActs")))upd.globals=[...G,R];
   if(m)await Store.update("meta/config",upd);else await Store.set("meta/config",upd)}
@@ -3158,7 +3162,7 @@ async function boot(){
     const D=await Promise.all([Store.list("skills"),Store.list("agents"),Store.list("flows"),jobsLaden(),Store.list("users"),Store.list("depts"),Store.list("projects")]);
     [SK,AG,FL,AU,US,DP,PJ]=D;DP.sort((a,b)=>(a.ord??0)-(b.ord??0));US.sort((a,b)=>(a.ord??0)-(b.ord??0));if(m){const c=m;GR=[...(c.groups||[])];GLOBAL=[...(c.globals||[])];SET={...SET,...(c.settings||{})}}
     SK.sort((a,b)=>(a.ord??0)-(b.ord??0));AG.sort((a,b)=>(a.ord??0)-(b.ord??0));FL.sort((a,b)=>(a.ord??0)-(b.ord??0));AU.sort((a,b)=>(+b.id.slice(2)||0)-(+a.id.slice(2)||0));
-    hydrate();const s0=snapshot();s0.forEach((v,k)=>LAST.set(k,v));if(migrateOrgs()){toast("Organisationen eingerichtet");schedule()}if(grMigrieren())schedule();[...GR,GR_OHNE].forEach(g=>COL.add(g.id));
+    hydrate();const s0=snapshot();s0.forEach((v,k)=>LAST.set(k,v));if(migrateOrgs()){toast("Organisationen eingerichtet");schedule()}if(grMigrieren())schedule();if(nameMigrieren())schedule();[...GR,GR_OHNE].forEach(g=>COL.add(g.id));
     const f=agVis()[0];cur=f?f[1]:-1;fcur=FL.findIndex(x=>x.p===FF&&!x.frei);
     render();jobs();setSave("ok","Gespeichert");kiSubscribe();show("org");hdr();if(SET.inst&&SET.inst.n)document.title=SET.inst.n;if(umg)toast("Datenbestand auf Stand "+SCHEMA+" umgestellt");
     archivieren().then(n=>{if(n)toast(n+" alte Aufträge ins Archiv verschoben")}).catch(e=>console.warn("Archiv",e));
@@ -3235,7 +3239,7 @@ function avRender(keep){const s=AVS(),o=s.org,S=avSel(o),O=orgById(o)||{},F=avFe
     head=`<th>Status</th><th>Nr.</th><th>Auftrag · Abteilung</th><th class="hm">Agent</th><th class="hm">Stand</th><th></th>`;
     rows=rows.map(r=>{const j=r.j,L=(j.log||[]).filter(x=>x&&!LOGSKIP.test(x[1]||"")),last=L[L.length-1];
       const st=j.st==="wait"?'<span class="kst wait">■ wartet auf dich</span>':j.st==="inbox"?`<label class="avsel"><input type="checkbox" data-avsel="${j.id}"> <span class="kst">📥 gesammelt</span></label>${prioB(j)}`:'<span class="kst run">● läuft</span>';
-      const stand=istPlan(j)?"✦ Plan zur Freigabe ("+j.plan.steps.length+" Teile)":Array.isArray(j.teile)&&j.st==="run"?esc(teilTxt(j)):j.st==="wait"?esc(j.q?(j.q.kind==="Rückfrage"?"Rückfrage":"Zur Freigabe")+(j.q.from&&j.q.from!=="Company OS"?" · "+j.q.from:""):"Wartet auf dich"):j.st==="inbox"?esc([(j.nach||[]).length?"wartet auf "+j.nach.join(", "):"",j.due?"fällig "+new Date(j.due+"T12:00").toLocaleDateString("de-DE",{day:"2-digit",month:"2-digit"}):"",j.gesammelt?"gesammelt "+new Date(j.gesammelt).toLocaleDateString("de-DE",{day:"2-digit",month:"2-digit"}):""].filter(Boolean).join(" · ")):j.st==="run"?esc([j.fired?"seit "+new Date(j.fired).toLocaleTimeString("de-DE",{hour:"2-digit",minute:"2-digit"}):"",last?last[1]:""].filter(Boolean).join(" · ")):"";
+      const stand=istPlan(j)?"✦ Plan zur Freigabe ("+j.plan.steps.length+" Teile)":Array.isArray(j.teile)&&j.st==="run"?esc(teilTxt(j)):j.st==="wait"?esc(j.q?(j.q.kind==="Rückfrage"?"Rückfrage":"Zur Freigabe")+(j.q.from&&!SYSFROM(j.q.from)?" · "+j.q.from:""):"Wartet auf dich"):j.st==="inbox"?esc([(j.nach||[]).length?"wartet auf "+j.nach.join(", "):"",j.due?"fällig "+new Date(j.due+"T12:00").toLocaleDateString("de-DE",{day:"2-digit",month:"2-digit"}):"",j.gesammelt?"gesammelt "+new Date(j.gesammelt).toLocaleDateString("de-DE",{day:"2-digit",month:"2-digit"}):""].filter(Boolean).join(" · ")):j.st==="run"?esc([j.fired?"seit "+new Date(j.fired).toLocaleTimeString("de-DE",{hour:"2-digit",minute:"2-digit"}):"",last?last[1]:""].filter(Boolean).join(" · ")):"";
       const act=j.st==="wait"?`<button class="btn sm p" data-avres="${j.id}">${istPlan(j)?"Plan prüfen":"Prüfen &amp; freigeben"}</button>`:j.st==="inbox"?`<button class="btn sm" data-avgo="${j.id}">▶ Starten</button> <button class="ic" data-avdrop="${j.id}" title="Aus dem Eingang verwerfen">✕</button>`:"";
       return `<tr class="${j.st==="inbox"?"ib":"cl"}" ${j.st==="inbox"?"":`data-avj="${j.id}"`}><td>${st}</td><td class="nr">${esc(j.id)}</td>${ttl(r)}<td class="hm">${agc(r)}</td><td class="hm sm">${stand}</td><td class="ac">${act}</td></tr>`})}
   else{const all=R.sort((a,b)=>b.d-a.d);rows=all.slice(0,AVN);
@@ -3363,10 +3367,10 @@ function einst(sec){if(sec)UI.sets=sec;if(!SETSEC.some(s=>s[0]===UI.sets))UI.set
     document.querySelectorAll("[data-thm]").forEach(b=>b.onclick=()=>{themeSet(b.dataset.thm);einst()});
     $("#sme").onchange=e=>{UI.me=e.target.value||undefined;saveUI();hdr();einst()}}
   else if(S==="inst"){const I=SET.inst||{};
-    C.innerHTML=`<h2>Instanz</h2><div class="field"><label>Name der Instanz</label><input type="text" id="sin" value="${esc(I.n||"")}" placeholder="z. B. Company OS business//acts"></div>
+    C.innerHTML=`<h2>Instanz</h2><div class="field"><label>Name der Instanz</label><input type="text" id="sin" value="${esc(I.n||"")}" placeholder="z. B. Organigraph business//acts"></div>
      <div class="field"><label>Inhaber</label><select id="sinh">${uopt(SET.inhaber||"","– noch nicht festgelegt –")}</select><div class="hint">Wer die Instanz verantwortet und Aufträge freigibt. Jede Instanz gehört genau einem Kunden und hat ihre eigene Datenbank.</div></div>
-     <div class="field"><label>Version</label><div class="hint" style="margin:0">Company OS ${esc(String(VER))} · Datenstand ${esc(String(SET.schema||"–"))}</div></div>`;
-    $("#sin").oninput=e=>{SET.inst={...(SET.inst||{}),n:e.target.value.trim()};document.title=(SET.inst.n||"My Company OS")};
+     <div class="field"><label>Version</label><div class="hint" style="margin:0">Organigraph ${esc(String(VER))} · Datenstand ${esc(String(SET.schema||"–"))}</div></div>`;
+    $("#sin").oninput=e=>{SET.inst={...(SET.inst||{}),n:e.target.value.trim()};document.title=(SET.inst.n||"Organigraph")};
     $("#sinh").onchange=e=>{SET.inhaber=e.target.value||undefined;hdr()}}
   else if(S==="orgs"){
     C.innerHTML=`<h2>Organigramme</h2><div class="hint" style="margin:0 0 10px">Je Organigramm Name, Kurzname für den Umschalter und Logo. Abteilungen, Teams und Agenten bearbeitest du im Organigramm über „✎ Bearbeiten“.</div>
@@ -3395,8 +3399,8 @@ function einst(sec){if(sec)UI.sets=sec;if(!SETSEC.some(s=>s[0]===UI.sets))UI.set
 function logoKlein(file){return new Promise((res,rej)=>{const r=new FileReader();r.onload=()=>{const im=new Image();im.onload=()=>{const k=Math.min(1,320/im.width,96/im.height),w=Math.max(1,Math.round(im.width*k)),h=Math.max(1,Math.round(im.height*k)),c=document.createElement("canvas");c.width=w;c.height=h;c.getContext("2d").drawImage(im,0,0,w,h);res(c.toDataURL("image/png"))};im.onerror=rej;im.src=r.result};r.onerror=rej;r.readAsDataURL(file)})}
 
 // ===== Projekte (Etappe 4b, Teil 1) =====
-// Projekte werden in Company OS angelegt und gehalten (Sammlung projects). Ein Projekt kann mit einem Backend-Projekt verbunden werden
-// (bk = {sys, orgId, orgN, id, n, url}); Aufträge tragen das Feld prj. Company OS arbeitet auch ohne Projekt („ohne Projekt“).
+// Projekte werden im Organigraph angelegt und gehalten (Sammlung projects). Ein Projekt kann mit einem Backend-Projekt verbunden werden
+// (bk = {sys, orgId, orgN, id, n, url}); Aufträge tragen das Feld prj. Der Organigraph arbeitet auch ohne Projekt („ohne Projekt“).
 let PJ=[],PJSEL=null;
 const PJST=[["aktiv","Aktiv"],["pausiert","Pausiert"],["abgeschlossen","Abgeschlossen"]];
 const pj=id=>id?PJ.find(p=>p.id===id):null;
@@ -3418,7 +3422,7 @@ function prj(){if(!orgById(OC))OC=ORGS()[0].id;const O=orgById(OC),F=UI.pjf||"ak
     ${V.map(p=>card(p.id,p.n,[p.kunde,usr(p.verantw)&&usr(p.verantw).n,p.bk?"↔ "+sysName(p.bk.sys):""].filter(Boolean).map(esc).join(" · ")||"&nbsp;",(p.st||"aktiv"))).join("")||`<div class="hint" style="margin:6px 0">${F==="aktiv"?"Noch keine aktiven Projekte in "+esc(O.kurz||O.n)+".":"Keine Projekte in dieser Auswahl."}</div>`}
     ${card(PJOHNE,"Ohne Projekt","Aufträge ohne Projektzuordnung","ohne")}
     <div class="btns" style="margin-top:10px"><button class="btn p" id="pjnew">+ Neues Projekt</button><button class="btn" id="pjimp" title="Aktive Projekte aus Bodo oder sellify übernehmen und verbinden">⇣ Aus Backend übernehmen …</button></div>
-    <div class="hint">Projekte gehören zu ${esc(O.kurz||O.n)} und werden in Company OS geführt. Verbunden mit einem Bodo- oder sellify-Projekt legt Claude Aufgaben und Notizen eines Auftrags dort am Projekt an.</div>`;
+    <div class="hint">Projekte gehören zu ${esc(O.kurz||O.n)} und werden im Organigraph geführt. Verbunden mit einem Bodo- oder sellify-Projekt legt Claude Aufgaben und Notizen eines Auftrags dort am Projekt an.</div>`;
   document.querySelectorAll("[data-pjo]").forEach(b=>b.onclick=()=>{if(blocked())return;OC=b.dataset.pjo;PJSEL=null;prj()});
   document.querySelectorAll("[data-pjf]").forEach(b=>b.onclick=()=>{if(blocked())return;UI.pjf=b.dataset.pjf;saveUI();PJSEL=null;prj()});
   document.querySelectorAll("[data-pj]").forEach(b=>b.onclick=()=>{if(b.dataset.pj!==PJSEL&&blocked())return;PJSEL=b.dataset.pj;prj()});
@@ -3439,11 +3443,11 @@ function pjDetail(){const C=$("#pjd"),o=OC;
   const ansicht=`<div class="pjview"><div class="row"><div class="field"><label>Kunde / Bezug</label><div class="pjv">${esc(p.kunde||"–")}</div></div><div class="field"><label>Status</label><div class="pjv"><span class="pjst ${esc(p.st||"aktiv")}">${esc(stl)}</span></div></div></div>
     <div class="row"><div class="field"><label>Verantwortlich</label><div class="pjv pjvu">${U?av(U,26)+" "+esc(U.n):"– offen –"}</div></div><div class="field"><label>Angelegt</label><div class="pjv">${p.angelegt?esc(new Date(p.angelegt).toLocaleDateString("de-DE")):"–"}</div></div></div>
     <div class="field"><label>Beschreibung</label><div class="pjv pjvb">${p.beschr?esc(p.beschr):'<span class="hint" style="margin:0">keine</span>'}</div></div>
-    <div class="field"><label>Backend</label>${p.bk?`<div class="pjlink"><span>${bkTxt}</span>${pjBk(p)}</div>`:'<div class="pjv"><span class="hint" style="margin:0">nicht verbunden – nur zur Einordnung in Company OS</span></div>'}</div></div>`;
+    <div class="field"><label>Backend</label>${p.bk?`<div class="pjlink"><span>${bkTxt}</span>${pjBk(p)}</div>`:'<div class="pjv"><span class="hint" style="margin:0">nicht verbunden – nur zur Einordnung im Organigraph</span></div>'}</div></div>`;
   const form=`<div class="row"><div class="field"><label>Name</label><input type="text" id="pjn" value="${esc(p.n||"")}"></div><div class="field"><label>Kunde / Bezug</label><input type="text" id="pjk" value="${esc(p.kunde||"")}" placeholder="z. B. Mieterverein Musterstadt"></div></div>
     <div class="row"><div class="field"><label>Status</label><div class="seg" id="pjst" style="margin:0">${PJST.map(([k,l])=>`<button data-pst="${k}" class="${k===(p.st||"aktiv")?"on":""}">${l}</button>`).join("")}</div></div><div class="field"><label>Verantwortlich</label>${usersSel("pjv",p.verantw||"","– offen –")}</div></div>
     <div class="field"><label>Beschreibung</label><textarea id="pjb" style="min-height:60px" placeholder="Worum geht es, was ist das Ziel?">${esc(p.beschr||"")}</textarea></div>
-    <div class="field"><label>Backend</label>${p.bk?`<div class="pjlink"><span>${bkTxt}</span>${pjBk(p)}<button class="btn sm" id="pjun">Verbindung lösen</button></div><div class="hint">Claude legt Aufgaben, Notizen und Termine eines Auftrags in diesem Projekt an. Buchungsdaten (Zeit, Verbrauch) werden später dorthin übergeben.</div>`:`<div class="btns" style="margin:0"><button class="btn sm" id="pjln">↔ Mit Backend-Projekt verbinden …</button></div><div class="hint">Ohne Verbindung dient das Projekt nur zur Einordnung in Company OS.</div>`}</div>
+    <div class="field"><label>Backend</label>${p.bk?`<div class="pjlink"><span>${bkTxt}</span>${pjBk(p)}<button class="btn sm" id="pjun">Verbindung lösen</button></div><div class="hint">Claude legt Aufgaben, Notizen und Termine eines Auftrags in diesem Projekt an. Buchungsdaten (Zeit, Verbrauch) werden später dorthin übergeben.</div>`:`<div class="btns" style="margin:0"><button class="btn sm" id="pjln">↔ Mit Backend-Projekt verbinden …</button></div><div class="hint">Ohne Verbindung dient das Projekt nur zur Einordnung im Organigraph.</div>`}</div>
     <div class="btns" style="margin:4px 0 0"><button class="btn sm d" id="pjdel">Projekt löschen</button></div>`;
   C.classList.toggle("editing",pe);
   C.innerHTML=kopf+(pe?form:ansicht)+liste;
@@ -3508,14 +3512,14 @@ function pjBackendDlg(p,sys0){const O=orgById(OC),dp=dienstVon(O,"projekt"),PS=p
 const pjBkVon=(r,sys,m)=>{const b={sys,id:r.id,n:r.n||r.title||"",url:r.url||"",at:new Date().toISOString()};if(adapter(sys)&&adapter(sys).mand&&m){b.orgId=m.id;b.orgN=m.name}return b};
 // Kontext für Claude
 function pjKontext(j){const P=pj(j.prj);if(!P)return "";const B=P.bk;
-  const kopf="PROJEKT des Auftrags: „"+P.n+"“ (Company OS "+P.id+(P.kunde?", Kunde/Bezug: "+P.kunde:"")+")";
+  const kopf="PROJEKT des Auftrags: „"+P.n+"“ (Organigraph "+P.id+(P.kunde?", Kunde/Bezug: "+P.kunde:"")+")";
   if(!B)return kopf+". Noch nicht mit einem Backend-Projekt verbunden – nur zur Einordnung, System und Mandant wie sonst bestimmen.";
   const a=adapter(B.sys),k=a?a.projektKontext(B):{wo:sysName(B.sys)+"-Projekt „"+B.n+"“ (Id "+B.id+", "+B.url+")",ziel:"Zielsystem ist damit "+sysName(B.sys)};
   return kopf+". Verbunden mit "+k.wo+". Alles, was du für diesen Auftrag in "+sysName(B.sys)+" anlegst (Aufgaben, Notizen, Termine, Dokumente), in diesem Projekt anlegen bzw. mit ihm verknüpfen; "+k.ziel+". Im Ergebnis vermerken, dass am Projekt angelegt wurde."}
 
 // ===== Verbrauch je Auftrag und Projekt (Etappe 4b, Teil 2) =====
 // Jede Claude-Sitzung misst vor ihrem letzten Schreibvorgang Laufzeit und Tokens aus ihrem eigenen Sitzungsprotokoll und hängt sie an j.verb an:
-// {sess, art, start, ende, sek, tin, tcw, tcr, tout, model} bzw. {sess, fehler}. Erfasst wird nur in Company OS, nichts wird ins Backend gebucht.
+// {sess, art, start, ende, sek, tin, tcw, tcr, tout, model} bzw. {sess, fehler}. Erfasst wird nur im Organigraph, nichts wird ins Backend gebucht.
 const VBK=["sek","tin","tcw","tcr","tout"];
 const VB0=()=>({n:0,sek:0,tin:0,tcw:0,tcr:0,tout:0,jobs:0,mit:0});
 const vbOk=v=>v&&!v.fehler&&v.sek!=null;
@@ -3554,7 +3558,7 @@ function dienstEinst(C){const O=ORGS(),AL=adapterListe();
     const mand=S&&S.mand?`<select data-dm="${o.id}|${k}" aria-label="Mandant">${(M.some(m=>m.id===d.orgId)||!d.orgId?"":`<option value="${esc(d.orgId)}" selected>${esc(d.orgN||d.orgId)}</option>`)+`<option value="">– Mandant wählen –</option>`+M.map(m=>`<option value="${m.id}" ${m.id===d.orgId?"selected":""}>${esc(m.name)}</option>`).join("")}</select>`:S?`<span class="hint" style="margin:0">ein System, kein Mandant</span>`:"";
     const ent=S?`<select data-de="${o.id}|${k}" aria-label="Entität">${E.map(([e,n])=>`<option value="${e}" ${e===d.ent?"selected":""}>${esc(n)} (${e})</option>`).join("")}</select>`:"";
     const st=c?`<span class="dst ${c.st}" title="${esc(c.t)}">${c.st==="ok"?"✓":c.st==="err"?"⚠":"ⓘ"}</span>`:"";
-    const zeit=k==="zeit"?`<label class="cb dzb" title="${esc(S&&!S.ent.zeit.length?ZEITTIP(d.sys):"Vorbereitet – die Laufzeit der KI-Sitzungen wird vorerst nur in Company OS erfasst (Entscheidung 17.10.2026).")}"><input type="checkbox" disabled> Laufzeit der KI-Sitzungen hier buchen</label>${(()=>{const so=!d.sys&&Object.values(o.dienste||{}).map(x=>x&&x.sys).find(s=>s&&adapter(s)&&!adapter(s).ent.zeit.length);return so?`<div class="hint dmsg">ⓘ ${esc(ZEITTIP(so))}</div>`:""})()}`:"";
+    const zeit=k==="zeit"?`<label class="cb dzb" title="${esc(S&&!S.ent.zeit.length?ZEITTIP(d.sys):"Vorbereitet – die Laufzeit der KI-Sitzungen wird vorerst nur im Organigraph erfasst (Entscheidung 17.10.2026).")}"><input type="checkbox" disabled> Laufzeit der KI-Sitzungen hier buchen</label>${(()=>{const so=!d.sys&&Object.values(o.dienste||{}).map(x=>x&&x.sys).find(s=>s&&adapter(s)&&!adapter(s).ent.zeit.length);return so?`<div class="hint dmsg">ⓘ ${esc(ZEITTIP(so))}</div>`:""})()}`:"";
     return `<div class="drow"><div class="dlab"><b>${l}</b><small>${esc(h)}</small></div><div class="dsel"><select data-ds="${o.id}|${k}" aria-label="System für ${l}">${sysOpt}</select>${mand}${ent}${st}</div>${zeit}${c&&c.st!=="ok"?`<div class="hint dmsg">${esc(c.t)}</div>`:""}</div>`};
   C.innerHTML=`<h2>Anbindungen</h2><div class="hint" style="margin:0 0 10px">Je Organigramm vier Dienste. Mehrere oder alle dürfen auf dasselbe System zeigen. Claude nutzt diese Zuordnung als Standard, wenn ein Auftrag kein System nennt; Projekte werden im Mandanten des Dienstes „Projekt“ gesucht.</div>
     ${O.map(o=>`<div class="dorg"><div class="dhd"><b>${o.logo?`<img class="olg" src="${o.logo}" alt="">`:""}${esc(o.n)}</b><span style="flex:1"></span>${o.chk?`<span class="hint" style="margin:0">geprüft ${esc(new Date(o.chk.at).toLocaleString("de-DE",{dateStyle:"short",timeStyle:"short"}))}</span>`:""}<button class="btn sm" data-dchk="${o.id}">Verbindung prüfen</button></div>${DIENSTE.map(x=>zeile(o,x)).join("")}</div>`).join("")}

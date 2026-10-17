@@ -1,5 +1,5 @@
 // ===== Benutzer-Zuordnung zu den Zielsystemen (systemseitig, nie von Hand) =====
-// Eine Zuordnung u.maps[i] = {sys, inst, instId, ext, mail, extId, userId, status, rollen, quelle, at} verbindet einen Company-OS-Benutzer
+// Eine Zuordnung u.maps[i] = {sys, inst, instId, ext, mail, extId, userId, status, rollen, quelle, at} verbindet einen Organigraph-Benutzer
 // mit seinem Benutzer in einem System bzw. Mandanten. Gesucht und gelesen wird ausschließlich über die Adapter.
 const ST={active:"aktiv",unclaimed:"ohne Zugang",invited:"eingeladen",suspended:"gesperrt",left:"ausgetreten"};
 const stBadge=m=>!adapter(m.sys)||!m.status?"":`<span class="stb ${m.status}">${ST[m.status]||esc(m.status)}</span>`;
@@ -20,7 +20,7 @@ const uHat=(u,f)=>(u.maps||[]).some(m=>uGleich(m,f));
 const uFehlt=u=>uSoll(u).filter(f=>!uHat(u,f));
 const uMapVon=(f,h)=>({sys:f.sys,inst:f.name,instId:f.id,ext:h.name||"",mail:h.email||"",extId:h.membershipId,userId:h.userId||"",status:h.status||"",rollen:(h.roleNames||[]).join(", "),quelle:"aus "+sysName(f.sys)+" gelesen",at:new Date().toISOString()});
 const uSeats=(f,u)=>adapter(f.sys).benutzerSuchen({mand:{id:f.id,name:f.name},name:u.n,mail:u.mail});
-// Treffer, die schon einem anderen Company-OS-Benutzer im selben System/Mandanten zugeordnet sind, nicht anbieten
+// Treffer, die schon einem anderen Organigraph-Benutzer im selben System/Mandanten zugeordnet sind, nicht anbieten
 const uFrei=(f,u,H)=>H.filter(h=>!US.some(x=>x!==u&&(x.maps||[]).some(m=>uGleich(m,f)&&m.extId===h.membershipId)));
 const uErr=(f,e)=>adapter(f.sys)?adapter(f.sys).fehler(e):String(e&&e.message||e);
 

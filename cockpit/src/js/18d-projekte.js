@@ -1,6 +1,6 @@
 // ===== Projekte (Etappe 4b, Teil 1) =====
-// Projekte werden in Company OS angelegt und gehalten (Sammlung projects). Ein Projekt kann mit einem Backend-Projekt verbunden werden
-// (bk = {sys, orgId, orgN, id, n, url}); Aufträge tragen das Feld prj. Company OS arbeitet auch ohne Projekt („ohne Projekt“).
+// Projekte werden im Organigraph angelegt und gehalten (Sammlung projects). Ein Projekt kann mit einem Backend-Projekt verbunden werden
+// (bk = {sys, orgId, orgN, id, n, url}); Aufträge tragen das Feld prj. Der Organigraph arbeitet auch ohne Projekt („ohne Projekt“).
 let PJ=[],PJSEL=null;
 const PJST=[["aktiv","Aktiv"],["pausiert","Pausiert"],["abgeschlossen","Abgeschlossen"]];
 const pj=id=>id?PJ.find(p=>p.id===id):null;
@@ -22,7 +22,7 @@ function prj(){if(!orgById(OC))OC=ORGS()[0].id;const O=orgById(OC),F=UI.pjf||"ak
     ${V.map(p=>card(p.id,p.n,[p.kunde,usr(p.verantw)&&usr(p.verantw).n,p.bk?"↔ "+sysName(p.bk.sys):""].filter(Boolean).map(esc).join(" · ")||"&nbsp;",(p.st||"aktiv"))).join("")||`<div class="hint" style="margin:6px 0">${F==="aktiv"?"Noch keine aktiven Projekte in "+esc(O.kurz||O.n)+".":"Keine Projekte in dieser Auswahl."}</div>`}
     ${card(PJOHNE,"Ohne Projekt","Aufträge ohne Projektzuordnung","ohne")}
     <div class="btns" style="margin-top:10px"><button class="btn p" id="pjnew">+ Neues Projekt</button><button class="btn" id="pjimp" title="Aktive Projekte aus Bodo oder sellify übernehmen und verbinden">⇣ Aus Backend übernehmen …</button></div>
-    <div class="hint">Projekte gehören zu ${esc(O.kurz||O.n)} und werden in Company OS geführt. Verbunden mit einem Bodo- oder sellify-Projekt legt Claude Aufgaben und Notizen eines Auftrags dort am Projekt an.</div>`;
+    <div class="hint">Projekte gehören zu ${esc(O.kurz||O.n)} und werden im Organigraph geführt. Verbunden mit einem Bodo- oder sellify-Projekt legt Claude Aufgaben und Notizen eines Auftrags dort am Projekt an.</div>`;
   document.querySelectorAll("[data-pjo]").forEach(b=>b.onclick=()=>{if(blocked())return;OC=b.dataset.pjo;PJSEL=null;prj()});
   document.querySelectorAll("[data-pjf]").forEach(b=>b.onclick=()=>{if(blocked())return;UI.pjf=b.dataset.pjf;saveUI();PJSEL=null;prj()});
   document.querySelectorAll("[data-pj]").forEach(b=>b.onclick=()=>{if(b.dataset.pj!==PJSEL&&blocked())return;PJSEL=b.dataset.pj;prj()});
@@ -43,11 +43,11 @@ function pjDetail(){const C=$("#pjd"),o=OC;
   const ansicht=`<div class="pjview"><div class="row"><div class="field"><label>Kunde / Bezug</label><div class="pjv">${esc(p.kunde||"–")}</div></div><div class="field"><label>Status</label><div class="pjv"><span class="pjst ${esc(p.st||"aktiv")}">${esc(stl)}</span></div></div></div>
     <div class="row"><div class="field"><label>Verantwortlich</label><div class="pjv pjvu">${U?av(U,26)+" "+esc(U.n):"– offen –"}</div></div><div class="field"><label>Angelegt</label><div class="pjv">${p.angelegt?esc(new Date(p.angelegt).toLocaleDateString("de-DE")):"–"}</div></div></div>
     <div class="field"><label>Beschreibung</label><div class="pjv pjvb">${p.beschr?esc(p.beschr):'<span class="hint" style="margin:0">keine</span>'}</div></div>
-    <div class="field"><label>Backend</label>${p.bk?`<div class="pjlink"><span>${bkTxt}</span>${pjBk(p)}</div>`:'<div class="pjv"><span class="hint" style="margin:0">nicht verbunden – nur zur Einordnung in Company OS</span></div>'}</div></div>`;
+    <div class="field"><label>Backend</label>${p.bk?`<div class="pjlink"><span>${bkTxt}</span>${pjBk(p)}</div>`:'<div class="pjv"><span class="hint" style="margin:0">nicht verbunden – nur zur Einordnung im Organigraph</span></div>'}</div></div>`;
   const form=`<div class="row"><div class="field"><label>Name</label><input type="text" id="pjn" value="${esc(p.n||"")}"></div><div class="field"><label>Kunde / Bezug</label><input type="text" id="pjk" value="${esc(p.kunde||"")}" placeholder="z. B. Mieterverein Musterstadt"></div></div>
     <div class="row"><div class="field"><label>Status</label><div class="seg" id="pjst" style="margin:0">${PJST.map(([k,l])=>`<button data-pst="${k}" class="${k===(p.st||"aktiv")?"on":""}">${l}</button>`).join("")}</div></div><div class="field"><label>Verantwortlich</label>${usersSel("pjv",p.verantw||"","– offen –")}</div></div>
     <div class="field"><label>Beschreibung</label><textarea id="pjb" style="min-height:60px" placeholder="Worum geht es, was ist das Ziel?">${esc(p.beschr||"")}</textarea></div>
-    <div class="field"><label>Backend</label>${p.bk?`<div class="pjlink"><span>${bkTxt}</span>${pjBk(p)}<button class="btn sm" id="pjun">Verbindung lösen</button></div><div class="hint">Claude legt Aufgaben, Notizen und Termine eines Auftrags in diesem Projekt an. Buchungsdaten (Zeit, Verbrauch) werden später dorthin übergeben.</div>`:`<div class="btns" style="margin:0"><button class="btn sm" id="pjln">↔ Mit Backend-Projekt verbinden …</button></div><div class="hint">Ohne Verbindung dient das Projekt nur zur Einordnung in Company OS.</div>`}</div>
+    <div class="field"><label>Backend</label>${p.bk?`<div class="pjlink"><span>${bkTxt}</span>${pjBk(p)}<button class="btn sm" id="pjun">Verbindung lösen</button></div><div class="hint">Claude legt Aufgaben, Notizen und Termine eines Auftrags in diesem Projekt an. Buchungsdaten (Zeit, Verbrauch) werden später dorthin übergeben.</div>`:`<div class="btns" style="margin:0"><button class="btn sm" id="pjln">↔ Mit Backend-Projekt verbinden …</button></div><div class="hint">Ohne Verbindung dient das Projekt nur zur Einordnung im Organigraph.</div>`}</div>
     <div class="btns" style="margin:4px 0 0"><button class="btn sm d" id="pjdel">Projekt löschen</button></div>`;
   C.classList.toggle("editing",pe);
   C.innerHTML=kopf+(pe?form:ansicht)+liste;
@@ -112,7 +112,7 @@ function pjBackendDlg(p,sys0){const O=orgById(OC),dp=dienstVon(O,"projekt"),PS=p
 const pjBkVon=(r,sys,m)=>{const b={sys,id:r.id,n:r.n||r.title||"",url:r.url||"",at:new Date().toISOString()};if(adapter(sys)&&adapter(sys).mand&&m){b.orgId=m.id;b.orgN=m.name}return b};
 // Kontext für Claude
 function pjKontext(j){const P=pj(j.prj);if(!P)return "";const B=P.bk;
-  const kopf="PROJEKT des Auftrags: „"+P.n+"“ (Company OS "+P.id+(P.kunde?", Kunde/Bezug: "+P.kunde:"")+")";
+  const kopf="PROJEKT des Auftrags: „"+P.n+"“ (Organigraph "+P.id+(P.kunde?", Kunde/Bezug: "+P.kunde:"")+")";
   if(!B)return kopf+". Noch nicht mit einem Backend-Projekt verbunden – nur zur Einordnung, System und Mandant wie sonst bestimmen.";
   const a=adapter(B.sys),k=a?a.projektKontext(B):{wo:sysName(B.sys)+"-Projekt „"+B.n+"“ (Id "+B.id+", "+B.url+")",ziel:"Zielsystem ist damit "+sysName(B.sys)};
   return kopf+". Verbunden mit "+k.wo+". Alles, was du für diesen Auftrag in "+sysName(B.sys)+" anlegst (Aufgaben, Notizen, Termine, Dokumente), in diesem Projekt anlegen bzw. mit ihm verknüpfen; "+k.ziel+". Im Ergebnis vermerken, dass am Projekt angelegt wurde."}
