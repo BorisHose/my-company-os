@@ -580,3 +580,4 @@ img.olg{height:18px;max-width:60px;object-fit:contain;margin-right:6px;vertical-
 .dx-dlg textarea{min-height:110px}
 .dx-dlg .dx-sum{min-width:0}
 @media(max-width:860px){.dx-body{grid-template-columns:1fr}.dx-side{border-left:0;border-top:1px solid var(--line)}.dx-head,.dx-foot,.dx-banner{padding-left:14px;padding-right:14px}.dx-main,.dx-side,.dx-pad{padding:14px}.dx-foot .btn{flex:1 1 auto}.dx-ed{min-height:180px}.dx-sum{flex-basis:100%}.dx-pop{min-width:200px;max-width:calc(100vw - 40px)}}
+.dx-ctx .seg button{white-space:nowrap}

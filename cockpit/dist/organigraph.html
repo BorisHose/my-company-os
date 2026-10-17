@@ -582,6 +582,7 @@ img.olg{height:18px;max-width:60px;object-fit:contain;margin-right:6px;vertical-
 .dx-dlg textarea{min-height:110px}
 .dx-dlg .dx-sum{min-width:0}
 @media(max-width:860px){.dx-body{grid-template-columns:1fr}.dx-side{border-left:0;border-top:1px solid var(--line)}.dx-head,.dx-foot,.dx-banner{padding-left:14px;padding-right:14px}.dx-main,.dx-side,.dx-pad{padding:14px}.dx-foot .btn{flex:1 1 auto}.dx-ed{min-height:180px}.dx-sum{flex-basis:100%}.dx-pop{min-width:200px;max-width:calc(100vw - 40px)}}
+.dx-ctx .seg button{white-space:nowrap}
 
 /* erzeugt von tools/dunkel.py – nicht von Hand ändern */
 :root[data-theme=dark]{color-scheme:dark;--bg:#0f141b;--panel:#171e29;--ink:#e4e8ef;--mut:#9aa4b4;--line:#2b3442;--acc:#5b8def;--accbg:#1c2b47;--warn:#f79009;--warnbg:#3a2615;--ok:#47cd89;--okbg:#12301f;--vio:#9b8afb;--viobg:#28213d;--teal:#36bffa;--tealbg:#11303a;--bodobg:#1d2939;--sellbg:#11303c}
@@ -1745,7 +1746,7 @@ const COL=new Set();
 let PF="bodo",AF="bodo",GEN=false;
 const PK=[["bodo","Bodo"],["sellify","sellify"],["all","Andere"]];
 const PN={bodo:"Bodo",sellify:"sellify",all:"Andere",multi:"Bodo + sellify"};
-const VER="75";
+const VER="76";
 // Produktbereiche: fest im Programm hinterlegt (Entscheidung Boris 09.10.2026), keine Konfiguration in der Datenbank
 const PT={bodo:"Produktbereich Bodo (Bodo Solutions, Mitgliederverwaltung) – alles, was für Bodo-Kunden und das Bodo-System gebraucht wird. Fest im Programm hinterlegt.",sellify:"Produktbereich sellify (business//acts, CRM-Plattform) – alles, was für sellify-Kunden und das sellify-System gebraucht wird. Fest im Programm hinterlegt.",all:"Andere = produktunabhängig, z. B. Web-QA, E-Mail, Word/PDF. Fest im Programm hinterlegt."};
 let AFIL="all";
@@ -2815,7 +2816,7 @@ let FL=[];
 const fl=n=>FL.find(f=>f.n===n);
 const nodeOf=(f,id)=>f.N.find(n=>n.id===id);
 const nodesOfType=(f,t)=>f.N.filter(n=>n.type===t);
-const nlabel=n=>n.type==="task"?(n.a?.n||(n.free?"Claude – frei":"?"))+(n.sk?" · "+skLbl(n):"")+": "+n.t:(n.label||NS[n.type].l);
+const nlabel=n=>n.type==="task"?(n.a?.n||(n.free?"Claude direkt":"?"))+(n.sk?" · "+skLbl(n):"")+": "+n.t:(n.label||NS[n.type].l);
 // Aufträge: Weg durch den Graphen (path) + aktueller Knoten
 function pathLin(f,k){const T=f.N.filter(n=>n.type!=="human"&&n.type!=="end");return T.slice(0,k+1).map(n=>n.id)}
 
@@ -2841,7 +2842,7 @@ function geo(f,e){
 function nodeHTML(f,n,o){
   const st=o.state?o.state(n):"",sel=!o.ro&&SEL&&SEL.k==="n"&&SEL.id===n.id?"sel":"";
   const prod=n.a?.p||f.p,hd=o.ro||n.type==="end"?"":`<span class="hd" data-hd="${n.id}" title="Ziehen = verbinden">+</span>`;
-  if(n.type==="task")return `<div class="node task p-${prod} ${st} ${sel}" data-n="${n.id}" style="left:${n.x}px;top:${n.y}px"><div class="ag">${esc(n.a?.n||(n.free?"Claude – frei":"Agent wählen"))}</div>${n.sk?`<div class="nsk ${skOk(n)?"":"bad"}" title="${skOk(n)?"Skill dieses Schritts":"Skill ist dem Agenten nicht mehr zugeordnet"}">${skOk(n)?"◆":"⚠"} ${esc(skLbl(n))}</div>`:""}<div>${esc(n.t||"Aufgabe …")}</div>${hd}</div>`;
+  if(n.type==="task")return `<div class="node task p-${prod} ${st} ${sel}" data-n="${n.id}" style="left:${n.x}px;top:${n.y}px"><div class="ag">${esc(n.a?.n||(n.free?"Claude direkt":"Agent wählen"))}</div>${n.sk?`<div class="nsk ${skOk(n)?"":"bad"}" title="${skOk(n)?"Skill dieses Schritts":"Skill ist dem Agenten nicht mehr zugeordnet"}">${skOk(n)?"◆":"⚠"} ${esc(skLbl(n))}</div>`:""}<div>${esc(n.t||"Aufgabe …")}</div>${hd}</div>`;
   if(n.type==="dec"||n.type==="human"){const hu=n.type==="human";
     return `<div class="node dia ${n.type} ${st} ${sel}" data-n="${n.id}" style="left:${n.x}px;top:${n.y}px"><svg viewBox="0 0 150 86" preserveAspectRatio="none"><polygon points="75,2 148,43 75,84 2,43"/></svg><div class="dt">${hu?"👤 ":""}${esc(n.label||"Frage …")}</div>${hd}</div>`}
   return `<div class="node circ ${n.type} ${st} ${sel}" data-n="${n.id}" style="left:${n.x}px;top:${n.y}px"><span class="ci">${n.type==="start"?"▶":"■"}</span><div class="cap">${esc(n.label||"")}</div>${hd}</div>`;
@@ -2919,7 +2920,7 @@ const skOk=n=>!n.sk||!!(n.a&&n.a.s.includes(n.sk));
 const skLbl=n=>n.sk?(sk(n.sk)?sk(n.sk).n:n.sk):"";
 function skSel(n){if(!n.a)return "";const L=n.a.s.map(id=>[id,sk(id)?sk(id).n:id]);
   return `<div class="field"><label>Skill</label><select id="nsk"><option value="">Agent entscheidet selbst</option>${L.map(([id,l])=>`<option value="${esc(id)}" ${n.sk===id?'selected':''}>${esc(l)}</option>`).join("")}${n.sk&&!skOk(n)?`<option value="${esc(n.sk)}" selected>⚠ ${esc(skLbl(n))} (hat der Agent nicht mehr)</option>`:""}</select>${n.sk&&!skOk(n)?'<div class="warnbox">Dieser Skill ist dem Agenten nicht mehr zugeordnet – bitte neu wählen oder dem Agenten wieder hinzufügen.</div>':'<div class="hint">Legt fest, welche Fähigkeit des Agenten dieser Schritt nutzt. Die Aufgabe wird beim Wählen aus der Skill-Beschreibung vorbelegt.</div>'}</div>`}
-function agentSel(f,cur,id,free){return `<select id="${id}">${free?`<option value="free" ${free===2?"selected":""}>Claude – frei (kein fester Agent)</option>`:""}${AG.filter(a=>a.p===f.p||a.p==="all").map(a=>`<option value="${AG.indexOf(a)}" ${cur===a?'selected':''}>${esc(a.n)}</option>`).join("")}</select>`}
+function agentSel(f,cur,id,free){return `<select id="${id}">${free?`<option value="free" ${free===2?"selected":""}>Claude direkt (kein fester Agent)</option>`:""}${AG.filter(a=>a.p===f.p||a.p==="all").map(a=>`<option value="${AG.indexOf(a)}" ${cur===a?'selected':''}>${esc(a.n)}</option>`).join("")}</select>`}
 function props(f){props0(f);if(!isEd("flow",f.id)){const P=$("#props");P.innerHTML=`<div class="lockhint">Nur lesen – zum Ändern oben „✎ Bearbeiten“.</div><fieldset disabled>${P.innerHTML}</fieldset>`}}
 function props0(f){
   const P=$("#props");
@@ -3007,7 +3008,7 @@ function tlName(o,did,tm){const d=dept(did);if(!tm)return "Abteilung "+((d||{}).
 const PRIO=[["d","Dringend"],["h","Hoch"],["n","Normal"],["l","Niedrig"]],PRN={d:0,h:1,n:2,l:3};
 const skOrg=(o)=>SK.filter(x=>!["vorschlag","entwurf"].includes(srcOf(x))&&(!o||!o.prod||x.p===o.prod||x.p==="all"||x.p==="multi"));
 function skOpts(L,cur){const G=[...new Set(L.map(x=>x.g))].sort((a,b)=>grIdx(a)-grIdx(b));return G.map(g=>`<optgroup label="${esc(grName(g))}">${L.filter(x=>x.g===g).map(x=>`<option value="${esc(x.id)}" ${x.id===cur?'selected':''}>${esc(x.n)}</option>`).join("")}</optgroup>`).join("")}
-function jobLbl(j){if(!j.f)return "–";if(!j.f.frei)return j.f.n;const a=j.aid&&AG.find(x=>x.id===j.aid),S=j.sk&&sk(j.sk);return (j.art==="agent"&&a?a.n:j.art==="abteilung"?"Abteilung "+((dept(j.abt)||{}).n||"")+(a?" · "+a.n:" · KI-Teamleiter"):"Freie Aufgabe")+(S?" · "+S.n:j.sk?" · "+j.sk:"")}
+function jobLbl(j){if(!j.f)return "–";if(!j.f.frei)return j.f.n;const a=j.aid&&AG.find(x=>x.id===j.aid),S=j.sk&&sk(j.sk);return (j.art==="agent"&&a?a.n:j.art==="abteilung"?"Abteilung "+((dept(j.abt)||{}).n||"")+(a?" · "+a.n:" · KI-Teamleiter"):"Claude direkt")+(S?" · "+S.n:j.sk?" · "+j.sk:"")}
 function startModal(f,keep){if(!keep)PEND=[];keep=keep||{};const SM=!!keep.sm;if(SM)keep.art=keep.art==="agent"&&keep.aid?"agent":"abteilung";
   const art=keep.art||(f&&!f.frei?"ablauf":"frei"),O=orgById(keep.org||OC)||ORGS()[0];
   const FLO=FL.filter(x=>!x.frei&&(x.p==="all"||!O.prod||x.p===O.prod));
@@ -3018,38 +3019,50 @@ function startModal(f,keep){if(!keep)PEND=[];keep=keep||{};const SM=!!keep.sm;if
   const skc=SKL.some(x=>x.id===keep.sk)?keep.sk:"";
   const s=f.N.find(n=>n.type==="start");
   const DPO=deptsOf(O.id),abt=art==="abteilung"||SM?(DPO.find(d=>d.id===keep.abt)||DPO[0]||null):null,TMS=abt?teamOpts(O.id,abt):[],TM=art==="abteilung"&&TMS.some(t=>t.id===keep.team)?keep.team:"",ABA=abt?tlAgents(O.id,abt.id,TM):[];
-  const ART=[["frei","Freie Aufgabe","Eine Aufgabe an Claude – ohne Prozess, optional mit einem bestimmten Skill"],["abteilung","Abteilung beauftragen","Der KI-Teamleiter der Abteilung wählt den passenden Agenten und erledigt die Aufgabe mit ihm"],["agent","Agent beauftragen","Ein Agent übernimmt die Aufgabe mit seinem Ziel, seinen Regeln und Skills – ohne Prozess"],["ablauf","Prozess starten","Ein Prozess mit festen Schritten, Entscheidungen und Freigaben"]];
-  $("#modal").innerHTML=`<div class="modal"><div class="box"><div class="bhead"><h3>${SM?"📥 Aufgabe sammeln":"Neuer Auftrag"}</h3><button class="ic" id="mclose" style="font-size:18px">✕</button></div>
-   <div class="field" style="margin-top:10px"><label>Organisation</label><div class="seg" id="jorg" style="margin:0">${ORGS().map(o=>`<button data-o="${o.id}" class="${o===O?'on':''}">${esc(o.kurz||o.n)}</button>`).join("")}</div></div>
-   <div class="field"><label>Projekt</label><select id="jprj">${pjOpts(O.id,pj(keep.prj)&&pj(keep.prj).org===O.id?keep.prj:"")}</select><div class="hint">${pjOrg(O.id).length?"Optional. Mit Bodo verbundene Projekte: Claude legt alles dort am Projekt an.":"Noch keine Projekte – anlegen unter „Projekte“. Ohne Projekt geht es auch."}</div></div>
-   ${SM?"":`<div class="field"><label>Art des Auftrags</label><div class="seg" id="jart" style="margin:0">${ART.map(([k,l,t])=>`<button data-a="${k}" class="${k===art?'on':''}" title="${esc(t)}">${l}</button>`).join("")}</div><div class="hint">${esc(ART.find(x=>x[0]===art)[2])}</div></div>`}
+  const ART=[["frei","Claude direkt","Eine Aufgabe direkt an Claude – ohne Prozess, optional mit einem bestimmten Skill"],["abteilung","Abteilung","Der KI-Teamleiter der Abteilung wählt den passenden Agenten"],["agent","Bestimmter Agent","Ein Agent übernimmt die Aufgabe mit seinem Ziel, seinen Regeln und Skills"],["ablauf","Prozess","Feste Schritte mit Entscheidungen und Freigaben"]];
+  const TP=RUNNERS[keep.tempo]?keep.tempo:"schnell",PH="Was soll erledigt werden? So ausführlich wie nötig:\n• Kunde / Ansprechpartner\n• gewünschtes Ergebnis (Dokument, Mail, Datensatz …)\n• Unterlagen, Links, Fristen\n\nScreenshots einfach einfügen (Strg+V) oder hineinziehen.";
+  const wer=SM?`<div class="field" style="margin-top:0"><label>Abteilung</label>${DPO.length?`<select id="jabt">${DPO.map(d=>`<option value="${d.id}" ${d===abt?'selected':''}>${esc(d.n)}</option>`).join("")}</select>`:'<div class="warnbox">Diese Organisation hat noch keine Abteilungen.</div>'}</div><div class="field"><label>Zuweisung</label><select id="jzu"><option value="">✦ KI-Teamleiter wählt</option>${ABA.map(a=>`<option value="${a.id}" ${art==="agent"&&ag&&ag.id===a.id?"selected":""}>${esc(a.n)}</option>`).join("")}</select><div class="hint">✦ Der KI-Teamleiter wählt aus: ${ABA.length?ABA.map(a=>esc(a.n)).join(", "):"– in dieser Abteilung ist noch kein Agent –"}</div></div>`
+    :`<div class="dx-opts" id="jart">${ART.map(([k,l,t])=>`<button type="button" data-a="${k}" class="${k===art?'on':''}"><span><b>${l}</b><small>${esc(t)}</small></span></button>`).join("")}</div>
    ${art==="ablauf"?`<div class="field"><label>Prozess</label><select id="jf">${PK.map(([p,l])=>{const L=FLO.filter(x=>x.p===p);return L.length?`<optgroup label="${esc(l)}">${L.map(x=>`<option value="${x.id}" ${x===f?'selected':''}>${esc(x.n)}</option>`).join("")}</optgroup>`:""}).join("")}</select>${f.goal?`<div class="hint">${esc(f.goal)}</div>`:""}${s?"":'<div class="warnbox">Dieser Prozess hat noch keinen Start-Knoten – unter „Prozesse“ ergänzen.</div>'}</div>`:""}
    ${art==="agent"&&!SM?`<div class="field"><label>Agent</label>${AGO.length?`<select id="jag">${AGO.map(a=>`<option value="${a.id}" ${a===ag?'selected':''}>${esc(a.n)}</option>`).join("")}</select>${ag&&ag.r?`<div class="hint">${esc(ag.r)}</div>`:""}`:'<div class="warnbox">In dieser Organisation ist noch kein Agent platziert.</div>'}</div>`:""}
    ${art==="abteilung"||SM?`<div class="${SM?"row":""}"><div class="field"><label>Abteilung</label>${DPO.length?`<select id="jabt">${DPO.map(d=>`<option value="${d.id}" ${d===abt?'selected':''}>${esc(d.n)}</option>`).join("")}</select>${art==="abteilung"&&TMS.length?`<select id="jteam" style="margin-top:6px" aria-label="Team"><option value="">Ganze Abteilung – KI-Teamleiter der Abteilung</option>${TMS.map(t=>`<option value="${t.id}" ${t.id===TM?"selected":""}>Team ${esc(t.n)} – eigener KI-Teamleiter</option>`).join("")}</select>`:""}${SM?`</div><div class="field"><label>Zuweisung</label><select id="jzu"><option value="">✦ KI-Teamleiter wählt</option>${ABA.map(a=>`<option value="${a.id}" ${art==="agent"&&ag&&ag.id===a.id?"selected":""}>${esc(a.n)}</option>`).join("")}</select>`:""}<div class="hint">✦ Der KI-Teamleiter wählt aus: ${ABA.length?ABA.map(a=>esc(a.n)).join(", "):"– in dieser Abteilung ist noch kein Agent –"}</div>`:'<div class="warnbox">Diese Organisation hat noch keine Abteilungen.</div>'}</div></div>`:""}
-   ${SM?`<div class="row"><div class="field"><label>Priorität</label><div class="seg" id="jprio" style="margin:0">${PRIO.map(([k,l])=>`<button data-p="${k}" class="${k===PR?"on":""}">${l}</button>`).join("")}</div></div><div class="field"><label>Fällig bis</label><input type="date" id="jdue" value="${esc(keep.due||"")}"></div></div>`:""}
    ${art!=="ablauf"&&art!=="abteilung"&&!SM?`<div class="field"><label for="jskq">Skill</label><div class="cbx" id="jskbox"><input type="text" id="jskq" role="combobox" aria-expanded="false" aria-autocomplete="list" autocomplete="off" placeholder="🔍 Skill suchen oder auswählen …" value="${esc(skc&&sk(skc)?sk(skc).n:(art==="agent"?"Agent entscheidet selbst":"Claude wählt selbst"))}"><span class="cbx-car" aria-hidden="true">▾</span><div class="cbx-list" id="jsklist" role="listbox" hidden></div></div><input type="hidden" id="jsk" value="${esc(skc)}"><div class="hint">${art==="agent"?"Nur Skills dieses Agenten.":"Nur Skills, die für "+esc(O.kurz||O.n)+" gelten und im Konto aktiv sind (keine Entwürfe oder Vorschläge)."}${skc&&sk(skc)&&sk(skc).d?"<br>"+esc(sk(skc).d):""}</div></div>`:""}
-   <div class="field"><label>Kurzbezeichnung</label><input type="text" id="jt" placeholder="Kurzbezeichnung des Auftrags, z. B. „Angebot Muster AG“" value="${esc(keep.t||"")}"></div>
-   <div class="field"><label>${esc(art==="ablauf"?(f.start||"Eingabe"):"Aufgabe")}</label><textarea id="ji" placeholder="Alles, was Claude für den Auftrag wissen muss (Kunde, Mandant, Unterlagen, Links). Screenshots einfach hier einfügen (Strg+V) oder hineinziehen.">${esc(keep.i||"")}</textarea>
-     <div class="anhbar"><div class="anhrow" id="janh"></div><label class="btn sm" style="cursor:pointer">📎 Bild anhängen<input type="file" id="jfile" accept="image/*" multiple style="display:none"></label></div></div>
-   ${art==="ablauf"?`<label class="cb" style="margin:6px 0 0"><input type="checkbox" id="jki" ${keep.ki===false?'':'checked'}> Von Claude ausführen lassen (startet eine Sitzung in deinem Abo)</label>`:""}
-   <div class="row" style="margin-top:8px"><div class="field"><label>Tempo</label><select id="jtempo">${Object.entries(RUNNERS).map(([k,R])=>`<option value="${k}" ${k===(keep.tempo||"schnell")?'selected':''}>${R.l}</option>`).join("")}</select><div class="hint">Schnell reicht für Datensätze und kurze Texte; gründlich für Dokumente, Angebote, Analysen.</div></div>
-   <div class="field"><label>Freigabe</label><label class="cb" style="margin:4px 0 0"><input type="checkbox" id="jvorab" ${keep.vorab?'checked':''}> Ohne Rückfrage ausführen, wenn eindeutig</label><div class="hint">Nur für einfache CRM-Anlagen (Aufgabe, Kontakt, Notiz, Termin) mit eindeutigem System und Mandant. E-Mails, Tickets, Änderungen und Löschen immer mit Freigabe.</div></div></div>
-   <div class="btns" style="margin-top:14px;justify-content:flex-end"><button class="btn" id="mx">Abbrechen</button>${SM?'<button class="btn" id="gonow">▶ Sammeln &amp; sofort starten</button><button class="btn p" id="go">📥 Sammeln</button>':'<button class="btn p" id="go">▶ Starten</button>'}</div></div></div>`;
+   ${art==="ablauf"?`<label class="cb" style="margin:6px 0 0"><input type="checkbox" id="jki" ${keep.ki===false?'':'checked'}> Von Claude ausführen lassen</label><div class="hint">startet eine Sitzung in deinem Abo; ohne Häkchen pflegst du die Schritte selbst</div>`:""}`;
+  $("#modal").innerHTML=`<div class="modal"><div class="box dx" id="jbox"><div class="dx-head"><h3>Neuer Auftrag${SM?' <span class="dx-pill inbox">📥 wird gesammelt</span>':""}</h3>
+   <div class="dx-ctx"><span>Für</span><div class="seg" id="jorg">${ORGS().map(o=>`<button type="button" data-o="${o.id}" class="${o===O?'on':''}">${esc(o.kurz||o.n)}</button>`).join("")}</div><select id="jprj" aria-label="Projekt" title="${esc(pjOrg(O.id).length?"Projekt (optional). Mit Bodo verbundene Projekte: Claude legt alles dort am Projekt an.":"Noch keine Projekte – anlegen unter „Projekte“. Ohne Projekt geht es auch.")}">${pjOpts(O.id,pj(keep.prj)&&pj(keep.prj).org===O.id?keep.prj:"")}</select></div><button class="dx-x" id="mclose" title="Schließen">✕</button></div>
+   <div class="dx-body"><div class="dx-main">
+    <div class="field"><label class="dx-lbl" for="jt">Kurzbezeichnung</label><input type="text" id="jt" placeholder="z. B. „Angebot Muster AG“" value="${esc(keep.t||"")}"></div>
+    <label class="dx-lbl">${esc(art==="ablauf"?(f.start||"Eingabe"):"Auftrag")}</label>${rtLeiste()}<div id="ji" class="dx-ed" contenteditable="true" role="textbox" aria-multiline="true" aria-label="Auftrag" data-ph="${esc(PH)}">${keep.i?mdHtml(keep.i,{ed:1,ph:1}):""}</div>
+    <div class="dx-drop"><div class="anhrow" id="janh"></div><label class="btn sm" style="cursor:pointer">📎 Bild anhängen<input type="file" id="jfile" accept="image/*" multiple style="display:none"></label><span>oder ins Textfeld einfügen (Strg+V) bzw. hineinziehen · höchstens 5 Bilder</span></div>
+   </div><div class="dx-side">
+    <div class="dx-sec"><h4><span class="dx-num">1</span>Wer erledigt den Auftrag?</h4>${wer}</div>
+    ${SM?`<div class="dx-sec dx-card v"><h4>📥 Für den Eingang</h4><label class="dx-lbl">Priorität</label><div class="seg" id="jprio">${PRIO.map(([k,l])=>`<button type="button" data-p="${k}" class="${k===PR?"on":""}">${l}</button>`).join("")}</div><label class="dx-lbl" style="margin-top:10px" for="jdue">Fällig bis</label><input type="date" id="jdue" value="${esc(keep.due||"")}"></div>`:""}
+    <div class="dx-sec"><h4><span class="dx-num">2</span>Wie gründlich?</h4><div class="seg" id="jtp">${Object.entries(RUNNERS).map(([k,R])=>`<button type="button" data-tp="${k}" class="${k===TP?'on':''}">${esc(R.l)}</button>`).join("")}</div><input type="hidden" id="jtempo" value="${TP}"><div class="hint">Schnell: Datensätze, kurze Texte · Gründlich: Dokumente, Angebote, Analysen</div></div>
+    <div class="dx-sec"><h4><span class="dx-num">3</span>Freigabe</h4><label class="cb" title="Nur für einfache CRM-Anlagen (Aufgabe, Kontakt, Notiz, Termin) mit eindeutigem System und Mandant."><input type="checkbox" id="jvorab" ${keep.vorab?'checked':''}> Ohne Rückfrage ausführen, wenn eindeutig <span style="cursor:help">ⓘ</span></label><div class="hint">Nur einfache CRM-Anlagen. E-Mails, Tickets, Änderungen und Löschen immer mit Freigabe.</div></div>
+   </div></div>
+   <div class="dx-foot"><span class="dx-sum" id="jsum"></span><button class="btn" id="mx">Abbrechen</button>${SM?'<button class="btn" id="jsmx" title="Doch nicht sammeln">Nicht sammeln</button><button class="btn" id="gonow">▶ Sammeln &amp; sofort starten</button><button class="btn p" id="go">📥 In Eingang sammeln</button>':`${art==="abteilung"||art==="agent"?'<button class="btn" id="jsm" title="In den Eingang der Abteilung legen statt sofort zu starten">📥 Nur sammeln</button>':""}<button class="btn p" id="go">▶ Auftrag starten</button>`}</div></div></div>`;
   const close=()=>$("#modal").innerHTML="";$("#mclose").onclick=close;$("#mx").onclick=close;
-  renderPend();const ji=$("#ji");
+  renderPend();const ji=$("#ji");rtBind(ji,$("#jbox .dx-tb"));
+  const sum=()=>{const e=$("#jsum");if(!e)return;const w=SM?(ag&&art==="agent"?ag.n:"Eingang "+(abt?abt.n:"")):art==="agent"?(ag?ag.n:"Agent"):art==="abteilung"?(abt?tlName(O.id,abt.id,$("#jteam")?$("#jteam").value:TM):"Abteilung"):art==="ablauf"?(f?f.n:"Prozess"):"Claude direkt";
+    const tp=(RUNNERS[$("#jtempo").value]||{}).l||"";e.innerHTML=esc(O.kurz||O.n)+" · <b>"+esc(w)+"</b> · "+esc(tp.replace(/^\S+\s/,""))+" · "+($("#jvorab").checked?"ohne Rückfrage, wenn eindeutig":"mit Freigabe")+(SM?" · Priorität "+esc((PRIO.find(x=>x[0]===prio())||[])[1]||""):"")};
+  document.querySelectorAll("#jtp [data-tp]").forEach(b=>b.onclick=()=>{$("#jtempo").value=b.dataset.tp;document.querySelectorAll("#jtp [data-tp]").forEach(x=>x.classList.toggle("on",x===b));sum()});
+  $("#jvorab").onchange=sum;
   ji.addEventListener("paste",e=>{const it=[...(e.clipboardData&&e.clipboardData.items||[])].filter(x=>x.type&&x.type.startsWith("image/"));if(!it.length)return;e.preventDefault();it.forEach(x=>addPend(x.getAsFile(),"Screenshot "+(PEND.length+1)))});
   ji.addEventListener("dragover",e=>{e.preventDefault();ji.classList.add("drop")});ji.addEventListener("dragleave",()=>ji.classList.remove("drop"));
   ji.addEventListener("drop",e=>{e.preventDefault();ji.classList.remove("drop");[...(e.dataTransfer.files||[])].forEach(f=>addPend(f))});
   $("#jfile").onchange=e=>{[...e.target.files].forEach(f=>addPend(f));e.target.value=""};
   const prio=()=>{const b=document.querySelector("#jprio .on");return b?b.dataset.p:PR};
-  const K=o=>({art,team:$("#jteam")?$("#jteam").value:TM,sm:SM,prio:SM?prio():PR,due:$("#jdue")?$("#jdue").value:"",org:O.id,aid:ag&&ag.id,abt:abt&&abt.id,sk:$("#jsk")?$("#jsk").value:"",t:$("#jt").value,i:$("#ji").value,tempo:$("#jtempo").value,vorab:$("#jvorab").checked,prj:$("#jprj")?$("#jprj").value:"",ki:$("#jki")?$("#jki").checked:true,...o});
+  const K=o=>({art,team:$("#jteam")?$("#jteam").value:TM,sm:SM,prio:SM?prio():PR,due:$("#jdue")?$("#jdue").value:"",org:O.id,aid:ag&&ag.id,abt:abt&&abt.id,sk:$("#jsk")?$("#jsk").value:"",t:$("#jt").value,i:rtMd($("#ji")),tempo:$("#jtempo").value,vorab:$("#jvorab").checked,prj:$("#jprj")?$("#jprj").value:"",ki:$("#jki")?$("#jki").checked:true,...o});
   document.querySelectorAll("#jorg [data-o]").forEach(b=>b.onclick=()=>startModal(art==="ablauf"?f:null,K({org:b.dataset.o,sk:"",aid:null,prj:""})));
   document.querySelectorAll("#jart [data-a]").forEach(b=>b.onclick=()=>startModal(null,K({art:b.dataset.a,sk:""})));
   const jf=$("#jf");if(jf)jf.onchange=e=>startModal(FL.find(x=>x.id===e.target.value),K());
   const jab=$("#jabt");if(jab)jab.onchange=e=>startModal(null,K(SM?{abt:e.target.value,art:"abteilung",aid:null}:{abt:e.target.value}));
   const jtm=$("#jteam");if(jtm)jtm.onchange=e=>startModal(null,K({team:e.target.value}));
   const jzu=$("#jzu");if(jzu)jzu.onchange=e=>startModal(null,K({art:e.target.value?"agent":"abteilung",aid:e.target.value||null}));
-  document.querySelectorAll("#jprio [data-p]").forEach(b=>b.onclick=()=>{document.querySelectorAll("#jprio [data-p]").forEach(x=>x.classList.toggle("on",x===b))});
+  document.querySelectorAll("#jprio [data-p]").forEach(b=>b.onclick=()=>{document.querySelectorAll("#jprio [data-p]").forEach(x=>x.classList.toggle("on",x===b));sum()});
+  {const b=$("#jsm");if(b)b.onclick=()=>startModal(null,K({sm:1,abt:art==="agent"&&ag?(PL(ag,O.id).abt||(DPO[0]||{}).id):(abt&&abt.id)}))}
+  {const b=$("#jsmx");if(b)b.onclick=()=>startModal(null,K({sm:false,art:art==="agent"&&ag?"agent":"abteilung"}))}
+  sum();
   const jag=$("#jag");if(jag)jag.onchange=e=>startModal(null,K({aid:e.target.value,sk:""}));
   {const jsk=$("#jsk"),q=$("#jskq"),L=$("#jsklist");if(jsk&&q){
     const none=art==="agent"?"Agent entscheidet selbst":"Claude wählt selbst",lab=()=>jsk.value&&sk(jsk.value)?sk(jsk.value).n:none;
@@ -3075,7 +3088,7 @@ function startModal(f,keep){if(!keep)PEND=[];keep=keep||{};const SM=!!keep.sm;if
   const go=async sofort=>{if(GOBUSY)return;if(!s)return toast("Der Prozess braucht einen Start-Knoten");if(art==="agent"&&!ag)return toast("Bitte einen Agenten wählen");if((art==="abteilung"||SM)&&!abt)return toast("Bitte eine Abteilung wählen");if(art==="abteilung"&&!ABA.length)return toast("In dieser Abteilung ist noch kein Agent – bitte zuerst einen platzieren");
     GOBUSY=true;let n;try{n=await nextJobNo()}finally{GOBUSY=false}const e=f.E.find(e=>e.f===s.id),nx=e&&nodeOf(f,e.t);
     const ki=art!=="ablauf"||$("#jki").checked,skv=$("#jsk")?$("#jsk").value:"";
-    const j={id:"A-"+n,f,fid:f.id,art,org:O.id,...(SM?{prio:prio(),gesammelt:new Date().toISOString()}:{}),t:$("#jt").value||(art==="agent"?ag.n:art==="abteilung"?"Auftrag an "+tlName(O.id,abt.id,TM):art==="frei"?(skv&&sk(skv)?sk(skv).n:"Freie Aufgabe"):"Neuer Auftrag"),in:$("#ji").value,path:ki?[s.id]:[s.id].concat(nx?[nx.id]:[]),st:"run",log:ki?[[now(),"KI-Auftrag angelegt von "+ICH()+""+(art==="agent"?" – an "+ag.n:art==="abteilung"?" – an "+tlName(O.id,abt.id,TM)+" (KI-Teamleiter)":art==="frei"?" – freie Aufgabe":"")]]:[[now(),"Auftrag gestartet von "+ICH()+""],[now(),nx?nlabel(nx)+" – beginnt":"–"]]};
+    const j={id:"A-"+n,f,fid:f.id,art,org:O.id,...(SM?{prio:prio(),gesammelt:new Date().toISOString()}:{}),t:$("#jt").value||(art==="agent"?ag.n:art==="abteilung"?"Auftrag an "+tlName(O.id,abt.id,TM):art==="frei"?(skv&&sk(skv)?sk(skv).n:"Claude direkt"):"Neuer Auftrag"),in:rtMd($("#ji")),path:ki?[s.id]:[s.id].concat(nx?[nx.id]:[]),st:"run",log:ki?[[now(),"KI-Auftrag angelegt von "+ICH()+""+(art==="agent"?" – an "+ag.n:art==="abteilung"?" – an "+tlName(O.id,abt.id,TM)+" (KI-Teamleiter)":art==="frei"?" – Claude direkt":"")]]:[[now(),"Auftrag gestartet von "+ICH()+""],[now(),nx?nlabel(nx)+" – beginnt":"–"]]};
     if(SM){const d=$("#jdue").value;if(d)j.due=d;j.log=[[now(),"Aufgabe gesammelt von "+ICH()+""+(art==="agent"?" – für "+ag.n:" – für Abteilung "+abt.n)]];if(!sofort)j.st="inbox"}
     if(art==="agent")j.aid=ag.id;if(art==="abteilung"||SM)j.abt=abt.id;if(art==="abteilung"&&TM)j.team=TM;if(skv&&art!=="abteilung")j.sk=skv;{const pv=$("#jprj")&&$("#jprj").value;if(pv&&pj(pv)){j.prj=pv;j.log[0][1]+=" · Projekt „"+pj(pv).n+"“"}}
     if(ki){j.ki=1;j.tempo=$("#jtempo").value;if($("#jvorab").checked)j.vorab=1}
@@ -3210,14 +3223,14 @@ function jobSteps(j){const L=[];
   else L.push([j.ok==="nein"?"Nicht abgeschlossen":"Abgeschlossen",j.ok==="nein"?"bad":"done"]);
   return L}
 function jobWho(j){let a=null;if((j.art==="agent"||j.art==="abteilung")&&j.aid)a=AG.find(x=>x.id===j.aid);else if(j.art==="abteilung")return {n:"✦ KI-Teamleiter",u:null,sub:tlName(jobOrg(j),j.abt,j.team||"")};else if(j.f&&!j.f.frei){const c=curN(j);a=c&&c.a||(j.f.N.find(n=>n.type==="task"&&n.a)||{}).a||null}
-  return a?{n:a.n,u:usr(a.owner),sub:"digitaler Mitarbeiter"}:{n:"Claude – frei",u:null,sub:"freie Aufgabe"}}
+  return a?{n:a.n,u:usr(a.owner),sub:"digitaler Mitarbeiter"}:{n:"Claude direkt",u:null,sub:"ohne festen Agenten"}}
 function jobCard(j){const W=jobWho(j),comp=!KOPEN.has(j.id),[oc,ot]=okTxt(j),neu=KINEW.has(j.id);
   const stTxt=isEnd(j)?`<span class="kst ${oc}">${doneTxt(j)}</span>`:j.st==="wait"?'<span class="kst wait">wartet auf dich</span>':'<span class="kst run"><i class="pulse"></i>läuft</span>';
   const badges=`${j.ki?'<span class="kib2" title="Wird von Claude ausgeführt – '+esc(RUNNER(j).l)+'">KI'+(j.tempo==="schnell"?" ⚡":"")+'</span>':''}${(j.anh||[]).length?' <span title="'+j.anh.length+' Bild(er) angehängt">📎'+j.anh.length+'</span>':''}${j.vorab?' <span class="badge" title="Einfache CRM-Anlagen ohne Rückfrage, wenn eindeutig">vorab</span>':''}${(j.sess||[]).some(s=>s.art==="ohne Rückmeldung")&&j.st==="wait"?' <span title="Sitzung ohne Rückmeldung">⚠</span>':''}${j.beispiel?' <span class="badge neu">Beispiel</span>':''}`;
   const head=`<div class="khd"><span>${esc(j.id)} · ${esc(jobLbl(j))}</span>${stTxt}</div>
     <div class="kwho">${av(W.u,40,1)}<div><b>${esc(j.t||"Auftrag")} ${badges}</b><small>${esc(W.n)} · ${W.u?"verantwortlich: "+esc(W.u.n):esc(W.sub)}${pj(j.prj)?` · <span class="pjchip">▣ ${esc(pj(j.prj).n)}</span>`:""}</small></div></div>`;
   const stamp=isEnd(j)&&neu&&j.ok!=="nein"?'<div class="kstamp" aria-hidden="true">ERLEDIGT</div>':"";
-  const qt=j.in?`<div class="kq"><span>„${esc(j.in)}“</span></div>`:"";
+  const qt=j.in?`<div class="kq"><span>„${esc(mdText(j.in))}“</span></div>`:"";
   if(comp){let line="",btn="";
     if(isEnd(j)){line=`<div class="kmini ${oc}">${esc((j.sum||"").split(/(?<=[.!?])\s/)[0]||ot)}</div>`;btn=(j.erg||[]).length||j.ki?`<button class="btn sm" data-res="${j.id}">Ergebnis ansehen${(j.erg||[]).length?" ("+j.erg.length+")":""}</button>`:""}
     else if(j.st==="wait"){const fl=(j.q&&j.q.text||"").split("\n").map(x=>x.trim()).filter(Boolean),ln=fl.find(x=>!/^(entwurf|freigabe|rückfrage)/i.test(x))||fl[0]||"";line=`<div class="kmini wait"><b>${esc(j.q&&j.q.kind==="Rückfrage"?"Rückfrage":"Zustimmung")}:</b> ${esc(ln)}</div>`;btn=`<button class="btn sm p" data-res="${j.id}">Prüfen & freigeben</button>`}
@@ -3348,6 +3361,64 @@ const now=()=>{const d=new Date();return d.toLocaleDateString("de-DE",{day:"2-di
 const uid=p=>p+"-"+Date.now().toString(36)+Math.random().toString(36).slice(2,6);
 // Großes Fenster (Assistenten, Auswahllisten); liefert die Schließen-Funktion
 function modalBox(html,wide){$("#modal").innerHTML=`<div class="modal"><div class="box wz ${wide?'wide':''}" id="box">${html}</div></div>`;return ()=>$("#modal").innerHTML=""}
+
+// ===== Formatierter Auftragstext (v76): Speicherung als einfaches Markdown im Feld „in“ =====
+// Erlaubt: **fett**, *kursiv*, Zwischenüberschrift (## …), Aufzählung (- …), Nummerierung (1. …), Links [Text](https://…).
+// Alter Klartext bleibt gültig. Claude bekommt den Text unverändert (Markdown liest Claude direkt).
+const MDLINK=/\[([^\]\n]+)\]\(((?:https?:\/\/|mailto:)[^\s)]+)\)/g;
+function mdInline(s,o){o=o||{};let t=esc(s);
+  t=t.replace(MDLINK,(m,a,h)=>`<a href="${h}" target="_blank" rel="noopener">${a}</a>`);
+  t=t.replace(/\*\*([^*\n]+?)\*\*/g,"<b>$1</b>").replace(/(^|[^*\w])\*([^*\n]+?)\*(?!\w)/g,"$1<i>$2</i>");
+  if(o.ph)t=t.replace(/\[([^\]\n<>]{1,40})\](?!\()/g,'<span class="dx-ph">[$1]</span>');
+  return t}
+// mdHtml(md,{ed,ph}): ed = für das Eingabefeld (eine Zeile je <div>), sonst Anzeige mit Absätzen
+function mdHtml(md,o){o=o||{};const L=String(md||"").replace(/\r/g,"").split("\n"),H=[];let i=0;
+  const li=(re,tag)=>{const it=[];while(i<L.length&&re.test(L[i])){it.push("<li>"+mdInline(L[i].replace(re,""),o)+"</li>");i++}H.push(`<${tag}>${it.join("")}</${tag}>`)};
+  while(i<L.length){const l=L[i];
+    if(/^\s*#{1,4}\s+/.test(l)){H.push("<h3>"+mdInline(l.replace(/^\s*#{1,4}\s+/,""),o)+"</h3>");i++}
+    else if(/^\s*[-*•]\s+/.test(l))li(/^\s*[-*•]\s+/,"ul");
+    else if(/^\s*\d+[.)]\s+/.test(l))li(/^\s*\d+[.)]\s+/,"ol");
+    else if(o.ed){H.push("<div>"+(l.trim()?mdInline(l,o):"<br>")+"</div>");i++}
+    else if(!l.trim())i++;
+    else{const P=[];while(i<L.length&&L[i].trim()&&!/^\s*(#{1,4}|[-*•]|\d+[.)])\s+/.test(L[i])){P.push(mdInline(L[i],o));i++}H.push("<p>"+P.join("<br>")+"</p>")}}
+  return H.join("")}
+// htmlMd(element): Inhalt eines Eingabefelds (contenteditable) → Markdown
+function htmlMd(root){const BL=/^(DIV|P|H[1-6]|UL|OL|LI|BLOCKQUOTE|PRE|TABLE|TR)$/;
+  const inl=n=>{if(n.nodeType===3)return n.nodeValue.replace(/ /g," ");if(n.nodeType!==1)return "";
+    const t=n.tagName;if(t==="BR")return "\n";if(t==="STYLE"||t==="SCRIPT")return "";
+    const c=[...n.childNodes].map(inl).join("");const w=x=>{const m=c.match(/^(\s*)([\s\S]*?)(\s*)$/);return m[2]?m[1]+x+m[2]+x+m[3]:c};
+    if(t==="B"||t==="STRONG"||(t==="SPAN"&&/^(bold|[6-9]00)$/.test(n.style&&n.style.fontWeight)))return w("**");
+    if(t==="I"||t==="EM")return w("*");
+    if(t==="A"){const h=n.getAttribute("href")||"";return /^(https?:|mailto:)/i.test(h)&&c.trim()?"["+c.trim()+"]("+h+")":c}
+    if(BL.test(t))return c+"\n";return c};
+  const L=[];let cur="";const fl=()=>{if(cur!==""){cur.split("\n").forEach(x=>L.push(x));cur=""}};
+  const walk=n=>{for(const c of n.childNodes){
+    if(c.nodeType===1&&BL.test(c.tagName)){fl();const t=c.tagName;
+      if(/^H/.test(t))L.push("## "+inl(c).replace(/\n+/g," ").trim());
+      else if(t==="UL"||t==="OL"){let k=1;for(const li of c.querySelectorAll(":scope>li"))L.push((t==="OL"?(k++)+". ":"- ")+inl(li).replace(/\n+/g," ").trim())}
+      else if(t==="LI")L.push("- "+inl(c).replace(/\n+/g," ").trim());
+      else if([...c.children].some(x=>BL.test(x.tagName))){walk(c);fl()}
+      else{inl(c).replace(/\n$/,"").split("\n").forEach(x=>L.push(x));if(t==="P")L.push("")}}
+    else cur+=inl(c)}};
+  walk(root);fl();
+  return L.join("\n").replace(/[ \t]+$/gm,"").replace(/\n{3,}/g,"\n\n").trim()}
+const rtMd=el=>el?(el.isContentEditable||el.getAttribute("contenteditable")?htmlMd(el):String(el.value||"")):"";
+const mdText=md=>String(md||"").replace(MDLINK,"$1").replace(/\*\*([^*\n]+?)\*\*/g,"$1").replace(/(^|[^*\w])\*([^*\n]+?)\*(?!\w)/g,"$1$2").replace(/^\s*#{1,4}\s+/gm,"").replace(/^\s*[-*•]\s+/gm,"• ");
+// Eingabefeld mit Leiste: Knöpfe [data-rt], Einfügen wird bereinigt; Bilder bleiben Sache des Aufrufers (onImage)
+function rtBind(ed,bar,o){o=o||{};let rng=null;const keep=()=>{const s=getSelection();if(s.rangeCount&&ed.contains(s.anchorNode))rng=s.getRangeAt(0).cloneRange()};
+  const back=()=>{ed.focus();if(rng){const s=getSelection();s.removeAllRanges();s.addRange(rng)}};
+  ed.addEventListener("keyup",keep);ed.addEventListener("mouseup",keep);ed.addEventListener("blur",keep);
+  try{document.execCommand("defaultParagraphSeparator",false,"div")}catch(e){}
+  if(bar)bar.querySelectorAll("[data-rt]").forEach(b=>{b.onmousedown=e=>e.preventDefault();b.onclick=async()=>{const c=b.dataset.rt;
+    if(c==="h"){back();const bl=(getSelection().anchorNode||{}).parentElement;document.execCommand("formatBlock",false,bl&&bl.closest&&bl.closest("h3")?"div":"h3")}
+    else if(c==="link"){keep();const u=await askText("Link einfügen","https://",{ok:"Einfügen"});if(!u||!/^(https?:\/\/|mailto:)/i.test(u))return u&&toast("Bitte eine Adresse mit https:// angeben");back();if(getSelection().isCollapsed)document.execCommand("insertHTML",false,`<a href="${esc(u)}">${esc(u)}</a>`);else document.execCommand("createLink",false,u)}
+    else if(c==="ph"&&o.onPh){keep();const n=await askText("Platzhalter einfügen","",{ph:"z. B. Kunde",ok:"Einfügen"});if(!n)return;back();document.execCommand("insertText",false,"["+n.replace(/[\[\]]/g,"")+"]");o.onPh()}
+    else{back();document.execCommand(c,false,null)}
+    keep();if(o.onChange)o.onChange()}});
+  ed.addEventListener("paste",e=>{const cd=e.clipboardData;if(!cd)return;if([...(cd.items||[])].some(x=>x.type&&x.type.startsWith("image/")))return;
+    e.preventDefault();const h=cd.getData("text/html");if(h){const d=document.createElement("template");d.innerHTML=h.replace(/<(script|style)[\s\S]*?<\/\1>/gi,"");document.execCommand("insertHTML",false,mdHtml(htmlMd(d.content),{ed:1}))}else document.execCommand("insertText",false,cd.getData("text/plain"))});
+  if(o.onChange)ed.addEventListener("input",o.onChange)}
+const rtLeiste=(ph)=>`<div class="dx-tb" role="toolbar" aria-label="Formatierung"><button type="button" data-rt="bold" title="Fett (Strg+B)"><b>B</b></button><button type="button" data-rt="italic" title="Kursiv (Strg+I)"><i>I</i></button><button type="button" data-rt="h" title="Zwischenüberschrift">H</button><button type="button" data-rt="insertUnorderedList" title="Aufzählung">• Liste</button><button type="button" data-rt="insertOrderedList" title="Nummerierung">1. Liste</button><button type="button" data-rt="link" title="Link">🔗 Link</button>${ph?'<span class="sp"></span><button type="button" data-rt="ph" title="Platzhalter wie [Kunde] einfügen">＋ Platzhalter</button>':""}</div>`;
 
 // ===== Speicher (db) =====
 let DB=null,RO=false;const LAST=new Map();let tmr=null,busy=false,again=false;
@@ -3486,7 +3557,7 @@ function avRender(keep){const s=AVS(),o=s.org,S=avSel(o),O=orgById(o)||{},F=avFe
   const D=deptsOf(o).map(d=>({id:d.id,n:d.n}));if(RT.some(r=>r.abt==="_none")||AG.some(a=>inOrg(a,o)&&!PL(a,o).abt))D.push({id:"_none",n:"Ohne Abteilung"});
   const dOn=k=>S.d===null||S.d.includes(k);
   const tree=D.map(d=>{const A=AG.filter(a=>inOrg(a,o)&&(PL(a,o).abt||"_none")===d.id).map(a=>({k:a.id,n:a.n}));
-      RT.filter(r=>r.abt===d.id&&!A.some(x=>x.k===r.ak)).forEach(r=>{if(!A.some(x=>x.k===r.ak))A.push({k:r.ak,n:r.a?r.a.n:r.ak==="_tl"?"✦ KI-Teamleiter (wählt noch)":"Claude – frei"})});
+      RT.filter(r=>r.abt===d.id&&!A.some(x=>x.k===r.ak)).forEach(r=>{if(!A.some(x=>x.k===r.ak))A.push({k:r.ak,n:r.a?r.a.n:r.ak==="_tl"?"✦ KI-Teamleiter (wählt noch)":"Claude direkt"})});
       const n=RT.filter(r=>r.abt===d.id).length;
       return `<label class="dl"><input type="checkbox" data-avd="${d.id}" ${dOn(d.id)?"checked":""}> ${esc(d.n)}<span class="n">${n}</span></label>`+
         A.map(a=>`<label class="al"><input type="checkbox" data-ava="${a.k}" data-avad="${d.id}" ${dOn(d.id)&&!S.ax.includes(a.k)?"checked":""}> ${esc(a.n)}<span class="n">${RT.filter(r=>r.abt===d.id&&r.ak===a.k).length}</span></label>`).join("")}).join("");
@@ -3501,7 +3572,7 @@ function avRender(keep){const s=AVS(),o=s.org,S=avSel(o),O=orgById(o)||{},F=avFe
     bar2=`<div class="seg2">${AVZ.map(([k,l])=>`<button data-avz="${k}" class="${s.zeit===k?"on":""}">${l}${k==="aelter"&&!AVARCH?"":`<span class="c">${RE.filter(r=>inFenster(r.d,F[k])).length}</span>`}</button>`).join("")}</div>
       <label class="cb" style="margin:0"><input type="checkbox" id="avabg" ${s.abg?"checked":""}> Abgebrochene zeigen</label>`}
   // Tabelle
-  const agc=r=>r.a?`<div class="avag">${av(usr(r.a.owner),24,1)}<span>${esc(r.a.n)}</span></div>`:`<div class="avag"><span class="avfr">✦</span><span>${r.ak==="_tl"?"KI-Teamleiter":"Claude – frei"}</span></div>`;
+  const agc=r=>r.a?`<div class="avag">${av(usr(r.a.owner),24,1)}<span>${esc(r.a.n)}</span></div>`:`<div class="avag"><span class="avfr">✦</span><span>${r.ak==="_tl"?"KI-Teamleiter":"Claude direkt"}</span></div>`;
   const dn=r=>{const d=dept(r.abt);return d?d.n:"Ohne Abteilung"};
   const ttl=r=>`<td class="t"><b>${esc(r.j.t||"–")}</b><small>${esc(dn(r))}${teilTxt(r.j)?" · "+esc(teilTxt(r.j)):""}</small></td>`;
   let rows,head,foot0="";

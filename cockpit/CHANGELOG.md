@@ -1,5 +1,12 @@
 # Änderungen – Cockpit
 
+## 76 · 17.10.2026 · „Neuer Auftrag“ neu aufgebaut, Sammeln im selben Fenster, „Claude direkt“ (Etappe 2)
+- „Neuer Auftrag“ in zwei Spalten: links Kurzbezeichnung, großes Auftragsfeld mit Formatierungsleiste (fett, kursiv, Zwischenüberschrift, Aufzählung, Nummerierung, Link) und Bildablage; rechts „Wer erledigt den Auftrag?“ als Liste (Claude direkt · Abteilung · Bestimmter Agent · Prozess) mit dem jeweils passenden Feld (Team, Agent, Skill, Prozess, „Von Claude ausführen lassen“), „Wie gründlich?“ als Umschalter und „Freigabe“. Organisation und Projekt im Kopf, Zusammenfassung im Fuß.
+- Formatierter Auftragstext wird als einfaches Markdown im bisherigen Feld gespeichert (`17b-text-format.js`); alter Klartext bleibt gültig, eingefügter Text aus Word/Mail wird bereinigt, Claude bekommt den Text unverändert. Auftragskarten zeigen einen Klartext-Auszug.
+- Sammeln: kein eigenes Fenster mehr – „Neuer Auftrag“ im Sammel-Modus (Hinweis „wird gesammelt“, Block „Für den Eingang“ mit Priorität und Fälligkeit). „📥 Nur sammeln“ erscheint bei Abteilung und Agent; „Nicht sammeln“ schaltet zurück.
+- „Freie Aufgabe“ heißt sichtbar „Claude direkt“ (Auswahl, Kartenzeilen, Verlauf, Übersicht, Prozessknoten ohne festen Agenten). Interner Wert `frei` bleibt; der Systemablauf heißt weiter „Freie Aufgabe“.
+- Element-IDs und Speicherlogik unverändert. Smoke-Test: 119 Prüfungen (neu: formatierter Auftragstext hin und zurück, Bereinigung beim Einfügen, alter Klartext).
+
 ## 75 · 17.10.2026 · Dialog-Bausteine und neue kleine Rückfragen (Etappe 1)
 - Neue gemeinsame Stile für die Auftrags-Dialoge (`.dx-*` in `1-stile.css`, Dunkel-Regeln über `tools/dunkel.py`): Kopf mit Status, Fuß mit Zusammenfassung, zwei Spalten (unter 860 px einspaltig), Statuspillen, Schrittliste, Karten, Menüs, Chips.
 - Kleine Rückfragen (`askOk`, `askText`) mit Titelzeile, Erklärung und eindeutigen Knöpfen; Rückgabewerte unverändert, gilt an allen rund 40 Stellen. Gefährliche Aktionen mit rotem Knopf.

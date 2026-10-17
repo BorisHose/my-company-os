@@ -39,7 +39,7 @@ let FL=[];
 const fl=n=>FL.find(f=>f.n===n);
 const nodeOf=(f,id)=>f.N.find(n=>n.id===id);
 const nodesOfType=(f,t)=>f.N.filter(n=>n.type===t);
-const nlabel=n=>n.type==="task"?(n.a?.n||(n.free?"Claude – frei":"?"))+(n.sk?" · "+skLbl(n):"")+": "+n.t:(n.label||NS[n.type].l);
+const nlabel=n=>n.type==="task"?(n.a?.n||(n.free?"Claude direkt":"?"))+(n.sk?" · "+skLbl(n):"")+": "+n.t:(n.label||NS[n.type].l);
 // Aufträge: Weg durch den Graphen (path) + aktueller Knoten
 function pathLin(f,k){const T=f.N.filter(n=>n.type!=="human"&&n.type!=="end");return T.slice(0,k+1).map(n=>n.id)}
 
@@ -65,7 +65,7 @@ function geo(f,e){
 function nodeHTML(f,n,o){
   const st=o.state?o.state(n):"",sel=!o.ro&&SEL&&SEL.k==="n"&&SEL.id===n.id?"sel":"";
   const prod=n.a?.p||f.p,hd=o.ro||n.type==="end"?"":`<span class="hd" data-hd="${n.id}" title="Ziehen = verbinden">+</span>`;
-  if(n.type==="task")return `<div class="node task p-${prod} ${st} ${sel}" data-n="${n.id}" style="left:${n.x}px;top:${n.y}px"><div class="ag">${esc(n.a?.n||(n.free?"Claude – frei":"Agent wählen"))}</div>${n.sk?`<div class="nsk ${skOk(n)?"":"bad"}" title="${skOk(n)?"Skill dieses Schritts":"Skill ist dem Agenten nicht mehr zugeordnet"}">${skOk(n)?"◆":"⚠"} ${esc(skLbl(n))}</div>`:""}<div>${esc(n.t||"Aufgabe …")}</div>${hd}</div>`;
+  if(n.type==="task")return `<div class="node task p-${prod} ${st} ${sel}" data-n="${n.id}" style="left:${n.x}px;top:${n.y}px"><div class="ag">${esc(n.a?.n||(n.free?"Claude direkt":"Agent wählen"))}</div>${n.sk?`<div class="nsk ${skOk(n)?"":"bad"}" title="${skOk(n)?"Skill dieses Schritts":"Skill ist dem Agenten nicht mehr zugeordnet"}">${skOk(n)?"◆":"⚠"} ${esc(skLbl(n))}</div>`:""}<div>${esc(n.t||"Aufgabe …")}</div>${hd}</div>`;
   if(n.type==="dec"||n.type==="human"){const hu=n.type==="human";
     return `<div class="node dia ${n.type} ${st} ${sel}" data-n="${n.id}" style="left:${n.x}px;top:${n.y}px"><svg viewBox="0 0 150 86" preserveAspectRatio="none"><polygon points="75,2 148,43 75,84 2,43"/></svg><div class="dt">${hu?"👤 ":""}${esc(n.label||"Frage …")}</div>${hd}</div>`}
   return `<div class="node circ ${n.type} ${st} ${sel}" data-n="${n.id}" style="left:${n.x}px;top:${n.y}px"><span class="ci">${n.type==="start"?"▶":"■"}</span><div class="cap">${esc(n.label||"")}</div>${hd}</div>`;
@@ -143,7 +143,7 @@ const skOk=n=>!n.sk||!!(n.a&&n.a.s.includes(n.sk));
 const skLbl=n=>n.sk?(sk(n.sk)?sk(n.sk).n:n.sk):"";
 function skSel(n){if(!n.a)return "";const L=n.a.s.map(id=>[id,sk(id)?sk(id).n:id]);
   return `<div class="field"><label>Skill</label><select id="nsk"><option value="">Agent entscheidet selbst</option>${L.map(([id,l])=>`<option value="${esc(id)}" ${n.sk===id?'selected':''}>${esc(l)}</option>`).join("")}${n.sk&&!skOk(n)?`<option value="${esc(n.sk)}" selected>⚠ ${esc(skLbl(n))} (hat der Agent nicht mehr)</option>`:""}</select>${n.sk&&!skOk(n)?'<div class="warnbox">Dieser Skill ist dem Agenten nicht mehr zugeordnet – bitte neu wählen oder dem Agenten wieder hinzufügen.</div>':'<div class="hint">Legt fest, welche Fähigkeit des Agenten dieser Schritt nutzt. Die Aufgabe wird beim Wählen aus der Skill-Beschreibung vorbelegt.</div>'}</div>`}
-function agentSel(f,cur,id,free){return `<select id="${id}">${free?`<option value="free" ${free===2?"selected":""}>Claude – frei (kein fester Agent)</option>`:""}${AG.filter(a=>a.p===f.p||a.p==="all").map(a=>`<option value="${AG.indexOf(a)}" ${cur===a?'selected':''}>${esc(a.n)}</option>`).join("")}</select>`}
+function agentSel(f,cur,id,free){return `<select id="${id}">${free?`<option value="free" ${free===2?"selected":""}>Claude direkt (kein fester Agent)</option>`:""}${AG.filter(a=>a.p===f.p||a.p==="all").map(a=>`<option value="${AG.indexOf(a)}" ${cur===a?'selected':''}>${esc(a.n)}</option>`).join("")}</select>`}
 function props(f){props0(f);if(!isEd("flow",f.id)){const P=$("#props");P.innerHTML=`<div class="lockhint">Nur lesen – zum Ändern oben „✎ Bearbeiten“.</div><fieldset disabled>${P.innerHTML}</fieldset>`}}
 function props0(f){
   const P=$("#props");

@@ -122,7 +122,7 @@ const check = (name, ok, info = '') => { CHECKS.push({ name, ok }); console.log(
   const sm0 = await p.evaluate(() => ({ h: document.querySelector('#modal h3') ? 1 : 0 }));
   await p.click(`[data-osm="${dsm}"]`); await p.waitForTimeout(250);
   const smv = await p.evaluate(() => ({ h: document.querySelector('#modal h3').textContent, art: !!document.querySelector('#jart'), zu: (document.querySelector('#jzu') || {}).value, prio: (document.querySelector('#jprio .on') || {}).dataset?.p, due: !!document.querySelector('#jdue'), btn: !!document.querySelector('#gonow') }));
-  check('Sammeln-Fenster: Titel, Zuweisung „KI-Teamleiter“, Priorität Normal, Fälligkeit, zwei Knöpfe', /sammeln/i.test(smv.h) && !smv.art && smv.zu === '' && smv.prio === 'n' && smv.due && smv.btn, JSON.stringify(smv));
+  check('Sammeln-Fenster: Titel, Zuweisung „KI-Teamleiter“, Priorität Normal, Fälligkeit, zwei Knöpfe', /sammeln|gesammelt/i.test(smv.h) && !smv.art && smv.zu === '' && smv.prio === 'n' && smv.due && smv.btn, JSON.stringify(smv));
   await p.evaluate(() => { document.getElementById('modal').innerHTML = '' });
   const fired0 = await p.evaluate(() => __C.filter(t => t === 'fire_trigger').length);
   await sammle('Niedrig spät', 'l', '2026-12-01'); await sammle('Dringend', 'd', '2026-11-20'); await sammle('Hoch früh', 'h', '2026-10-20');
@@ -530,6 +530,11 @@ const check = (name, ok, info = '') => { CHECKS.push({ name, ok }); console.log(
   await p.evaluate(() => document.querySelector('#stop').click()); await p.waitForTimeout(200); await p.click('#dlg [data-yes]'); await p.waitForTimeout(300);
   const v10b = await p.evaluate(id => !AU.find(x => x.id === id), v4c.id);
   check('Verhalten: Löschen nur nach Bestätigung', v10a && v10b, JSON.stringify([v10a, v10b]));
+  const rt = await p.evaluate(() => { const md = 'Erstgespräch war **gut**, *kurz*.\n## Unterlagen\n- Kontakt anlegen\n- Angebot\n1. eins\n2. zwei\n[Exposé](https://example.org/x)';
+    const d = document.createElement('div'); d.innerHTML = mdHtml(md, { ed: 1 }); const back = htmlMd(d);
+    const w = document.createElement('template'); w.innerHTML = '<p style="color:red">Hallo <b>Welt</b><script>alert(1)<\/script></p><ul><li>a</li></ul><img src=x onerror=alert(1)>'; const san = mdHtml(htmlMd(w.content));
+    const alt = mdHtml('Zeile 1\nZeile 2'); return { gleich: back === md, back, san, sauber: !/script|onerror|img|style/.test(san) && /<b>Welt<\/b>/.test(san), alt: alt === '<p>Zeile 1<br>Zeile 2</p>', txt: mdText(md).includes('Erstgespräch war gut') } });
+  check('Verhalten: formatierter Auftragstext (Markdown hin und zurück, Einfügen bereinigt, alter Klartext)', rt.gleich && rt.sauber && rt.alt && rt.txt, JSON.stringify(rt));
   await vClr();
   check('keine Laufzeitfehler', errs.length === 0, errs.slice(0, 3).join(' | '));
   await b.close();

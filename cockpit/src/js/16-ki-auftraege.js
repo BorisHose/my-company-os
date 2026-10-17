@@ -123,14 +123,14 @@ function jobSteps(j){const L=[];
   else L.push([j.ok==="nein"?"Nicht abgeschlossen":"Abgeschlossen",j.ok==="nein"?"bad":"done"]);
   return L}
 function jobWho(j){let a=null;if((j.art==="agent"||j.art==="abteilung")&&j.aid)a=AG.find(x=>x.id===j.aid);else if(j.art==="abteilung")return {n:"✦ KI-Teamleiter",u:null,sub:tlName(jobOrg(j),j.abt,j.team||"")};else if(j.f&&!j.f.frei){const c=curN(j);a=c&&c.a||(j.f.N.find(n=>n.type==="task"&&n.a)||{}).a||null}
-  return a?{n:a.n,u:usr(a.owner),sub:"digitaler Mitarbeiter"}:{n:"Claude – frei",u:null,sub:"freie Aufgabe"}}
+  return a?{n:a.n,u:usr(a.owner),sub:"digitaler Mitarbeiter"}:{n:"Claude direkt",u:null,sub:"ohne festen Agenten"}}
 function jobCard(j){const W=jobWho(j),comp=!KOPEN.has(j.id),[oc,ot]=okTxt(j),neu=KINEW.has(j.id);
   const stTxt=isEnd(j)?`<span class="kst ${oc}">${doneTxt(j)}</span>`:j.st==="wait"?'<span class="kst wait">wartet auf dich</span>':'<span class="kst run"><i class="pulse"></i>läuft</span>';
   const badges=`${j.ki?'<span class="kib2" title="Wird von Claude ausgeführt – '+esc(RUNNER(j).l)+'">KI'+(j.tempo==="schnell"?" ⚡":"")+'</span>':''}${(j.anh||[]).length?' <span title="'+j.anh.length+' Bild(er) angehängt">📎'+j.anh.length+'</span>':''}${j.vorab?' <span class="badge" title="Einfache CRM-Anlagen ohne Rückfrage, wenn eindeutig">vorab</span>':''}${(j.sess||[]).some(s=>s.art==="ohne Rückmeldung")&&j.st==="wait"?' <span title="Sitzung ohne Rückmeldung">⚠</span>':''}${j.beispiel?' <span class="badge neu">Beispiel</span>':''}`;
   const head=`<div class="khd"><span>${esc(j.id)} · ${esc(jobLbl(j))}</span>${stTxt}</div>
     <div class="kwho">${av(W.u,40,1)}<div><b>${esc(j.t||"Auftrag")} ${badges}</b><small>${esc(W.n)} · ${W.u?"verantwortlich: "+esc(W.u.n):esc(W.sub)}${pj(j.prj)?` · <span class="pjchip">▣ ${esc(pj(j.prj).n)}</span>`:""}</small></div></div>`;
   const stamp=isEnd(j)&&neu&&j.ok!=="nein"?'<div class="kstamp" aria-hidden="true">ERLEDIGT</div>':"";
-  const qt=j.in?`<div class="kq"><span>„${esc(j.in)}“</span></div>`:"";
+  const qt=j.in?`<div class="kq"><span>„${esc(mdText(j.in))}“</span></div>`:"";
   if(comp){let line="",btn="";
     if(isEnd(j)){line=`<div class="kmini ${oc}">${esc((j.sum||"").split(/(?<=[.!?])\s/)[0]||ot)}</div>`;btn=(j.erg||[]).length||j.ki?`<button class="btn sm" data-res="${j.id}">Ergebnis ansehen${(j.erg||[]).length?" ("+j.erg.length+")":""}</button>`:""}
     else if(j.st==="wait"){const fl=(j.q&&j.q.text||"").split("\n").map(x=>x.trim()).filter(Boolean),ln=fl.find(x=>!/^(entwurf|freigabe|rückfrage)/i.test(x))||fl[0]||"";line=`<div class="kmini wait"><b>${esc(j.q&&j.q.kind==="Rückfrage"?"Rückfrage":"Zustimmung")}:</b> ${esc(ln)}</div>`;btn=`<button class="btn sm p" data-res="${j.id}">Prüfen & freigeben</button>`}
