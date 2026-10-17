@@ -1,5 +1,8 @@
 # Änderungen – Cockpit
 
+## 83 · 17.10.2026 · Fehlerbehebung Knopf bei Rückfragen
+- Wartet ein Auftrag auf eine Rückfrage (nicht auf eine Freigabe), heißt der Knopf in der Übersicht und auf der Auftragskarte jetzt „Antworten“ statt „Prüfen & freigeben“.
+
 ## 82 · 17.10.2026 · Fehlerbehebung Hinweistext
 - Archiv-Hinweis in der Einzahl korrekt: „1 alter Auftrag ins Archiv verschoben“.
 
