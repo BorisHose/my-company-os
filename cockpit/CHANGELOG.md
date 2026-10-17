@@ -1,5 +1,13 @@
 # Änderungen – Cockpit
 
+## 69 · 17.10.2026 · sellify-Benutzer zuordnen (Wunsch Boris)
+- Nutzt ein Organigramm des Benutzers sellify (Anbindung oder Produkt), gehört auch eine sellify-Zuordnung zum Soll; fehlt sie, erscheint „In sellify suchen“.
+- Suche über den sellify-Connector (Benutzerliste, Suche nach Nachname, Treffer bei gleichem vollen Namen oder gleicher E-Mail); gelöschte Benutzer werden nicht angeboten, bereits anderen Benutzern zugeordnete ebenfalls.
+- „Abgleichen“ (vorher „Mit Bodo abgleichen“) liest Bodo- und sellify-Zuordnungen neu und ergänzt fehlende eindeutige.
+- Gespeichert: sellify-Benutzer-Id, Login, Name, E-Mail, Status (aktiv / ohne Anmeldung / ausgeschieden), Rollen.
+- Seite darf dafür das sellify-Werkzeug sellify_user lesen (neue Berechtigung).
+- Smoke-Test: 102 Prüfungen.
+
 ## 68 · 17.10.2026 · Benutzer-Zuordnungen nur systemseitig (Vorgabe Boris)
 - „Vertreten in Zielsystemen“ ist nicht mehr von Hand änderbar (auch nicht im Bearbeitungsmodus): System, Mandant, Benutzer, E-Mail, Status und Kennungen werden nur angezeigt; „+ Zuordnung von Hand“ entfällt. Im Bearbeitungsmodus kann eine Zuordnung nur gelöst werden.
 - Soll je Benutzer: eine Zuordnung in jedem Bodo-Mandanten seiner Organigramme (⚙ Anbindungen; ohne Anbindungen die eigenen Bodo-Mandanten). Fehlende erscheinen markiert mit „In Bodo suchen“.

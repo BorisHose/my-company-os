@@ -4,7 +4,7 @@ const DEF_ORGS=[]; // eigene Mandanten stehen in den Einstellungen (settings.bod
 const ownOrgs=()=>(SET.bodoOrgs&&SET.bodoOrgs.length?SET.bodoOrgs:DEF_ORGS);
 let MCP;const mcpP=(window.claude?window.claude.use("mcp"):Promise.resolve(null)).then(m=>MCP=m).catch(()=>MCP=null);
 const ST={active:"aktiv",unclaimed:"ohne Zugang",invited:"eingeladen",suspended:"gesperrt",left:"ausgetreten"};
-const stBadge=m=>m.sys!=="bodo"||!m.status?"":`<span class="stb ${m.status}">${ST[m.status]||esc(m.status)}</span>`;
+const stBadge=m=>(m.sys!=="bodo"&&m.sys!=="sellify")||!m.status?"":`<span class="stb ${m.status}">${ST[m.status]||esc(m.status)}</span>`;
 function mcpMsg(e){const c=e&&e.code;return c==="server_not_connected"?"Bodo-Verbindung nicht gefunden – in claude.ai unter Einstellungen → Konnektoren „bodo solutions“ hinzufügen."
   :c==="needs_reauth"?"Bodo-Verbindung abgelaufen – in claude.ai unter Einstellungen → Konnektoren neu verbinden."
   :c==="not_in_manifest"||c==="not_granted"||c==="consent_required"?"Der Zugriff auf Bodo wurde für diese Seite nicht erlaubt (Berechtigungen der Seite)."
@@ -123,9 +123,9 @@ async function inviteDlg(u,m){const close=modalBox(`<div class="bhead"><h3>${esc
       catch(e){$("#ierr").innerHTML=`<div class="warnbox">${esc(mcpMsg(e))}</div>`;$("#igo").disabled=false}}}
   catch(e){$("#irol").innerHTML=`<div class="warnbox">${esc(mcpMsg(e))}</div>`}}
 // Abgleich: Status/IDs aus Bodo nachziehen
-async function syncUser(u){const B=(u.maps||[]).filter(m=>m.sys==="bodo"&&m.instId),FE=uFehlt(u);if(!B.length&&!FE.length)return toast("Keine Bodo-Mandanten zum Abgleichen");toast("Gleiche mit Bodo ab …");let n=0,neu=0,f=[];
-  for(const x of FE){try{const H=(await findSeats(x.id,u.mail,u.n)).filter(h=>!US.some(y=>y!==u&&(y.maps||[]).some(m=>m.sys==="bodo"&&m.instId===x.id&&m.extId===h.membershipId)));if(H.length===1){(u.maps=u.maps||[]).push(uMapVon(x,H[0]));neu++}else f.push(x.name+": "+(H.length?H.length+" Treffer – bitte „In Bodo suchen“":"nicht gefunden"))}catch(e){f.push(x.name+": "+mcpMsg(e))}}
-  for(const m of B){try{const H=await findSeats(m.instId,m.mail||u.mail,m.ext||u.n);const h=H.find(x=>x.membershipId===m.extId)||H.find(x=>x.status==="active")||H[0];
-      if(h){Object.assign(m,{ext:h.name,mail:h.email||m.mail,extId:h.membershipId,userId:h.userId||m.userId||"",status:h.status,rollen:(h.roleNames||[]).join(", "),quelle:"aus Bodo gelesen",at:new Date().toISOString()});if(m.status==="unclaimed"&&h.offeneEinladung)m.status="invited";n++}else f.push(m.inst+": nicht gefunden")}
-    catch(e){f.push(m.inst+": "+mcpMsg(e))}}
+async function syncUser(u){const B=(u.maps||[]).filter(m=>(m.sys==="bodo"&&m.instId)||m.sys==="sellify"),FE=uFehlt(u);if(!B.length&&!FE.length)return toast("Keine Systeme zum Abgleichen");toast("Gleiche ab …");let n=0,neu=0,f=[];
+  for(const x of FE){try{const H=uFrei(x,u,await uSeats(x,u));if(H.length===1){(u.maps=u.maps||[]).push(uMapVon(x,H[0]));neu++}else f.push(x.name+": "+(H.length?H.length+" Treffer – bitte „In "+SYS[x.sys]+" suchen“":"nicht gefunden"))}catch(e){f.push(x.name+": "+uErr(x,e))}}
+  for(const m of B){try{const H=m.sys==="sellify"?await sfSeats(m.ext||u.n,m.mail||u.mail):await findSeats(m.instId,m.mail||u.mail,m.ext||u.n);const h=H.find(x=>x.membershipId===m.extId)||(m.sys==="bodo"?(H.find(x=>x.status==="active")||H[0]):null);
+      if(h){Object.assign(m,{ext:h.name,mail:h.email||m.mail,extId:h.membershipId,userId:h.userId||m.userId||"",status:h.status,rollen:(h.roleNames||[]).join(", "),quelle:"aus "+SYS[m.sys]+" gelesen",at:new Date().toISOString()});if(m.status==="unclaimed"&&h.offeneEinladung)m.status="invited";n++}else f.push((m.inst||SYS[m.sys])+": nicht gefunden")}
+    catch(e){f.push((m.inst||SYS[m.sys])+": "+(m.sys==="sellify"?sfMsg(e):mcpMsg(e)))}}
   schedule();users();toast(n+" Zuordnung(en) abgeglichen"+(neu?", "+neu+" neu zugeordnet":"")+(f.length?" · "+f.join(" · "):""))}

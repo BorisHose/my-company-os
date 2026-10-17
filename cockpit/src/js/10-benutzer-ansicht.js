@@ -21,12 +21,12 @@ function uedit(){
    <div class="field" style="margin-top:12px"><span class="flabel">Vertreten in Zielsystemen <span class="hint" style="font-weight:400">– nur systemseitig, nicht von Hand änderbar</span></span>
     <div class="mapw"><table class="map"><thead><tr><th>System</th><th>Instanz / Mandant</th><th>Benutzer dort</th><th>E-Mail dort</th><th>Status</th><th>Kennungen</th><th></th></tr></thead><tbody>
     ${(u.maps||[]).map((m,i)=>`<tr><td>${esc(SYS[m.sys]||m.sys||"")}</td><td>${esc(m.inst||"")}</td><td>${esc(m.ext||"")}</td><td>${esc(m.mail||"")}</td><td style="white-space:nowrap">${stBadge(m)}${m.rollen?`<div class="hint" style="margin:2px 0 0">${esc(m.rollen)}</div>`:""}</td><td class="mids" title="${esc("Instanz-ID: "+(m.instId||"–")+"\nBenutzer-ID: "+(m.extId||"–")+(m.userId?"\nKonto-ID: "+m.userId:""))}"><code>${esc(String(m.instId||"–").slice(0,8))}…</code> / <code>${esc(String(m.extId||"–").slice(0,8))}…</code>${m.quelle?`<div class="hint" style="margin:2px 0 0">${esc(m.quelle)}${m.at?" · "+esc(new Date(m.at).toLocaleDateString("de-DE")):""}</div>`:""}</td><td>${ue?`<button class="ic" data-mx="${i}" title="Zuordnung lösen">×</button>`:""}</td></tr>`).join("")}
-    ${uFehlt(u).map(f=>`<tr class="mfehlt"><td>Bodo</td><td>${esc(f.name)}</td><td colspan="3" class="hint">noch nicht zugeordnet</td><td colspan="2">${ue?"":`<button class="btn sm" data-mfind="${esc(f.id)}">In Bodo suchen</button>`}</td></tr>`).join("")}
+    ${uFehlt(u).map(f=>`<tr class="mfehlt"><td>${esc(SYS[f.sys]||f.sys)}</td><td>${esc(f.name)}</td><td colspan="3" class="hint">noch nicht zugeordnet</td><td colspan="2">${ue?"":`<button class="btn sm" data-mfind="${esc(f.sys+"|"+f.id)}">In ${esc(SYS[f.sys]||f.sys)} suchen</button>`}</td></tr>`).join("")}
     ${!(u.maps||[]).length&&!uFehlt(u).length?`<tr><td colspan="7" class="hint">Noch keine Zuordnung.</td></tr>`:""}
     </tbody></table></div>
     ${ue?"":(u.maps||[]).map((m,i)=>m.sys==="bodo"&&m.instId&&m.extId&&m.status==="unclaimed"?`<div class="hint" style="margin:6px 0 0">${esc(m.inst)}: Benutzer ohne Zugang – <button class="btn sm" data-inv="${i}" title="Einladung mit Mail aus Bodo schicken">Einladen …</button></div>`:"").join("")}
-    ${ue?"":`<div class="btns" style="margin-top:6px"><button class="btn sm" id="mwiz">In weiteren Bodo-Mandanten anlegen …</button><button class="btn sm" id="msync">Mit Bodo abgleichen</button></div>`}
-    <div class="hint">Je Benutzer gehört in jeden Bodo-Mandanten seiner Organigramme (⚙ Anbindungen) genau eine Zuordnung. Sie entsteht nur systemseitig: „Mit Bodo abgleichen“ liest bestehende Zuordnungen neu und ergänzt fehlende, wenn der Benutzer im Mandanten eindeutig gefunden wird; sonst „In Bodo suchen“ bzw. „In weiteren Bodo-Mandanten anlegen …“. Von Hand geänderte Kennungen würden die Zuordnung zerstören und sind daher gesperrt.</div></div>
+    ${ue?"":`<div class="btns" style="margin-top:6px"><button class="btn sm" id="mwiz">In weiteren Bodo-Mandanten anlegen …</button><button class="btn sm" id="msync" title="Zuordnungen in Bodo und sellify neu lesen und fehlende eindeutige ergänzen">Abgleichen</button></div>`}
+    <div class="hint">Je Benutzer gehört in jeden Bodo-Mandanten seiner Organigramme (⚙ Anbindungen) und – wenn eines davon sellify nutzt – in sellify genau eine Zuordnung. Sie entsteht nur systemseitig: „Abgleichen“ liest bestehende Zuordnungen neu und ergänzt fehlende, wenn der Benutzer im Mandanten eindeutig gefunden wird; sonst „In … suchen“ bzw. „In weiteren Bodo-Mandanten anlegen …“. Von Hand geänderte Kennungen würden die Zuordnung zerstören und sind daher gesperrt.</div></div>
    <div class="field"><span class="flabel">Verantwortlich für</span>${ags.length?ags.map(a=>`<span class="chip" style="display:inline-flex;margin:0 6px 6px 0">${esc(a.n)}</span>`).join(""):'<span class="hint">noch keinen Agenten</span>'}${dep.length?`<div class="hint">Vertretung für: ${dep.map(a=>esc(a.n)).join(", ")}</div>`:""}</div>
    <div class="btns" style="border-top:1px solid var(--line);padding-top:12px"><button class="btn p" id="uak">${u.aktiv===false?'Wieder aktiv setzen':'Als ausgeschieden markieren'}</button>
      <span class="hint" style="margin:0;align-self:center;flex:1">${u.aktiv===false?'':'Empfohlen statt Löschen – Verweise in Agenten und Abläufen bleiben gültig.'}</span>
@@ -56,16 +56,28 @@ function uedit(){
     d.querySelector("[data-d]").onclick=()=>{close();US.splice(ucur,1);ucur=-1;up();toast("Benutzer gelöscht")}};
 }
 
-// Soll-Zuordnungen: jeder Bodo-Mandant, den die Organigramme des Benutzers unter ⚙ Anbindungen nutzen; ohne Anbindungen die eigenen Bodo-Mandanten
-function uSoll(u){const S=new Map();(u.orgs||[]).forEach(oid=>{const o=orgById(oid);if(!o)return;DIENSTE.forEach(([k])=>{const d=dienstVon(o,k);if(d&&d.sys==="bodo"&&d.orgId)S.set(d.orgId,d.orgN||d.orgId)})});
-  if(!S.size)ownOrgs().forEach(m=>S.set(m.id,m.name));return [...S].map(([id,name])=>({id,name}))}
-const uFehlt=u=>uSoll(u).filter(f=>!(u.maps||[]).some(m=>m.sys==="bodo"&&m.instId===f.id));
-const uMapVon=(f,h)=>({sys:"bodo",inst:f.name,instId:f.id,ext:h.name||"",mail:h.email||"",extId:h.membershipId,userId:h.userId||"",status:h.status||"",rollen:(h.roleNames||[]).join(", "),quelle:"aus Bodo gelesen",at:new Date().toISOString()});
-// Systemseitig zuordnen: im Mandanten nach E-Mail und Name suchen; eindeutiger Treffer wird übernommen, mehrere zur Auswahl, keiner → Hinweis auf „anlegen“
-async function uSuchen(u,orgId,btn){const f=uSoll(u).find(x=>x.id===orgId)||{id:orgId,name:orgId};if(btn){btn.disabled=true;btn.textContent="sucht …"}
-  try{const H=(await findSeats(orgId,u.mail,u.n)).filter(h=>!US.some(x=>x!==u&&(x.maps||[]).some(m=>m.sys==="bodo"&&m.instId===orgId&&m.extId===h.membershipId)));
+// Soll-Zuordnungen: je Bodo-Mandant, den die Organigramme des Benutzers unter ⚙ Anbindungen nutzen (ohne Anbindungen: die eigenen Bodo-Mandanten),
+// dazu sellify (ein System ohne Mandant), wenn eines seiner Organigramme sellify anbindet oder das Produkt sellify hat
+function uSoll(u){const S=new Map();let sf=false;(u.orgs||[]).forEach(oid=>{const o=orgById(oid);if(!o)return;if(o.prod==="sellify")sf=true;
+    DIENSTE.forEach(([k])=>{const d=dienstVon(o,k);if(!d)return;if(d.sys==="bodo"&&d.orgId)S.set(d.orgId,d.orgN||d.orgId);if(d.sys==="sellify")sf=true})});
+  if(!S.size)ownOrgs().forEach(m=>S.set(m.id,m.name));const L=[...S].map(([id,name])=>({sys:"bodo",id,name}));if(sf)L.push({sys:"sellify",id:"sellify",name:"sellify"});return L}
+const uHat=(u,f)=>(u.maps||[]).some(m=>m.sys===f.sys&&(f.sys==="sellify"||m.instId===f.id));
+const uFehlt=u=>uSoll(u).filter(f=>!uHat(u,f));
+const uMapVon=(f,h)=>({sys:f.sys,inst:f.name,instId:f.id,ext:h.name||"",mail:h.email||"",extId:h.membershipId,userId:h.userId||"",status:h.status||"",rollen:(h.roleNames||[]).join(", "),quelle:"aus "+SYS[f.sys]+" gelesen",at:new Date().toISOString()});
+const sfMail=p=>{const e=p&&p.emailAddress;return typeof e==="string"?e:e?(e.address||e.value||e.email||""):""};
+// sellify-Benutzer nach Name (und E-Mail) suchen; Treffer in der Form von findSeats
+async function sfSeats(name,mail){const nn=String(name||"").trim().toLowerCase(),mm=String(mail||"").trim().toLowerCase(),q=String(name||"").trim().split(/\s+/).pop()||"";if(!q)return [];
+  const r=await sellify("sellify_user",{action:"list",params:{q,limit:25}});
+  return ((r&&r.items)||[]).filter(x=>!x.deleted).map(x=>{const p=x.person||{};return {name:[p.firstName,p.lastName].filter(Boolean).join(" "),email:sfMail(p),membershipId:String(x.id),userId:x.login||"",status:x.retired||(p.retired)?"left":x.canLogin===false?"unclaimed":"active",roleNames:(x.roles||[]).filter(r=>!r.deleted).map(r=>r.name)}})
+    .filter(h=>(mm&&h.email.toLowerCase()===mm)||(nn&&h.name.toLowerCase()===nn))}
+const uSeats=(f,u)=>f.sys==="sellify"?sfSeats(u.n,u.mail):findSeats(f.id,u.mail,u.n);
+const uFrei=(f,u,H)=>H.filter(h=>!US.some(x=>x!==u&&(x.maps||[]).some(m=>m.sys===f.sys&&(f.sys==="sellify"||m.instId===f.id)&&m.extId===h.membershipId)));
+const uErr=(f,e)=>f.sys==="sellify"?sfMsg(e):mcpMsg(e);
+// Systemseitig zuordnen: eindeutiger Treffer wird übernommen, mehrere zur Auswahl, keiner → Hinweis
+async function uSuchen(u,key,btn){const [sys,id]=key.split("|"),f=uSoll(u).find(x=>x.sys===sys&&x.id===id)||{sys,id,name:id};if(btn){btn.disabled=true;btn.textContent="sucht …"}
+  try{const H=uFrei(f,u,await uSeats(f,u));
     if(H.length===1){(u.maps=u.maps||[]).push(uMapVon(f,H[0]));schedule();users();toast("Zugeordnet: "+(H[0].name||u.n)+" in "+f.name);return}
-    if(!H.length){users();toast("In „"+f.name+"“ nicht gefunden – über „In weiteren Bodo-Mandanten anlegen …“ anlegen");return}
-    const v=await dlg(`<h3 style="margin:0 0 10px;font-size:15px">Welcher Benutzer in „${esc(f.name)}“ ist ${esc(u.n)}?</h3>${H.map((h,i)=>`<label class="cb"><input type="radio" name="usel" value="${i}" ${i?"":"checked"}> ${esc(h.name||"")} · ${esc(h.email||"")} <span class="hint" style="margin:0">${esc(ST[h.status]||h.status||"")}</span></label>`).join("")}<input type="hidden" id="dlgin" value="0"><div class="btns" style="margin-top:12px;justify-content:flex-end"><button class="btn" data-no>Abbrechen</button><button class="btn p" data-yes>Zuordnen</button></div>`);
-    users();if(v==null)return;const i=+((document.querySelector('[name="usel"]:checked')||{}).value||0);(u.maps=u.maps||[]).push(uMapVon(f,H[i]));schedule();users();toast("Zugeordnet")}
-  catch(e){users();toast(mcpMsg(e))}}
+    if(!H.length){users();toast("In „"+f.name+"“ nicht gefunden"+(f.sys==="bodo"?" – über „In weiteren Bodo-Mandanten anlegen …“ anlegen":" – bitte den Benutzer in sellify anlegen bzw. Name/E-Mail angleichen"));return}
+    const v=await dlg(`<h3 style="margin:0 0 10px;font-size:15px">Welcher Benutzer in „${esc(f.name)}“ ist ${esc(u.n)}?</h3>${H.map((h,i)=>`<label class="cb"><input type="radio" name="usel" value="${i}" ${i?"":"checked"}> ${esc(h.name||"")} · ${esc(h.email||h.userId||"")} <span class="hint" style="margin:0">${esc(ST[h.status]||h.status||"")}</span></label>`).join("")}<div class="btns" style="margin-top:12px;justify-content:flex-end"><button class="btn" data-no>Abbrechen</button><button class="btn p" data-yes>Zuordnen</button></div>`);
+    if(v==null){users();return}const i=+((document.querySelector('[name="usel"]:checked')||{}).value||0);(u.maps=u.maps||[]).push(uMapVon(f,H[i]));schedule();users();toast("Zugeordnet")}
+  catch(e){users();toast(uErr(f,e))}}
