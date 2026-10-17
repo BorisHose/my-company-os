@@ -1,5 +1,12 @@
 # Änderungen – Cockpit
 
+## 68 · 17.10.2026 · Benutzer-Zuordnungen nur systemseitig (Vorgabe Boris)
+- „Vertreten in Zielsystemen“ ist nicht mehr von Hand änderbar (auch nicht im Bearbeitungsmodus): System, Mandant, Benutzer, E-Mail, Status und Kennungen werden nur angezeigt; „+ Zuordnung von Hand“ entfällt. Im Bearbeitungsmodus kann eine Zuordnung nur gelöst werden.
+- Soll je Benutzer: eine Zuordnung in jedem Bodo-Mandanten seiner Organigramme (⚙ Anbindungen; ohne Anbindungen die eigenen Bodo-Mandanten). Fehlende erscheinen markiert mit „In Bodo suchen“.
+- „In Bodo suchen“ sucht im Mandanten nach E-Mail und Name: ein Treffer wird übernommen, mehrere zur Auswahl, keiner → Hinweis auf „In weiteren Bodo-Mandanten anlegen …“. Ein Bodo-Benutzer, der schon einem anderen Company-OS-Benutzer zugeordnet ist, wird nicht angeboten.
+- „Mit Bodo abgleichen“ liest bestehende Zuordnungen neu und ergänzt fehlende, wenn der Treffer eindeutig ist; jede Zuordnung zeigt „aus Bodo gelesen“ mit Datum.
+- Smoke-Test: 101 Prüfungen.
+
 ## 67 · 17.10.2026 · Benutzerliste gleich hoch wie „Benutzer bearbeiten“ (Wunsch Boris)
 - Der Kasten „Benutzer“ ist immer genau so hoch wie „Benutzer bearbeiten“ und wächst mit ihm; passen nicht alle Benutzer hinein, scrollt die Liste in sich.
 - Schmale Fenster (unter 1100 px, untereinander): Liste höchstens halbe Bildschirmhöhe, darin scrollbar.
