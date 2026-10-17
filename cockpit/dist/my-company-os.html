@@ -390,6 +390,18 @@ img.olg{height:18px;max-width:60px;object-fit:contain;margin-right:6px;vertical-
 .pjr .pjvb{font-size:12px;color:var(--mut);white-space:nowrap}@media(max-width:600px){.pjr .pjvb{display:none}}
 #pjd .flabel{margin-top:12px}
 
+/* v60 Anbindungen */
+.dorg{border:1px solid var(--line);border-radius:10px;padding:10px 12px;margin:0 0 12px;background:#fff}
+.dhd{display:flex;align-items:center;gap:8px;margin:0 0 6px}.dhd .olg{height:20px;margin-right:6px;vertical-align:middle}
+.drow{display:grid;grid-template-columns:220px minmax(0,1fr);gap:4px 12px;padding:7px 0;border-top:1px solid var(--line)}
+.dlab{display:flex;flex-direction:column}.dlab small{font-size:12px;color:var(--mut)}
+.dsel{display:flex;flex-wrap:wrap;gap:6px;align-items:center}.dsel select{width:auto;min-width:150px;max-width:100%}
+.dzb{grid-column:2;margin:0;font-size:12.5px;color:var(--mut)}.dmsg{grid-column:2;margin:0}
+.dst{display:inline-flex;align-items:center;justify-content:center;width:22px;height:22px;border-radius:50%;font-size:12px;font-weight:700}.dst.ok{background:#e7f6ee;color:#067647}.dst.err{background:#fdecec;color:#b42318}.dst.info{background:#e8f0fd;color:#1d4ed8}
+.dkat{width:100%;border-collapse:collapse;font-size:12.5px}.dkat th,.dkat td{border:1px solid var(--line);padding:5px 7px;text-align:left;vertical-align:top}.dkat th{background:#f7f9fc;font-weight:600}
+@media(max-width:700px){.drow{grid-template-columns:1fr}.dzb,.dmsg{grid-column:1}.dkat{display:block;overflow-x:auto}}
+.spur{display:flex;flex-direction:column;gap:4px}.spr{display:flex;gap:8px;align-items:center;font-size:12.5px;padding:5px 8px;border:1px solid var(--line);border-radius:7px}.spr span:nth-child(2){flex:1}.sprd{font-weight:600;min-width:120px}.spr a{text-decoration:none}
+
 /* erzeugt von tools/dunkel.py – nicht von Hand ändern */
 :root[data-theme=dark]{color-scheme:dark;--bg:#0f141b;--panel:#171e29;--ink:#e4e8ef;--mut:#9aa4b4;--line:#2b3442;--acc:#5b8def;--accbg:#1c2b47;--warn:#f79009;--warnbg:#3a2615;--ok:#47cd89;--okbg:#12301f;--vio:#9b8afb;--viobg:#28213d;--teal:#36bffa;--tealbg:#11303a;--bodobg:#1d2939;--sellbg:#11303c}
 :root[data-theme=dark] body{background:var(--bg);color:var(--ink)}
@@ -830,6 +842,18 @@ img.olg{height:18px;max-width:60px;object-fit:contain;margin-right:6px;vertical-
 :root[data-theme=dark] .vbgrid>div{border:1px solid var(--line);border-radius:8px;background:#171e29}
 :root[data-theme=dark] .vbgrid small{color:var(--mut)}
 :root[data-theme=dark] .pjr .pjvb{color:var(--mut)}
+:root[data-theme=dark] .dorg{border:1px solid var(--line);border-radius:10px;background:#171e29}
+:root[data-theme=dark] .drow{border-top:1px solid var(--line)}
+:root[data-theme=dark] .dlab small{color:var(--mut)}
+:root[data-theme=dark] .dzb{color:var(--mut)}
+:root[data-theme=dark] .dst{border-radius:50%}
+:root[data-theme=dark] .dst.ok{background:#123323;color:#47cd89}
+:root[data-theme=dark] .dst.err{background:#3d1c1c;color:#f97066}
+:root[data-theme=dark] .dst.info{background:#1c2b47;color:#84adff}
+:root[data-theme=dark] .dkat{border-collapse:collapse}
+:root[data-theme=dark] .dkat th,:root[data-theme=dark] .dkat td{border:1px solid var(--line)}
+:root[data-theme=dark] .dkat th{background:#131a24}
+:root[data-theme=dark] .spr{border:1px solid var(--line);border-radius:7px}
 :root[data-theme=dark] nav button.on{background:#2f6fdf;color:#fff}:root[data-theme=dark] body{background:var(--bg);color:var(--ink)}:root[data-theme=dark] input,:root[data-theme=dark] select,:root[data-theme=dark] textarea{background:#131a24;color:var(--ink);border-color:#3a4456}:root[data-theme=dark] .modal{background:#000000a6}:root[data-theme=dark] img.olg,:root[data-theme=dark] .av img{filter:none}
 @media (prefers-color-scheme:dark){:root[data-theme=auto]{color-scheme:dark;--bg:#0f141b;--panel:#171e29;--ink:#e4e8ef;--mut:#9aa4b4;--line:#2b3442;--acc:#5b8def;--accbg:#1c2b47;--warn:#f79009;--warnbg:#3a2615;--ok:#47cd89;--okbg:#12301f;--vio:#9b8afb;--viobg:#28213d;--teal:#36bffa;--tealbg:#11303a;--bodobg:#1d2939;--sellbg:#11303c}
 :root[data-theme=auto] body{background:var(--bg);color:var(--ink)}
@@ -1270,6 +1294,18 @@ img.olg{height:18px;max-width:60px;object-fit:contain;margin-right:6px;vertical-
 :root[data-theme=auto] .vbgrid>div{border:1px solid var(--line);border-radius:8px;background:#171e29}
 :root[data-theme=auto] .vbgrid small{color:var(--mut)}
 :root[data-theme=auto] .pjr .pjvb{color:var(--mut)}
+:root[data-theme=auto] .dorg{border:1px solid var(--line);border-radius:10px;background:#171e29}
+:root[data-theme=auto] .drow{border-top:1px solid var(--line)}
+:root[data-theme=auto] .dlab small{color:var(--mut)}
+:root[data-theme=auto] .dzb{color:var(--mut)}
+:root[data-theme=auto] .dst{border-radius:50%}
+:root[data-theme=auto] .dst.ok{background:#123323;color:#47cd89}
+:root[data-theme=auto] .dst.err{background:#3d1c1c;color:#f97066}
+:root[data-theme=auto] .dst.info{background:#1c2b47;color:#84adff}
+:root[data-theme=auto] .dkat{border-collapse:collapse}
+:root[data-theme=auto] .dkat th,:root[data-theme=auto] .dkat td{border:1px solid var(--line)}
+:root[data-theme=auto] .dkat th{background:#131a24}
+:root[data-theme=auto] .spr{border:1px solid var(--line);border-radius:7px}
 :root[data-theme=auto] nav button.on{background:#2f6fdf;color:#fff}:root[data-theme=auto] body{background:var(--bg);color:var(--ink)}:root[data-theme=auto] input,:root[data-theme=auto] select,:root[data-theme=auto] textarea{background:#131a24;color:var(--ink);border-color:#3a4456}:root[data-theme=auto] .modal{background:#000000a6}:root[data-theme=auto] img.olg,:root[data-theme=auto] .av img{filter:none}}
 
 </style>
@@ -1334,7 +1370,7 @@ const COL=new Set();
 let PF="bodo",AF="bodo",GEN=false;
 const PK=[["bodo","Bodo"],["sellify","sellify"],["all","Andere"]];
 const PN={bodo:"Bodo",sellify:"sellify",all:"Andere",multi:"Bodo + sellify"};
-const VER="59";
+const VER="60";
 // Produktbereiche: fest im Programm hinterlegt (Entscheidung Boris 09.10.2026), keine Konfiguration in der Datenbank
 const PT={bodo:"Produktbereich Bodo (Bodo Solutions, Mitgliederverwaltung) – alles, was für Bodo-Kunden und das Bodo-System gebraucht wird. Fest im Programm hinterlegt.",sellify:"Produktbereich sellify (business//acts, CRM-Plattform) – alles, was für sellify-Kunden und das sellify-System gebraucht wird. Fest im Programm hinterlegt.",all:"Andere = produktunabhängig, z. B. Web-QA, E-Mail, Word/PDF. Fest im Programm hinterlegt."};
 let AFIL="all";
@@ -2398,7 +2434,7 @@ function resultModal(j){KINEW.delete(j.id);const [cls,lab]=okTxt(j),E=j.erg||[],
    ${j.sum?`<div class="kisum"><b>Rückmeldung von Claude:</b> ${esc(j.sum)}</div>`:isEnd(j)||W?"":`<div class="hint">Claude arbeitet noch – die Ansicht aktualisiert sich von selbst.</div>`}
    ${E.length?`<div class="flabel">Ergebnisse (${E.length})</div>${E.map(e=>`<div class="ergit"><div class="ergh"><b>${esc(e.t||"Ergebnis")}</b>${e.art?`<span class="hint" style="margin:0">${esc(e.art)}</span>`:""}<span style="flex:1"></span>${e.url?`<a class="btn sm p" href="${esc(e.url)}" target="_blank" rel="noopener">Öffnen ↗</a>`:""}</div>${e.vorschau?`<div class="ergv">${esc(e.vorschau)}</div>`:""}${e.url?`<div class="hint" style="margin:4px 0 0;word-break:break-all">${esc(e.url)}</div>`:""}</div>`).join("")}`:istPlan(j)||Array.isArray(j.teile)?"":'<div class="hint">Noch keine Ergebnisse eingetragen.</div>'}
    ${(j.sess||[]).length?`<div class="flabel" style="margin-top:10px">Claude-Sitzungen</div><div class="sessl">${j.sess.map((s,i)=>`<a href="${esc(s.url)}" target="_blank" rel="noopener">🔗 Sitzung ${i+1}${s.at?" · "+esc(new Date(s.at).toLocaleString("de-DE",{dateStyle:"short",timeStyle:"short"})):""}</a>`).join("")}</div>`:""}
-   ${vbJobHtml(j)}
+   ${spurHtml(j)}${vbJobHtml(j)}
    <div class="btns" style="justify-content:flex-end;margin-top:12px"><button class="btn" id="rlog" title="Verlauf, Prozessgrafik, Sitzungen und weitere Aktionen">Details …</button><button class="btn p" id="rclose">Schließen</button></div>`,true);
   anhBind(j);{const rp=$("#rprj");if(rp)rp.onchange=e=>pjSetJob(j,e.target.value)}$("#mclose").onclick=$("#rclose").onclick=()=>{close();if(!$("#projects").classList.contains("hide"))prj();else jobs()};$("#rlog").onclick=()=>{close();jobModalK(j)};
   document.querySelectorAll("[data-plk]").forEach(e=>e.onclick=()=>{const k=AU.find(x=>x.id===e.dataset.plk);if(k){close();resultModal(k)}});
@@ -2418,6 +2454,7 @@ function kiContext(j){const f=j.f,L=[];if(!f)return "";const cur=j.path[j.path.l
   else if(f.frei)L.push(j.art==="agent"&&JA?"AGENT BEAUFTRAGT – kein Prozess: Handle als Agent „"+JA.n+"“ (Angaben unten) und erledige die Aufgabe direkt."+(JS?"":" Passenden Skill des Agenten selbst wählen.")+" Freigaben vor Außenwirkung wie immer. Den einen Schritt des Systemablaufs nur zum Fortschreiben von path nutzen.":"FREIE AUFGABE – kein Prozess: die Eingabe direkt erledigen (Frage beantworten, recherchieren oder eine einzelne Aktion)."+(JS?"":" Passenden Skill aus dem Konto selbst wählen.")+" Freigaben vor Außenwirkung wie immer.");
   if(JS)L.push("SKILL VERWENDEN: „"+JS.n+"“ – im Konto: "+(KS(JS).join(", ")||"nur im Cockpit, kein Konto-Skill")+(JS.d?" · "+JS.d:""));
   if(j.prj&&pj(j.prj))L.push(pjKontext(j));
+  {const dk=dienstKontext(JO);if(dk)L.push(dk)}
   if(JO)L.push("Organisation des Auftrags: "+JO.n+(JO.prod?" (Produkt "+PN[JO.prod]+")":""));
   L.push("Auftrag "+j.id+": "+(j.t||"")+(j.in?"\nEingabe von "+ICH()+": "+j.in:""));
   if(j.prio&&j.prio!=="n"||j.due)L.push("Priorität des Auftrags: "+((PRIO.find(p=>p[0]===(j.prio||"n"))||[])[1]||"Normal")+(j.due?" · Fällig bis: "+new Date(j.due+"T12:00").toLocaleDateString("de-DE"):""));
@@ -2917,10 +2954,7 @@ function einst(sec){if(sec)UI.sets=sec;if(!SETSEC.some(s=>s[0]===UI.sets))UI.set
      <div class="btns"><button class="btn sm" id="sruns">Letzten Lauf prüfen</button></div>`;
     document.querySelectorAll("[data-trg]").forEach(i=>i.onchange=()=>{const v=i.value.trim();SET.trig={...(SET.trig||{})};if(/^trig_\w+$/.test(v))SET.trig[i.dataset.trg]=v;else{delete SET.trig[i.dataset.trg];toast("Ungültige Kennung – Standard bleibt")}});
     $("#sruns").onclick=kiRuns}
-  else if(S==="dienste"){
-    C.innerHTML=`<h2>Anbindungen</h2><div class="hint" style="margin:0 0 10px">In Vorbereitung: je Organigramm die Dienste CRM, Auftragsmanagement, Projekt und Zeiterfassung mit System, Mandant und Entität. Bis dahin gilt die bisherige Bodo-Anbindung.</div>
-     <div class="btns"><button class="btn sm" id="sbodo">⚙ Eigene Bodo-Mandanten</button></div>`;
-    $("#sbodo").onclick=ownOrgsDlg}
+  else if(S==="dienste")dienstEinst(C)
 }
 // Logo einlesen: in 320×96 einpassen, Transparenz behalten (PNG)
 function logoKlein(file){return new Promise((res,rej)=>{const r=new FileReader();r.onload=()=>{const im=new Image();im.onload=()=>{const k=Math.min(1,320/im.width,96/im.height),w=Math.max(1,Math.round(im.width*k)),h=Math.max(1,Math.round(im.height*k)),c=document.createElement("canvas");c.width=w;c.height=h;c.getContext("2d").drawImage(im,0,0,w,h);res(c.toDataURL("image/png"))};im.onerror=rej;im.src=r.result};r.onerror=rej;r.readAsDataURL(file)})}
@@ -2992,7 +3026,7 @@ function pjJobField(j){const o=jobOrg(j);if(j.parent)return "";return `<div clas
 // Bodo-Projekte suchen: zum Verbinden eines Projekts (p) oder zum Übernehmen mehrerer (p = null)
 const bodoPjSt=s=>s==="active"?"aktiv":s==="paused"?"pausiert":"abgeschlossen";
 function pjBodoDlg(p){const O=orgById(OC),M=ownOrgs();if(!M.length)return toast("Keine eigenen Bodo-Mandanten hinterlegt – ⚙ Einstellungen › Anbindungen");
-  let om=M.find(m=>m.id===(O.pjBodo||""))||M[0],q="",alle=false,R=[],busy=false,err="";
+  const dp=dienstVon(O,"projekt");let om=M.find(m=>m.id===(dp&&dp.sys==="bodo"&&dp.orgId?dp.orgId:(O.pjBodo||"")))||M[0],q="",alle=false,R=[],busy=false,err="";
   const close=modalBox(`<div class="bhead"><h3>${p?"„"+esc(p.n)+"“ mit Bodo-Projekt verbinden":"Projekte aus Bodo übernehmen"}</h3><button class="ic" id="mclose" style="font-size:18px">✕</button></div>
     <div class="row"><div class="field"><label>Bodo-Mandant</label><select id="pbm">${M.map(m=>`<option value="${m.id}" ${m===om?"selected":""}>${esc(m.name)}</option>`).join("")}</select></div><div class="field"><label>Suche</label><input type="search" id="pbq" placeholder="Projektname …"></div></div>
     <label class="cb" style="margin:0 0 8px"><input type="checkbox" id="pba"> auch pausierte und abgeschlossene Projekte</label>
@@ -3043,6 +3077,54 @@ function vbPjHtml(L){const a=vbSumme(L);if(!L.length)return `<div class="hint" s
     ${a.n?`<div class="hint" style="margin:4px 0 0">${vbAuf(a)}</div>`:""}<div class="hint" style="margin:4px 0 0">${VBHINT} Berücksichtigt sind die geladenen Aufträge (offen und erledigt der letzten 90 Tage); Teilaufträge zählen beim Hauptauftrag.</div>`}
 // Kurzfassung fürs Archiv
 const vbArchiv=j=>{const a=vbJob(j,false);return a.n?{n:a.n,sek:a.sek,tin:a.tin,tcw:a.tcw,tcr:a.tcr,tout:a.tout}:null};
+
+// ===== Anbindungen: vier Dienste je Organigramm (Etappe 4b, Teil 3) =====
+// Je Organigramm o.dienste = {crm|auftrag|projekt|zeit: {sys, orgId, orgN, ent}}; Prüfergebnis o.chk = {at, erg:{dienst:{st:"ok"|"err"|"info", t}}}.
+// Der Systemkatalog beschreibt, welche Dienste ein System mit welchen Entitäten anbietet. Neues System = neuer Katalogeintrag.
+const DIENSTE=[["crm","CRM","Kontakte, Organisationen, Verkaufschancen"],["auftrag","Auftragsmanagement","der kommerzielle Auftrag – in der Regel über das Projekt geführt"],["projekt","Projekt","Klammer für Aufgaben, Notizen und Termine eines Auftrags"],["zeit","Zeiterfassung","Zeiteinträge, z. B. für die Laufzeit der KI-Sitzungen"]];
+const SYSKAT={
+  bodo:{n:"Bodo",mcp:"bodo solutions",mand:true,pruefbar:true,kiUser:false,ent:{crm:[["contact","Kontakt/Firma"],["member","Vertragsinhaber"],["opportunity","Verkaufschance"],["lead","Vertriebsanfrage"]],auftrag:[["order","Auftrag"],["opportunity","Verkaufschance"]],projekt:[["project","Projekt"]],zeit:[["timeEntry","Zeiteintrag"]]}},
+  sellify:{n:"sellify",mcp:"sellify",mand:false,pruefbar:false,kiUser:false,ent:{crm:[["contact","Organisation"],["person","Person"],["sale","Chance"]],auftrag:[["sale","Chance"],["project","Projekt"]],projekt:[["project","Projekt"]],zeit:[]}}};
+const ZEITTIP=s=>"Zeiterfassung ist mit "+SYSKAT[s].n+" nicht möglich. Soll ein anderes System für die Zeiterfassung angebunden werden? Bitte sprich uns als Hersteller an.";
+const entN=(s,d,e)=>((SYSKAT[s]&&SYSKAT[s].ent[d]||[]).find(x=>x[0]===e)||[e,e])[1];
+const dienstVon=(o,k)=>{o=typeof o==="string"?orgById(o):o;const d=o&&o.dienste&&o.dienste[k];return d&&d.sys&&SYSKAT[d.sys]?d:null};
+function dienstEinst(C){const O=ORGS(),M=ownOrgs();
+  const zeile=(o,[k,l,h])=>{const d=(o.dienste||{})[k]||{},S=SYSKAT[d.sys],E=S?S.ent[k]:[],c=o.chk&&o.chk.erg&&o.chk.erg[k];
+    const sysOpt=`<option value="">– keins –</option>`+Object.entries(SYSKAT).map(([id,x])=>{const kann=x.ent[k].length>0;return `<option value="${id}" ${id===d.sys?"selected":""} ${kann?"":"disabled"} title="${kann?"":esc(ZEITTIP(id))}">${esc(x.n)}${kann?"":" – nicht verfügbar"}</option>`}).join("");
+    const mand=S&&S.mand?`<select data-dm="${o.id}|${k}" aria-label="Mandant">${(M.some(m=>m.id===d.orgId)||!d.orgId?"":`<option value="${esc(d.orgId)}" selected>${esc(d.orgN||d.orgId)}</option>`)+`<option value="">– Mandant wählen –</option>`+M.map(m=>`<option value="${m.id}" ${m.id===d.orgId?"selected":""}>${esc(m.name)}</option>`).join("")}</select>`:S?`<span class="hint" style="margin:0">ein System, kein Mandant</span>`:"";
+    const ent=S?`<select data-de="${o.id}|${k}" aria-label="Entität">${E.map(([e,n])=>`<option value="${e}" ${e===d.ent?"selected":""}>${esc(n)} (${e})</option>`).join("")}</select>`:"";
+    const st=c?`<span class="dst ${c.st}" title="${esc(c.t)}">${c.st==="ok"?"✓":c.st==="err"?"⚠":"ⓘ"}</span>`:"";
+    const zeit=k==="zeit"?`<label class="cb dzb" title="${esc(S&&!S.ent.zeit.length?ZEITTIP(d.sys):"Vorbereitet – die Laufzeit der KI-Sitzungen wird vorerst nur in Company OS erfasst (Entscheidung 17.10.2026).")}"><input type="checkbox" disabled> Laufzeit der KI-Sitzungen hier buchen</label>${(()=>{const so=!d.sys&&Object.values(o.dienste||{}).map(x=>x&&x.sys).find(s=>s&&SYSKAT[s]&&!SYSKAT[s].ent.zeit.length);return so?`<div class="hint dmsg">ⓘ ${esc(ZEITTIP(so))}</div>`:""})()}`:"";
+    return `<div class="drow"><div class="dlab"><b>${l}</b><small>${esc(h)}</small></div><div class="dsel"><select data-ds="${o.id}|${k}" aria-label="System für ${l}">${sysOpt}</select>${mand}${ent}${st}</div>${zeit}${c&&c.st!=="ok"?`<div class="hint dmsg">${esc(c.t)}</div>`:""}</div>`};
+  C.innerHTML=`<h2>Anbindungen</h2><div class="hint" style="margin:0 0 10px">Je Organigramm vier Dienste. Mehrere oder alle dürfen auf dasselbe System zeigen. Claude nutzt diese Zuordnung als Standard, wenn ein Auftrag kein System nennt; Projekte werden im Mandanten des Dienstes „Projekt“ gesucht.</div>
+    ${O.map(o=>`<div class="dorg"><div class="dhd"><b>${o.logo?`<img class="olg" src="${o.logo}" alt="">`:""}${esc(o.n)}</b><span style="flex:1"></span>${o.chk?`<span class="hint" style="margin:0">geprüft ${esc(new Date(o.chk.at).toLocaleString("de-DE",{dateStyle:"short",timeStyle:"short"}))}</span>`:""}<button class="btn sm" data-dchk="${o.id}">Verbindung prüfen</button></div>${DIENSTE.map(x=>zeile(o,x)).join("")}</div>`).join("")}
+    <div class="flabel">Systemkatalog</div><table class="dkat"><thead><tr><th>System</th>${DIENSTE.map(d=>`<th>${d[1]}</th>`).join("")}<th>KI-Benutzer</th></tr></thead><tbody>${Object.values(SYSKAT).map(S=>`<tr><td><b>${esc(S.n)}</b></td>${DIENSTE.map(([k])=>`<td>${S.ent[k].length?S.ent[k].map(e=>esc(e[1])).join(", "):'<span class="hint" style="margin:0" title="'+esc(ZEITTIP(Object.keys(SYSKAT).find(x=>SYSKAT[x]===S)))+'">–</span>'}</td>`).join("")}<td>${S.kiUser?"ja":'<span class="hint" style="margin:0">noch nicht</span>'}</td></tr>`).join("")}</tbody></table>
+    <div class="hint">KI-Benutzer: Agenten sollen künftig als eigener, nicht-physischer Benutzer im Backend buchen. Bodo und sellify unterstützen das noch nicht – vorbereitet, nicht umgesetzt. sellify ist aus dieser Seite nicht prüfbar; die Claude-Sitzung erreicht es über ihren Connector.</div>
+    <div class="btns"><button class="btn sm" id="sbodo">⚙ Eigene Bodo-Mandanten</button></div>`;
+  const D=(v)=>{const [oid,k]=v.split("|"),o=orgById(oid);o.dienste={...(o.dienste||{})};o.dienste[k]={...(o.dienste[k]||{})};return [o,k,o.dienste[k]]};
+  document.querySelectorAll("[data-ds]").forEach(s=>s.onchange=()=>{const [o,k,d]=D(s.dataset.ds);if(!s.value){delete o.dienste[k]}else{d.sys=s.value;d.ent=SYSKAT[s.value].ent[k][0][0];if(!SYSKAT[s.value].mand){delete d.orgId;delete d.orgN}
+      else if(!d.orgId){const andere=Object.values(o.dienste).find(x=>x&&x.sys===s.value&&x.orgId);if(andere){d.orgId=andere.orgId;d.orgN=andere.orgN}}}
+    if(o.chk&&o.chk.erg)delete o.chk.erg[k];schedule();einst()});
+  document.querySelectorAll("[data-dm]").forEach(s=>s.onchange=()=>{const [o,k,d]=D(s.dataset.dm);const m=M.find(x=>x.id===s.value);if(m){d.orgId=m.id;d.orgN=m.name}else{delete d.orgId;delete d.orgN}if(o.chk&&o.chk.erg)delete o.chk.erg[k];schedule();einst()});
+  document.querySelectorAll("[data-de]").forEach(s=>s.onchange=()=>{const [o,k,d]=D(s.dataset.de);d.ent=s.value;if(o.chk&&o.chk.erg)delete o.chk.erg[k];schedule();einst()});
+  document.querySelectorAll("[data-dchk]").forEach(b=>b.onclick=async()=>{b.disabled=true;b.textContent="prüfe …";await dienstPruefen(orgById(b.dataset.dchk));einst()});
+  $("#sbodo").onclick=ownOrgsDlg}
+async function dienstPruefen(o){const r={at:new Date().toISOString(),erg:{}};let orgs=null;
+  for(const [k] of DIENSTE){const d=dienstVon(o,k);if(!d)continue;const S=SYSKAT[d.sys];
+    if(!S.pruefbar){r.erg[k]={st:"info",t:S.n+" ist aus dieser Seite nicht prüfbar – die Claude-Sitzung nutzt den Connector „"+S.mcp+"“."};continue}
+    if(S.mand&&!d.orgId){r.erg[k]={st:"err",t:"Kein Mandant gewählt"};continue}
+    try{if(!orgs)orgs=((await bodo("bodo_list_orgs",{}))||{}).orgs||[];const m=orgs.find(x=>x.orgId===d.orgId);
+      if(!m){r.erg[k]={st:"err",t:"Mandant „"+(d.orgN||d.orgId)+"“ ist für dieses Konto nicht erreichbar"};continue}
+      if(m.mcpAccess&&m.mcpAccess.allowed===false){r.erg[k]={st:"err",t:m.mcpAccess.message||"KI-Zugang im Mandanten gesperrt"};continue}
+      await bodo("bodo_search",{resourceType:d.ent,orgId:d.orgId,limit:1,fields:["_id"]});r.erg[k]={st:"ok",t:"Mandant „"+m.name+"“ erreichbar, "+entN(d.sys,k,d.ent)+" lesbar"}}
+    catch(e){r.erg[k]={st:"err",t:mcpMsg(e)}}}
+  o.chk=r;schedule();const n=Object.values(r.erg).filter(x=>x.st==="err").length;toast(Object.keys(r.erg).length?(n?n+" Dienst"+(n===1?"":"e")+" mit Problem":"Alle Dienste erreichbar"):"Keine Dienste zugeordnet");return r}
+// Kontext für Claude: Standard-Zielsysteme des Organigramms
+function dienstKontext(o){if(!o||!o.dienste)return "";const L=DIENSTE.map(([k,l])=>{const d=dienstVon(o,k);return d?l+" = "+SYSKAT[d.sys].n+(d.orgId?" (Mandant "+(d.orgN||"")+", orgId "+d.orgId+")":"")+", Entität "+d.ent:null}).filter(Boolean);
+  return L.length?"ANBINDUNGEN des Organigramms (Standard, wenn der Auftrag kein System oder keinen Mandanten nennt; nennt der Auftrag ausdrücklich etwas anderes, gilt der Auftrag, bei Widerspruch nachfragen): "+L.join("; ")+".":""}
+// Datenspur eines Auftrags (von Claude geschrieben: spur = [{dienst, sys, orgId, ent, id, url, akt}])
+function spurHtml(j){const S=(j.spur||[]).filter(Boolean);if(!S.length)return "";const dn=k=>(DIENSTE.find(d=>d[0]===k)||[k,k==="sonst"?"Sonstiges":k||"–"])[1];
+  return `<div class="flabel" style="margin-top:10px">Datenspur (${S.length})</div><div class="spur">${S.map(s=>`<div class="spr"><span class="sprd">${esc(dn(s.dienst))}</span><span>${esc((SYSKAT[s.sys]||{n:s.sys||""}).n)}${s.orgN?" · "+esc(s.orgN):""} · ${esc(s.ent||"")} ${s.akt?"· "+esc(s.akt):""}</span>${s.url?`<a href="${esc(s.url)}" target="_blank" rel="noopener">↗</a>`:""}</div>`).join("")}</div>`}
 
 boot();
 // Breitenregler Ablauf-Eigenschaften (rechts)

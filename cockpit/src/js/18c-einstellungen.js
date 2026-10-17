@@ -44,10 +44,7 @@ function einst(sec){if(sec)UI.sets=sec;if(!SETSEC.some(s=>s[0]===UI.sets))UI.set
      <div class="btns"><button class="btn sm" id="sruns">Letzten Lauf prüfen</button></div>`;
     document.querySelectorAll("[data-trg]").forEach(i=>i.onchange=()=>{const v=i.value.trim();SET.trig={...(SET.trig||{})};if(/^trig_\w+$/.test(v))SET.trig[i.dataset.trg]=v;else{delete SET.trig[i.dataset.trg];toast("Ungültige Kennung – Standard bleibt")}});
     $("#sruns").onclick=kiRuns}
-  else if(S==="dienste"){
-    C.innerHTML=`<h2>Anbindungen</h2><div class="hint" style="margin:0 0 10px">In Vorbereitung: je Organigramm die Dienste CRM, Auftragsmanagement, Projekt und Zeiterfassung mit System, Mandant und Entität. Bis dahin gilt die bisherige Bodo-Anbindung.</div>
-     <div class="btns"><button class="btn sm" id="sbodo">⚙ Eigene Bodo-Mandanten</button></div>`;
-    $("#sbodo").onclick=ownOrgsDlg}
+  else if(S==="dienste")dienstEinst(C)
 }
 // Logo einlesen: in 320×96 einpassen, Transparenz behalten (PNG)
 function logoKlein(file){return new Promise((res,rej)=>{const r=new FileReader();r.onload=()=>{const im=new Image();im.onload=()=>{const k=Math.min(1,320/im.width,96/im.height),w=Math.max(1,Math.round(im.width*k)),h=Math.max(1,Math.round(im.height*k)),c=document.createElement("canvas");c.width=w;c.height=h;c.getContext("2d").drawImage(im,0,0,w,h);res(c.toDataURL("image/png"))};im.onerror=rej;im.src=r.result};r.onerror=rej;r.readAsDataURL(file)})}

@@ -65,7 +65,7 @@ function pjJobField(j){const o=jobOrg(j);if(j.parent)return "";return `<div clas
 // Bodo-Projekte suchen: zum Verbinden eines Projekts (p) oder zum Übernehmen mehrerer (p = null)
 const bodoPjSt=s=>s==="active"?"aktiv":s==="paused"?"pausiert":"abgeschlossen";
 function pjBodoDlg(p){const O=orgById(OC),M=ownOrgs();if(!M.length)return toast("Keine eigenen Bodo-Mandanten hinterlegt – ⚙ Einstellungen › Anbindungen");
-  let om=M.find(m=>m.id===(O.pjBodo||""))||M[0],q="",alle=false,R=[],busy=false,err="";
+  const dp=dienstVon(O,"projekt");let om=M.find(m=>m.id===(dp&&dp.sys==="bodo"&&dp.orgId?dp.orgId:(O.pjBodo||"")))||M[0],q="",alle=false,R=[],busy=false,err="";
   const close=modalBox(`<div class="bhead"><h3>${p?"„"+esc(p.n)+"“ mit Bodo-Projekt verbinden":"Projekte aus Bodo übernehmen"}</h3><button class="ic" id="mclose" style="font-size:18px">✕</button></div>
     <div class="row"><div class="field"><label>Bodo-Mandant</label><select id="pbm">${M.map(m=>`<option value="${m.id}" ${m===om?"selected":""}>${esc(m.name)}</option>`).join("")}</select></div><div class="field"><label>Suche</label><input type="search" id="pbq" placeholder="Projektname …"></div></div>
     <label class="cb" style="margin:0 0 8px"><input type="checkbox" id="pba"> auch pausierte und abgeschlossene Projekte</label>

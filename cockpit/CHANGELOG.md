@@ -1,5 +1,15 @@
 # Änderungen – Cockpit
 
+## 60 · 17.10.2026 · Etappe 4b, Teil 3 „Anbindungen“ (Freigabe Boris)
+- ⚙ Einstellungen › Anbindungen: je Organigramm vier Dienste – CRM, Auftragsmanagement (kommerzieller Auftrag), Projekt, Zeiterfassung – mit System, Mandant und Entität; mehrere Dienste dürfen auf dasselbe System zeigen, der Mandant wird für weitere Dienste desselben Systems vorgeschlagen.
+- Systemkatalog im Code (Bodo: contact, member, opportunity, lead, order, project, timeEntry; sellify: contact, person, sale, project; keine Zeiterfassung). Neues System = neuer Katalogeintrag.
+- „Verbindung prüfen“: Bodo-Mandant erreichbar, KI-Zugang aktiv, Entität lesbar (Ergebnis wird gespeichert); sellify ist aus der Seite nicht prüfbar (Hinweis).
+- Zeiterfassung mit sellify ausgegraut mit Hinweis, sich beim Hersteller zu melden; „Laufzeit hier buchen“ vorbereitet, aber noch nicht aktiv (Verbrauch vorerst nur in Company OS).
+- KI-Benutzer je System im Katalog vorgesehen (Bodo und sellify: noch nicht).
+- Claude bekommt die Anbindungen als Standard-Zielsysteme im Kontext und schreibt eine Datenspur (spur) der angelegten bzw. geänderten Datensätze; Anzeige im Ergebnisfenster.
+- Projekte aus Bodo werden standardmäßig im Mandanten des Dienstes „Projekt“ gesucht.
+- Smoke-Test: 87 Prüfungen.
+
 ## 59 · 17.10.2026 · Etappe 4b, Teil 2 „Verbrauch“ (Freigabe Boris)
 - Jede Claude-Sitzung misst vor ihrem letzten Schreibvorgang Laufzeit und Tokens (Eingabe, Cache geschrieben, Cache gelesen, Ausgabe) aus ihrem eigenen Sitzungsprotokoll und schreibt sie in den Auftrag (Feld verb). Anweisung beider geplanten Aufgaben ergänzt.
 - Anzeige im Ergebnisfenster (mit Teilaufträgen), je Auftrag in der Projektliste, Summe je Projekt und „Ohne Projekt“ (Laufzeit, Tokens, Sitzungen, gemessene Aufträge); Laufzeit auf der Projektkarte.

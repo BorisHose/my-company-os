@@ -438,6 +438,18 @@
 :root[data-theme=dark] .vbgrid>div{border:1px solid var(--line);border-radius:8px;background:#171e29}
 :root[data-theme=dark] .vbgrid small{color:var(--mut)}
 :root[data-theme=dark] .pjr .pjvb{color:var(--mut)}
+:root[data-theme=dark] .dorg{border:1px solid var(--line);border-radius:10px;background:#171e29}
+:root[data-theme=dark] .drow{border-top:1px solid var(--line)}
+:root[data-theme=dark] .dlab small{color:var(--mut)}
+:root[data-theme=dark] .dzb{color:var(--mut)}
+:root[data-theme=dark] .dst{border-radius:50%}
+:root[data-theme=dark] .dst.ok{background:#123323;color:#47cd89}
+:root[data-theme=dark] .dst.err{background:#3d1c1c;color:#f97066}
+:root[data-theme=dark] .dst.info{background:#1c2b47;color:#84adff}
+:root[data-theme=dark] .dkat{border-collapse:collapse}
+:root[data-theme=dark] .dkat th,:root[data-theme=dark] .dkat td{border:1px solid var(--line)}
+:root[data-theme=dark] .dkat th{background:#131a24}
+:root[data-theme=dark] .spr{border:1px solid var(--line);border-radius:7px}
 :root[data-theme=dark] nav button.on{background:#2f6fdf;color:#fff}:root[data-theme=dark] body{background:var(--bg);color:var(--ink)}:root[data-theme=dark] input,:root[data-theme=dark] select,:root[data-theme=dark] textarea{background:#131a24;color:var(--ink);border-color:#3a4456}:root[data-theme=dark] .modal{background:#000000a6}:root[data-theme=dark] img.olg,:root[data-theme=dark] .av img{filter:none}
 @media (prefers-color-scheme:dark){:root[data-theme=auto]{color-scheme:dark;--bg:#0f141b;--panel:#171e29;--ink:#e4e8ef;--mut:#9aa4b4;--line:#2b3442;--acc:#5b8def;--accbg:#1c2b47;--warn:#f79009;--warnbg:#3a2615;--ok:#47cd89;--okbg:#12301f;--vio:#9b8afb;--viobg:#28213d;--teal:#36bffa;--tealbg:#11303a;--bodobg:#1d2939;--sellbg:#11303c}
 :root[data-theme=auto] body{background:var(--bg);color:var(--ink)}
@@ -878,4 +890,16 @@
 :root[data-theme=auto] .vbgrid>div{border:1px solid var(--line);border-radius:8px;background:#171e29}
 :root[data-theme=auto] .vbgrid small{color:var(--mut)}
 :root[data-theme=auto] .pjr .pjvb{color:var(--mut)}
+:root[data-theme=auto] .dorg{border:1px solid var(--line);border-radius:10px;background:#171e29}
+:root[data-theme=auto] .drow{border-top:1px solid var(--line)}
+:root[data-theme=auto] .dlab small{color:var(--mut)}
+:root[data-theme=auto] .dzb{color:var(--mut)}
+:root[data-theme=auto] .dst{border-radius:50%}
+:root[data-theme=auto] .dst.ok{background:#123323;color:#47cd89}
+:root[data-theme=auto] .dst.err{background:#3d1c1c;color:#f97066}
+:root[data-theme=auto] .dst.info{background:#1c2b47;color:#84adff}
+:root[data-theme=auto] .dkat{border-collapse:collapse}
+:root[data-theme=auto] .dkat th,:root[data-theme=auto] .dkat td{border:1px solid var(--line)}
+:root[data-theme=auto] .dkat th{background:#131a24}
+:root[data-theme=auto] .spr{border:1px solid var(--line);border-radius:7px}
 :root[data-theme=auto] nav button.on{background:#2f6fdf;color:#fff}:root[data-theme=auto] body{background:var(--bg);color:var(--ink)}:root[data-theme=auto] input,:root[data-theme=auto] select,:root[data-theme=auto] textarea{background:#131a24;color:var(--ink);border-color:#3a4456}:root[data-theme=auto] .modal{background:#000000a6}:root[data-theme=auto] img.olg,:root[data-theme=auto] .av img{filter:none}}

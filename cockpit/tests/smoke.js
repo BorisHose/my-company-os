@@ -16,7 +16,7 @@ data.jobs.push(
   { id: 'A-150', t: 'Alter Auftrag', art: 'frei', org: 'og-bodo', fid: data.jobs[0].fid, st: 'done', ok: 'ja', ki: 1, fertig: tage(200), sum: 'Alt.', erg: [{ t: 'X', url: 'https://example.org/x', vorschau: 'lang' }], log: [], path: [] });
 const mock = `<script>window.__W=[];window.__C=[];const D=${JSON.stringify(data).replace(/</g, '\\u003c')};
 const S={};S["meta/config"]=D.meta;["skills","agents","flows","jobs","users","depts"].forEach(c=>(D[c]||[]).forEach(x=>{S[c+"/"+x.id]=JSON.parse(JSON.stringify(x))}));window.__S=S;
-const mcp={callTool:async(s,tool,inp)=>{__C.push(tool);(window.__CI=window.__CI||[]).push(inp);if(tool==="list_triggers")return {payload:{data:[]}};if(tool==="bodo_search"&&inp&&inp.resourceType==="project")return {payload:{items:[{id:"bp1",title:"Einführung Musterverein",url:"https://bodo-app.com/o/x/projekte/bp1",data:{projectStatus:"active",ownerName:"Boris Hose",description:"Test"}},{id:"bp2",title:"Migration Musterverein",url:"https://bodo-app.com/o/x/projekte/bp2",data:{projectStatus:"active"}}],hasMore:false}};return {payload:{}}}};
+const mcp={callTool:async(s,tool,inp)=>{__C.push(tool);(window.__CI=window.__CI||[]).push(inp);if(tool==="list_triggers")return {payload:{data:[]}};if(tool==="bodo_list_orgs")return {payload:{orgs:(window.__S["meta/config"].settings.bodoOrgs||[]).map(o=>({orgId:o.id,name:o.name,mcpAccess:{allowed:true}}))}};if(tool==="bodo_search"&&inp&&inp.resourceType==="project")return {payload:{items:[{id:"bp1",title:"Einführung Musterverein",url:"https://bodo-app.com/o/x/projekte/bp1",data:{projectStatus:"active",ownerName:"Boris Hose",description:"Test"}},{id:"bp2",title:"Migration Musterverein",url:"https://bodo-app.com/o/x/projekte/bp2",data:{projectStatus:"active"}}],hasMore:false}};return {payload:{}}}};
 const smp=async()=>({text:""});smp.json=async()=>({});
 const OPS={"==":(a,b)=>a===b,"!=":(a,b)=>a!==b,"<":(a,b)=>a<b,"<=":(a,b)=>a<=b,">":(a,b)=>a>b,">=":(a,b)=>a>=b,"in":(a,b)=>b.includes(a),"not-in":(a,b)=>!b.includes(a)};
 const L=new Set(),LS={};window.__L=L;window.__LS=LS;
@@ -284,6 +284,21 @@ const check = (name, ok, info = '') => { CHECKS.push({ name, ok }); console.log(
     show('projects'); PJSEL = j.prj; prj(); const d = document.querySelector('#pjd').textContent; return { a: vbJob(j), tok: vbTok(vbJob(j)), t: t.includes('3:10 min') && t.includes('2 Sitzungen gemessen') && t.includes('kein Protokoll'), d: d.includes('3:10 min') && d.includes('1 von 1'), arch: vbArchiv(j) } }, pjA.id);
   check('Verbrauch: Summe je Auftrag, Anzeige im Ergebnis und im Projekt, Archiv-Kurzfassung', vbr.a.sek === 190 && vbr.tok === 74215 && vbr.t && vbr.d && vbr.arch.sek === 190, JSON.stringify(vbr));
   if (SHOT) await p.screenshot({ path: SHOT + '/e7-verbrauch.png' });
+  // ----- v60 Anbindungen -----
+  await p.evaluate(() => { document.getElementById('modal').innerHTML = ''; show('settings'); einst('dienste') }); await p.waitForTimeout(300);
+  const an0 = await p.evaluate(() => { const o = ORGS()[0], q = s => document.querySelector(s);
+    const z = q(`[data-ds="${o.id}|zeit"] option[value="sellify"]`); return { rows: document.querySelectorAll('.drow').length, zeitSellifyAus: !!z && z.disabled && /Hersteller/.test(z.title) } });
+  check('Anbindungen: vier Dienste je Organigramm, Zeiterfassung mit sellify ausgegraut mit Hinweis', an0.rows === 4 * (await p.evaluate(() => ORGS().length)) && an0.zeitSellifyAus, JSON.stringify(an0));
+  await p.evaluate(() => { const o = ORGS()[0], set = (sel, v) => { const e = document.querySelector(sel); e.value = v; e.dispatchEvent(new Event('change')) };
+    set(`[data-ds="${o.id}|crm"]`, 'bodo'); set(`[data-dm="${o.id}|crm"]`, ownOrgs()[0].id); set(`[data-ds="${o.id}|projekt"]`, 'bodo'); set(`[data-ds="${o.id}|auftrag"]`, 'sellify') }); await p.waitForTimeout(200);
+  const an1 = await p.evaluate(async () => { const o = ORGS()[0]; const r = await dienstPruefen(o); return { d: o.dienste, r: r.erg, ctx: dienstKontext(o) } });
+  check('Anbindungen: Mandant wird für weitere Bodo-Dienste übernommen, Entität vorbelegt', an1.d.crm.ent === 'contact' && an1.d.projekt.orgId === an1.d.crm.orgId && an1.d.auftrag.sys === 'sellify' && !an1.d.auftrag.orgId, JSON.stringify(an1.d));
+  check('Anbindungen: Verbindung prüfen (Bodo ok, sellify nur Hinweis) und Kontext für Claude', an1.r.crm.st === 'ok' && an1.r.projekt.st === 'ok' && an1.r.auftrag.st === 'info' && an1.ctx.includes('ANBINDUNGEN') && an1.ctx.includes('Entität contact'), JSON.stringify([an1.r, an1.ctx]));
+  if (SHOT) { await p.evaluate(() => einst('dienste')); await p.waitForTimeout(200); await p.screenshot({ path: SHOT + '/e8-anbindungen.png', fullPage: true }) }
+  check('Datenspur im Ergebnisfenster', await p.evaluate(() => { const j = AU.find(x => x.ki); j.spur = [{ dienst: 'projekt', sys: 'bodo', orgN: 'Bodo Solutions', ent: 'task', id: 't1', url: 'https://bodo-app.com/x', akt: 'angelegt' }]; resultModal(j); const ok = document.querySelector('#box').textContent.includes('Datenspur (1)'); document.getElementById('modal').innerHTML = ''; return ok }));
+  await p.setViewportSize({ width: 390, height: 844 }); await p.evaluate(() => einst('dienste')); await p.waitForTimeout(200);
+  check('Anbindungen: Handy ohne seitliches Scrollen', await p.evaluate(() => document.documentElement.scrollWidth <= innerWidth + 1));
+  await p.setViewportSize({ width: 1440, height: 900 });
   check('keine Laufzeitfehler', errs.length === 0, errs.slice(0, 3).join(' | '));
   await b.close();
   fs.unlinkSync(tmp);
