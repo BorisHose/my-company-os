@@ -1,5 +1,13 @@
 # Änderungen – Cockpit
 
+## 72 · 17.10.2026 · Agenten-Assistent nach Feedback, Skill-Gruppen (Freigabe Boris)
+- Assistent: Produkt (aus der Organisation) und Platz (aus dem Knopf) stehen fest und werden nur angezeigt.
+- Skills-Schritt in voller Breite: oben **Vorschläge von Claude** aus Name und Ziel (einzeln oder alle übernehmen, „Neu vorschlagen“; läuft beim ersten Öffnen bzw. nach Änderung von Name oder Ziel automatisch, über das Abo), darunter die Auswahl als Leiste und der Katalog in aufklappbaren Gruppen (zu Beginn zu, Suche öffnet Gruppen mit Treffern, „Alle auf/zu“).
+- Regeln-Schritt: nur die Regeln der gewählten Skills (je Skill, mit Kern/Produkt-Herkunft) und eigene Regeln; die allgemeinen Vorgaben bleiben in der Ansicht „Agenten“.
+- Skill-Gruppen mit festen Kennungen statt Listenposition (`11a-skill-gruppen.js`); ältere Daten werden beim Laden umgestellt. Neu: ⚙ Einstellungen › Skill-Gruppen (anlegen, umbenennen, ordnen, entfernen – über ✎ Bearbeiten).
+- Die Skill-Auswahl im Agenten-Editor ist ebenfalls aufklappbar (gemeinsame Komponente).
+- Smoke-Test: 105 Prüfungen.
+
 ## 71 · 17.10.2026 · Agenten im Organigramm anlegen und bearbeiten (Konzept freigegeben von Boris)
 - Im Organigramm „+ Agent“ je Abteilung, je Team und unter „Ohne Abteilung“ (die Spalte erscheint auch, wenn die Organisation noch keine Abteilungen hat); an jeder Agentenkarte ✎ neben ▶. Beides nur außerhalb von „✎ Bearbeiten“ des Organigramms.
 - Assistent in 4 Schritten: Grunddaten (Name Pflicht, Ziel, Produkt vorbelegt mit dem der Organisation, Modell, Abteilung/Team, Verantwortlich/Vertretung, Verbindungen) · Skills aus dem Katalog (Suche, Gruppen, Produktfilter, Entwürfe/Vorschläge markiert, Auswahl rechts) · Regeln (eigene, geerbte zur Ansicht, allgemeine Vorgaben) · Zusammenfassung mit Hinweisen (Einsatz für das Plugin offen, Skill eines anderen Produkts, Skill noch nicht im Konto).

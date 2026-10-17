@@ -27,8 +27,7 @@ function tlAgents(o,did,tm){const d=dept(did),T=teamsOf(d);return AG.filter(a=>{
 function tlName(o,did,tm){const d=dept(did);if(!tm)return "Abteilung "+((d||{}).n||"");if(tm==="_allg")return "Team Allgemein ("+((d||{}).n||"")+")";const t=teamsOf(d).find(x=>x.id===tm);return "Team "+(t?t.n:"?")+" ("+((d||{}).n||"")+")"}
 const PRIO=[["d","Dringend"],["h","Hoch"],["n","Normal"],["l","Niedrig"]],PRN={d:0,h:1,n:2,l:3};
 const skOrg=(o)=>SK.filter(x=>!["vorschlag","entwurf"].includes(srcOf(x))&&(!o||!o.prod||x.p===o.prod||x.p==="all"||x.p==="multi"));
-const grName=g=>(g!=null&&g!==""&&GR[+g]!=null)?GR[+g]:(typeof g==="string"&&isNaN(+g)?g:"Ohne Gruppe");
-function skOpts(L,cur){const G=[...new Set(L.map(x=>x.g))].sort((a,b)=>(+a)-(+b));return G.map(g=>`<optgroup label="${esc(grName(g))}">${L.filter(x=>x.g===g).map(x=>`<option value="${esc(x.id)}" ${x.id===cur?'selected':''}>${esc(x.n)}</option>`).join("")}</optgroup>`).join("")}
+function skOpts(L,cur){const G=[...new Set(L.map(x=>x.g))].sort((a,b)=>grIdx(a)-grIdx(b));return G.map(g=>`<optgroup label="${esc(grName(g))}">${L.filter(x=>x.g===g).map(x=>`<option value="${esc(x.id)}" ${x.id===cur?'selected':''}>${esc(x.n)}</option>`).join("")}</optgroup>`).join("")}
 function jobLbl(j){if(!j.f)return "–";if(!j.f.frei)return j.f.n;const a=j.aid&&AG.find(x=>x.id===j.aid),S=j.sk&&sk(j.sk);return (j.art==="agent"&&a?a.n:j.art==="abteilung"?"Abteilung "+((dept(j.abt)||{}).n||"")+(a?" · "+a.n:" · KI-Teamleiter"):"Freie Aufgabe")+(S?" · "+S.n:j.sk?" · "+j.sk:"")}
 function startModal(f,keep){if(!keep)PEND=[];keep=keep||{};const SM=!!keep.sm;if(SM)keep.art=keep.art==="agent"&&keep.aid?"agent":"abteilung";
   const art=keep.art||(f&&!f.frei?"ablauf":"frei"),O=orgById(keep.org||OC)||ORGS()[0];
@@ -77,7 +76,7 @@ function startModal(f,keep){if(!keep)PEND=[];keep=keep||{};const SM=!!keep.sm;if
     const none=art==="agent"?"Agent entscheidet selbst":"Claude wählt selbst",lab=()=>jsk.value&&sk(jsk.value)?sk(jsk.value).n:none;
     let act=0,items=[],openState=false;
     const draw=()=>{const t=q.dataset.typed?q.value:"",M=t?SKL.filter(x=>skMatch(x,t)):SKL;items=[{id:"",n:none}];let h=`<div class="cbx-i ${!jsk.value?'cur':''}" data-k="0">${esc(none)}</div>`;
-      [...new Set(M.map(x=>x.g))].sort((a,b)=>(+a)-(+b)).forEach(g=>{h+=`<div class="cbx-g">${esc(grName(g))}</div>`;M.filter(x=>x.g===g).forEach(x=>{items.push(x);h+=`<div class="cbx-i ${jsk.value===x.id?'cur':''}" data-k="${items.length-1}" role="option" title="${esc(x.d||"")}">${esc(x.n)}</div>`})});
+      [...new Set(M.map(x=>x.g))].sort((a,b)=>grIdx(a)-grIdx(b)).forEach(g=>{h+=`<div class="cbx-g">${esc(grName(g))}</div>`;M.filter(x=>x.g===g).forEach(x=>{items.push(x);h+=`<div class="cbx-i ${jsk.value===x.id?'cur':''}" data-k="${items.length-1}" role="option" title="${esc(x.d||"")}">${esc(x.n)}</div>`})});
       if(M.length===0)h+='<div class="cbx-e">Kein Skill gefunden</div>';
       L.innerHTML=h;if(act>=items.length)act=items.length-1;mark(act>=0);
       L.querySelectorAll("[data-k]").forEach(d=>{d.onmousedown=e=>{e.preventDefault();pick(+d.dataset.k)};d.onmousemove=()=>{if(act!==+d.dataset.k){act=+d.dataset.k;mark(false)}}})};

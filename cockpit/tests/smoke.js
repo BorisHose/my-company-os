@@ -17,7 +17,7 @@ data.jobs.push(
 const mock = `<script>window.__W=[];window.__C=[];const D=${JSON.stringify(data).replace(/</g, '\\u003c')};
 const S={};S["meta/config"]=D.meta;["skills","agents","flows","jobs","users","depts"].forEach(c=>(D[c]||[]).forEach(x=>{S[c+"/"+x.id]=JSON.parse(JSON.stringify(x))}));window.__S=S;
 const mcp={callTool:async(s,tool,inp)=>{__C.push(tool);(window.__CI=window.__CI||[]).push(inp);if(tool==="list_triggers")return {payload:{data:[]}};if(tool==="sellify_user")return {payload:{total:1,items:[{id:429,login:"Ho",person:{firstName:"Boris",lastName:"Hose",emailAddress:{}},canLogin:true,deleted:false,roles:[{name:"Full access",deleted:false}]}],hasMore:false}};if(tool==="bodo_search"&&inp&&inp.resourceType==="benutzer")return {payload:{items:[{data:{membershipId:"mb-"+inp.orgId.slice(0,4),userId:"us-x",name:"Boris Hose",email:"boris.hose@muster-haustechnik.example",status:"active",roleNames:["Administrator"]}}]}};if(tool==="sellify_project"&&inp.params&&inp.params.q==="viele"){const o=inp.params.offset||0,n=o?5:25;return {payload:{total:30,items:Array.from({length:n},(_,i)=>({id:1000+o+i,name:"Viele "+(o+i),done:false,webUrl:"https://sellify.example/e/projects/"+(1000+o+i)})),hasMore:!o,nextOffset:o?null:25}}}if(tool==="sellify_project")return {payload:{total:2,items:[{id:3,name:"Prozessoptimierung Muster",number:"10019",done:false,status:{name:{"de-DE":"Aktiv"}},responsible:{firstName:"Boris",lastName:"Hose"},description:"Test",webUrl:"https://sellify.example/e/projects/3"},{id:5,name:"Debug Muster",number:"10021",done:false,webUrl:"https://sellify.example/e/projects/5"}],hasMore:false}};if(tool==="bodo_list_orgs")return {payload:{orgs:(window.__S["meta/config"].settings.bodoOrgs||[]).map(o=>({orgId:o.id,name:o.name,mcpAccess:{allowed:true}}))}};if(tool==="bodo_search"&&inp&&inp.resourceType==="project")return {payload:{items:[{id:"bp1",title:"Einführung Musterverein",url:"https://bodo-app.com/o/x/projekte/bp1",data:{projectStatus:"active",ownerName:"Boris Hose",description:"Test"}},{id:"bp2",title:"Migration Musterverein",url:"https://bodo-app.com/o/x/projekte/bp2",data:{projectStatus:"active"}}],hasMore:false}};return {payload:{}}}};
-const smp=async()=>({text:""});smp.json=async()=>({});
+const smp=async()=>({text:""});smp.json=async(p)=>{window.__SMP=(window.__SMP||0)+1;window.__SMPP=String(p);return String(p).includes("SKILL-KATALOG")?{vorschlaege:[{id:"kontakt-anlegen",warum:"Legt Kontakte an."},{id:"gibt-es-nicht",warum:"x"},{id:"angebot-erstellen",warum:"Erstellt Angebote."}]}:{}};
 const OPS={"==":(a,b)=>a===b,"!=":(a,b)=>a!==b,"<":(a,b)=>a<b,"<=":(a,b)=>a<=b,">":(a,b)=>a>b,">=":(a,b)=>a>=b,"in":(a,b)=>b.includes(a),"not-in":(a,b)=>!b.includes(a)};
 const L=new Set(),LS={};window.__L=L;window.__LS=LS;
 const run=q=>{let r=Object.keys(S).filter(k=>k.split("/").length===2&&k.startsWith(q.c+"/")).map(k=>S[k]);q.w.forEach(([f,o,v])=>{r=r.filter(x=>x[f]!==undefined&&OPS[o](x[f],v))});
@@ -349,7 +349,7 @@ const check = (name, ok, info = '') => { CHECKS.push({ name, ok }); console.log(
   await p.setViewportSize({ width: 1440, height: 900 });
   // ----- v66 Benutzer in den Einstellungen -----
   const bu = await p.evaluate(async () => { show('settings'); einst('darst'); document.querySelector('[data-sets="users"]').click(); await new Promise(r => setTimeout(r, 150));
-    const R = { nav: document.querySelectorAll('#setnav [data-sets]').length === 6, on: document.querySelector('#setnav .on').dataset.sets === 'users', liste: document.querySelectorAll('#setu #ulist .uitem').length > 0, edit: !!document.querySelector('#setu #uedit .etop'), setcAus: document.querySelector('#setc').hidden, kein: !document.querySelector('main#users') };
+    const R = { nav: document.querySelectorAll('#setnav [data-sets]').length === SETSEC.length && SETSEC.length === 7, on: document.querySelector('#setnav .on').dataset.sets === 'users', liste: document.querySelectorAll('#setu #ulist .uitem').length > 0, edit: !!document.querySelector('#setu #uedit .etop'), setcAus: document.querySelector('#setc').hidden, kein: !document.querySelector('main#users') };
     document.querySelector('[data-sets="ausf"]').click(); R.zurueck = !document.querySelector('#setc').hidden && document.querySelector('#setu').hidden && /Ausführung/.test(document.querySelector('#setc').textContent); return R });
   check('Benutzer eingebettet: Menü links bleibt, Liste und Bearbeitung rechts, Wechsel zurück', Object.values(bu).every(Boolean), JSON.stringify(bu));
   // ----- v67 Benutzerliste gleich hoch, Scrollbar bei vielen -----
@@ -400,14 +400,20 @@ const check = (name, ok, info = '') => { CHECKS.push({ name, ok }); console.log(
     R.knoepfe = document.querySelectorAll('#orgv .oadd').length > deptsOf(OC).length - 1 && document.querySelectorAll('#orgv .oedit').length === document.querySelectorAll('#orgv .oag').length;
     const vor = AG.length; $q(`[data-oadd="${d.id}|"]`).click(); await w(100);
     R.titel = /Neuer Agent in „/.test($q('#gwh').textContent) && $q('#gwh').textContent.includes(d.n);
-    R.produkt = $q('#gwp').value === (O.prod || 'all') && $q('#gwa').value === d.id;
+    R.produkt = !$q('#gwp') && !$q('#gwa') && $q('.gwfest').textContent.includes(PN[O.prod || 'all']) && $q('.gwfest').textContent.includes(d.n);
     $q('#gww').click(); R.pflicht = $q('#gwerr').style.display !== 'none' && !!$q('#gwn');
     const n = $q('#gwn'); n.value = 'Testagent Assistent'; n.dispatchEvent(new Event('input')); const r = $q('#gwr'); r.value = 'Prüft den Assistenten.'; r.dispatchEvent(new Event('input'));
-    $q('#gww').click(); await w(50); const c = $q('#gwkat [data-pks]'); R.katalog = !!c && !!$q('#pkq') && !!$q('#pkonly');
+    $q('#gww').click(); await w(80); R.zugeklappt = !$q('#gwkat [data-pks]') && document.querySelectorAll('#gwkat [data-pko]').length > 1;
+    R.kiVorschlag = document.querySelectorAll('#gwki [data-kiv]').length === 2 && /SKILL-KATALOG/.test(window.__SMPP) && window.__SMPP.includes('Prüft den Assistenten.');
+    $q('#gwki [data-kiv="kontakt-anlegen"]').click(); R.kiUebernommen = $q('#gwsn').textContent === 'Ausgewählt (1)' && /übernommen/.test($q('#gwki [data-kiv="kontakt-anlegen"]').textContent);
+    $q('#gwki [data-kiv="kontakt-anlegen"]').click(); R.kiZurueck = $q('#gwsn').textContent === 'Ausgewählt (0)';
+    $q('#gwkat [data-pko]').click(); const c = $q('#gwkat [data-pks]'); R.katalog = !!c && !!$q('#pkq') && !!$q('#pkonly');
     c.checked = true; c.dispatchEvent(new Event('change')); R.gewaehlt = $q('#gwsn').textContent === 'Ausgewählt (1)';
     $q('#gwsl [data-gwx]').click(); R.entfernt = $q('#gwsn').textContent === 'Ausgewählt (0)' && !$q('#gwkat [data-pks]').checked;
     const c2 = $q('#gwkat [data-pks]'); c2.checked = true; c2.dispatchEvent(new Event('change'));
-    $q('#gww').click(); const o = $q('#gwown'); o.value = 'Nie ohne Freigabe versenden'; o.dispatchEvent(new KeyboardEvent('keydown', { key: 'Enter' })); R.regel = document.querySelectorAll('[data-gwro]').length === 1;
+    const nR = skRegeln(sk(c2.dataset.pks), O.prod || 'all').length;
+    $q('#gww').click(); R.skillRegeln = document.querySelectorAll('.gwrs').length === 1 && document.querySelectorAll('.gwrs .lprule').length === nR && !document.querySelector('[data-gwgl]');
+    const o = $q('#gwown'); o.value = 'Nie ohne Freigabe versenden'; o.dispatchEvent(new KeyboardEvent('keydown', { key: 'Enter' })); R.regel = document.querySelectorAll('[data-gwro]').length === 1;
     $q('#gww').click(); R.zusammen = $q('.gwsum').textContent.includes('Testagent Assistent') && $q('.gwsum').textContent.includes(d.n);
     R.nochNicht = AG.length === vor; $q('#gwok').click(); await w(1300);
     const a = AG.find(x => x.n === 'Testagent Assistent'); R.angelegt = !!a && AG.length === vor + 1 && PL(a, OC).abt === d.id && a.s.length === 1 && a.own.length === 1 && a.r === 'Prüft den Assistenten.';
@@ -428,9 +434,32 @@ const check = (name, ok, info = '') => { CHECKS.push({ name, ok }); console.log(
     // im Bearbeitungsmodus des Organigramms keine Assistent-Knöpfe
     $q('#orgedit').click(); R.editAus = !document.querySelector('#orgv .oadd') && !document.querySelector('#orgv .oedit'); $q('#orged [data-ecancel]').click();
     // Skill-Auswahl im Agenten-Editor nutzt dieselbe Komponente
-    skPick(a); await w(50); const c3 = [...document.querySelectorAll('#pkt [data-pks]')].find(x => !x.checked); c3.checked = true; c3.dispatchEvent(new Event('change')); R.skPick = /1 hinzu/.test($q('#pkcnt').textContent); $q('#pkno').click(); R.skPickUnveraendert = a.s.length === 1;
+    skPick(a); await w(50); $q('#pkauf').click(); const c3 = [...document.querySelectorAll('#pkt [data-pks]')].find(x => !x.checked); c3.checked = true; c3.dispatchEvent(new Event('change')); R.skPick = /1 hinzu/.test($q('#pkcnt').textContent); $q('#pkno').click(); R.skPickUnveraendert = a.s.length === 1;
     AG.splice(AG.indexOf(a), 1); schedule(); org(); return R });
   check('Agent im Organigramm: + Agent, 4 Schritte, Pflichtname, Skills aus dem Katalog, Regeln, Anlegen erst bei Bestätigung, Auftrag, Abbrechen, Bearbeiten über ✎', Object.values(ga).every(Boolean), JSON.stringify(ga));
+  // ----- v72 Skill-Gruppen: feste Ids, Aufklappen, Einstellungen -----
+  const gr = await p.evaluate(async () => { const w = ms => new Promise(r => setTimeout(r, ms)); const R = {}; const $q = s => document.querySelector(s);
+    document.getElementById('modal').innerHTML = '';
+    R.migriert = GR.length === 9 && GR.every(g => g && typeof g.id === 'string' && g.n) && SK.every(s => grById(s.g)) && sk('kontakt-anlegen').g === GR[0].id && sk('xlsx').g === GR[7].id;
+    await w(1200); R.gespeichert = (window.__S['meta/config'].groups || []).every(g => g && g.id) && window.__S['skills/kontakt-anlegen'].g === GR[0].id;
+    show('skills'); [...GR, GR_OHNE].forEach(g => COL.add(g.id)); lib(); R.libZu = document.querySelectorAll('#lib .grp.col').length === document.querySelectorAll('#lib .grp').length;
+    $q('#lib [data-tg]').click(); R.libAuf = document.querySelectorAll('#lib .grp:not(.col)').length === 1;
+    // Einstellungen › Skill-Gruppen
+    show('settings'); einst('sgr'); R.ansicht = document.querySelectorAll('.grt tbody tr').length === 9 && !$q('[data-grn]');
+    $q('#grped .ebtn').click(); R.edit = document.querySelectorAll('[data-grn]').length === 9;
+    const g0 = GR[0], g1 = GR[1]; $q('[data-grd="0"]').click(); R.ordnen = GR[0] === g1 && GR[1] === g0;
+    const i = $q(`[data-grn="${g0.id}"]`); i.value = 'Umbenannt'; i.dispatchEvent(new Event('change')); R.umbenannt = g0.n === 'Umbenannt';
+    $q('[data-ecancel]').click(); R.verworfen = GR[0].n !== 'Umbenannt' && GR[0].id === g0.id && grById(g0.id).n !== 'Umbenannt';
+    $q('#grped .ebtn').click(); const k = SK.filter(s => s.g === GR[2].id).length, gid = GR[2].id; $q(`[data-grx="${gid}"]`).click(); await w(50); $q('#dlg [data-yes]').click(); await w(50);
+    R.entfernt = !grById(gid) && SK.filter(s => s.g === '').length === k && document.querySelector('.grt tr.dim') !== null;
+    $q('#grneu').click(); await w(50); const ti = $q('#dlgin'); ti.value = 'Neue Testgruppe'; $q('#dlg [data-yes]').click(); await w(50);
+    R.neu = GR.some(g => g.n === 'Neue Testgruppe' && /^gr-neue-testgruppe/.test(g.id));
+    $q('[data-esave]').click(); await w(1200); R.saved = (window.__S['meta/config'].groups || []).some(g => g.n === 'Neue Testgruppe') && !EDIT;
+    // Auswahl im Agenten-Editor: zugeklappt, Suche öffnet Gruppen mit Treffern
+    const a = AG[0]; skPick(a); await w(50); R.pickZu = !document.querySelector('#pkt [data-pks]'); const q = $q('#pkq'); q.value = 'Kontakt'; q.dispatchEvent(new Event('input'));
+    R.sucheAuf = document.querySelectorAll('#pkt [data-pks]').length >= 1; $q('#pkno').click();
+    return R });
+  check('Skill-Gruppen: Umstellung auf feste Ids und gespeichert, Gruppen auf-/zuklappbar, Einstellungen (ordnen, umbenennen, verwerfen, entfernen, anlegen, speichern), Suche öffnet Gruppen', Object.values(gr).every(Boolean), JSON.stringify(gr));
   check('keine Laufzeitfehler', errs.length === 0, errs.slice(0, 3).join(' | '));
   await b.close();
   if (process.env.KEEP) fs.copyFileSync(tmp, path.join(ROOT, 'tests', '.keep.html')); fs.unlinkSync(tmp);

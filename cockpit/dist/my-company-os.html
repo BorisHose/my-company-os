@@ -450,12 +450,24 @@ img.olg{height:18px;max-width:60px;object-fit:contain;margin-right:6px;vertical-
 .oadd{display:block;width:100%;margin-top:6px;padding:5px 8px;border:1px dashed var(--line);border-radius:8px;background:transparent;color:var(--mut);font-size:12.5px;cursor:pointer;text-align:center}
 .oadd:hover,.oadd:focus-visible{border-color:var(--acc);color:var(--acc);background:var(--accbg)}
 .wz .steps2 span[data-gws]{cursor:pointer}
-.gwsk{display:grid;grid-template-columns:minmax(0,1fr) 220px;gap:14px;align-items:start}
-.gwsk .pkwrap{max-height:46vh}
-.gwsel{border-left:1px solid var(--line);padding-left:12px}.gwsel .flabel{margin-top:0}
 #gwsl{display:flex;flex-wrap:wrap;gap:6px}
 .gwsum{display:grid;grid-template-columns:150px minmax(0,1fr);gap:8px 12px;font-size:13.5px}.gwsum>b{color:var(--mut);font-weight:600}
-@media(max-width:700px){.gwsk{grid-template-columns:minmax(0,1fr)}.gwsel{border-left:0;padding-left:0;border-top:1px solid var(--line);padding-top:10px}.gwsum{grid-template-columns:minmax(0,1fr);gap:2px}.gwsum>span{margin-bottom:8px}}
+@media(max-width:700px){.gwsum{grid-template-columns:minmax(0,1fr);gap:2px}.gwsum>span{margin-bottom:8px}}
+
+/* Assistent v72: feste Angaben, KI-Vorschläge, Auswahlleiste, Regeln je Skill; Skill-Auswahl aufklappbar; Skill-Gruppen */
+.gwfest{display:flex;gap:8px 20px;flex-wrap:wrap;background:var(--accbg);border-radius:8px;padding:8px 12px;margin:0 0 12px;font-size:13.5px}.gwfest b{color:var(--mut);font-weight:600;margin-right:4px}
+.pkbar{display:flex;align-items:center;gap:6px;flex-wrap:wrap;margin:8px 0 0}
+.pkt tr.gh{cursor:pointer}.pkt tr.gh .caret{display:inline-block;width:12px;color:var(--mut)}
+.gwki{border:1px solid var(--line);border-radius:10px;padding:10px 12px;margin:0 0 12px;background:var(--panel,#fff)}
+.gwkih{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin:0 0 6px}.gwkih>b{color:var(--navy)}
+.gwkir{display:flex;gap:10px;align-items:flex-start;padding:6px 0;border-top:1px solid var(--line)}.gwkir:first-of-type{border-top:0}
+.gwkir>.btn{flex:none;min-width:116px}.gwkir small{display:block;color:var(--mut);font-size:12.5px;margin-top:2px}
+.gwselbar{display:flex;align-items:center;gap:8px;flex-wrap:wrap}.gwselbar .flabel{margin:0}
+.gwrs{margin:0 0 8px}.gwrsh{font-weight:600;font-size:13px;margin:0 0 2px}
+.grt{width:100%;border-collapse:collapse;font-size:13.5px}.grt th,.grt td{text-align:left;padding:6px 8px;border-bottom:1px solid var(--line)}.grt th{color:var(--mut);font-weight:600;font-size:12px}
+.grt td:nth-child(2){width:70px}.grt input{width:100%}.grt .grk{white-space:nowrap;width:110px}.grt tr.dim td{color:var(--mut)}
+#gwkat .pkwrap{max-height:40vh}
+@media(max-width:700px){.gwkir{flex-direction:column}.gwkir>.btn{min-width:0;order:2}}
 
 /* erzeugt von tools/dunkel.py – nicht von Hand ändern */
 :root[data-theme=dark]{color-scheme:dark;--bg:#0f141b;--panel:#171e29;--ink:#e4e8ef;--mut:#9aa4b4;--line:#2b3442;--acc:#5b8def;--accbg:#1c2b47;--warn:#f79009;--warnbg:#3a2615;--ok:#47cd89;--okbg:#12301f;--vio:#9b8afb;--viobg:#28213d;--teal:#36bffa;--tealbg:#11303a;--bodobg:#1d2939;--sellbg:#11303c}
@@ -919,9 +931,19 @@ img.olg{height:18px;max-width:60px;object-fit:contain;margin-right:6px;vertical-
 :root[data-theme=dark] .oag:hover .oedit,:root[data-theme=dark] .oag .oedit:focus-visible{border-color:var(--acc);color:var(--acc)}
 :root[data-theme=dark] .oadd{border:1px dashed var(--line);border-radius:8px;background:transparent;color:var(--mut)}
 :root[data-theme=dark] .oadd:hover,:root[data-theme=dark] .oadd:focus-visible{border-color:var(--acc);color:var(--acc);background:var(--accbg)}
-:root[data-theme=dark] .gwsel{border-left:1px solid var(--line)}
 :root[data-theme=dark] .gwsum>b{color:var(--mut)}
-:root[data-theme=dark] .gwsel{border-left:0;border-top:1px solid var(--line)}
+:root[data-theme=dark] .gwfest{background:var(--accbg);border-radius:8px}
+:root[data-theme=dark] .gwfest b{color:var(--mut)}
+:root[data-theme=dark] .pkt tr.gh .caret{color:var(--mut)}
+:root[data-theme=dark] .gwki{border:1px solid var(--line);border-radius:10px;background:var(--panel,#171e29)}
+:root[data-theme=dark] .gwkih>b{color:#9ab7de}
+:root[data-theme=dark] .gwkir{border-top:1px solid var(--line)}
+:root[data-theme=dark] .gwkir:first-of-type{border-top:0}
+:root[data-theme=dark] .gwkir small{color:var(--mut)}
+:root[data-theme=dark] .grt{border-collapse:collapse}
+:root[data-theme=dark] .grt th,:root[data-theme=dark] .grt td{border-bottom:1px solid var(--line)}
+:root[data-theme=dark] .grt th{color:var(--mut)}
+:root[data-theme=dark] .grt tr.dim td{color:var(--mut)}
 :root[data-theme=dark] nav button.on{background:#2f6fdf;color:#fff}:root[data-theme=dark] body{background:var(--bg);color:var(--ink)}:root[data-theme=dark] input,:root[data-theme=dark] select,:root[data-theme=dark] textarea{background:#131a24;color:var(--ink);border-color:#3a4456}:root[data-theme=dark] .modal{background:#000000a6}:root[data-theme=dark] img.olg,:root[data-theme=dark] .av img{filter:none}
 @media (prefers-color-scheme:dark){:root[data-theme=auto]{color-scheme:dark;--bg:#0f141b;--panel:#171e29;--ink:#e4e8ef;--mut:#9aa4b4;--line:#2b3442;--acc:#5b8def;--accbg:#1c2b47;--warn:#f79009;--warnbg:#3a2615;--ok:#47cd89;--okbg:#12301f;--vio:#9b8afb;--viobg:#28213d;--teal:#36bffa;--tealbg:#11303a;--bodobg:#1d2939;--sellbg:#11303c}
 :root[data-theme=auto] body{background:var(--bg);color:var(--ink)}
@@ -1384,9 +1406,19 @@ img.olg{height:18px;max-width:60px;object-fit:contain;margin-right:6px;vertical-
 :root[data-theme=auto] .oag:hover .oedit,:root[data-theme=auto] .oag .oedit:focus-visible{border-color:var(--acc);color:var(--acc)}
 :root[data-theme=auto] .oadd{border:1px dashed var(--line);border-radius:8px;background:transparent;color:var(--mut)}
 :root[data-theme=auto] .oadd:hover,:root[data-theme=auto] .oadd:focus-visible{border-color:var(--acc);color:var(--acc);background:var(--accbg)}
-:root[data-theme=auto] .gwsel{border-left:1px solid var(--line)}
 :root[data-theme=auto] .gwsum>b{color:var(--mut)}
-:root[data-theme=auto] .gwsel{border-left:0;border-top:1px solid var(--line)}
+:root[data-theme=auto] .gwfest{background:var(--accbg);border-radius:8px}
+:root[data-theme=auto] .gwfest b{color:var(--mut)}
+:root[data-theme=auto] .pkt tr.gh .caret{color:var(--mut)}
+:root[data-theme=auto] .gwki{border:1px solid var(--line);border-radius:10px;background:var(--panel,#171e29)}
+:root[data-theme=auto] .gwkih>b{color:#9ab7de}
+:root[data-theme=auto] .gwkir{border-top:1px solid var(--line)}
+:root[data-theme=auto] .gwkir:first-of-type{border-top:0}
+:root[data-theme=auto] .gwkir small{color:var(--mut)}
+:root[data-theme=auto] .grt{border-collapse:collapse}
+:root[data-theme=auto] .grt th,:root[data-theme=auto] .grt td{border-bottom:1px solid var(--line)}
+:root[data-theme=auto] .grt th{color:var(--mut)}
+:root[data-theme=auto] .grt tr.dim td{color:var(--mut)}
 :root[data-theme=auto] nav button.on{background:#2f6fdf;color:#fff}:root[data-theme=auto] body{background:var(--bg);color:var(--ink)}:root[data-theme=auto] input,:root[data-theme=auto] select,:root[data-theme=auto] textarea{background:#131a24;color:var(--ink);border-color:#3a4456}:root[data-theme=auto] .modal{background:#000000a6}:root[data-theme=auto] img.olg,:root[data-theme=auto] .av img{filter:none}}
 
 </style>
@@ -1451,7 +1483,7 @@ const COL=new Set();
 let PF="bodo",AF="bodo",GEN=false;
 const PK=[["bodo","Bodo"],["sellify","sellify"],["all","Andere"]];
 const PN={bodo:"Bodo",sellify:"sellify",all:"Andere",multi:"Bodo + sellify"};
-const VER="71";
+const VER="72";
 // Produktbereiche: fest im Programm hinterlegt (Entscheidung Boris 09.10.2026), keine Konfiguration in der Datenbank
 const PT={bodo:"Produktbereich Bodo (Bodo Solutions, Mitgliederverwaltung) – alles, was für Bodo-Kunden und das Bodo-System gebraucht wird. Fest im Programm hinterlegt.",sellify:"Produktbereich sellify (business//acts, CRM-Plattform) – alles, was für sellify-Kunden und das sellify-System gebraucht wird. Fest im Programm hinterlegt.",all:"Andere = produktunabhängig, z. B. Web-QA, E-Mail, Word/PDF. Fest im Programm hinterlegt."};
 let AFIL="all";
@@ -1887,77 +1919,101 @@ function goSkill(aid,sid){const s=sk(sid);if(!s)return;if(EDIT&&blocked())return
   setTimeout(()=>{const el=document.querySelector(`#lib .skill[data-id="${CSS.escape(sid)}"]`);if(!el)return;el.scrollIntoView({block:"center",behavior:"smooth"});el.classList.remove("hit");void el.offsetWidth;el.classList.add("hit")},120)}
 // ===== Agent im Organigramm anlegen oder bearbeiten (Assistent in 4 Schritten) =====
 // Aufruf aus dem Organigramm: „+ Agent“ je Abteilung, Team oder „Ohne Abteilung“ und ✎ an jeder Agentenkarte.
+// Produkt (aus der Organisation) und Platz (aus dem Knopf) stehen fest; verschoben wird im Organigramm über „✎ Bearbeiten“.
 // Gearbeitet wird auf einem Entwurf (Kopie). Erst „Agent anlegen“ bzw. „Änderungen speichern“ übernimmt ihn und speichert;
 // Abbrechen verwirft ihn. Die Ansicht „Agenten“ bleibt die Gesamtübersicht mit allen Feldern.
 const AGW_SCHRITTE=[["grund","Grunddaten"],["skills","Skills"],["regeln","Regeln"],["fertig","Zusammenfassung"]];
-// Produkte, die ein Agent in dieser Organisation haben kann – sonst erschiene er dort nicht (inOrg): das Produkt der Organisation oder produktunabhängig
-const agProdukte=O=>O&&O.prod?[O.prod,"all"]:["all"];
 const agLeer=p=>({id:uid("ag"),n:"",p,owner:null,dep:null,r:"",w:"",bsp:[],note:"",s:[],mcp:[],m:"Sonnet",own:[],gl:GLOBAL.map((g,i)=>i<4?1:0)});
 // Prüfung vor „Weiter“ bzw. „Anlegen“: liefert einen Fehlertext oder ""
 function agPruefen(E){const n=(E.n||"").trim();if(!n)return "Bitte einen Namen eingeben";
   if(AG.some(a=>a.id!==E.id&&a.n.trim().toLowerCase()===n.toLowerCase()))return "Einen Agenten „"+n+"“ gibt es schon – bitte einen anderen Namen wählen";return ""}
+const agPlatzTxt=(E,O)=>{const pl=PL(E,O.id),d=dept(pl.abt),t=teamsOf(d).find(x=>x.id===pl.team);return d?d.n+(t?" · Team "+t.n:""):"ohne Abteilung"};
+const skPasst=(s,p)=>p==="all"||s.p===p||s.p==="all"||s.p==="multi";
+
+// --- KI-Vorschläge für Skills (Fähigkeit „sample“: fragt Claude über das Abo des Betrachters) ---
+// Liefert [{id, warum}] nur mit Skills aus dem Katalog, die zum Produkt passen. Fehler werden als {code} weitergereicht.
+async function agSkillVorschlag(E,O,opts){await sampleP;if(!SAMPLE)throw {code:"not_granted"};
+  const K=SK.filter(s=>skPasst(s,E.p)),d=dept(PL(E,O.id).abt);
+  const prompt=["Du hilfst, einen KI-Agenten in „My Company OS“ zusammenzustellen. Wähle aus dem Skill-Katalog die Skills, die der Agent für sein Ziel braucht – lieber wenige passende als viele.",
+    "AGENT","Name: "+E.n,"Ziel: "+(E.r||"(nicht angegeben)"),"Organisation: "+O.n+(d?" · Abteilung: "+d.n:""),"Produkt: "+PN[E.p],
+    "SKILL-KATALOG (id | Name | Gruppe | Beschreibung)",...K.map(s=>s.id+" | "+s.n+" | "+grName(s.g)+" | "+String(s.d||"").replace(/\s+/g," ").slice(0,220)),
+    'Antworte nur mit JSON: {"vorschlaege":[{"id":"<id aus dem Katalog>","warum":"<ein kurzer Satz auf Deutsch>"}]} – höchstens 6 Einträge, die wichtigsten zuerst, nur ids aus dem Katalog.'].join("\n");
+  const j=await SAMPLE.json(prompt,{modelTier:"quick",...(opts||{})});const L=(j&&Array.isArray(j.vorschlaege))?j.vorschlaege:[];const ok=new Set(K.map(s=>s.id)),seen=new Set();
+  return L.map(x=>({id:String(x&&x.id||""),warum:String(x&&x.warum||"").slice(0,200)})).filter(x=>ok.has(x.id)&&!seen.has(x.id)&&seen.add(x.id)).slice(0,6)}
+const KIV_FEHLER={rate_limited:"Gerade zu viele Anfragen an Claude – bitte später „Neu vorschlagen“.",invalid_json:"Der Vorschlag war nicht lesbar – „Neu vorschlagen“ versuchen.",refused:"Claude hat keinen Vorschlag gemacht – Ziel genauer beschreiben.",empty_completion:"Kein Vorschlag erhalten – Ziel genauer beschreiben.",session_expired:"Bitte in claude.ai neu anmelden.",upstream_error:"Claude war nicht erreichbar – „Neu vorschlagen“ versuchen."};
+const KIV_AUS=new Set(["not_granted","sampling_disabled","not_declared","capability_disabled","capability_removed"]);
 
 // ziel = {org, abt, team} für einen neuen Agenten oder {org, aid} zum Bearbeiten
 function agAssistent(ziel){if(blocked())return;const oid=ziel.org,O=orgById(oid);if(!O)return;
   const alt=ziel.aid?AG.find(x=>x.id===ziel.aid):null;if(ziel.aid&&!alt)return toast("Agent nicht gefunden");
-  const E=alt?JSON.parse(JSON.stringify(alt)):agLeer(agProdukte(O)[0]);
+  const E=alt?JSON.parse(JSON.stringify(alt)):agLeer(O.prod||"all");
   if(!alt){if(ziel.abt)moveAg(E,oid,ziel.abt,ziel.team||"");const a=adapter(E.p);if(a)E.mcp=[a.n];const me=ME();if(me&&(me.orgs||[]).includes(oid))E.owner=me.id}
   const START=JSON.stringify(E),SEL=new Set(E.s);let schritt=0,weit=alt?AGW_SCHRITTE.length-1:0;
-  const close=modalBox(`<div class="bhead"><h3 id="gwh"></h3><button class="ic" id="mclose" style="font-size:18px" title="Abbrechen">✕</button></div>
+  // KI-Vorschläge: kiv = {st:"leer"|"laeuft"|"ok"|"fehler"|"aus", L:[{id,warum}], t, key}
+  const kiv={st:"leer",L:[],t:"",key:""};let kivCtl=null;
+  const close0=modalBox(`<div class="bhead"><h3 id="gwh"></h3><button class="ic" id="mclose" style="font-size:18px" title="Abbrechen">✕</button></div>
     <div class="steps2" id="gwst"></div><div id="gwb"></div><div class="warnbox" id="gwerr" style="display:none;margin-top:10px"></div>
     <div class="btns" id="gwf" style="margin-top:14px;align-items:center"></div>`,true);
-  const kopf=()=>{$("#gwh").textContent=alt?"Agent „"+alt.n+"“ bearbeiten":"Neuer Agent in "+(dept(PL(E,oid).abt)?"„"+dept(PL(E,oid).abt).n+"“":"„"+(O.kurz||O.n)+"“ · ohne Abteilung")};
+  const close=()=>{if(kivCtl)kivCtl.abort();close0()};
+  const kopf=()=>{$("#gwh").textContent=alt?"Agent „"+alt.n+"“ bearbeiten":"Neuer Agent in „"+(dept(PL(E,oid).abt)?dept(PL(E,oid).abt).n:(O.kurz||O.n)+" · ohne Abteilung")+"“"};
   const fehler=t=>{const b=$("#gwerr");b.style.display=t?"":"none";b.textContent=t||""};
   const syncSkills=()=>{E.s=E.s.filter(x=>SEL.has(x)).concat([...SEL].filter(x=>!E.s.includes(x)))};
   const abbrechen=async()=>{if(JSON.stringify(E)!==START&&!await askOk(alt?"Änderungen an „"+alt.n+"“ verwerfen?":"Entwurf für den neuen Agenten verwerfen?","Verwerfen"))return;close()};
   $("#mclose").onclick=abbrechen;
 
-  // --- Schritt 1: Grunddaten ---
-  const grund=B=>{const pl=PL(E,oid),T=teamsOf(dept(pl.abt)),P=agProdukte(O).includes(E.p)?agProdukte(O):[E.p,...agProdukte(O)];
-    B.innerHTML=`<div class="field"><label>Name <span class="need">Pflicht</span></label><input type="text" id="gwn" value="${esc(E.n)}" placeholder="z. B. Angebotsassistent"></div>
-      <div class="field"><label>Ziel – was erreicht der Agent?</label><textarea id="gwr" placeholder="z. B. Erstellt nach einem Erstgespräch Angebot und Begleitmail für den Interessenten.">${esc(E.r)}</textarea></div>
-      <div class="row"><div class="field"><label>Produkt</label><select id="gwp">${P.map(p=>`<option value="${p}" ${E.p===p?"selected":""}>${esc(PN[p])}</option>`).join("")}</select></div>
-        <div class="field"><label>Modell</label><select id="gwm">${["Opus","Sonnet","Haiku"].map(m=>`<option ${m===E.m?"selected":""}>${m}</option>`).join("")}</select></div></div>
-      <div class="hint" style="margin:-6px 0 10px">${O.prod?"Vorbelegt mit dem Produkt der Organisation. „"+esc(PN.all)+"“ = produktunabhängig, erscheint in jeder Organisation.":"Die Organisation hat kein Produkt – der Agent ist produktunabhängig und erscheint in jeder Organisation."}</div>
-      <div class="row"><div class="field"><label>Abteilung · ${esc(O.kurz||O.n)}</label><select id="gwa"><option value="">– ohne Abteilung –</option>${deptsOf(oid).map(d=>`<option value="${d.id}" ${pl.abt===d.id?"selected":""}>${esc(d.n)}</option>`).join("")}</select></div>
-        <div class="field"><label>Team</label><select id="gwt" ${T.length?"":"disabled"}><option value="">${T.length?"– direkt in der Abteilung –":"– keine Teams –"}</option>${T.map(t=>`<option value="${t.id}" ${pl.team===t.id?"selected":""}>${esc(t.n)}</option>`).join("")}</select></div></div>
+  // --- Schritt 1: Grunddaten (Produkt und Platz stehen fest) ---
+  const grund=B=>{
+    B.innerHTML=`<div class="gwfest"><span><b>Produkt</b> ${esc(PN[E.p])}</span><span><b>Platz</b> ${esc(O.kurz||O.n)} · ${esc(agPlatzTxt(E,O))}</span></div>
+      <div class="field"><label>Name <span class="need">Pflicht</span></label><input type="text" id="gwn" value="${esc(E.n)}" placeholder="z. B. Angebotsassistent"></div>
+      <div class="field"><label>Ziel – was erreicht der Agent?</label><textarea id="gwr" placeholder="z. B. Erstellt nach einem Erstgespräch Angebot und Begleitmail für den Interessenten.">${esc(E.r)}</textarea>
+        <div class="hint" style="margin:4px 0 0">Aus Name und Ziel schlägt Claude im nächsten Schritt passende Skills vor.</div></div>
       <div class="row"><div class="field"><label>Verantwortlich (Mensch)</label>${usersSel("gwo",E.owner,"– offen –")}</div><div class="field"><label>Vertretung</label>${usersSel("gwd",E.dep,"– offen –")}</div></div>
-      <div class="field"><label>Verbindungen (MCP)</label><div style="display:flex;gap:16px;flex-wrap:wrap">${adapterListe().map(x=>`<label class="cb"><input type="checkbox" data-gwc="${esc(x.n)}" ${E.mcp.includes(x.n)?"checked":""}> ${esc(x.n)}</label>`).join("")}</div></div>`;
+      <div class="row"><div class="field"><label>Modell</label><select id="gwm">${["Opus","Sonnet","Haiku"].map(m=>`<option ${m===E.m?"selected":""}>${m}</option>`).join("")}</select></div>
+        <div class="field"><label>Verbindungen (MCP)</label><div style="display:flex;gap:16px;flex-wrap:wrap;padding-top:6px">${adapterListe().map(x=>`<label class="cb"><input type="checkbox" data-gwc="${esc(x.n)}" ${E.mcp.includes(x.n)?"checked":""}> ${esc(x.n)}</label>`).join("")}</div></div></div>`;
     $("#gwn").oninput=e=>{E.n=e.target.value;fehler("")};$("#gwr").oninput=e=>{E.r=e.target.value};$("#gwm").onchange=e=>{E.m=e.target.value};
-    $("#gwp").onchange=e=>{E.p=e.target.value};
-    $("#gwa").onchange=e=>{moveAg(E,oid,e.target.value,"");kopf();zeige()};$("#gwt").onchange=e=>{moveAg(E,oid,PL(E,oid).abt,e.target.value)};
     $("#gwo").onchange=e=>{E.owner=e.target.value||null;if(E.owner&&E.dep===E.owner){E.dep=null;zeige()}};$("#gwd").onchange=e=>{E.dep=e.target.value||null};
     B.querySelectorAll("[data-gwc]").forEach(c=>c.onchange=()=>{E.mcp=c.checked?[...E.mcp,c.dataset.gwc]:E.mcp.filter(x=>x!==c.dataset.gwc)});
     if(!alt)setTimeout(()=>{const n=$("#gwn");if(n)n.focus()},30)};
 
-  // --- Schritt 2: Skills aus dem Katalog ---
-  const skills=B=>{B.innerHTML=`<div class="gwsk"><div id="gwkat"></div><div class="gwsel"><div class="flabel" id="gwsn"></div><div id="gwsl"></div></div></div>`;
-    const auswahl=()=>{syncSkills();$("#gwsn").textContent="Ausgewählt ("+E.s.length+")";
-      $("#gwsl").innerHTML=E.s.map(id=>{const s=sk(id),b=s&&bad(E,s),dim=s&&["entwurf","vorschlag"].includes(srcOf(s));return `<span class="chip ${b?"bad":""}" title="${b?"Gehört zu "+esc(PN[s.p])+" – passt nicht zum Produkt dieses Agenten":dim?"Noch nicht im Konto":""}"><span>${b?"⚠ ":""}${esc(s?s.n:id)}${dim?` <small class="prf">· ${srcOf(s)==="vorschlag"?"Vorschlag":"Entwurf"}</small>`:""}</span><button class="ic" data-gwx="${esc(id)}" title="entfernen">×</button></span>`}).join("")||'<span class="hint">Noch keine Skills – links ankreuzen.</span>';
-      $("#gwsl").querySelectorAll("[data-gwx]").forEach(b=>b.onclick=()=>{SEL.delete(b.dataset.gwx);K.draw();auswahl()})};
-    const K=skAuswahl($("#gwkat"),{p:E.p,SEL,onChange:auswahl});auswahl()};
+  // --- Schritt 2: Skills – oben die Vorschläge der KI, darunter der Katalog in Gruppen ---
+  let K=null;
+  const kivZeichnen=()=>{const b=$("#gwki");if(!b)return;
+    const kopfz=`<div class="gwkih"><b>✦ Vorschläge von Claude</b><span class="hint" style="margin:0">aus Name und Ziel</span><span style="flex:1"></span>${kiv.st==="laeuft"?'<button class="btn sm" id="gwkis">Stopp</button>':kiv.st==="aus"?"":'<button class="btn sm" id="gwkin">Neu vorschlagen</button>'}${kiv.st==="ok"&&kiv.L.some(x=>!SEL.has(x.id))?'<button class="btn sm p" id="gwkia">Alle übernehmen</button>':""}</div>`;
+    const rumpf=kiv.st==="laeuft"?'<div class="hint">Claude sucht passende Skills …</div>':kiv.st==="aus"?'<div class="hint">KI-Vorschläge sind in dieser Ansicht nicht verfügbar – bitte unten aus dem Katalog wählen.</div>':kiv.st==="fehler"?`<div class="hint">${esc(kiv.t)}</div>`:kiv.st==="ok"&&!kiv.L.length?'<div class="hint">Kein passender Skill im Katalog gefunden.</div>':kiv.st==="ok"?kiv.L.map(x=>{const s=sk(x.id),dr=SEL.has(x.id);return `<div class="gwkir ${dr?"on":""}"><button class="btn sm ${dr?"":"p"}" data-kiv="${esc(x.id)}">${dr?"✓ übernommen":"Übernehmen"}</button><div><b>${esc(s.n)}</b> ${srcBadge(s)}<small>${esc(x.warum)}</small></div></div>`}).join(""):'<div class="hint">Für Vorschläge in den Grunddaten einen Namen und am besten ein Ziel angeben.</div>';
+    b.innerHTML=kopfz+rumpf;
+    const st=$("#gwkis");if(st)st.onclick=()=>{if(kivCtl)kivCtl.abort()};const nn=$("#gwkin");if(nn)nn.onclick=()=>kivLaden(true);
+    const al=$("#gwkia");if(al)al.onclick=()=>{kiv.L.forEach(x=>SEL.add(x.id));if(K)K.draw();auswahl()};
+    b.querySelectorAll("[data-kiv]").forEach(x=>x.onclick=()=>{const id=x.dataset.kiv;SEL.has(id)?SEL.delete(id):SEL.add(id);if(K)K.draw();auswahl()})};
+  const kivLaden=async neu=>{if(!E.n.trim()){kiv.st="leer";return kivZeichnen()}if(kivCtl)kivCtl.abort();const ctl=kivCtl=new AbortController();
+    kiv.key=E.n+"|"+E.r+"|"+E.p;kiv.st="laeuft";kivZeichnen();
+    try{const L=await agSkillVorschlag(E,O,{signal:ctl.signal,...(neu?{cache:false}:{})});if(kivCtl!==ctl)return;kiv.L=L;kiv.st="ok"}
+    catch(e){if(kivCtl!==ctl)return;const c=e&&e.code;if(c==="cancelled"){kiv.st=kiv.L.length?"ok":"fehler";kiv.t="Abgebrochen – „Neu vorschlagen“ startet erneut."}else if(KIV_AUS.has(c))kiv.st="aus";else{kiv.st="fehler";kiv.t=KIV_FEHLER[c]||KIV_FEHLER.upstream_error}}
+    if(kivCtl===ctl)kivCtl=null;kivZeichnen()};
+  const auswahl=()=>{syncSkills();const n=$("#gwsn");if(!n)return;n.textContent="Ausgewählt ("+E.s.length+")";
+    $("#gwsl").innerHTML=E.s.map(id=>{const s=sk(id),b=s&&bad(E,s),dim=s&&["entwurf","vorschlag"].includes(srcOf(s));return `<span class="chip ${b?"bad":""}" title="${b?"Gehört zu "+esc(PN[s.p])+" – passt nicht zum Produkt dieses Agenten":dim?"Noch nicht im Konto":""}"><span>${b?"⚠ ":""}${esc(s?s.n:id)}${dim?` <small class="prf">· ${srcOf(s)==="vorschlag"?"Vorschlag":"Entwurf"}</small>`:""}</span><button class="ic" data-gwx="${esc(id)}" title="entfernen">×</button></span>`}).join("")||'<span class="hint" style="margin:0">noch keine – Vorschläge übernehmen oder unten ankreuzen</span>';
+    $("#gwsl").querySelectorAll("[data-gwx]").forEach(b=>b.onclick=()=>{SEL.delete(b.dataset.gwx);if(K)K.draw();auswahl()});kivZeichnen()};
+  const skills=B=>{B.innerHTML=`<div class="gwki" id="gwki"></div><div class="gwselbar"><span class="flabel" id="gwsn"></span><div id="gwsl"></div></div><div class="flabel" style="margin-top:12px">Skill-Katalog</div><div id="gwkat"></div>`;
+    K=skAuswahl($("#gwkat"),{p:E.p,SEL,onChange:auswahl,fokus:false});auswahl();
+    if(kiv.st!=="aus"&&kiv.key!==E.n+"|"+E.r+"|"+E.p)kivLaden(false)};
 
-  // --- Schritt 3: Regeln ---
-  const regeln=B=>{const inh=inherited(E);
-    B.innerHTML=`<div class="lpwrap"><div class="lpsec"><h4>Eigene Regeln dieses Agenten <span class="badge">${E.own.length}</span></h4>
+  // --- Schritt 3: Regeln – die Regeln der gewählten Skills (nur Anzeige) und eigene Regeln ---
+  const regeln=B=>{const S=E.s.map(sk).filter(Boolean).map(s=>({s,R:skRegeln(s,E.p)})),nR=S.reduce((n,x)=>n+x.R.length,0);
+    B.innerHTML=`<div class="lpwrap"><div class="lpsec"><h4>Aus den gewählten Skills <span class="badge lp">${nR}</span><span class="hint" style="margin:0;font-weight:400">kommen aus dem Skill, dort änderbar</span></h4>
+        ${S.length?S.map(({s,R})=>`<div class="gwrs"><div class="gwrsh">⛨ ${esc(s.n)}</div>${R.map(x=>`<div class="lprule"><span class="txt">${esc(x.r)}</span>${x.l?`<span class="src">${esc(x.l)}</span>`:""}</div>`).join("")||'<div class="hint" style="margin:0">keine Regeln</div>'}</div>`).join(""):'<div class="hint">Noch keine Skills gewählt.</div>'}</div>
+      <div class="lpsec"><h4>Eigene Regeln dieses Agenten <span class="badge">${E.own.length}</span></h4>
         ${E.own.map((r,i)=>`<div class="lprule"><span class="txt">${esc(r)}</span><button class="ic" data-gwro="${i}" title="entfernen">×</button></div>`).join("")||'<div class="hint">Noch keine.</div>'}
-        <div class="ownadd"><input type="text" id="gwown" placeholder="Neue Regel, z. B. „Angebote nie ohne Freigabe versenden“ …"><button class="btn" id="gwownb">Hinzufügen</button></div></div>
-      <div class="lpsec"><h4>Aus den Skills geerbt <span class="badge lp">${inh.length}</span><span class="hint" style="margin:0;font-weight:400">automatisch, nur im Skill änderbar</span></h4>
-        ${inh.map(([r,srcs])=>`<div class="lprule"><span class="txt">${esc(r)}</span>${srcs.map(x=>`<span class="src" title="${esc(x.s.id)}">⛨ ${esc(x.l)}</span>`).join(" ")}</div>`).join("")||'<div class="hint">Die gewählten Skills bringen keine Leitplanken mit.</div>'}</div>
-      <div class="lpsec"><h4>Deine allgemeinen Vorgaben</h4><div class="hint" style="margin:0 0 6px">Gelten in Cowork sowieso immer. Häkchen = zusätzlich fest in den Agenten schreiben.</div>
-        ${GLOBAL.map((r,i)=>`<label class="cb"><input type="checkbox" data-gwgl="${i}" ${E.gl[i]?"checked":""}> ${esc(r)}</label>`).join("")}</div></div>`;
+        <div class="ownadd"><input type="text" id="gwown" placeholder="Neue Regel, z. B. „Angebote nie ohne Freigabe versenden“ …"><button class="btn" id="gwownb">Hinzufügen</button></div></div></div>`;
     const add=()=>{const v=$("#gwown").value.trim();if(!v)return;if(E.own.includes(v))return toast("Diese Regel gibt es schon");E.own.push(v);zeige();const i=$("#gwown");if(i)i.focus()};
     $("#gwownb").onclick=add;$("#gwown").onkeydown=e=>{if(e.key==="Enter")add()};
-    B.querySelectorAll("[data-gwro]").forEach(b=>b.onclick=()=>{E.own.splice(+b.dataset.gwro,1);zeige()});
-    B.querySelectorAll("[data-gwgl]").forEach(c=>c.onchange=()=>{E.gl[+c.dataset.gwgl]=c.checked?1:0})};
+    B.querySelectorAll("[data-gwro]").forEach(b=>b.onclick=()=>{E.own.splice(+b.dataset.gwro,1);zeige()})};
 
   // --- Schritt 4: Zusammenfassung ---
-  const fertig=B=>{const pl=PL(E,oid),d=dept(pl.abt),t=teamsOf(d).find(x=>x.id===pl.team),ow=usr(E.owner),dp=usr(E.dep),inh=inherited(E);
-    const S=E.s.map(id=>sk(id)),falsch=S.filter(s=>s&&bad(E,s)),entw=S.filter(s=>s&&["entwurf","vorschlag"].includes(srcOf(s)));
+  const fertig=B=>{const ow=usr(E.owner),dp=usr(E.dep),S=E.s.map(id=>sk(id)),nR=S.reduce((n,s)=>n+(s?skRegeln(s,E.p).length:0),0);
+    const falsch=S.filter(s=>s&&bad(E,s)),entw=S.filter(s=>s&&["entwurf","vorschlag"].includes(srcOf(s)));
     const z=(k,v,warn)=>`<b>${k}</b><span${warn?' style="color:var(--warn)"':""}>${v}</span>`;
-    B.innerHTML=`<div class="gwsum">${z("Name",esc(E.n))}${z("Platz",esc(O.kurz||O.n)+" · "+(d?esc(d.n)+(t?" · Team "+esc(t.n):""):"ohne Abteilung"))}${z("Produkt · Modell",esc(PN[E.p])+" · "+esc(E.m))}
+    B.innerHTML=`<div class="gwsum">${z("Name",esc(E.n))}${z("Platz",esc(O.kurz||O.n)+" · "+esc(agPlatzTxt(E,O)))}${z("Produkt · Modell",esc(PN[E.p])+" · "+esc(E.m))}
       ${z("Ziel",E.r?esc(E.r):"offen",!E.r)}${z("Verantwortlich",ow?esc(ow.n)+(dp?" · Vertretung "+esc(dp.n):" · Vertretung offen"):"offen",!ow)}${z("Verbindungen",E.mcp.length?esc(E.mcp.join(", ")):"keine")}
-      ${z("Skills",S.length?S.map(s=>s?esc(s.n):"?").join(", "):"keine",!S.length)}${z("Regeln",E.own.length+" eigene · "+inh.length+" aus Skills geerbt")}
+      ${z("Skills",S.length?S.map(s=>s?esc(s.n):"?").join(", "):"keine",!S.length)}${z("Regeln",nR+" aus den Skills · "+E.own.length+" eigene")}
       ${z("Einsatz",E.w&&(E.bsp||[]).length?"festgelegt":"„Wann einsetzen?“ und Beispielsätze offen – für das Plugin nötig, in der Ansicht „Agenten“ unter Einsatz ergänzen",!(E.w&&(E.bsp||[]).length))}</div>
       ${falsch.length?`<div class="warnbox" style="margin-top:10px">⚠ ${falsch.map(s=>esc(s.n)).join(", ")} ${falsch.length===1?"gehört":"gehören"} zu einem anderen Produkt.</div>`:""}
       ${entw.length?`<div class="hint" style="margin-top:8px">${entw.map(s=>esc(s.n)).join(", ")}: noch nicht im Konto (Entwurf bzw. Vorschlag) – der Agent kann ${entw.length===1?"diesen Skill":"diese Skills"} erst nutzen, wenn ${entw.length===1?"er":"sie"} übernommen ${entw.length===1?"ist":"sind"}.</div>`:""}`};
@@ -1965,9 +2021,9 @@ function agAssistent(ziel){if(blocked())return;const oid=ziel.org,O=orgById(oid)
   // --- Anlegen bzw. Speichern ---
   const sichern=()=>{const f=agPruefen(E);if(f){schritt=0;zeige();return fehler(f)}E.n=E.n.trim();
     if(alt){const vor=JSON.parse(JSON.stringify(alt));Object.keys(alt).forEach(k=>delete alt[k]);Object.assign(alt,E);const pv=markProv("agents",alt,vor);schedule();close();org();toast("Agent „"+alt.n+"“ gespeichert");if(pv)setTimeout(()=>provConfirm([["agents",alt]]),60);return}
-    E.ord=AG.length;AG.push(E);schedule();org();
+    E.ord=AG.length;AG.push(E);schedule();org();if(kivCtl)kivCtl.abort();
     $("#gwh").textContent="Agent „"+E.n+"“ ist angelegt";$("#gwst").innerHTML="";fehler("");
-    $("#gwb").innerHTML=`<p style="margin:0 0 6px">Der Agent steht jetzt im Organigramm${dept(PL(E,oid).abt)?" in „"+esc(dept(PL(E,oid).abt).n)+"“":""}. Alle Felder findest du auch in der Ansicht „Agenten“.</p>${E.w&&(E.bsp||[]).length?"":'<div class="hint">Für das Plugin fehlen noch „Wann einsetzen?“ und Beispielsätze.</div>'}`;
+    $("#gwb").innerHTML=`<p style="margin:0 0 6px">Der Agent steht jetzt im Organigramm in „${esc(agPlatzTxt(E,O))}“. Alle Felder findest du auch in der Ansicht „Agenten“.</p>${E.w&&(E.bsp||[]).length?"":'<div class="hint">Für das Plugin fehlen noch „Wann einsetzen?“ und Beispielsätze.</div>'}`;
     $("#gwf").innerHTML=`<button class="btn" id="gwopen">Im Agenten öffnen</button><span style="flex:1"></span><button class="btn" id="gwdone">Fertig</button><button class="btn p" id="gwgo">▶ Ersten Auftrag geben</button>`;
     $("#mclose").onclick=$("#gwdone").onclick=close;$("#gwopen").onclick=()=>{close();goAgent(E.id)};
     $("#gwgo").onclick=()=>{close();startModal(null,{art:"agent",aid:E.id,org:oid})}};
@@ -1977,7 +2033,7 @@ function agAssistent(ziel){if(blocked())return;const oid=ziel.org,O=orgById(oid)
   function zeige(){kopf();
     $("#gwst").innerHTML=AGW_SCHRITTE.map(([k,l],i)=>`<span class="${i===schritt?"on":i<=weit?"ok":""}" ${i<=weit&&i!==schritt?`data-gws="${i}" role="button" tabindex="0" title="Zu „${l}“"`:""}>${i+1} · ${l}</span>`).join("");
     $("#gwst").querySelectorAll("[data-gws]").forEach(s=>{s.onclick=()=>geh(+s.dataset.gws);s.onkeydown=e=>{if(e.key==="Enter")geh(+s.dataset.gws)}});
-    ANS[AGW_SCHRITTE[schritt][0]]($("#gwb"));const letzt=schritt===AGW_SCHRITTE.length-1;
+    K=null;ANS[AGW_SCHRITTE[schritt][0]]($("#gwb"));const letzt=schritt===AGW_SCHRITTE.length-1;
     $("#gwf").innerHTML=`<button class="btn" id="gwx">Abbrechen</button><span style="flex:1"></span>${schritt?'<button class="btn" id="gwz">◂ Zurück</button>':""}${letzt?`<button class="btn p" id="gwok">${alt?"Änderungen speichern":"Agent anlegen"}</button>`:`<button class="btn ${alt?"":"p"}" id="gww">Weiter ▸</button>`}${alt&&!letzt?'<button class="btn p" id="gwok">Speichern</button>':""}`;
     $("#gwx").onclick=abbrechen;const z=$("#gwz");if(z)z.onclick=()=>geh(schritt-1);const w=$("#gww");if(w)w.onclick=()=>geh(schritt+1);const ok=$("#gwok");if(ok)ok.onclick=sichern}
   zeige()}
@@ -2104,14 +2160,39 @@ function fzHit(hay,q){q=fzNorm(q).trim();if(!q)return true;const H=fzNorm(hay),H
     for(let i=3;i<=w.length-3;i++){if(H.includes(w.slice(0,i))&&H.includes(w.slice(i)))return true}return false})}
 const skMatch=(s,q)=>!q||fzHit([s.id,s.n,s.d,grName(s.g),...KS(s)].join(" "),q);
 const skVis=s=>skOrgOk(s,SKORG)&&(!SKSRC||srcOf(s)===SKSRC)&&(AFIL==="ohne"?!use(s.id):AFIL==="used"?use(s.id)>0:true);
+// ===== Skill-Gruppen =====
+// meta/config.groups = [{id, n}] in Anzeigereihenfolge; jeder Skill verweist mit s.g auf die Gruppen-Id ("" = ohne Gruppe).
+// Feste Ids statt Listenposition: Umbenennen, Umsortieren und Entfernen einer Gruppe verschiebt keinen Skill in eine falsche Gruppe.
+// Ältere Daten (groups als Namen, s.g als Position) stellt grMigrieren() beim Laden einmalig um.
+const GR_OHNE={id:"",n:"Ohne Gruppe"};
+const grSlug=n=>"gr-"+(String(n).toLowerCase().replace(/ä/g,"ae").replace(/ö/g,"oe").replace(/ü/g,"ue").replace(/ß/g,"ss").replace(/[^a-z0-9]+/g,"-").replace(/^-|-$/g,"").slice(0,40)||"gruppe");
+function grNeuId(n){const b=grSlug(n);let id=b,i=2;while(GR.some(g=>g.id===id))id=b+"-"+i++;return id}
+const grById=id=>GR.find(g=>g.id===id)||null;
+const grIdx=id=>{const i=GR.findIndex(g=>g.id===id);return i<0?GR.length:i};
+const grName=id=>(grById(id)||GR_OHNE).n;
+// Gruppen mit ihren Skills aus L in Anzeigereihenfolge; „Ohne Gruppe“ am Ende, wenn sie Skills hat
+const grMitSkills=L=>[...GR,GR_OHNE].map(g=>({g,S:L.filter(s=>(grById(s.g)?s.g:"")===g.id)})).filter(x=>x.S.length);
+// Gruppe anlegen (Name muss neu sein); liefert die Gruppe oder null
+function grAnlegen(n){n=String(n||"").trim();if(!n)return null;if(GR.some(g=>g.n.toLowerCase()===n.toLowerCase())){toast("Diese Gruppe gibt es schon");return null}const g={id:grNeuId(n),n};GR.push(g);return g}
+// Verweis eines Skills auf eine Gruppe deuten: Id, ältere Listenposition oder Gruppenname
+function grIdVon(g,alt){if(g==null||g==="")return "";if(GR.some(x=>x.id===g))return g;
+  if(typeof g==="number"||/^\d+$/.test(String(g))){const x=(alt||GR)[+g];return x?(typeof x==="string"?(GR.find(y=>y.n===x)||{}).id||"":x.id):""}
+  const m=GR.find(x=>x.n.toLowerCase()===String(g).toLowerCase());return m?m.id:""}
+function grMigrieren(){let ch=false;const alt=GR.slice();
+  if(GR.some(g=>typeof g==="string"||!g||!g.id)){const neu=[];GR=neu;alt.forEach(g=>{const n=typeof g==="string"?g:(g&&g.n)||"Gruppe";neu.push({id:grNeuId(n),n})});ch=true}
+  SK.forEach(s=>{const id=grIdVon(s.g,alt);if(id!==s.g){s.g=id;ch=true}});return ch}
+// <option>-Liste der Gruppen für Auswahlfelder
+const grOpts=(cur,ohne)=>(ohne?`<option value="">${esc(GR_OHNE.n)}</option>`:"")+GR.map(g=>`<option value="${esc(g.id)}" ${g.id===cur?"selected":""}>${esc(g.n)}</option>`).join("");
+
 function lib(){
   if(!$("#lib"))return;const q=$("#q").value.toLowerCase().trim();let h="";
-  GR.forEach((g,gi)=>{
-    const all=SK.filter(s=>s.g===gi&&skVis(s)),items=all.filter(s=>skMatch(s,q));
+  const GL=[...GR,...(SK.some(s=>!grById(s.g))?[GR_OHNE]:[])];
+  GL.forEach(g=>{const gi=g.id;
+    const all=SK.filter(s=>(grById(s.g)?s.g:"")===gi&&skVis(s)),items=all.filter(s=>skMatch(s,q));
     if(!all.length&&!isEd("lib"))return;
     if(q&&!items.length)return;
     const col=!q&&COL.has(gi);
-    h+=`<div class="grp ${col?'col':''}" data-g="${gi}"><div class="ghead" data-tg="${gi}"><span class="caret">▾</span>${esc(g)} <span class="cnt">(${q?items.length+"/":""}${all.length})</span>${isEd("lib")?`<button class="ic" data-rg="${gi}" title="Gruppe umbenennen">✎</button>`:""}</div><div class="gbody">`;
+    h+=`<div class="grp ${col?'col':''}" data-g="${gi}"><div class="ghead" data-tg="${gi}"><span class="caret">▾</span>${esc(g.n)} <span class="cnt">(${q?items.length+"/":""}${all.length})</span>${isEd("lib")&&gi?`<button class="ic" data-rg="${gi}" title="Gruppe umbenennen">✎</button>`:""}</div><div class="gbody">`;
     items.forEach(s=>{const u=use(s.id);
       h+=`<div class="skill p-${s.p} ${s.neu?'neu':''} ${SKSEL===s.id?'sel':''}" ${isEd("lib")?'draggable="true"':''} data-id="${s.id}"><div class="t"><b>${esc(s.n)}</b>${s.p==="multi"?`<span class="pb multi">Kern</span> <span class="pb bodo">Bodo</span> <span class="pb sellify">sellify${s.prof&&s.prof.sellify&&s.prof.sellify.neu?" · neu":""}</span>`:`<span class="pb ${s.p}">${PN[s.p]}</span>`} ${srcBadge(s)}${s.prov?` <span class="pvb ${s.prov.stat}" title="${s.prov.stat==="frei"?"Freigegeben – wird beim nächsten Abgleich zu Claude übertragen":"Im Cockpit geändert – noch nicht zur Übertragung an Claude freigegeben"}">⇅ ${s.prov.stat==="frei"?"freigegeben":"nicht bei Claude"}</span>`:""}<small>${esc(s.d)}</small>${ksLine(s)}</div>
       <div class="side"><button class="ic" data-edit="${s.id}" title="Skill bearbeiten">⚙</button><span class="badge ${s.std?'std':''} ${u?'':'zero'}" title="${u?'Wird von '+u+' Agent(en) genutzt':'Von keinem Agenten genutzt'}">in ${u} Ag.</span>${allLp(s)?`<span class="badge lp" title="${allLp(s)} Leitplanke(n)">⛨ ${allLp(s)}</span>`:''}</div></div>`});
@@ -2121,15 +2202,15 @@ function lib(){
   const le=isEd("lib");$("#libp").classList.toggle("editing",le);$("#newG").style.display=le?"":"none";$("#libed").innerHTML=le?edBtns(1):`<button class="btn sm ebtn" id="libedit" title="Gruppen anlegen, umbenennen und Skills per Ziehen umsortieren">✎ Gruppen ordnen</button>`;
   const lb=$("#libedit");if(lb)lb.onclick=()=>{if(startEdit("lib",null,null,["meta/config",...SK.map(s=>"skills/"+s.id)])){COL.clear();render();toast("Skills auf eine Gruppe ziehen = umsortieren")}};bindEd($("#libed"),()=>render());
   $("#lib").innerHTML=h||`<p class="hint">${AFIL==="ohne"?"Alle passenden Skills sind mindestens einem Agenten zugeordnet.":"Keine Skills für diesen Filter."}</p>`;seg();skDetail();
-  document.querySelectorAll("[data-tg]").forEach(e=>e.onclick=ev=>{if(ev.target.closest("[data-rg]"))return;const g=+e.dataset.tg;COL.has(g)?COL.delete(g):COL.add(g);lib()});
+  document.querySelectorAll("[data-tg]").forEach(e=>e.onclick=ev=>{if(ev.target.closest("[data-rg]"))return;const g=e.dataset.tg;COL.has(g)?COL.delete(g):COL.add(g);lib()});
   document.querySelectorAll("#lib .skill").forEach(e=>{
     e.ondragstart=ev=>ev.dataTransfer.setData("t",e.dataset.id);
     e.onclick=ev=>{if(ev.target.closest("[data-edit]"))return;SKSEL=e.dataset.id;document.querySelectorAll("#lib .skill.sel").forEach(x=>x.classList.remove("sel"));e.classList.add("sel");skDetail()}});
   document.querySelectorAll("#lib [data-edit]").forEach(b=>b.onclick=()=>skillModal(b.dataset.edit));
-  document.querySelectorAll("[data-rg]").forEach(b=>b.onclick=async ev=>{ev.stopPropagation();if(!isEd("lib"))return toast("Gruppen umbenennen: erst „✎ Gruppen ordnen“");const n=await askText("Gruppe umbenennen",GR[+b.dataset.rg]);if(n){GR[+b.dataset.rg]=n;render();schedule()}});
+  document.querySelectorAll("[data-rg]").forEach(b=>b.onclick=async ev=>{ev.stopPropagation();if(!isEd("lib"))return toast("Gruppen umbenennen: erst „✎ Gruppen ordnen“");const G=grById(b.dataset.rg),n=G&&await askText("Gruppe umbenennen",G.n);if(n){G.n=n;render();schedule()}});
   document.querySelectorAll(".grp").forEach(g=>{
     g.ondragover=e=>{if(!isEd("lib"))return;e.preventDefault();g.classList.add("over")};g.ondragleave=()=>g.classList.remove("over");
-    g.ondrop=e=>{e.preventDefault();g.classList.remove("over");if(!isEd("lib"))return;const s=sk(e.dataTransfer.getData("t"));if(s){s.g=+g.dataset.g;COL.delete(s.g);render();toast("Verschoben nach „"+GR[s.g]+"“")}}});
+    g.ondrop=e=>{e.preventDefault();g.classList.remove("over");if(!isEd("lib"))return;const s=sk(e.dataTransfer.getData("t"));if(s){s.g=g.dataset.g;COL.delete(s.g);render();toast("Verschoben nach „"+grName(s.g)+"“")}}});
 }
 function skDetail(){const P=$("#skdet");if(!P)return;const s=SKSEL&&sk(SKSEL);
   if(!s){P.innerHTML='<h2>Details</h2><p class="hint">Links einen Skill antippen – hier erscheinen Beschreibung, Leitplanken, Inhalt und die Agenten, die ihn nutzen.</p>';return}
@@ -2143,22 +2224,25 @@ function skDetail(){const P=$("#skdet");if(!P)return;const s=SKSEL&&sk(SKSEL);
    ${s.body?`<details><summary>Inhalt (SKILL.md)</summary><pre>${esc(s.body)}</pre></details>`:""}`;
   $("#skdedit").onclick=()=>skillModal(s.id);
   P.querySelectorAll("[data-goag]").forEach(c=>c.onclick=()=>goAgent(c.dataset.goag))}
-// Skill-Auswahl aus dem Katalog: Suche, Gruppen (ganze Gruppe per Häkchen), Produktfilter; Entwürfe und Vorschläge sind markiert.
-// Zeichnet in root. SEL (Set der Skill-Ids) wird direkt geändert; onChange läuft nach jeder Änderung. Genutzt von skPick und dem Agenten-Assistenten.
-function skAuswahl(root,{p,SEL,onChange,fokus}){let q="",only=true;
+// Skill-Auswahl aus dem Katalog: Suche, aufklappbare Gruppen (ganze Gruppe per Häkchen), Produktfilter; Entwürfe und Vorschläge sind markiert.
+// Zeichnet in root. SEL (Set der Skill-Ids) wird direkt geändert; onChange läuft nach jeder Änderung. Gruppen starten zugeklappt,
+// bei einer Suche sind alle Gruppen mit Treffern offen. Genutzt von skPick und dem Agenten-Assistenten.
+function skAuswahl(root,{p,SEL,onChange,fokus}){let q="",only=true;const OFFEN=new Set();
   const okA=s=>p==="all"||s.p===p||s.p==="all"||s.p==="multi";
   root.innerHTML=`<input type="search" id="pkq" placeholder="🔍 Skill suchen (Name, Beschreibung, Gruppe, Konto-Name) …" autocomplete="off">
-   <label class="cb" style="margin:8px 0 0"><input type="checkbox" id="pkonly" checked> Nur Skills, die zum Produkt des Agenten passen (${esc(PN[p])}${p==="all"?"":" + produktneutral"})</label>
+   <div class="pkbar"><label class="cb" style="margin:0"><input type="checkbox" id="pkonly" checked> Nur Skills, die zum Produkt passen (${esc(PN[p])}${p==="all"?"":" + produktneutral"})</label><span style="flex:1"></span><button class="btn sm" id="pkauf" type="button">Alle auf</button><button class="btn sm" id="pkzu" type="button">Alle zu</button></div>
    <div class="pkwrap"><table class="pkt" id="pkt"></table></div>`;
-  const tab=root.querySelector("#pkt"),geaendert=()=>{draw();if(onChange)onChange()};
-  const draw=()=>{const L=SK.filter(s=>(!only||okA(s)||SEL.has(s.id))&&skMatch(s,q));let h="";
-    [...new Set(L.map(s=>s.g))].sort((x,y)=>(+x)-(+y)).forEach(g=>{const G=L.filter(s=>s.g===g),n=G.filter(s=>SEL.has(s.id)).length;
-      h+=`<tr class="gh"><td style="width:28px"><input type="checkbox" data-pkg="${g}" ${n===G.length?"checked":""} title="Ganze Gruppe auswählen"></td><td colspan="2">${esc(grName(g))} <span class="hint" style="margin:0;font-weight:400">${n}/${G.length}</span></td></tr>`;
-      G.forEach(s=>{const dim=["entwurf","vorschlag"].includes(srcOf(s));h+=`<tr class="${dim?"dim":""}"><td><input type="checkbox" data-pks="${esc(s.id)}" ${SEL.has(s.id)?"checked":""}></td><td><b style="color:var(--ink)">${esc(s.n)}</b>${dim?' <span class="hint" style="margin:0">(noch nicht im Konto)</span>':""}<small>${esc((s.d||"").split(/\s*Nutzen bei\s*:/i)[0].slice(0,160))}</small></td><td style="white-space:nowrap">${srcBadge(s)}</td></tr>`})});
+  const tab=root.querySelector("#pkt"),geaendert=()=>{draw();if(onChange)onChange()};let GL=[];
+  const draw=()=>{const L=SK.filter(s=>(!only||okA(s)||SEL.has(s.id))&&skMatch(s,q));GL=grMitSkills(L);let h="";
+    GL.forEach(({g,S:G})=>{const n=G.filter(s=>SEL.has(s.id)).length,auf=!!q||OFFEN.has(g.id);
+      h+=`<tr class="gh ${auf?"auf":""}" data-pko="${esc(g.id)}"><td style="width:28px"><input type="checkbox" data-pkg="${esc(g.id)}" ${n===G.length?"checked":""} title="Ganze Gruppe auswählen" aria-label="Ganze Gruppe ${esc(g.n)} auswählen"></td><td colspan="2"><span class="caret">${auf?"▾":"▸"}</span> ${esc(g.n)} <span class="hint" style="margin:0;font-weight:400">${n?n+" von "+G.length+" gewählt":G.length+" Skill"+(G.length===1?"":"s")}</span></td></tr>`;
+      if(auf)G.forEach(s=>{const dim=["entwurf","vorschlag"].includes(srcOf(s));h+=`<tr class="${dim?"dim":""}"><td><input type="checkbox" data-pks="${esc(s.id)}" ${SEL.has(s.id)?"checked":""}></td><td><b style="color:var(--ink)">${esc(s.n)}</b>${dim?' <span class="hint" style="margin:0">(noch nicht im Konto)</span>':""}<small>${esc((s.d||"").split(/\s*Nutzen bei\s*:/i)[0].slice(0,160))}</small></td><td style="white-space:nowrap">${srcBadge(s)}</td></tr>`})});
     tab.innerHTML=h||'<tr><td class="hint">Kein Skill gefunden.</td></tr>';
+    tab.querySelectorAll("[data-pko]").forEach(r=>r.onclick=e=>{if(e.target.closest("input"))return;const id=r.dataset.pko;OFFEN.has(id)?OFFEN.delete(id):OFFEN.add(id);draw()});
     tab.querySelectorAll("[data-pks]").forEach(c=>c.onchange=()=>{c.checked?SEL.add(c.dataset.pks):SEL.delete(c.dataset.pks);geaendert()});
-    tab.querySelectorAll("[data-pkg]").forEach(c=>c.onchange=()=>{L.filter(s=>String(s.g)===c.dataset.pkg).forEach(s=>c.checked?SEL.add(s.id):SEL.delete(s.id));geaendert()})};
+    tab.querySelectorAll("[data-pkg]").forEach(c=>c.onchange=()=>{const x=GL.find(y=>y.g.id===c.dataset.pkg);if(x)x.S.forEach(s=>c.checked?SEL.add(s.id):SEL.delete(s.id));geaendert()})};
   draw();const qi=root.querySelector("#pkq");if(fokus!==false)qi.focus();qi.oninput=()=>{q=qi.value.toLowerCase().trim();draw()};root.querySelector("#pkonly").onchange=e=>{only=e.target.checked;draw()};
+  root.querySelector("#pkauf").onclick=()=>{GL.forEach(x=>OFFEN.add(x.g.id));draw()};root.querySelector("#pkzu").onclick=()=>{OFFEN.clear();draw()};
   return {draw}}
 function skPick(a){const OLD=new Set(a.s),SEL=new Set(a.s);
   const close=modalBox(`<div class="bhead"><h3>Skills für „${esc(a.n)}“</h3><button class="ic" id="mclose" style="font-size:18px">✕</button></div>
@@ -2186,7 +2270,7 @@ function draftModal(){
    <div class="hint" style="margin:0 0 12px">Der Entwurf liegt zunächst nur im Cockpit. Beim nächsten <b>⟳ Abgleich</b> schlägt Claude ihn dir als echten Skill im Konto vor – erst nach deiner Freigabe wird er angelegt.</div>
    <div class="row"><div class="field"><label>Name</label><input type="text" id="dn" placeholder="z. B. sellify Angebot erstellen"></div>
    <div class="field"><label>Produkt</label><select id="dp">${["bodo","sellify","all"].map(p=>`<option value="${p}" ${PF===p?'selected':''}>${PN[p]}</option>`).join("")}</select></div></div>
-   <div class="row"><div class="field"><label>Gruppe</label><select id="dg">${GR.map((g,i)=>`<option value="${i}">${esc(g)}</option>`).join("")}</select></div>
+   <div class="row"><div class="field"><label>Gruppe</label><select id="dg">${grOpts(GR[0]&&GR[0].id,1)}</select></div>
    <div class="field"><label>Anlegen bei</label><select id="dv">${PROV.map(([k,l,on])=>`<option value="${k}" ${on?'':'disabled'}>${l}${on?'':' (später)'}</option>`).join("")}</select></div></div>
    <div class="field"><label>Beschreibung – wann soll der Skill benutzt werden?</label><textarea id="dd" placeholder="z. B. Wenn für einen sellify-Interessenten ein Angebot erstellt werden soll …"></textarea></div>
    <div class="field"><label>Was soll der Skill tun? (Stichpunkte, Vorlagen, Quellen)</label><textarea id="di" style="min-height:110px" placeholder="Ablauf, benötigte Daten, Vorlagen, Zielsystem …"></textarea></div>
@@ -2196,7 +2280,7 @@ function draftModal(){
   $("#dok").onclick=()=>{const n=$("#dn").value.trim();if(!n)return toast("Bitte einen Namen eingeben");
     const slug=n.toLowerCase().replace(/ä/g,"ae").replace(/ö/g,"oe").replace(/ü/g,"ue").replace(/ß/g,"ss").replace(/[^a-z0-9]+/g,"-").replace(/^-|-$/g,"");
     let id=slug||uid("sk");while(sk(id))id=slug+"-"+Math.random().toString(36).slice(2,5);
-    const s={id,n,d:$("#dd").value.trim(),p:$("#dp").value,g:+$("#dg").value,lp:$("#dl").value.split("\n").map(x=>x.trim()).filter(Boolean),src:"entwurf",ks:[],seit:new Date().toISOString().slice(0,10),entw:{prov:$("#dv").value,inh:$("#di").value.trim(),stat:"offen"}};
+    const s={id,n,d:$("#dd").value.trim(),p:$("#dp").value,g:$("#dg").value,lp:$("#dl").value.split("\n").map(x=>x.trim()).filter(Boolean),src:"entwurf",ks:[],seit:new Date().toISOString().slice(0,10),entw:{prov:$("#dv").value,inh:$("#di").value.trim(),stat:"offen"}};
     SK.push(s);COL.delete(s.g);close();render();schedule();toast("Entwurf gespeichert – wird beim Abgleich vorgeschlagen")}}
 function syncModal(){
   const S=SET.sync||{},pv=SET.prov||"claude",dr=SK.filter(s=>srcOf(s)==="entwurf");
@@ -2223,7 +2307,7 @@ function skillModal(id){
    <div class="hint" style="margin:0 0 12px"><code>${s.id}</code> · ${srcBadge(s)}${s.neu?' · <b>Neu – existiert noch nicht</b>':''}${s.std?' · Standard-Skill von Anthropic – Inhalt nicht änderbar':''}</div>
    <div class="row"><div class="field"><label>Anzeigename im Cockpit <span class="mark">Vorschlag Claude</span></label><input type="text" id="sn" value="${esc(s.n)}"></div>
    <div class="field"><label>Produkt</label><select id="sp">${["bodo","sellify","all"].map(p=>`<option value="${p}" ${s.p===p?'selected':''}>${PN[p]}</option>`).join("")}</select></div></div>
-   <div class="row"><div class="field"><label>Gruppe</label><select id="sg">${GR.map((g,i)=>`<option value="${i}" ${i===s.g?'selected':''}>${esc(g)}</option>`).join("")}<option value="new">+ Neue Gruppe …</option></select></div>
+   <div class="row"><div class="field"><label>Gruppe</label><select id="sg">${grOpts(s.g,1)}<option value="new">+ Neue Gruppe …</option></select></div>
    <div class="field"><label>Echter Skill im Konto bzw. Plugin</label><input type="text" id="sks" value="${esc(KS(s).join(", "))}" ${s.std?'disabled':''}><div class="hint">Mehrere mit Komma trennen. Plugin-Skills als <code>plugin:skill</code>.</div></div></div>
    <div class="field"><label>Beschreibung – wann Claude den Skill benutzt</label><textarea id="sd" ${s.std?'disabled':''}>${esc(s.d)}</textarea>
      <div class="warnbox">Diese Beschreibung steuert, wann Claude den Skill automatisch auswählt. Der Anzeigename oben ist dagegen nur Kosmetik.</div></div>
@@ -2237,8 +2321,8 @@ function skillModal(id){
   const sp=$("#split");if(sp)sp.onclick=()=>{const o=s.p;s.p="multi";s.prof={bodo:{txt:o==="bodo"?"(bisherige Bodo-Besonderheiten hierher verschieben)":"",lp:[]},sellify:{txt:o==="sellify"?"(bisherige sellify-Besonderheiten hierher verschieben)":"",lp:[],neu:o!=="sellify"?1:0}};render();multiModal(s);toast("Aufgeteilt in Kern + Bodo + sellify")};
   $("#mmax").onclick=()=>{const b=$("#box");b.classList.toggle("max");$("#mmax").textContent=b.classList.contains("max")?"⤡":"⤢";$("#mmax").title=b.classList.contains("max")?"Dialog verkleinern":"Dialog vergrößern"};
   $("#mclose").onclick=close;$("#mx").onclick=close;
-  $("#sg").onchange=async e=>{if(e.target.value==="new"){const n=await askText("Name der neuen Gruppe","");if(n){GR.push(n);e.target.add(new Option(n,GR.length-1,true,true),e.target.options.length-1)}else e.target.value=s.g}};
-  $("#ms").onclick=()=>{s.n=$("#sn").value;s.g=+$("#sg").value;s.p=$("#sp").value;if(!s.std){s.ks=$("#sks").value.split(",").map(x=>x.trim()).filter(Boolean);s.d=$("#sd").value;s.body=$("#sb").value;s.lp=$("#slp").value.split("\n").map(x=>x.trim()).filter(Boolean)}close();const ch=markProv("skills",s,OLD);render();schedule();toast("Gespeichert");if(ch)setTimeout(()=>provConfirm([["skills",s]]),60)};
+  $("#sg").onchange=async e=>{if(e.target.value==="new"){const n=await askText("Name der neuen Gruppe","");const G=n&&grAnlegen(n);if(G){e.target.add(new Option(G.n,G.id,true,true),e.target.options.length-1)}else e.target.value=s.g}};
+  $("#ms").onclick=()=>{s.n=$("#sn").value;s.g=$("#sg").value;s.p=$("#sp").value;if(!s.std){s.ks=$("#sks").value.split(",").map(x=>x.trim()).filter(Boolean);s.d=$("#sd").value;s.body=$("#sb").value;s.lp=$("#slp").value.split("\n").map(x=>x.trim()).filter(Boolean)}close();const ch=markProv("skills",s,OLD);render();schedule();toast("Gespeichert");if(ch)setTimeout(()=>provConfirm([["skills",s]]),60)};
 }
 
 function multiModal(s){const OLD=JSON.parse(JSON.stringify(s));
@@ -2267,7 +2351,7 @@ function multiModal(s){const OLD=JSON.parse(JSON.stringify(s));
    <div class="bhead"><h3>Skill bearbeiten</h3><button class="ic" id="mmax" title="Dialog vergrößern" style="font-size:18px">⤢</button><button class="ic" id="mclose" title="Schließen" style="font-size:18px">✕</button></div>
    <div class="hint" style="margin:0 0 12px"><code>${s.id}</code> · ${srcBadge(s)} · ein Skill mit gemeinsamem Kern und Produkt-Profilen · im Konto: ${KS(s).map(x=>`<code>${esc(x)}</code>`).join(" + ")||"noch keiner"}</div>
    <div class="row"><div class="field"><label>Anzeigename im Cockpit</label><input type="text" id="sn" value="${esc(W.n)}"></div>
-    <div class="field"><label>Gruppe</label><select id="sg">${GR.map((g,i)=>`<option value="${i}" ${i===W.g?'selected':''}>${esc(g)}</option>`).join("")}</select></div></div>
+    <div class="field"><label>Gruppe</label><select id="sg">${grOpts(W.g,1)}</select></div></div>
    <div class="tabs" id="mtabs">${[["core","Gemeinsam (Kern)"],["bodo","Bodo-Profil"],["sellify","sellify-Profil"],["cmp","Vergleich"]].concat(s.orig?[["orig","Original-Skills"]]:[]).map(([k,l])=>`<button data-tab="${k}" class="${k}">${l}</button>`).join("")}</div>
    <div id="mpane"></div>
    <div class="infobox" style="margin-top:12px">Vorschlag: Kern und Profile sind aus deinen echten Skills abgeleitet. Im Konto bleiben die Skills unverändert, bis du den Umbau freigibst.</div>
@@ -2276,7 +2360,7 @@ function multiModal(s){const OLD=JSON.parse(JSON.stringify(s));
   document.querySelectorAll("#mtabs button").forEach(b=>b.onclick=()=>{grab();tab=b.dataset.tab;show()});show();
   const close=()=>$("#modal").innerHTML="";$("#mclose").onclick=close;$("#mx").onclick=close;
   $("#mmax").onclick=()=>{const b=$("#box");b.classList.toggle("max");$("#mmax").textContent=b.classList.contains("max")?"⤡":"⤢"};
-  $("#ms").onclick=()=>{grab();Object.assign(s,{n:$("#sn").value,g:+$("#sg").value,d:W.d,lp:W.lp,body:W.body,prof:W.prof});close();const ch=markProv("skills",s,OLD);render();schedule();if(ch)setTimeout(()=>provConfirm([["skills",s]]),60);toast(tab==="core"?"Gespeichert – gilt für Bodo und sellify":"Gespeichert")};
+  $("#ms").onclick=()=>{grab();Object.assign(s,{n:$("#sn").value,g:$("#sg").value,d:W.d,lp:W.lp,body:W.body,prof:W.prof});close();const ch=markProv("skills",s,OLD);render();schedule();if(ch)setTimeout(()=>provConfirm([["skills",s]]),60);toast(tab==="core"?"Gespeichert – gilt für Bodo und sellify":"Gespeichert")};
 }
 
 function inherited(a){ // Leitplanken aus Skills, gleiche Regel aus mehreren Skills zusammengefasst
@@ -2285,6 +2369,9 @@ function inherited(a){ // Leitplanken aus Skills, gleiche Regel aus mehreren Ski
     if(s.p==="multi")(a.p==="all"?["bodo","sellify"]:[a.p]).forEach(k=>s.prof[k]&&s.prof[k].lp.forEach(r=>add(r,{s,l:s.n+" · "+PN[k]})))});
   return [...m.entries()];
 }
+// Regeln eines Skills für ein Produkt: [{r, l}] – die Leitplanken des Skills und bei Kern-Skills die des Produktprofils (l = Herkunft)
+function skRegeln(s,p){const L=(s.lp||[]).map(r=>({r,l:s.p==="multi"?"Kern":""}));
+  if(s.p==="multi")(p==="all"?["bodo","sellify"]:[p]).forEach(k=>s.prof&&s.prof[k]&&(s.prof[k].lp||[]).forEach(r=>L.push({r,l:PN[k]})));return L}
 function md(a){
   const slug=a.n.toLowerCase().replace(/ä/g,"ae").replace(/ö/g,"oe").replace(/ü/g,"ue").replace(/ß/g,"ss").replace(/[^a-z0-9]+/g,"-").replace(/^-|-$/g,"");
   const inh=inherited(a),gl=GLOBAL.filter((r,i)=>a.gl[i]);
@@ -2403,8 +2490,8 @@ function startRename(i){renaming=i;cur=i;render();const r=$("#rn");r.focus();r.s
 function matrix(){
   const AV=agVis();
   let h=`<table><thead><tr><th>Skill</th>${AV.map(([a])=>`<th>${esc(a.n)}</th>`).join("")}</tr></thead><tbody>`;
-  GR.forEach((g,gi)=>{const items=SK.filter(s=>s.g===gi&&vis0(s));if(!items.length)return;
-    h+=`<tr><td class="gr" colspan="${AV.length+1}">${esc(g)}</td></tr>`;
+  grMitSkills(SK.filter(vis0)).forEach(({g,S:items})=>{
+    h+=`<tr><td class="gr" colspan="${AV.length+1}">${esc(g.n)}</td></tr>`;
     items.forEach(s=>{const u=use(s.id);h+=`<tr><td><span class="pb ${s.p}">${PN[s.p]}</span> ${esc(s.n)}${isNeu(s)?' <span class="badge neu">Neu</span>':''} <span class="badge ${u?'':'zero'}">${u}</span></td>${AV.map(([a,i])=>`<td class="${a.s.includes(s.id)?'x':'e'}" data-a="${i}" data-s="${s.id}">${a.s.includes(s.id)?'●':'·'}</td>`).join("")}</tr>`})});
   $("#mtx").innerHTML=h+"</tbody></table>";
   const me=isEd("matrix");$("#mtx").closest(".panel").classList.toggle("editing",me);
@@ -2418,10 +2505,10 @@ $("#newU").onclick=()=>{if(!blocked())wizard(null)};$("#ownOrgs").onclick=ownOrg
 $("#uold").onchange=e=>{UOLD=e.target.checked;users()};
 $("#gen").onchange=e=>{GEN=e.target.checked;render()};
 
-$("#colAll").onclick=()=>{GR.forEach((g,i)=>COL.add(i));lib()};
+$("#colAll").onclick=()=>{[...GR,GR_OHNE].forEach(g=>COL.add(g.id));lib()};
 $("#expAll").onclick=()=>{COL.clear();lib()};
 $("#sknew").onclick=draftModal;$("#sksync").onclick=syncModal;
-$("#newG").onclick=async()=>{if(!isEd("lib"))return toast("Neue Gruppe: erst „✎ Gruppen ordnen“");const n=await askText("Name der neuen Gruppe","");if(n){GR.push(n);render();schedule();toast("Gruppe angelegt – Skills per Ziehen hinein")}};
+$("#newG").onclick=async()=>{if(!isEd("lib"))return toast("Neue Gruppe: erst „✎ Gruppen ordnen“");const n=await askText("Name der neuen Gruppe","");if(n&&grAnlegen(n)){render();schedule();toast("Gruppe angelegt – Skills per Ziehen hinein")}};
 $("#newA").onclick=()=>{if(blocked())return;const a={id:uid("ag"),n:"Neuer Agent",p:AF,owner:null,dep:null,r:"",w:"",bsp:[],note:"",s:[],mcp:[],m:"Sonnet",own:[],gl:GLOBAL.map((g,i)=>i<4?1:0),ord:AG.length};AG.push(a);cur=AG.length-1;
   startEdit("agent",a.id,"basis",["agents/"+a.id],true);EOPEN.add("basis");render();const n=$("#an");if(n){n.focus();n.select()}};
 
@@ -2657,8 +2744,7 @@ function tlAgents(o,did,tm){const d=dept(did),T=teamsOf(d);return AG.filter(a=>{
 function tlName(o,did,tm){const d=dept(did);if(!tm)return "Abteilung "+((d||{}).n||"");if(tm==="_allg")return "Team Allgemein ("+((d||{}).n||"")+")";const t=teamsOf(d).find(x=>x.id===tm);return "Team "+(t?t.n:"?")+" ("+((d||{}).n||"")+")"}
 const PRIO=[["d","Dringend"],["h","Hoch"],["n","Normal"],["l","Niedrig"]],PRN={d:0,h:1,n:2,l:3};
 const skOrg=(o)=>SK.filter(x=>!["vorschlag","entwurf"].includes(srcOf(x))&&(!o||!o.prod||x.p===o.prod||x.p==="all"||x.p==="multi"));
-const grName=g=>(g!=null&&g!==""&&GR[+g]!=null)?GR[+g]:(typeof g==="string"&&isNaN(+g)?g:"Ohne Gruppe");
-function skOpts(L,cur){const G=[...new Set(L.map(x=>x.g))].sort((a,b)=>(+a)-(+b));return G.map(g=>`<optgroup label="${esc(grName(g))}">${L.filter(x=>x.g===g).map(x=>`<option value="${esc(x.id)}" ${x.id===cur?'selected':''}>${esc(x.n)}</option>`).join("")}</optgroup>`).join("")}
+function skOpts(L,cur){const G=[...new Set(L.map(x=>x.g))].sort((a,b)=>grIdx(a)-grIdx(b));return G.map(g=>`<optgroup label="${esc(grName(g))}">${L.filter(x=>x.g===g).map(x=>`<option value="${esc(x.id)}" ${x.id===cur?'selected':''}>${esc(x.n)}</option>`).join("")}</optgroup>`).join("")}
 function jobLbl(j){if(!j.f)return "–";if(!j.f.frei)return j.f.n;const a=j.aid&&AG.find(x=>x.id===j.aid),S=j.sk&&sk(j.sk);return (j.art==="agent"&&a?a.n:j.art==="abteilung"?"Abteilung "+((dept(j.abt)||{}).n||"")+(a?" · "+a.n:" · KI-Teamleiter"):"Freie Aufgabe")+(S?" · "+S.n:j.sk?" · "+j.sk:"")}
 function startModal(f,keep){if(!keep)PEND=[];keep=keep||{};const SM=!!keep.sm;if(SM)keep.art=keep.art==="agent"&&keep.aid?"agent":"abteilung";
   const art=keep.art||(f&&!f.frei?"ablauf":"frei"),O=orgById(keep.org||OC)||ORGS()[0];
@@ -2707,7 +2793,7 @@ function startModal(f,keep){if(!keep)PEND=[];keep=keep||{};const SM=!!keep.sm;if
     const none=art==="agent"?"Agent entscheidet selbst":"Claude wählt selbst",lab=()=>jsk.value&&sk(jsk.value)?sk(jsk.value).n:none;
     let act=0,items=[],openState=false;
     const draw=()=>{const t=q.dataset.typed?q.value:"",M=t?SKL.filter(x=>skMatch(x,t)):SKL;items=[{id:"",n:none}];let h=`<div class="cbx-i ${!jsk.value?'cur':''}" data-k="0">${esc(none)}</div>`;
-      [...new Set(M.map(x=>x.g))].sort((a,b)=>(+a)-(+b)).forEach(g=>{h+=`<div class="cbx-g">${esc(grName(g))}</div>`;M.filter(x=>x.g===g).forEach(x=>{items.push(x);h+=`<div class="cbx-i ${jsk.value===x.id?'cur':''}" data-k="${items.length-1}" role="option" title="${esc(x.d||"")}">${esc(x.n)}</div>`})});
+      [...new Set(M.map(x=>x.g))].sort((a,b)=>grIdx(a)-grIdx(b)).forEach(g=>{h+=`<div class="cbx-g">${esc(grName(g))}</div>`;M.filter(x=>x.g===g).forEach(x=>{items.push(x);h+=`<div class="cbx-i ${jsk.value===x.id?'cur':''}" data-k="${items.length-1}" role="option" title="${esc(x.d||"")}">${esc(x.n)}</div>`})});
       if(M.length===0)h+='<div class="cbx-e">Kein Skill gefunden</div>';
       L.innerHTML=h;if(act>=items.length)act=items.length-1;mark(act>=0);
       L.querySelectorAll("[data-k]").forEach(d=>{d.onmousedown=e=>{e.preventDefault();pick(+d.dataset.k)};d.onmousemove=()=>{if(act!==+d.dataset.k){act=+d.dataset.k;mark(false)}}})};
@@ -3072,7 +3158,7 @@ async function boot(){
     const D=await Promise.all([Store.list("skills"),Store.list("agents"),Store.list("flows"),jobsLaden(),Store.list("users"),Store.list("depts"),Store.list("projects")]);
     [SK,AG,FL,AU,US,DP,PJ]=D;DP.sort((a,b)=>(a.ord??0)-(b.ord??0));US.sort((a,b)=>(a.ord??0)-(b.ord??0));if(m){const c=m;GR=[...(c.groups||[])];GLOBAL=[...(c.globals||[])];SET={...SET,...(c.settings||{})}}
     SK.sort((a,b)=>(a.ord??0)-(b.ord??0));AG.sort((a,b)=>(a.ord??0)-(b.ord??0));FL.sort((a,b)=>(a.ord??0)-(b.ord??0));AU.sort((a,b)=>(+b.id.slice(2)||0)-(+a.id.slice(2)||0));
-    hydrate();GR.forEach((g,i)=>COL.add(i));const s0=snapshot();s0.forEach((v,k)=>LAST.set(k,v));if(migrateOrgs()){toast("Organisationen eingerichtet");schedule()}
+    hydrate();const s0=snapshot();s0.forEach((v,k)=>LAST.set(k,v));if(migrateOrgs()){toast("Organisationen eingerichtet");schedule()}if(grMigrieren())schedule();[...GR,GR_OHNE].forEach(g=>COL.add(g.id));
     const f=agVis()[0];cur=f?f[1]:-1;fcur=FL.findIndex(x=>x.p===FF&&!x.frei);
     render();jobs();setSave("ok","Gespeichert");kiSubscribe();show("org");hdr();if(SET.inst&&SET.inst.n)document.title=SET.inst.n;if(umg)toast("Datenbestand auf Stand "+SCHEMA+" umgestellt");
     archivieren().then(n=>{if(n)toast(n+" alte Aufträge ins Archiv verschoben")}).catch(e=>console.warn("Archiv",e));
@@ -3264,7 +3350,7 @@ function uhr(){const e=$("#clock");if(!e)return;const d=new Date();e.textContent
 setInterval(uhr,15000);
 function hdr(){uhr();const m=$("#me");if(m){const u=ME();m.innerHTML=av(u,30);m.title=u?"Angemeldet als "+u.n+" – Einstellungen öffnen":"Benutzer wählen";m.onclick=()=>einst("darst")}
   const g=$("#gear");if(g)g.onclick=()=>einst();}
-const SETSEC=[["darst","Darstellung"],["inst","Instanz"],["orgs","Organigramme"],["users","Benutzer"],["ausf","Ausführung"],["dienste","Anbindungen"]];
+const SETSEC=[["darst","Darstellung"],["inst","Instanz"],["orgs","Organigramme"],["users","Benutzer"],["ausf","Ausführung"],["dienste","Anbindungen"],["sgr","Skill-Gruppen"]];
 function einst(sec){if(sec)UI.sets=sec;if(!SETSEC.some(s=>s[0]===UI.sets))UI.sets="darst";saveUI();if($("#settings").classList.contains("hide")){show("settings");return}
   const S=UI.sets;$("#setnav").innerHTML=SETSEC.map(([k,l])=>`<button class="setn ${k===S?"on":""}" data-sets="${k}">${l}</button>`).join("");
   document.querySelectorAll("[data-sets]").forEach(b=>b.onclick=()=>{if(b.dataset.sets!==S&&blocked())return;einst(b.dataset.sets)});
@@ -3303,6 +3389,7 @@ function einst(sec){if(sec)UI.sets=sec;if(!SETSEC.some(s=>s[0]===UI.sets))UI.set
     document.querySelectorAll("[data-trg]").forEach(i=>i.onchange=()=>{const v=i.value.trim();SET.trig={...(SET.trig||{})};if(/^trig_\w+$/.test(v))SET.trig[i.dataset.trg]=v;else{delete SET.trig[i.dataset.trg];toast("Ungültige Kennung – Standard bleibt")}});
     $("#sruns").onclick=kiRuns}
   else if(S==="dienste")dienstEinst(C)
+  else if(S==="sgr")grEinst(C)
 }
 // Logo einlesen: in 320×96 einpassen, Transparenz behalten (PNG)
 function logoKlein(file){return new Promise((res,rej)=>{const r=new FileReader();r.onload=()=>{const im=new Image();im.onload=()=>{const k=Math.min(1,320/im.width,96/im.height),w=Math.max(1,Math.round(im.width*k)),h=Math.max(1,Math.round(im.height*k)),c=document.createElement("canvas");c.width=w;c.height=h;c.getContext("2d").drawImage(im,0,0,w,h);res(c.toDataURL("image/png"))};im.onerror=rej;im.src=r.result};r.onerror=rej;r.readAsDataURL(file)})}
@@ -3494,6 +3581,28 @@ function dienstKontext(o){if(!o||!o.dienste)return "";const L=DIENSTE.map(([k,l]
 // Datenspur eines Auftrags (von Claude geschrieben: spur = [{dienst, sys, orgId, ent, id, url, akt}])
 function spurHtml(j){const S=(j.spur||[]).filter(Boolean);if(!S.length)return "";const dn=k=>(DIENSTE.find(d=>d[0]===k)||[k,k==="sonst"?"Sonstiges":k||"–"])[1];
   return `<div class="flabel" style="margin-top:10px">Datenspur (${S.length})</div><div class="spur">${S.map(s=>`<div class="spr"><span class="sprd">${esc(dn(s.dienst))}</span><span>${esc(sysName(s.sys))}${s.orgN?" · "+esc(s.orgN):""} · ${esc(s.ent||"")} ${s.akt?"· "+esc(s.akt):""}</span>${s.url?`<a href="${esc(s.url)}" target="_blank" rel="noopener">↗</a>`:""}</div>`).join("")}</div>`}
+
+// ===== Einstellungen › Skill-Gruppen: anlegen, umbenennen, ordnen, entfernen =====
+// Änderungen nur über ✎ Bearbeiten → Speichern (wie überall). Entfernen einer Gruppe mit Skills schiebt diese nach „Ohne Gruppe“.
+function grEinst(C){const ed=isEd("grp"),n=id=>SK.filter(s=>s.g===id).length,ohne=SK.filter(s=>!grById(s.g)).length;
+  C.innerHTML=`<div class="etop"><h2 style="margin:0;flex:1">Skill-Gruppen</h2><span id="grped">${edBtns(ed)}</span></div>
+    <div class="hint" style="margin:6px 0 12px">Die Reihenfolge gilt für den Skill-Katalog und die Skill-Auswahl der Agenten. Skills ordnest du unter „Skills“ über „✎ Gruppen ordnen“ (ziehen) oder ⚙ am Skill einer Gruppe zu.</div>
+    <table class="grt"><thead><tr><th>Gruppe</th><th>Skills</th>${ed?"<th></th>":""}</tr></thead><tbody>
+    ${GR.map((g,i)=>`<tr><td>${ed?`<input type="text" data-grn="${esc(g.id)}" value="${esc(g.n)}" aria-label="Name der Gruppe">`:esc(g.n)}</td><td>${n(g.id)}</td>${ed?`<td class="grk"><button class="ic" data-gru="${i}" ${i?"":"disabled"} title="nach oben">↑</button><button class="ic" data-grd="${i}" ${i<GR.length-1?"":"disabled"} title="nach unten">↓</button><button class="ic" data-grx="${esc(g.id)}" title="Gruppe entfernen">🗑</button></td>`:""}</tr>`).join("")}
+    ${ohne?`<tr class="dim"><td>${esc(GR_OHNE.n)}</td><td>${ohne}</td>${ed?"<td></td>":""}</tr>`:""}</tbody></table>
+    ${ed?'<button class="btn sm" id="grneu" style="margin-top:10px">+ Gruppe</button>':""}`;
+  bindEd($("#grped"),()=>einst());
+  const b=$("#grped [data-eopen], #grped .ebtn");if(b)b.onclick=()=>{if(startEdit("grp",null,null,["meta/config",...SK.map(s=>"skills/"+s.id)]))einst()};
+  if(!ed)return;
+  C.querySelectorAll("[data-grn]").forEach(i=>i.onchange=()=>{const g=grById(i.dataset.grn),v=i.value.trim();if(!v){i.value=g.n;return toast("Name darf nicht leer sein")}
+    if(GR.some(x=>x!==g&&x.n.toLowerCase()===v.toLowerCase())){i.value=g.n;return toast("Diese Gruppe gibt es schon")}g.n=v});
+  const tausch=(i,j)=>{const t=GR[i];GR[i]=GR[j];GR[j]=t;einst()};
+  C.querySelectorAll("[data-gru]").forEach(x=>x.onclick=()=>tausch(+x.dataset.gru,+x.dataset.gru-1));
+  C.querySelectorAll("[data-grd]").forEach(x=>x.onclick=()=>tausch(+x.dataset.grd,+x.dataset.grd+1));
+  C.querySelectorAll("[data-grx]").forEach(x=>x.onclick=async()=>{const g=grById(x.dataset.grx),k=n(g.id);
+    if(!await askOk("Gruppe „"+g.n+"“ entfernen?"+(k?" "+k+" Skill"+(k===1?"":"s")+" stehen danach unter „Ohne Gruppe“.":""),"Entfernen"))return;
+    SK.forEach(s=>{if(s.g===g.id)s.g=""});GR.splice(GR.indexOf(g),1);COL.delete(g.id);einst()});
+  $("#grneu").onclick=async()=>{const v=await askText("Name der neuen Gruppe","");if(v&&grAnlegen(v))einst()}}
 
 boot();
 // Breitenregler Ablauf-Eigenschaften (rechts)

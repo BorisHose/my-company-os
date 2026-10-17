@@ -39,3 +39,8 @@ cockpit/
 - Je System eine Datei: `07b-adapter-bodo.js`, `07c-adapter-sellify.js`. Systemeigene Oberflächen (z. B. `07d-bodo-benutzerverwaltung.js`) nutzen nur ihren Adapter.
 - Neues System anbinden: Datei `07x-adapter-<system>.js` nach dem Vertrag anlegen, Werkzeuge in `berechtigungen.json` ergänzen, Mock in `tests/smoke.js` ergänzen. Der Smoke-Test prüft Vertrag und Berechtigungen für jeden Adapter.
 - Die Kennung (`id`) eines Adapters steht in gespeicherten Daten (Zuordnungen, Projekte, Anbindungen) und wird nie geändert.
+
+## Skill-Gruppen (seit Version 72)
+- `meta/config.groups` = `[{id, n}]` in Anzeigereihenfolge; jeder Skill verweist mit `g` auf die Gruppen-Id (`""` = ohne Gruppe). Code in `11a-skill-gruppen.js`.
+- Ältere Daten (Gruppen als Namen, `g` als Listenposition) stellt `grMigrieren()` beim Laden einmalig um.
+- Pflege unter ⚙ Einstellungen › Skill-Gruppen (`18g-skill-gruppen-einstellungen.js`).

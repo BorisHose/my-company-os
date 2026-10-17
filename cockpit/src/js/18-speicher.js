@@ -82,7 +82,7 @@ async function boot(){
     const D=await Promise.all([Store.list("skills"),Store.list("agents"),Store.list("flows"),jobsLaden(),Store.list("users"),Store.list("depts"),Store.list("projects")]);
     [SK,AG,FL,AU,US,DP,PJ]=D;DP.sort((a,b)=>(a.ord??0)-(b.ord??0));US.sort((a,b)=>(a.ord??0)-(b.ord??0));if(m){const c=m;GR=[...(c.groups||[])];GLOBAL=[...(c.globals||[])];SET={...SET,...(c.settings||{})}}
     SK.sort((a,b)=>(a.ord??0)-(b.ord??0));AG.sort((a,b)=>(a.ord??0)-(b.ord??0));FL.sort((a,b)=>(a.ord??0)-(b.ord??0));AU.sort((a,b)=>(+b.id.slice(2)||0)-(+a.id.slice(2)||0));
-    hydrate();GR.forEach((g,i)=>COL.add(i));const s0=snapshot();s0.forEach((v,k)=>LAST.set(k,v));if(migrateOrgs()){toast("Organisationen eingerichtet");schedule()}
+    hydrate();const s0=snapshot();s0.forEach((v,k)=>LAST.set(k,v));if(migrateOrgs()){toast("Organisationen eingerichtet");schedule()}if(grMigrieren())schedule();[...GR,GR_OHNE].forEach(g=>COL.add(g.id));
     const f=agVis()[0];cur=f?f[1]:-1;fcur=FL.findIndex(x=>x.p===FF&&!x.frei);
     render();jobs();setSave("ok","Gespeichert");kiSubscribe();show("org");hdr();if(SET.inst&&SET.inst.n)document.title=SET.inst.n;if(umg)toast("Datenbestand auf Stand "+SCHEMA+" umgestellt");
     archivieren().then(n=>{if(n)toast(n+" alte Aufträge ins Archiv verschoben")}).catch(e=>console.warn("Archiv",e));

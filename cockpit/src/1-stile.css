@@ -448,9 +448,21 @@ img.olg{height:18px;max-width:60px;object-fit:contain;margin-right:6px;vertical-
 .oadd{display:block;width:100%;margin-top:6px;padding:5px 8px;border:1px dashed var(--line);border-radius:8px;background:transparent;color:var(--mut);font-size:12.5px;cursor:pointer;text-align:center}
 .oadd:hover,.oadd:focus-visible{border-color:var(--acc);color:var(--acc);background:var(--accbg)}
 .wz .steps2 span[data-gws]{cursor:pointer}
-.gwsk{display:grid;grid-template-columns:minmax(0,1fr) 220px;gap:14px;align-items:start}
-.gwsk .pkwrap{max-height:46vh}
-.gwsel{border-left:1px solid var(--line);padding-left:12px}.gwsel .flabel{margin-top:0}
 #gwsl{display:flex;flex-wrap:wrap;gap:6px}
 .gwsum{display:grid;grid-template-columns:150px minmax(0,1fr);gap:8px 12px;font-size:13.5px}.gwsum>b{color:var(--mut);font-weight:600}
-@media(max-width:700px){.gwsk{grid-template-columns:minmax(0,1fr)}.gwsel{border-left:0;padding-left:0;border-top:1px solid var(--line);padding-top:10px}.gwsum{grid-template-columns:minmax(0,1fr);gap:2px}.gwsum>span{margin-bottom:8px}}
+@media(max-width:700px){.gwsum{grid-template-columns:minmax(0,1fr);gap:2px}.gwsum>span{margin-bottom:8px}}
+
+/* Assistent v72: feste Angaben, KI-Vorschläge, Auswahlleiste, Regeln je Skill; Skill-Auswahl aufklappbar; Skill-Gruppen */
+.gwfest{display:flex;gap:8px 20px;flex-wrap:wrap;background:var(--accbg);border-radius:8px;padding:8px 12px;margin:0 0 12px;font-size:13.5px}.gwfest b{color:var(--mut);font-weight:600;margin-right:4px}
+.pkbar{display:flex;align-items:center;gap:6px;flex-wrap:wrap;margin:8px 0 0}
+.pkt tr.gh{cursor:pointer}.pkt tr.gh .caret{display:inline-block;width:12px;color:var(--mut)}
+.gwki{border:1px solid var(--line);border-radius:10px;padding:10px 12px;margin:0 0 12px;background:var(--panel,#fff)}
+.gwkih{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin:0 0 6px}.gwkih>b{color:var(--navy)}
+.gwkir{display:flex;gap:10px;align-items:flex-start;padding:6px 0;border-top:1px solid var(--line)}.gwkir:first-of-type{border-top:0}
+.gwkir>.btn{flex:none;min-width:116px}.gwkir small{display:block;color:var(--mut);font-size:12.5px;margin-top:2px}
+.gwselbar{display:flex;align-items:center;gap:8px;flex-wrap:wrap}.gwselbar .flabel{margin:0}
+.gwrs{margin:0 0 8px}.gwrsh{font-weight:600;font-size:13px;margin:0 0 2px}
+.grt{width:100%;border-collapse:collapse;font-size:13.5px}.grt th,.grt td{text-align:left;padding:6px 8px;border-bottom:1px solid var(--line)}.grt th{color:var(--mut);font-weight:600;font-size:12px}
+.grt td:nth-child(2){width:70px}.grt input{width:100%}.grt .grk{white-space:nowrap;width:110px}.grt tr.dim td{color:var(--mut)}
+#gwkat .pkwrap{max-height:40vh}
+@media(max-width:700px){.gwkir{flex-direction:column}.gwkir>.btn{min-width:0;order:2}}

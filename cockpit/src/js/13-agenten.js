@@ -4,6 +4,9 @@ function inherited(a){ // Leitplanken aus Skills, gleiche Regel aus mehreren Ski
     if(s.p==="multi")(a.p==="all"?["bodo","sellify"]:[a.p]).forEach(k=>s.prof[k]&&s.prof[k].lp.forEach(r=>add(r,{s,l:s.n+" · "+PN[k]})))});
   return [...m.entries()];
 }
+// Regeln eines Skills für ein Produkt: [{r, l}] – die Leitplanken des Skills und bei Kern-Skills die des Produktprofils (l = Herkunft)
+function skRegeln(s,p){const L=(s.lp||[]).map(r=>({r,l:s.p==="multi"?"Kern":""}));
+  if(s.p==="multi")(p==="all"?["bodo","sellify"]:[p]).forEach(k=>s.prof&&s.prof[k]&&(s.prof[k].lp||[]).forEach(r=>L.push({r,l:PN[k]})));return L}
 function md(a){
   const slug=a.n.toLowerCase().replace(/ä/g,"ae").replace(/ö/g,"oe").replace(/ü/g,"ue").replace(/ß/g,"ss").replace(/[^a-z0-9]+/g,"-").replace(/^-|-$/g,"");
   const inh=inherited(a),gl=GLOBAL.filter((r,i)=>a.gl[i]);
@@ -122,8 +125,8 @@ function startRename(i){renaming=i;cur=i;render();const r=$("#rn");r.focus();r.s
 function matrix(){
   const AV=agVis();
   let h=`<table><thead><tr><th>Skill</th>${AV.map(([a])=>`<th>${esc(a.n)}</th>`).join("")}</tr></thead><tbody>`;
-  GR.forEach((g,gi)=>{const items=SK.filter(s=>s.g===gi&&vis0(s));if(!items.length)return;
-    h+=`<tr><td class="gr" colspan="${AV.length+1}">${esc(g)}</td></tr>`;
+  grMitSkills(SK.filter(vis0)).forEach(({g,S:items})=>{
+    h+=`<tr><td class="gr" colspan="${AV.length+1}">${esc(g.n)}</td></tr>`;
     items.forEach(s=>{const u=use(s.id);h+=`<tr><td><span class="pb ${s.p}">${PN[s.p]}</span> ${esc(s.n)}${isNeu(s)?' <span class="badge neu">Neu</span>':''} <span class="badge ${u?'':'zero'}">${u}</span></td>${AV.map(([a,i])=>`<td class="${a.s.includes(s.id)?'x':'e'}" data-a="${i}" data-s="${s.id}">${a.s.includes(s.id)?'●':'·'}</td>`).join("")}</tr>`})});
   $("#mtx").innerHTML=h+"</tbody></table>";
   const me=isEd("matrix");$("#mtx").closest(".panel").classList.toggle("editing",me);
@@ -137,9 +140,9 @@ $("#newU").onclick=()=>{if(!blocked())wizard(null)};$("#ownOrgs").onclick=ownOrg
 $("#uold").onchange=e=>{UOLD=e.target.checked;users()};
 $("#gen").onchange=e=>{GEN=e.target.checked;render()};
 
-$("#colAll").onclick=()=>{GR.forEach((g,i)=>COL.add(i));lib()};
+$("#colAll").onclick=()=>{[...GR,GR_OHNE].forEach(g=>COL.add(g.id));lib()};
 $("#expAll").onclick=()=>{COL.clear();lib()};
 $("#sknew").onclick=draftModal;$("#sksync").onclick=syncModal;
-$("#newG").onclick=async()=>{if(!isEd("lib"))return toast("Neue Gruppe: erst „✎ Gruppen ordnen“");const n=await askText("Name der neuen Gruppe","");if(n){GR.push(n);render();schedule();toast("Gruppe angelegt – Skills per Ziehen hinein")}};
+$("#newG").onclick=async()=>{if(!isEd("lib"))return toast("Neue Gruppe: erst „✎ Gruppen ordnen“");const n=await askText("Name der neuen Gruppe","");if(n&&grAnlegen(n)){render();schedule();toast("Gruppe angelegt – Skills per Ziehen hinein")}};
 $("#newA").onclick=()=>{if(blocked())return;const a={id:uid("ag"),n:"Neuer Agent",p:AF,owner:null,dep:null,r:"",w:"",bsp:[],note:"",s:[],mcp:[],m:"Sonnet",own:[],gl:GLOBAL.map((g,i)=>i<4?1:0),ord:AG.length};AG.push(a);cur=AG.length-1;
   startEdit("agent",a.id,"basis",["agents/"+a.id],true);EOPEN.add("basis");render();const n=$("#an");if(n){n.focus();n.select()}};
