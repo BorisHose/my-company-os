@@ -1,5 +1,11 @@
 # Änderungen – Cockpit
 
+## 55 · 17.10.2026 · KI-Teamleiter je Team
+- Teams im Organigramm haben ein eigenes „▶“ (Auftrag an das Team); Agenten direkt in der Abteilung bilden das Team „Allgemein“ mit eigenem „▶“.
+- Fenster „Abteilung beauftragen“: bei Abteilungen mit Teams zusätzlich Auswahl „Ganze Abteilung“ oder ein Team; der KI-Teamleiter wählt nur aus den Agenten dieses Bereichs (Plan darf weiterhin andere Bereiche einbeziehen, wenn nötig).
+- Auftrag speichert `team` (Team-ID oder `_allg`); Kontext, Kachel und Plan nennen „KI-Teamleiter Team …“.
+- Smoke-Test: 61 Prüfungen.
+
 ## 54 · 17.10.2026 · Etappe 3 „KI-Teamleiter mit Plan“
 - Bei „Abteilung beauftragen“ darf der KI-Teamleiter statt einer Einzelwahl einen Plan vorschlagen: bis zu 6 Teilaufträge mit Agent, optional Skill, Reihenfolge („startet nach …“) und Begründung; Agenten anderer Abteilungen nur, wenn fachlich nötig.
 - Fenster „Vorschlag“: Plan mit Agentenwahl je Schritt, Hinweis bei fremder Abteilung (Zustimmung der Leitung, ohne Leitung Boris), „▶ Plan freigeben & starten“, „Ändern …“ (geht an den Teamleiter zurück), „Abbrechen“.

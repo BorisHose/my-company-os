@@ -351,3 +351,5 @@ fieldset:disabled .ic,fieldset:disabled .ownadd,fieldset:disabled [data-r],field
 .plt{flex:1;min-width:0;font-size:13px;display:flex;flex-direction:column;gap:3px}.plrow{display:flex;gap:8px;align-items:center}.plrow b{width:18px;text-align:center;color:var(--vio)}.plrow select{flex:1;min-width:0;font-weight:600}
 .plab{font-size:12px;color:#8a5a00;background:#fff4d6;border-radius:6px;padding:2px 8px;align-self:flex-start}
 .plsum{font-size:13px;color:#4a3a7a}.pltl{cursor:pointer}.pltl:hover{border-color:var(--acc)}
+/* v55: Team beauftragen */
+.otplay{margin-left:6px;width:22px;height:22px;border-radius:50%;border:1px solid var(--line);background:#fff;color:var(--acc);font-size:9px;cursor:pointer;display:inline-grid;place-items:center;padding:0 0 0 2px;vertical-align:middle}.otplay:hover{border-color:var(--acc);background:var(--accbg)}

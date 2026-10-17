@@ -9,7 +9,7 @@ function planHtml(j){const P=j.plan,S=P.steps,o=jobOrg(j),AGO=AG.filter(a=>inOrg
   const opt=s=>{const D=deptsOf(o);return D.map(d=>{const L=AGO.filter(a=>PL(a,o).abt===d.id);return L.length?`<optgroup label="${esc(d.n)}">${L.map(a=>`<option value="${a.id}" ${a.id===s.aid?"selected":""}>${esc(a.n)}</option>`).join("")}</optgroup>`:""}).join("")+
     (AGO.some(a=>!PL(a,o).abt)?`<optgroup label="Ohne Abteilung">${AGO.filter(a=>!PL(a,o).abt).map(a=>`<option value="${a.id}" ${a.id===s.aid?"selected":""}>${esc(a.n)}</option>`).join("")}</optgroup>`:"")+
     (s.aid&&!AGO.some(a=>a.id===s.aid)?`<option value="${esc(s.aid)}" selected>⚠ unbekannter Agent (${esc(s.aid)})</option>`:"")};
-  return `<div class="plbox"><div class="plh"><span class="plic">✦</span><b>KI-Teamleiter ${esc((dept(j.abt)||{}).n||"")} schlägt vor: ${S.length} Teilauftr${S.length===1?"ag":"äge"} an ${nA} Agent${nA===1?"":"en"}</b></div>
+  return `<div class="plbox"><div class="plh"><span class="plic">✦</span><b>KI-Teamleiter ${esc(tlName(jobOrg(j),j.abt,j.team||"").replace(/^Abteilung /,""))} schlägt vor: ${S.length} Teilauftr${S.length===1?"ag":"äge"} an ${nA} Agent${nA===1?"":"en"}</b></div>
     ${S.map((s,i)=>{const a=AG.find(x=>x.id===s.aid),fremd=a&&j.abt&&PL(a,o).abt&&PL(a,o).abt!==j.abt;
       return `<div class="plstep">${av(a&&usr(a.owner),36,1)}<div class="plt"><div class="plrow"><b>${i+1}</b><select data-plag="${i}" aria-label="Agent für Schritt ${i+1}">${opt(s)}</select></div>
         <div>${esc(s.t||"")}${(s.nach||[]).length?` <span class="hint" style="margin:0">· startet nach ${s.nach.join(", ")}</span>`:""}${s.sk?` <span class="hint" style="margin:0">· Skill: ${esc(s.sk)}</span>`:""}</div>

@@ -101,6 +101,17 @@ const check = (name, ok, info = '') => { CHECKS.push({ name, ok }); console.log(
   const pe = await p.evaluate(id => { const P = AU.find(j => j.id === id); return { st: P.st, ok: P.ok, sum: P.sum, erg: (P.erg || []).length, db: window.__S['jobs/' + id].st }; }, pl.id);
   check('Alle Teile fertig: Hauptauftrag erledigt mit Zusammenfassung', pe.st === 'done' && pe.ok === 'ja' && pe.db === 'done' && /3 erledigt/.test(pe.sum) && pe.erg === 1, JSON.stringify(pe));
   await p.evaluate(() => { document.getElementById('modal').innerHTML = '' });
+  // ----- Teamleiter je Team -----
+  const tmI = await p.evaluate(() => { const o = OC, d = deptsOf(o).find(x => AG.filter(a => inOrg(a, o) && PL(a, o).abt === x.id).length >= 2); const A = AG.filter(a => inOrg(a, o) && PL(a, o).abt === d.id);
+    d.teams = [{ id: 'tm-test', n: 'Angebote' }]; A[0].pl = { ...A[0].pl, [o]: { abt: d.id, team: 'tm-test' } }; show('org'); return { d: d.id, a0: A[0].id, a1: A[1].id }; });
+  await p.waitForTimeout(300);
+  check('Organigramm: ▶ je Team und für „Allgemein“', (await p.$$(`[data-otm="${tmI.d}|tm-test"]`)).length === 1 && (await p.$$(`[data-otm="${tmI.d}|_allg"]`)).length === 1);
+  await p.click(`[data-otm="${tmI.d}|tm-test"]`); await p.waitForTimeout(300);
+  const tmv = await p.evaluate(() => ({ team: (document.querySelector('#jteam') || {}).value, hint: (document.querySelector('#jabt') || {}).parentElement.querySelector('.hint').textContent }));
+  check('Team beauftragen: Team vorgewählt, nur dessen Agenten zur Wahl', tmv.team === 'tm-test' && !tmv.hint.includes(',') , JSON.stringify(tmv));
+  await p.fill('#modal #ji', 'Teamauftrag'); await p.click('#modal #go'); await p.waitForTimeout(1200);
+  const tmj = await p.evaluate(i => { const j = AU.find(x => x.in === 'Teamauftrag'); const t = (window.__CI || []).filter(x => x && x.text).map(x => x.text).pop() || ''; return { team: j && j.team, ctx: t.includes('Team Angebote') && t.includes(i.a0) && !t.includes('(' + i.a1 + ')') }; }, tmI);
+  check('Teamauftrag: team gespeichert, Kontext nennt nur Agenten des Teams', tmj.team === 'tm-test' && tmj.ctx, JSON.stringify(tmj));
   // ----- Etappe 2: Sammeln und Eingang -----
   await p.evaluate(() => show('org')); await p.waitForTimeout(200);
   check('Organigramm: „📥 n“ und „+ Sammeln“ je Abteilung', (await p.$$('[data-oin]')).length > 0 && (await p.$$('[data-osm]')).length === (await p.$$('[data-oin]')).length);
