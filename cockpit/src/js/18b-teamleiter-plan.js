@@ -25,7 +25,7 @@ async function planFreigeben(j){await kiFresh(j);if(!istPlan(j))throw {message:"
     const k={id:ids[i],f:F,fid:F.id,art:"agent",aid:a.id,org:o,t:s.t&&s.t.length<80?s.t:(j.t+" – Teil "+(i+1)),in:"Teilauftrag "+(i+1)+" von "+S.length+" aus Plan "+j.id+" „"+j.t+"“: "+(s.t||"")+"\n\nUrsprüngliche Aufgabe von "+ICH()+": "+(j.in||j.t),
       path:[st.id],st:"inbox",ki:1,tempo:j.tempo||"schnell",parent:j.id,step:i+1,nach:(s.nach||[]).map(n=>ids[n-1]).filter(Boolean),auto:1,gesammelt:new Date().toISOString(),
       log:[[now(),"Teilauftrag "+(i+1)+"/"+S.length+" aus Plan "+j.id]]};
-    if(p.abt)k.abt=p.abt;if(p.team)k.team=p.team;if(skx)k.sk=skx.id;if(j.vorab)k.vorab=1;if(j.prio)k.prio=j.prio;if(j.due)k.due=j.due;if((j.anh||[]).length)k.anh=j.anh;return k});
+    if(p.abt)k.abt=p.abt;if(p.team)k.team=p.team;if(skx)k.sk=skx.id;if(j.vorab)k.vorab=1;if(j.prj)k.prj=j.prj;if(j.prio)k.prio=j.prio;if(j.due)k.due=j.due;if((j.anh||[]).length)k.anh=j.anh;return k});
   for(const k of kids){await Store.set("jobs/"+k.id,JSON.parse(jobSer(k)));LAST.set("jobs/"+k.id,jobSer(k));AU.unshift(k)}
   const fremd=[...new Set(kids.map(k=>k.abt).filter(a=>a&&a!==j.abt))];
   j.teile=ids;j.st="run";delete j.q;j.plan.frei=new Date().toISOString();j.log.push([now(),"Plan freigegeben von "+ICH()+" – "+S.length+" Teilaufträge",1]);

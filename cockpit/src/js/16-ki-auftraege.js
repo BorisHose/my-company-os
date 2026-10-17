@@ -20,7 +20,7 @@ async function kiCancel(j){if(!await askOk("Auftrag „"+j.t+"“ abbrechen? Cla
   toast("Auftrag abgebrochen");return true}
 function resultModal(j){KINEW.delete(j.id);const [cls,lab]=okTxt(j),E=j.erg||[],W=j.st==="wait"&&j.q,Q=j.q||{};
   const close=modalBox(`<div class="bhead"><h3>${istPlan(j)?"Vorschlag":"Ergebnis"}: ${esc(j.t)}</h3><span class="okb ${cls}">${lab}</span><button class="ic" id="mclose" title="Schließen" style="font-size:18px">✕</button></div>
-   <div class="hint" style="margin:0 0 10px">${esc(j.id)} · ${esc(jobLbl(j))}${(j.log||[]).length?" · zuletzt "+esc(j.log[j.log.length-1][0]):""}</div>
+   <div class="hint" style="margin:0 0 10px">${esc(j.id)} · ${esc(jobLbl(j))}${(j.log||[]).length?" · zuletzt "+esc(j.log[j.log.length-1][0]):""}</div>${pjJobField(j)}
    ${W&&istPlan(j)?planHtml(j)+`<div class="btns" style="margin:8px 0 6px"><button class="btn p" id="plgo">▶ Plan freigeben &amp; starten</button><button class="btn" id="rchg">Ändern …</button><button class="btn d" id="rcan">Abbrechen</button></div><div id="rchgbox" style="display:none;margin-top:8px"><textarea id="rchgt" placeholder="Was soll der Teamleiter anders planen? z. B. ohne Video, anderer Agent für Schritt 2 …" style="min-height:70px"></textarea><div class="btns" style="justify-content:flex-end"><button class="btn p" id="rchgok">Änderung an den Teamleiter senden</button></div></div>`:W?`<div class="qbox"><b>${esc(Q.kind||"Rückfrage")} von ${esc(Q.from||"Claude")}</b><p style="margin:6px 0;white-space:pre-wrap">${esc(Q.text||"")}</p>${Q.why?`<div class="hint" style="margin:0">${esc(Q.why)}</div>`:""}
      <div class="btns">${(Q.opts||[]).filter(o=>!/^abbrechen/i.test(o.trim())).map((o,i)=>`<button class="btn ${i?'':'p'}" data-rans="${esc(o)}">${esc(o)}</button>`).join("")}<button class="btn" id="rchg">Ändern …</button><button class="btn d" id="rcan">Abbrechen</button></div>
      <div id="rchgbox" style="display:none;margin-top:8px"><textarea id="rchgt" placeholder="Was soll anders sein? z. B. anderer Mandant, anderer Titel, Fälligkeit …" style="min-height:70px"></textarea><div class="btns" style="justify-content:flex-end"><button class="btn p" id="rchgok">Änderung an Claude senden</button></div></div></div>`:""}
@@ -29,7 +29,7 @@ function resultModal(j){KINEW.delete(j.id);const [cls,lab]=okTxt(j),E=j.erg||[],
    ${E.length?`<div class="flabel">Ergebnisse (${E.length})</div>${E.map(e=>`<div class="ergit"><div class="ergh"><b>${esc(e.t||"Ergebnis")}</b>${e.art?`<span class="hint" style="margin:0">${esc(e.art)}</span>`:""}<span style="flex:1"></span>${e.url?`<a class="btn sm p" href="${esc(e.url)}" target="_blank" rel="noopener">Öffnen ↗</a>`:""}</div>${e.vorschau?`<div class="ergv">${esc(e.vorschau)}</div>`:""}${e.url?`<div class="hint" style="margin:4px 0 0;word-break:break-all">${esc(e.url)}</div>`:""}</div>`).join("")}`:istPlan(j)||Array.isArray(j.teile)?"":'<div class="hint">Noch keine Ergebnisse eingetragen.</div>'}
    ${(j.sess||[]).length?`<div class="flabel" style="margin-top:10px">Claude-Sitzungen</div><div class="sessl">${j.sess.map((s,i)=>`<a href="${esc(s.url)}" target="_blank" rel="noopener">🔗 Sitzung ${i+1}${s.at?" · "+esc(new Date(s.at).toLocaleString("de-DE",{dateStyle:"short",timeStyle:"short"})):""}</a>`).join("")}</div>`:""}
    <div class="btns" style="justify-content:flex-end;margin-top:12px"><button class="btn" id="rlog" title="Verlauf, Prozessgrafik, Sitzungen und weitere Aktionen">Details …</button><button class="btn p" id="rclose">Schließen</button></div>`,true);
-  anhBind(j);$("#mclose").onclick=$("#rclose").onclick=()=>{close();jobs()};$("#rlog").onclick=()=>{close();jobModalK(j)};
+  anhBind(j);{const rp=$("#rprj");if(rp)rp.onchange=e=>pjSetJob(j,e.target.value)}$("#mclose").onclick=$("#rclose").onclick=()=>{close();if(!$("#projects").classList.contains("hide"))prj();else jobs()};$("#rlog").onclick=()=>{close();jobModalK(j)};
   document.querySelectorAll("[data-plk]").forEach(e=>e.onclick=()=>{const k=AU.find(x=>x.id===e.dataset.plk);if(k){close();resultModal(k)}});
   if(W&&istPlan(j))planBind(j,close);
   if(W){document.querySelectorAll("[data-rans]").forEach(b=>b.onclick=()=>{close();kiAnswer(j,b.dataset.rans)});
@@ -46,6 +46,7 @@ function kiContext(j){const f=j.f,L=[];if(!f)return "";const cur=j.path[j.path.l
   if(f.frei&&JD&&!JA){const AO=AG.filter(a=>inOrg(a,JO||j.org));L.push("ALLE AGENTEN der Organisation (nur für Pläne): "+AO.map(a=>a.n+" ("+a.id+", Abteilung "+((dept(PL(a,JO?JO.id:j.org).abt)||{}).n||"ohne")+"): "+String(a.r||"–").slice(0,140)).join(" | "))}
   else if(f.frei)L.push(j.art==="agent"&&JA?"AGENT BEAUFTRAGT – kein Prozess: Handle als Agent „"+JA.n+"“ (Angaben unten) und erledige die Aufgabe direkt."+(JS?"":" Passenden Skill des Agenten selbst wählen.")+" Freigaben vor Außenwirkung wie immer. Den einen Schritt des Systemablaufs nur zum Fortschreiben von path nutzen.":"FREIE AUFGABE – kein Prozess: die Eingabe direkt erledigen (Frage beantworten, recherchieren oder eine einzelne Aktion)."+(JS?"":" Passenden Skill aus dem Konto selbst wählen.")+" Freigaben vor Außenwirkung wie immer.");
   if(JS)L.push("SKILL VERWENDEN: „"+JS.n+"“ – im Konto: "+(KS(JS).join(", ")||"nur im Cockpit, kein Konto-Skill")+(JS.d?" · "+JS.d:""));
+  if(j.prj&&pj(j.prj))L.push(pjKontext(j));
   if(JO)L.push("Organisation des Auftrags: "+JO.n+(JO.prod?" (Produkt "+PN[JO.prod]+")":""));
   L.push("Auftrag "+j.id+": "+(j.t||"")+(j.in?"\nEingabe von "+ICH()+": "+j.in:""));
   if(j.prio&&j.prio!=="n"||j.due)L.push("Priorität des Auftrags: "+((PRIO.find(p=>p[0]===(j.prio||"n"))||[])[1]||"Normal")+(j.due?" · Fällig bis: "+new Date(j.due+"T12:00").toLocaleDateString("de-DE"):""));
@@ -121,7 +122,7 @@ function jobCard(j){const W=jobWho(j),comp=!KOPEN.has(j.id),[oc,ot]=okTxt(j),neu
   const stTxt=isEnd(j)?`<span class="kst ${oc}">${doneTxt(j)}</span>`:j.st==="wait"?'<span class="kst wait">wartet auf dich</span>':'<span class="kst run"><i class="pulse"></i>läuft</span>';
   const badges=`${j.ki?'<span class="kib2" title="Wird von Claude ausgeführt – '+esc(RUNNER(j).l)+'">KI'+(j.tempo==="schnell"?" ⚡":"")+'</span>':''}${(j.anh||[]).length?' <span title="'+j.anh.length+' Bild(er) angehängt">📎'+j.anh.length+'</span>':''}${j.vorab?' <span class="badge" title="Einfache CRM-Anlagen ohne Rückfrage, wenn eindeutig">vorab</span>':''}${(j.sess||[]).some(s=>s.art==="ohne Rückmeldung")&&j.st==="wait"?' <span title="Sitzung ohne Rückmeldung">⚠</span>':''}${j.beispiel?' <span class="badge neu">Beispiel</span>':''}`;
   const head=`<div class="khd"><span>${esc(j.id)} · ${esc(jobLbl(j))}</span>${stTxt}</div>
-    <div class="kwho">${av(W.u,40,1)}<div><b>${esc(j.t||"Auftrag")} ${badges}</b><small>${esc(W.n)} · ${W.u?"verantwortlich: "+esc(W.u.n):esc(W.sub)}</small></div></div>`;
+    <div class="kwho">${av(W.u,40,1)}<div><b>${esc(j.t||"Auftrag")} ${badges}</b><small>${esc(W.n)} · ${W.u?"verantwortlich: "+esc(W.u.n):esc(W.sub)}${pj(j.prj)?` · <span class="pjchip">▣ ${esc(pj(j.prj).n)}</span>`:""}</small></div></div>`;
   const stamp=isEnd(j)&&neu&&j.ok!=="nein"?'<div class="kstamp" aria-hidden="true">ERLEDIGT</div>':"";
   const qt=j.in?`<div class="kq"><span>„${esc(j.in)}“</span></div>`:"";
   if(comp){let line="",btn="";
@@ -215,9 +216,10 @@ $("#newF").onclick=()=>{if(blocked())return;const a=AG.find(x=>x.p===FF)||AG[0];
 const AGRP=["build","skills","matrix"];
 function show(v){if(v==="agrp")v=AGRP.includes(UI.agv)?UI.agv:"build";if(EDIT&&!$("#"+v).classList.contains("hide"))return;if(blocked())return;document.querySelectorAll("nav button").forEach(x=>x.classList.toggle("on",x.dataset.v===v||(x.dataset.v==="agrp"&&AGRP.includes(v))));
   {const sn=$("#subnav");if(sn){sn.hidden=!AGRP.includes(v);sn.querySelectorAll("[data-sv]").forEach(b=>b.classList.toggle("on",b.dataset.sv===v))}if(AGRP.includes(v)&&UI.agv!==v){UI.agv=v;saveUI()}}
-  ["build","matrix","flows","jobs","users","org","skills","settings"].forEach(id=>$("#"+id).classList.toggle("hide",id!==v));{const g=$("#gear");if(g)g.classList.toggle("on",v==="settings"||v==="users")}if(v==="settings")einst();
+  ["build","matrix","flows","jobs","projects","users","org","skills","settings"].forEach(id=>$("#"+id).classList.toggle("hide",id!==v));{const g=$("#gear");if(g)g.classList.toggle("on",v==="settings"||v==="users")}if(v==="settings")einst();
   if(v==="skills")lib();
   if(v==="org")org();
+  if(v==="projects")prj();
   if(v==="users"){if(ucur<0&&US.length)ucur=0;users()}
   if(v==="build"||v==="matrix")render()
   if(v==="flows")flows();if(v==="jobs"){jobs();if(AU.some(j=>j.ki))kiReload(true).then(kiCheckRuns);kiPoll()}}

@@ -416,6 +416,24 @@
 :root[data-theme=dark] .subnav button{background:none;border:0;border-bottom:2px solid transparent;color:#ffffffcc}
 :root[data-theme=dark] .subnav button:hover{color:#fff}
 :root[data-theme=dark] .subnav button.on{color:#fff;border-bottom-color:#2b3442}
+:root[data-theme=dark] .pjc{background:#171e29;border:1px solid var(--line);border-radius:10px;color:inherit}
+:root[data-theme=dark] .pjc:hover{border-color:#3a4658}
+:root[data-theme=dark] .pjc.on{border-color:var(--navy)}
+:root[data-theme=dark] .pjc small{color:var(--mut)}
+:root[data-theme=dark] .pjc.pausiert b,:root[data-theme=dark] .pjc.abgeschlossen b{color:var(--mut)}
+:root[data-theme=dark] .pjc.ohne{border-style:dashed}
+:root[data-theme=dark] .pjz{color:var(--mut)}
+:root[data-theme=dark] .pjz .pjo{color:#1f7a3a}
+:root[data-theme=dark] .pjz .pjw{color:#a35c00}
+:root[data-theme=dark] .pjr{border:1px solid var(--line);border-radius:8px;background:#171e29}
+:root[data-theme=dark] .pjr:hover{border-color:#3a4658}
+:root[data-theme=dark] .pjr .pjid{color:var(--mut)}
+:root[data-theme=dark] .pjr .pjt small{color:var(--mut)}
+:root[data-theme=dark] .pjlink{border:1px solid var(--line);border-radius:8px;background:#131a24}
+:root[data-theme=dark] .pjbk{color:#9ab7de;border:1px solid var(--line);border-radius:999px;background:#171e29}
+:root[data-theme=dark] .pjsel label{color:var(--mut)}
+:root[data-theme=dark] .pbr{border:1px solid var(--line);border-radius:8px}
+:root[data-theme=dark] .pbr small{color:var(--mut)}
 :root[data-theme=dark] nav button.on{background:#2f6fdf;color:#fff}:root[data-theme=dark] body{background:var(--bg);color:var(--ink)}:root[data-theme=dark] input,:root[data-theme=dark] select,:root[data-theme=dark] textarea{background:#131a24;color:var(--ink);border-color:#3a4456}:root[data-theme=dark] .modal{background:#000000a6}:root[data-theme=dark] img.olg,:root[data-theme=dark] .av img{filter:none}
 @media (prefers-color-scheme:dark){:root[data-theme=auto]{color-scheme:dark;--bg:#0f141b;--panel:#171e29;--ink:#e4e8ef;--mut:#9aa4b4;--line:#2b3442;--acc:#5b8def;--accbg:#1c2b47;--warn:#f79009;--warnbg:#3a2615;--ok:#47cd89;--okbg:#12301f;--vio:#9b8afb;--viobg:#28213d;--teal:#36bffa;--tealbg:#11303a;--bodobg:#1d2939;--sellbg:#11303c}
 :root[data-theme=auto] body{background:var(--bg);color:var(--ink)}
@@ -834,4 +852,22 @@
 :root[data-theme=auto] .subnav button{background:none;border:0;border-bottom:2px solid transparent;color:#ffffffcc}
 :root[data-theme=auto] .subnav button:hover{color:#fff}
 :root[data-theme=auto] .subnav button.on{color:#fff;border-bottom-color:#2b3442}
+:root[data-theme=auto] .pjc{background:#171e29;border:1px solid var(--line);border-radius:10px;color:inherit}
+:root[data-theme=auto] .pjc:hover{border-color:#3a4658}
+:root[data-theme=auto] .pjc.on{border-color:var(--navy)}
+:root[data-theme=auto] .pjc small{color:var(--mut)}
+:root[data-theme=auto] .pjc.pausiert b,:root[data-theme=auto] .pjc.abgeschlossen b{color:var(--mut)}
+:root[data-theme=auto] .pjc.ohne{border-style:dashed}
+:root[data-theme=auto] .pjz{color:var(--mut)}
+:root[data-theme=auto] .pjz .pjo{color:#1f7a3a}
+:root[data-theme=auto] .pjz .pjw{color:#a35c00}
+:root[data-theme=auto] .pjr{border:1px solid var(--line);border-radius:8px;background:#171e29}
+:root[data-theme=auto] .pjr:hover{border-color:#3a4658}
+:root[data-theme=auto] .pjr .pjid{color:var(--mut)}
+:root[data-theme=auto] .pjr .pjt small{color:var(--mut)}
+:root[data-theme=auto] .pjlink{border:1px solid var(--line);border-radius:8px;background:#131a24}
+:root[data-theme=auto] .pjbk{color:#9ab7de;border:1px solid var(--line);border-radius:999px;background:#171e29}
+:root[data-theme=auto] .pjsel label{color:var(--mut)}
+:root[data-theme=auto] .pbr{border:1px solid var(--line);border-radius:8px}
+:root[data-theme=auto] .pbr small{color:var(--mut)}
 :root[data-theme=auto] nav button.on{background:#2f6fdf;color:#fff}:root[data-theme=auto] body{background:var(--bg);color:var(--ink)}:root[data-theme=auto] input,:root[data-theme=auto] select,:root[data-theme=auto] textarea{background:#131a24;color:var(--ink);border-color:#3a4456}:root[data-theme=auto] .modal{background:#000000a6}:root[data-theme=auto] img.olg,:root[data-theme=auto] .av img{filter:none}}

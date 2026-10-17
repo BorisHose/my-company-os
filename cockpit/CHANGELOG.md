@@ -1,5 +1,13 @@
 # Änderungen – Cockpit
 
+## 58 · 17.10.2026 · Etappe 4b, Teil 1 „Projekte“ (Freigabe Boris)
+- Neuer Reiter „Projekte“ (Leiste: Organigramm · Aufträge · Projekte · Prozesse · Agenten ▾): je Organigramm Übersicht nach Aktiv · Pausiert · Abgeschlossen mit offenen, wartenden und erledigten Aufträgen; Karte „Ohne Projekt“.
+- Projekte werden in Company OS angelegt (Sammlung projects): Name, Kunde/Bezug, Status, Verantwortlich, Beschreibung.
+- Verbindung mit einem Bodo-Projekt (Suche im gewählten Mandanten über den Connector) und „⇣ Aus Bodo übernehmen“ für mehrere aktive Projekte auf einmal; der zuletzt gewählte Mandant wird je Organigramm gemerkt.
+- Aufträge: Projekt im Fenster „Neuer Auftrag“ wählbar (optional), „+ Auftrag in diesem Projekt“, Zuordnung im Ergebnisfenster änderbar; Teilaufträge eines Plans erben das Projekt; Projekt auf der Auftragskachel; Archiv behält die Zuordnung.
+- Claude bekommt Projekt und ggf. Bodo-Projekt-ID im Kontext und legt Aufgaben, Notizen und Termine des Auftrags dort am Projekt an.
+- Smoke-Test: 81 Prüfungen.
+
 ## 57 · 17.10.2026 · Kopfzeile aufgeräumt (Freigabe Boris)
 - Leiste: Organigramm · Aufträge · Prozesse · Agenten ▾; „Agenten ▾“ öffnet eine Unterleiste mit Agenten · Skills · Matrix, der zuletzt gewählte Reiter wird gemerkt. Platz für „Projekte“ kommt mit 4b.
 - Begriffe: „KI-Aufträge“ → „Aufträge“, „+ KI-Auftrag“ → „+ Auftrag“, „Neuer KI-Auftrag“ → „Neuer Auftrag“; „Abläufe“/„Ablauf“ → „Prozesse“/„Prozess“ in Leiste, Designer und Auftragsfenster (Texte für Claude bleiben unverändert).

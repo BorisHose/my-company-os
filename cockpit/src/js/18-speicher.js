@@ -47,15 +47,15 @@ async function umzug3(m,s){const alt=(s.orgs||[]).some(o=>o.id==="og-bodo"),p={s
 async function archivieren(){if(!neuSchema()||!await Store.lease("meta/archiv-lauf",120000))return 0;let n=0;
   const alt=await Store.list("jobs",{where:[["fertig","<",cutoffISO()]],limit:50});
   for(const j of alt){if(!isEnd(j))continue;const mon=j.fMon||String(j.fertig).slice(0,7),base="archiv/"+(j.org||"ohne")+"-"+mon;
-    const kurz=plain({id:j.id,t:j.t||"",art:j.art||"",aid:j.aid||null,abt:j.abt||null,team:j.team||null,fertig:j.fertig,st:j.st,ok:j.ok||null,sum:j.sum||"",erg:(j.erg||[]).map(e=>({t:e.t||"",url:e.url||""}))});
+    const kurz=plain({id:j.id,t:j.t||"",art:j.art||"",aid:j.aid||null,abt:j.abt||null,team:j.team||null,fertig:j.fertig,st:j.st,ok:j.ok||null,prj:j.prj||null,sum:j.sum||"",erg:(j.erg||[]).map(e=>({t:e.t||"",url:e.url||""}))});
     let k=base,a=null;for(let i=1;i<100;i++){k=base+(i>1?"-"+i:"");a=await Store.get(k);if(!a||(a.items||[]).some(x=>x.id===j.id)||JSON.stringify(a).length<200000)break}
     a=a||{org:j.org||null,mon,items:[]};if(!(a.items||[]).some(x=>x.id===j.id)){a.items=[...(a.items||[]),kurz];await Store.set(k,a)}
     const chk=await Store.get(k);if(!chk||!(chk.items||[]).some(x=>x.id===j.id))continue;
     for(const x of (j.anh||[]))for(let i=0;i<(x.n||0);i++)await Store.del("anhaenge/"+x.aid+"_"+i);
     await Store.del("jobs/"+j.id);n++}
   return n}
-const OUT={depts:d=>d,users:u=>u,skills:s=>s,agents:a=>a,flows:f=>({...f,N:f.N.map(n=>{const {a,...r}=n;return {...r,aid:a?a.id:(r.aid??null)}})}),jobs:j=>{const {f,...r}=j;return {...r,fid:f?f.id:r.fid}}};
-function snapshot(){const m=new Map();[["users",US],["skills",SK],["agents",AG],["flows",FL],["jobs",AU],["depts",DP]].forEach(([c,arr])=>arr.forEach(o=>{if(!o.id)o.id=uid(c.slice(0,2));const k=c+"/"+o.id;
+const OUT={depts:d=>d,users:u=>u,skills:s=>s,agents:a=>a,flows:f=>({...f,N:f.N.map(n=>{const {a,...r}=n;return {...r,aid:a?a.id:(r.aid??null)}})}),jobs:j=>{const {f,...r}=j;return {...r,fid:f?f.id:r.fid}},projects:p=>p};
+function snapshot(){const m=new Map();[["users",US],["skills",SK],["agents",AG],["flows",FL],["jobs",AU],["depts",DP],["projects",PJ]].forEach(([c,arr])=>arr.forEach(o=>{if(!o.id)o.id=uid(c.slice(0,2));const k=c+"/"+o.id;
     if(EDIT&&EDIT.orig.has(k)){const v=EDIT.orig.get(k);if(v!==null)m.set(k,v);return}if(EDIT&&EDIT.newc&&EDIT.newc.includes(c))return;m.set(k,JSON.stringify(OUT[c](o)))}));
   if(EDIT)EDIT.orig.forEach((v,k)=>{if(v!==null&&k!=="meta/config"&&!m.has(k))m.set(k,v)}); // im Bearbeiten Gelöschtes erst beim Speichern löschen
   if(EDIT&&EDIT.orig.has("meta/config")){m.set("meta/config",EDIT.orig.get("meta/config"));return m}
@@ -79,8 +79,8 @@ async function boot(){
   if(!DB){RO=true;setSave("err","Speicher nicht verfügbar");emptyState("Speicher nicht verfügbar","Öffne das Cockpit angemeldet auf claude.ai, damit deine Daten geladen und gespeichert werden.");return}
   try{let umg=false;try{umg=await migrieren()}catch(e){console.warn("Umstellung auf Datenstand "+SCHEMA+" nicht möglich",e)}
     const m=await Store.get("meta/config");if(m&&m.settings)SET={...SET,...m.settings};
-    const D=await Promise.all([Store.list("skills"),Store.list("agents"),Store.list("flows"),jobsLaden(),Store.list("users"),Store.list("depts")]);
-    [SK,AG,FL,AU,US,DP]=D;DP.sort((a,b)=>(a.ord??0)-(b.ord??0));US.sort((a,b)=>(a.ord??0)-(b.ord??0));if(m){const c=m;GR=[...(c.groups||[])];GLOBAL=[...(c.globals||[])];SET={...SET,...(c.settings||{})}}
+    const D=await Promise.all([Store.list("skills"),Store.list("agents"),Store.list("flows"),jobsLaden(),Store.list("users"),Store.list("depts"),Store.list("projects")]);
+    [SK,AG,FL,AU,US,DP,PJ]=D;DP.sort((a,b)=>(a.ord??0)-(b.ord??0));US.sort((a,b)=>(a.ord??0)-(b.ord??0));if(m){const c=m;GR=[...(c.groups||[])];GLOBAL=[...(c.globals||[])];SET={...SET,...(c.settings||{})}}
     SK.sort((a,b)=>(a.ord??0)-(b.ord??0));AG.sort((a,b)=>(a.ord??0)-(b.ord??0));FL.sort((a,b)=>(a.ord??0)-(b.ord??0));AU.sort((a,b)=>(+b.id.slice(2)||0)-(+a.id.slice(2)||0));
     hydrate();GR.forEach((g,i)=>COL.add(i));const s0=snapshot();s0.forEach((v,k)=>LAST.set(k,v));if(migrateOrgs()){toast("Organisationen eingerichtet");schedule()}
     const f=agVis()[0];cur=f?f[1]:-1;fcur=FL.findIndex(x=>x.p===FF&&!x.frei);

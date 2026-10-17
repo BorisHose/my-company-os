@@ -16,7 +16,7 @@ data.jobs.push(
   { id: 'A-150', t: 'Alter Auftrag', art: 'frei', org: 'og-bodo', fid: data.jobs[0].fid, st: 'done', ok: 'ja', ki: 1, fertig: tage(200), sum: 'Alt.', erg: [{ t: 'X', url: 'https://example.org/x', vorschau: 'lang' }], log: [], path: [] });
 const mock = `<script>window.__W=[];window.__C=[];const D=${JSON.stringify(data).replace(/</g, '\\u003c')};
 const S={};S["meta/config"]=D.meta;["skills","agents","flows","jobs","users","depts"].forEach(c=>(D[c]||[]).forEach(x=>{S[c+"/"+x.id]=JSON.parse(JSON.stringify(x))}));window.__S=S;
-const mcp={callTool:async(s,tool,inp)=>{__C.push(tool);(window.__CI=window.__CI||[]).push(inp);if(tool==="list_triggers")return {payload:{data:[]}};return {payload:{}}}};
+const mcp={callTool:async(s,tool,inp)=>{__C.push(tool);(window.__CI=window.__CI||[]).push(inp);if(tool==="list_triggers")return {payload:{data:[]}};if(tool==="bodo_search"&&inp&&inp.resourceType==="project")return {payload:{items:[{id:"bp1",title:"Einführung Musterverein",url:"https://bodo-app.com/o/x/projekte/bp1",data:{projectStatus:"active",ownerName:"Boris Hose",description:"Test"}},{id:"bp2",title:"Migration Musterverein",url:"https://bodo-app.com/o/x/projekte/bp2",data:{projectStatus:"active"}}],hasMore:false}};return {payload:{}}}};
 const smp=async()=>({text:""});smp.json=async()=>({});
 const OPS={"==":(a,b)=>a===b,"!=":(a,b)=>a!==b,"<":(a,b)=>a<b,"<=":(a,b)=>a<=b,">":(a,b)=>a>b,">=":(a,b)=>a>=b,"in":(a,b)=>b.includes(a),"not-in":(a,b)=>!b.includes(a)};
 const L=new Set(),LS={};window.__L=L;window.__LS=LS;
@@ -208,7 +208,7 @@ const check = (name, ok, info = '') => { CHECKS.push({ name, ok }); console.log(
   await p.evaluate(() => { UI.me = undefined; saveUI(); hdr(); show('org') });
   // ----- v57: Kopfzeile aufgeräumt -----
   const nv = await p.evaluate(() => [...document.querySelectorAll('nav button')].map(b => b.textContent.replace(/\d+$/, '').trim()));
-  check('Kopfzeile: Organigramm · Aufträge · Prozesse · Agenten ▾', JSON.stringify(nv) === JSON.stringify(['Organigramm', 'Aufträge', 'Prozesse', 'Agenten ▾']), JSON.stringify(nv));
+  check('Kopfzeile: Organigramm · Aufträge · Projekte · Prozesse · Agenten ▾', JSON.stringify(nv) === JSON.stringify(['Organigramm', 'Aufträge', 'Projekte', 'Prozesse', 'Agenten ▾']), JSON.stringify(nv));
   await p.click('nav [data-v="agrp"]'); await p.waitForTimeout(200);
   await p.click('#subnav [data-sv="skills"]'); await p.waitForTimeout(250);
   const sn = await p.evaluate(() => ({ sub: !document.querySelector('#subnav').hidden, sk: !document.querySelector('#skills').classList.contains('hide'), on: document.querySelector('nav [data-v="agrp"]').classList.contains('on'), agv: JSON.parse(localStorage.getItem('cos-ui')).agv }));
@@ -254,6 +254,30 @@ const check = (name, ok, info = '') => { CHECKS.push({ name, ok }); console.log(
   const tst = await p.evaluate(() => (document.querySelector('.toast') || {}).textContent || '');
   const neu = await p.evaluate(() => { const k = Object.keys(window.__S).filter(k => /^jobs\/A-2\d\d$/.test(k)).sort().pop(); return { k, j: window.__S[k], fired: __C.includes('fire_trigger') }; });
   check('Neuer KI-Auftrag: Nummer vom Zähler, Protokoll 2, Claude angestoßen', +neu.k.slice(7) > 207 && neu.j.pv === 2 && neu.fired, JSON.stringify([neu.k, neu.j && neu.j.pv, neu.fired, tst]));
+  // ----- v58 Projekte -----
+  await p.evaluate(() => { document.getElementById('modal').innerHTML = ''; OC = ORGS()[0].id; show('projects') }); await p.waitForTimeout(300);
+  check('Projekte: Reiter sichtbar mit „Ohne Projekt“', await p.evaluate(() => !document.querySelector('#projects').classList.contains('hide') && !!document.querySelector('[data-pj="_ohne"]')));
+  await p.evaluate(() => pjBodoDlg(null)); await p.waitForTimeout(500);
+  check('Projekte: Bodo-Projekte werden gelistet', (await p.$$('#modal [data-pbc]')).length === 2);
+  await p.evaluate(() => { document.querySelectorAll('#modal [data-pbc]').forEach(c => { c.checked = true; c.dispatchEvent(new Event('change')) }); document.querySelector('#pbok').click() }); await p.waitForTimeout(1200);
+  const pjI = await p.evaluate(() => ({ n: PJ.length, bk: PJ.every(x => x.bk && x.bk.sys === 'bodo' && x.bk.orgId), db: Object.keys(window.__S).filter(k => k.startsWith('projects/')).length, cards: document.querySelectorAll('#pjl [data-pj]').length, inp: (window.__CI || []).filter(x => x && x.resourceType === 'project').pop() }));
+  check('Projekte: Übernahme legt verbundene Projekte an und speichert sie', pjI.n === 2 && pjI.bk && pjI.db === 2 && pjI.cards === 3 && pjI.inp.achsen.status === 'aktiv', JSON.stringify(pjI));
+  if (SHOT) await p.screenshot({ path: SHOT + '/e6-projekte.png' });
+  await p.evaluate(() => { const x = PJ[0]; startModal(null, { org: x.org, prj: x.id }) }); await p.waitForTimeout(300);
+  check('Projekte: Startfenster übernimmt das Projekt', await p.evaluate(() => document.querySelector('#jprj').value === PJ[0].id));
+  await p.fill('#modal #ji', 'Projektauftrag'); await p.click('#modal #go'); await p.waitForTimeout(1500);
+  const pjA = await p.evaluate(() => { const j = AU.find(x => x.in === 'Projektauftrag'), t = (window.__CI || []).filter(x => x && x.text).map(x => x.text).pop() || ''; return { prj: j && j.prj, db: j && (window.__S['jobs/' + j.id] || {}).prj, ctx: t.includes('PROJEKT des Auftrags') && t.includes('projectId ' + PJ[0].bk.id), id: j && j.id } });
+  check('Projekte: Auftrag trägt Projekt, Claude bekommt Projekt und Bodo-Projekt-ID', pjA.prj === pjA.db && !!pjA.prj && pjA.ctx, JSON.stringify(pjA));
+  await p.evaluate(() => { show('projects'); PJSEL = PJ[0].id; prj() }); await p.waitForTimeout(300);
+  check('Projekte: Detail listet den Auftrag offen', await p.evaluate(id => !!document.querySelector('#pjd [data-pjj="' + id + '"]'), pjA.id));
+  await p.evaluate(id => resultModal(AU.find(j => j.id === id)), pjA.id); await p.waitForTimeout(300);
+  await p.evaluate(() => { const s = document.querySelector('#rprj'); s.value = PJ[1].id; s.dispatchEvent(new Event('change')) }); await p.waitForTimeout(500);
+  check('Projekte: Zuordnung im Ergebnisfenster ändern speichert nur prj', await p.evaluate(id => window.__S['jobs/' + id].prj === PJ[1].id, pjA.id));
+  await p.evaluate(() => { document.getElementById('modal').innerHTML = ''; show('projects'); PJSEL = '_ohne'; prj() }); await p.waitForTimeout(300);
+  check('Projekte: „Ohne Projekt“ zeigt Aufträge ohne Zuordnung', await p.evaluate(() => document.querySelectorAll('#pjd [data-pjj]').length > 0));
+  await p.setViewportSize({ width: 390, height: 844 }); await p.waitForTimeout(200);
+  check('Projekte: Handy ohne seitliches Scrollen', await p.evaluate(() => document.documentElement.scrollWidth <= innerWidth + 1), '');
+  await p.setViewportSize({ width: 1440, height: 900 });
   check('keine Laufzeitfehler', errs.length === 0, errs.slice(0, 3).join(' | '));
   await b.close();
   fs.unlinkSync(tmp);
