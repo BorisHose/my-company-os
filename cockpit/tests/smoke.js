@@ -48,7 +48,7 @@ const check = (name, ok, info = '') => { CHECKS.push({ name, ok }); console.log(
   check('Organigramm zeigt Agenten', (await p.$$('.oag')).length > 0);
   for (const v of ['jobs', 'flows', 'build', 'skills', 'users', 'matrix', 'org']) {
     await p.evaluate(v => show(v), v); await p.waitForTimeout(250);
-    check('Ansicht ' + v + ' sichtbar', await p.$eval('#' + v, e => getComputedStyle(e).display !== 'none'));
+    check('Ansicht ' + v + ' sichtbar', await p.$eval(v === 'users' ? '#setu' : '#' + v, e => getComputedStyle(e).display !== 'none' && !e.closest('.hide')));
   }
   await p.evaluate(() => show('jobs')); await p.waitForTimeout(300);
   check('KI-Aufträge zeigen Kacheln', (await p.$$('#kb .kc, #kb .kmini')).length > 0);
@@ -184,7 +184,7 @@ const check = (name, ok, info = '') => { CHECKS.push({ name, ok }); console.log(
   await p.evaluate(() => show('org')); await p.waitForTimeout(200);
   const hd = await p.evaluate(() => ({ clock: (document.querySelector('#clock') || {}).textContent || '', me: !!document.querySelector('#me .av'), gear: !!document.querySelector('#gear'), users: !!document.querySelector('nav [data-v="users"]') }));
   check('Kopfzeile: Datum/Uhrzeit, Avatar, Zahnrad; Benutzer nicht mehr in der Leiste', /\d\d\.\d\d\.\d{4} · \d\d:\d\d/.test(hd.clock) && hd.me && hd.gear && !hd.users, JSON.stringify(hd));
-  await p.click('#gear'); await p.waitForTimeout(250);
+  await p.click('#gear'); await p.waitForTimeout(250); await p.evaluate(() => einst('darst')); await p.waitForTimeout(100);
   const se = await p.evaluate(() => ({ vis: !document.querySelector('#settings').classList.contains('hide'), nav: [...document.querySelectorAll('[data-sets]')].map(b => b.dataset.sets) }));
   check('Einstellungen öffnen mit allen Bereichen', se.vis && ['darst', 'inst', 'orgs', 'users', 'ausf', 'dienste'].every(k => se.nav.includes(k)), JSON.stringify(se));
   await p.click('[data-thm="dark"]'); await p.waitForTimeout(150);
@@ -347,6 +347,11 @@ const check = (name, ok, info = '') => { CHECKS.push({ name, ok }); console.log(
   check('Agenten ▾ auf dem Handy: Liste unter dem Knopf, ganz sichtbar', mm.ok, JSON.stringify(mm));
   if (SHOT) { await p.evaluate(() => document.querySelector('#agbtn').click()); await p.screenshot({ path: SHOT + '/e9-agmenu-mobil.png' }); await p.evaluate(() => document.body.click()) }
   await p.setViewportSize({ width: 1440, height: 900 });
+  // ----- v66 Benutzer in den Einstellungen -----
+  const bu = await p.evaluate(async () => { show('settings'); einst('darst'); document.querySelector('[data-sets="users"]').click(); await new Promise(r => setTimeout(r, 150));
+    const R = { nav: document.querySelectorAll('#setnav [data-sets]').length === 6, on: document.querySelector('#setnav .on').dataset.sets === 'users', liste: document.querySelectorAll('#setu #ulist .uitem').length > 0, edit: !!document.querySelector('#setu #uedit .etop'), setcAus: document.querySelector('#setc').hidden, kein: !document.querySelector('main#users') };
+    document.querySelector('[data-sets="ausf"]').click(); R.zurueck = !document.querySelector('#setc').hidden && document.querySelector('#setu').hidden && /Ausführung/.test(document.querySelector('#setc').textContent); return R });
+  check('Benutzer eingebettet: Menü links bleibt, Liste und Bearbeitung rechts, Wechsel zurück', Object.values(bu).every(Boolean), JSON.stringify(bu));
   check('keine Laufzeitfehler', errs.length === 0, errs.slice(0, 3).join(' | '));
   await b.close();
   if (process.env.KEEP) fs.copyFileSync(tmp, path.join(ROOT, 'tests', '.keep.html')); fs.unlinkSync(tmp);

@@ -216,13 +216,12 @@ $("#newF").onclick=()=>{if(blocked())return;const a=AG.find(x=>x.p===FF)||AG[0];
   f.N.push(t,e);f.E.push({f:f.N[0].id,t:t.id,l:""},{f:t.id,t:e.id,l:""});fcur=FL.length-1;startEdit("flow",f.id,null,["flows/"+f.id],true);SEL=null;flows();$("#fn").focus();$("#fn").select()};
 
 const AGRP=["build","skills","matrix"];
-function show(v){if(v==="agrp")v=AGRP.includes(UI.agv)?UI.agv:"build";if(EDIT&&!$("#"+v).classList.contains("hide"))return;if(blocked())return;document.querySelectorAll("nav button").forEach(x=>x.classList.toggle("on",x.dataset.v===v||(x.dataset.v==="agrp"&&AGRP.includes(v))));
+function show(v){if(v==="users"){UI.sets="users";v="settings"}if(v==="agrp")v=AGRP.includes(UI.agv)?UI.agv:"build";if(EDIT&&!$("#"+v).classList.contains("hide"))return;if(blocked())return;document.querySelectorAll("nav button").forEach(x=>x.classList.toggle("on",x.dataset.v===v||(x.dataset.v==="agrp"&&AGRP.includes(v))));
   {agMenu(false);$("#agmenu").querySelectorAll("[data-sv]").forEach(b=>{const on=b.dataset.sv===v;b.classList.toggle("on",on);b.setAttribute("aria-checked",on?"true":"false")});if(AGRP.includes(v)&&UI.agv!==v){UI.agv=v;saveUI()}}
-  ["build","matrix","flows","jobs","projects","users","org","skills","settings"].forEach(id=>$("#"+id).classList.toggle("hide",id!==v));{const g=$("#gear");if(g)g.classList.toggle("on",v==="settings"||v==="users")}if(v==="settings")einst();
+  ["build","matrix","flows","jobs","projects","org","skills","settings"].forEach(id=>$("#"+id).classList.toggle("hide",id!==v));{const g=$("#gear");if(g)g.classList.toggle("on",v==="settings")}if(v==="settings")einst();
   if(v==="skills")lib();
   if(v==="org")org();
   if(v==="projects")prj();
-  if(v==="users"){if(ucur<0&&US.length)ucur=0;users()}
   if(v==="build"||v==="matrix")render()
   if(v==="flows")flows();if(v==="jobs"){jobs();if(AU.some(j=>j.ki))kiReload(true).then(kiCheckRuns);kiPoll()}}
 // Menü „Agenten ▾“: Klick öffnet eine Auswahlliste (Agenten · Skills · Matrix) unter dem Knopf

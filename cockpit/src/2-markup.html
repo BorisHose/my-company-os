@@ -46,12 +46,12 @@
    <div id="orgv"></div></section>
 </main>
 <main id="projects" class="hide"><section class="panel"><h2>Projekte</h2><div id="pjl"></div></section><section class="panel" id="pjd"></section></main>
-<main id="settings" class="hide" style="grid-template-columns:220px minmax(0,1fr)"><section class="panel"><h2>⚙ Einstellungen</h2><div id="setnav"></div></section><section class="panel" id="setc"></section></main>
-<main id="users" class="hide" style="grid-template-columns:300px minmax(0,1fr)">
-  <section class="panel"><h2><button class="lnk" id="ub" title="Zurück zu den Einstellungen">⚙ Einstellungen</button> › Benutzer</h2><div class="opts" style="margin-bottom:8px"><label><input type="checkbox" id="uold"> Ausgeschiedene zeigen</label></div><div id="ulist"></div><button class="btn p" id="newU" style="width:100%">+ Neuer Benutzer …</button><button class="btn sm" id="ownOrgs" style="width:100%;margin-top:6px">⚙ Eigene Bodo-Mandanten</button>
+<main id="settings" class="hide" style="grid-template-columns:220px minmax(0,1fr)"><section class="panel"><h2>⚙ Einstellungen</h2><div id="setnav"></div></section><section class="panel" id="setc"></section><div id="setu" class="setu" hidden>
+  <section class="panel"><h2>Benutzer</h2><div class="opts" style="margin-bottom:8px"><label><input type="checkbox" id="uold"> Ausgeschiedene zeigen</label></div><div id="ulist"></div><button class="btn p" id="newU" style="width:100%">+ Neuer Benutzer …</button><button class="btn sm" id="ownOrgs" style="width:100%;margin-top:6px">⚙ Eigene Bodo-Mandanten</button>
   <div class="hint">Menschen, die in My Company OS handeln – z. B. als Verantwortliche für Agenten. Je Benutzer lässt sich hinterlegen, wer er in Bodo, sellify oder anderen Systemen ist.</div></section>
   <section class="panel" id="uedit"></section>
-</main>
+</div></main>
+
 <div id="modal"></div>
 
 <script>

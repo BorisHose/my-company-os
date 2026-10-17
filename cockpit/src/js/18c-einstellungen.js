@@ -7,11 +7,13 @@ document.documentElement.dataset.theme=UI.theme||"light";
 function uhr(){const e=$("#clock");if(!e)return;const d=new Date();e.textContent=d.toLocaleDateString("de-DE",{weekday:"short",day:"2-digit",month:"2-digit",year:"numeric"})+" · "+d.toLocaleTimeString("de-DE",{hour:"2-digit",minute:"2-digit"});e.title=d.toLocaleDateString("de-DE",{weekday:"long",day:"numeric",month:"long",year:"numeric"})}
 setInterval(uhr,15000);
 function hdr(){uhr();const m=$("#me");if(m){const u=ME();m.innerHTML=av(u,30);m.title=u?"Angemeldet als "+u.n+" – Einstellungen öffnen":"Benutzer wählen";m.onclick=()=>einst("darst")}
-  const g=$("#gear");if(g)g.onclick=()=>einst();const ub=$("#ub");if(ub)ub.onclick=()=>einst("users")}
+  const g=$("#gear");if(g)g.onclick=()=>einst();}
 const SETSEC=[["darst","Darstellung"],["inst","Instanz"],["orgs","Organigramme"],["users","Benutzer"],["ausf","Ausführung"],["dienste","Anbindungen"]];
 function einst(sec){if(sec)UI.sets=sec;if(!SETSEC.some(s=>s[0]===UI.sets))UI.sets="darst";saveUI();if($("#settings").classList.contains("hide")){show("settings");return}
   const S=UI.sets;$("#setnav").innerHTML=SETSEC.map(([k,l])=>`<button class="setn ${k===S?"on":""}" data-sets="${k}">${l}</button>`).join("");
-  document.querySelectorAll("[data-sets]").forEach(b=>b.onclick=()=>{if(b.dataset.sets==="users"){UI.sets="users";saveUI();show("users");return}einst(b.dataset.sets)});
+  document.querySelectorAll("[data-sets]").forEach(b=>b.onclick=()=>{if(b.dataset.sets!==S&&blocked())return;einst(b.dataset.sets)});
+  // Benutzer: eingebettet rechts neben der Menüführung (Liste und Bearbeitung), Menü links bleibt
+  const BU=S==="users";$("#setc").hidden=BU;$("#setu").hidden=!BU;if(BU){if(ucur<0&&US.length)ucur=0;users();return}
   const C=$("#setc"),uopt=(v,leer)=>`<option value="">${leer}</option>`+US.filter(u=>u.aktiv!==false||u.id===v).map(u=>`<option value="${u.id}" ${u.id===v?"selected":""}>${esc(u.n)}</option>`).join("");
   if(S==="darst"){const t=UI.theme||"light";
     C.innerHTML=`<h2>Darstellung</h2><div class="field"><label>Farbschema</label><div class="seg" id="sthm" style="margin:0">${[["light","☀ Hell"],["dark","☾ Dunkel"],["auto","Automatisch"]].map(([k,l])=>`<button data-thm="${k}" class="${k===t?"on":""}">${l}</button>`).join("")}</div><div class="hint">„Automatisch“ folgt der Einstellung des Geräts. Gilt für diesen Browser.</div></div>

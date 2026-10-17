@@ -1,5 +1,12 @@
 # Änderungen – Cockpit
 
+## 66 · 17.10.2026 · Benutzer in den Einstellungen eingebettet (Wunsch Boris)
+- ⚙ Einstellungen › Benutzer verhält sich wie die übrigen Bereiche: Die Menüführung bleibt links, Benutzerliste und Bearbeitung erscheinen rechts daneben. Eigene Ansicht „Benutzer“ und Rücksprung-Link entfallen.
+- Wechsel zwischen Bereichen ist gesperrt, solange ein Benutzer bearbeitet wird.
+- ⚙ öffnet den zuletzt gewählten Bereich.
+- Schmale Fenster (unter 1100 px): Liste und Bearbeitung untereinander.
+- Smoke-Test: 99 Prüfungen.
+
 ## 65 · 17.10.2026 · „Agenten ▾“ als Auswahlliste (Wunsch Boris)
 - Klick auf „Agenten ▾“ öffnet eine Auswahlliste direkt unter dem Knopf: Agenten · Skills · Matrix, der aktuelle Reiter mit ✓. Die zweite Leiste unter der Navigation entfällt, die Kopfzeile bleibt gleich hoch.
 - Schließen per Auswahl, Klick daneben, Escape, Tab, Scrollen der Leiste oder Größenänderung; Pfeiltasten wählen in der Liste.
