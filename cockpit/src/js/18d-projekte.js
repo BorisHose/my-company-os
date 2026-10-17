@@ -23,11 +23,11 @@ function prj(){if(!orgById(OC))OC=ORGS()[0].id;const O=orgById(OC),F=UI.pjf||"ak
     ${card(PJOHNE,"Ohne Projekt","Aufträge ohne Projektzuordnung","ohne")}
     <div class="btns" style="margin-top:10px"><button class="btn p" id="pjnew">+ Neues Projekt</button><button class="btn" id="pjimp" title="Aktive Projekte aus Bodo oder sellify übernehmen und verbinden">⇣ Aus Backend übernehmen …</button></div>
     <div class="hint">Projekte gehören zu ${esc(O.kurz||O.n)} und werden in Company OS geführt. Verbunden mit einem Bodo- oder sellify-Projekt legt Claude Aufgaben und Notizen eines Auftrags dort am Projekt an.</div>`;
-  document.querySelectorAll("[data-pjo]").forEach(b=>b.onclick=()=>{OC=b.dataset.pjo;PJSEL=null;prj()});
-  document.querySelectorAll("[data-pjf]").forEach(b=>b.onclick=()=>{UI.pjf=b.dataset.pjf;saveUI();PJSEL=null;prj()});
-  document.querySelectorAll("[data-pj]").forEach(b=>b.onclick=()=>{PJSEL=b.dataset.pj;prj()});
-  $("#pjnew").onclick=async()=>{const n=await askText("Name des neuen Projekts","");if(!n)return;const p={id:uid("pj"),org:OC,n,st:"aktiv",verantw:(ME()||{}).id||null,angelegt:new Date().toISOString()};PJ.push(p);PJSEL=p.id;UI.pjf="aktiv";saveUI();schedule();prj();toast("Projekt angelegt")};
-  $("#pjimp").onclick=()=>pjBodoDlg(null);
+  document.querySelectorAll("[data-pjo]").forEach(b=>b.onclick=()=>{if(blocked())return;OC=b.dataset.pjo;PJSEL=null;prj()});
+  document.querySelectorAll("[data-pjf]").forEach(b=>b.onclick=()=>{if(blocked())return;UI.pjf=b.dataset.pjf;saveUI();PJSEL=null;prj()});
+  document.querySelectorAll("[data-pj]").forEach(b=>b.onclick=()=>{if(b.dataset.pj!==PJSEL&&blocked())return;PJSEL=b.dataset.pj;prj()});
+  $("#pjnew").onclick=()=>{if(blocked())return;const p={id:uid("pj"),org:OC,n:"Neues Projekt",st:"aktiv",verantw:(ME()||{}).id||null,angelegt:new Date().toISOString()};PJ.push(p);PJSEL=p.id;UI.pjf="aktiv";saveUI();startEdit("projekt",p.id,null,["projects/"+p.id],true);prj();const n=$("#pjn");if(n){n.focus();n.select()}};
+  $("#pjimp").onclick=()=>{if(blocked())return;pjBodoDlg(null)};
   pjDetail()}
 function pjDetail(){const C=$("#pjd"),o=OC;
   const L=pjJobs(PJSEL,o),off=L.filter(j=>!isEnd(j)),fer=L.filter(j=>isEnd(j)).sort((a,b)=>String(b.fertig||"").localeCompare(String(a.fertig||"")));
@@ -37,24 +37,33 @@ function pjDetail(){const C=$("#pjd"),o=OC;
     <div class="flabel">Verbrauch</div>${vbPjHtml(L)}`;
   if(PJSEL===PJOHNE){C.innerHTML=`<h2>Ohne Projekt <span class="hint" style="margin:0 0 0 8px;text-transform:none;letter-spacing:0;font-weight:400">${esc((orgById(o)||{}).kurz||"")}</span></h2><div class="hint" style="margin:0 0 6px">Aufträge, die keinem Projekt zugeordnet sind. Zuordnen kannst du im Ergebnisfenster eines Auftrags unter „Projekt“.</div>${liste}`;pjBindRows();return}
   const p=pj(PJSEL);if(!p){C.innerHTML=`<div class="empty"><b>Kein Projekt gewählt</b>Lege links ein Projekt an oder übernimm aktive Projekte aus Bodo oder sellify.</div>`;return}
-  C.innerHTML=`<h2 style="justify-content:space-between"><span>▣ ${esc(p.n)}</span><span><button class="btn sm p" id="pjgo" ${(p.st||"aktiv")!=="aktiv"?"disabled title=\"Nur aktive Projekte nehmen neue Aufträge an\"":""}>+ Auftrag in diesem Projekt</button></span></h2>
-    <div class="row"><div class="field"><label>Name</label><input type="text" id="pjn" value="${esc(p.n||"")}"></div><div class="field"><label>Kunde / Bezug</label><input type="text" id="pjk" value="${esc(p.kunde||"")}" placeholder="z. B. Mieterverein Musterstadt"></div></div>
+  const pe=isEd("projekt",p.id),U=usr(p.verantw),stl=(PJST.find(x=>x[0]===(p.st||"aktiv"))||[,"Aktiv"])[1];
+  const bkTxt=p.bk?`Verbunden mit <b>${esc(PN[p.bk.sys]||p.bk.sys)}-Projekt „${esc(p.bk.n||"")}“</b>${p.bk.orgId?" im Mandanten "+esc(p.bk.orgN||p.bk.orgId):""}`:"";
+  const kopf=`<h2 style="justify-content:space-between"><span>▣ ${esc(p.n)}</span><span class="pjhb">${pe?"":`<button class="btn sm p" id="pjgo" ${(p.st||"aktiv")!=="aktiv"?"disabled title=\"Nur aktive Projekte nehmen neue Aufträge an\"":""}>+ Auftrag in diesem Projekt</button>`}${edBtns(pe,'id="pjed"')}</span></h2>`;
+  const ansicht=`<div class="pjview"><div class="row"><div class="field"><label>Kunde / Bezug</label><div class="pjv">${esc(p.kunde||"–")}</div></div><div class="field"><label>Status</label><div class="pjv"><span class="pjst ${esc(p.st||"aktiv")}">${esc(stl)}</span></div></div></div>
+    <div class="row"><div class="field"><label>Verantwortlich</label><div class="pjv pjvu">${U?av(U,26)+" "+esc(U.n):"– offen –"}</div></div><div class="field"><label>Angelegt</label><div class="pjv">${p.angelegt?esc(new Date(p.angelegt).toLocaleDateString("de-DE")):"–"}</div></div></div>
+    <div class="field"><label>Beschreibung</label><div class="pjv pjvb">${p.beschr?esc(p.beschr):'<span class="hint" style="margin:0">keine</span>'}</div></div>
+    <div class="field"><label>Backend</label>${p.bk?`<div class="pjlink"><span>${bkTxt}</span>${pjBk(p)}</div>`:'<div class="pjv"><span class="hint" style="margin:0">nicht verbunden – nur zur Einordnung in Company OS</span></div>'}</div></div>`;
+  const form=`<div class="row"><div class="field"><label>Name</label><input type="text" id="pjn" value="${esc(p.n||"")}"></div><div class="field"><label>Kunde / Bezug</label><input type="text" id="pjk" value="${esc(p.kunde||"")}" placeholder="z. B. Mieterverein Musterstadt"></div></div>
     <div class="row"><div class="field"><label>Status</label><div class="seg" id="pjst" style="margin:0">${PJST.map(([k,l])=>`<button data-pst="${k}" class="${k===(p.st||"aktiv")?"on":""}">${l}</button>`).join("")}</div></div><div class="field"><label>Verantwortlich</label>${usersSel("pjv",p.verantw||"","– offen –")}</div></div>
     <div class="field"><label>Beschreibung</label><textarea id="pjb" style="min-height:60px" placeholder="Worum geht es, was ist das Ziel?">${esc(p.beschr||"")}</textarea></div>
-    <div class="field"><label>Backend</label>${p.bk?`<div class="pjlink"><span>Verbunden mit <b>${esc(PN[p.bk.sys]||p.bk.sys)}-Projekt „${esc(p.bk.n||"")}“</b>${p.bk.orgId?" im Mandanten "+esc(p.bk.orgN||p.bk.orgId):""}</span>${pjBk(p)}<button class="btn sm" id="pjun">Verbindung lösen</button></div><div class="hint">Claude legt Aufgaben, Notizen und Termine eines Auftrags in diesem Projekt an. Buchungsdaten (Zeit, Verbrauch) werden später dorthin übergeben.</div>`:`<div class="btns" style="margin:0"><button class="btn sm" id="pjln">↔ Mit Backend-Projekt verbinden …</button></div><div class="hint">Ohne Verbindung dient das Projekt nur zur Einordnung in Company OS.</div>`}</div>
-    ${liste}
-    <div class="btns" style="margin-top:14px;justify-content:flex-end"><button class="btn d" id="pjdel">Projekt löschen</button></div>`;
-  const up=()=>{schedule()};
-  $("#pjn").oninput=e=>{p.n=e.target.value.trim()||p.n;up()};$("#pjn").onchange=()=>prj();
-  $("#pjk").oninput=e=>{p.kunde=e.target.value.trim();up()};$("#pjb").oninput=e=>{p.beschr=e.target.value;up()};
-  $("#pjv").onchange=e=>{p.verantw=e.target.value||null;up();prj()};
-  document.querySelectorAll("[data-pst]").forEach(b=>b.onclick=()=>{p.st=b.dataset.pst;up();prj()});
-  $("#pjgo").onclick=()=>{if(blocked())return;startModal(null,{org:p.org,prj:p.id})};
-  const un=$("#pjun");if(un)un.onclick=async()=>{if(await askOk("Verbindung zum "+(PN[p.bk.sys]||p.bk.sys)+"-Projekt „"+p.bk.n+"“ lösen? Das Projekt dort bleibt unverändert.","Verbindung lösen")){delete p.bk;up();prj()}};
-  const ln=$("#pjln");if(ln)ln.onclick=()=>pjBodoDlg(p);
-  $("#pjdel").onclick=async()=>{const n=AU.filter(j=>j.prj===p.id).length;if(!await askOk(n?"Projekt „"+p.n+"“ löschen? "+n+" Aufträge verlieren die Zuordnung und erscheinen unter „Ohne Projekt“.":"Projekt „"+p.n+"“ löschen?"))return;
-    for(const j of AU.filter(x=>x.prj===p.id)){delete j.prj;try{await Store.update("jobs/"+j.id,{prj:null});LAST.set("jobs/"+j.id,jobSer(j))}catch(e){}}
-    PJ=PJ.filter(x=>x!==p);PJSEL=null;schedule();prj();toast("Projekt gelöscht")};
+    <div class="field"><label>Backend</label>${p.bk?`<div class="pjlink"><span>${bkTxt}</span>${pjBk(p)}<button class="btn sm" id="pjun">Verbindung lösen</button></div><div class="hint">Claude legt Aufgaben, Notizen und Termine eines Auftrags in diesem Projekt an. Buchungsdaten (Zeit, Verbrauch) werden später dorthin übergeben.</div>`:`<div class="btns" style="margin:0"><button class="btn sm" id="pjln">↔ Mit Backend-Projekt verbinden …</button></div><div class="hint">Ohne Verbindung dient das Projekt nur zur Einordnung in Company OS.</div>`}</div>
+    <div class="btns" style="margin:4px 0 0"><button class="btn sm d" id="pjdel">Projekt löschen</button></div>`;
+  C.classList.toggle("editing",pe);
+  C.innerHTML=kopf+(pe?form:ansicht)+liste;
+  const eb=$("#pjed");if(eb)eb.onclick=()=>{if(startEdit("projekt",p.id,null,["projects/"+p.id]))pjDetail()};
+  bindEd(C,()=>prj());
+  const go=$("#pjgo");if(go)go.onclick=()=>{if(blocked())return;startModal(null,{org:p.org,prj:p.id})};
+  if(pe){
+    $("#pjn").oninput=e=>{p.n=e.target.value.trim()||p.n};
+    $("#pjk").oninput=e=>{p.kunde=e.target.value.trim()};$("#pjb").oninput=e=>{p.beschr=e.target.value};
+    $("#pjv").onchange=e=>{p.verantw=e.target.value||null};
+    document.querySelectorAll("[data-pst]").forEach(b=>b.onclick=()=>{p.st=b.dataset.pst;document.querySelectorAll("[data-pst]").forEach(x=>x.classList.toggle("on",x===b))});
+    const un=$("#pjun");if(un)un.onclick=async()=>{if(await askOk("Verbindung zum "+(PN[p.bk.sys]||p.bk.sys)+"-Projekt „"+p.bk.n+"“ lösen? Das Projekt dort bleibt unverändert. Wirksam mit „Speichern“.","Verbindung lösen")){delete p.bk;pjDetail()}};
+    const ln=$("#pjln");if(ln)ln.onclick=()=>pjBodoDlg(p);
+    $("#pjdel").onclick=async()=>{const n=AU.filter(j=>j.prj===p.id).length;if(!await askOk(n?"Projekt „"+p.n+"“ löschen? "+n+" Aufträge verlieren die Zuordnung und erscheinen unter „Ohne Projekt“.":"Projekt „"+p.n+"“ löschen?"))return;
+      for(const j of AU.filter(x=>x.prj===p.id)){delete j.prj;try{await Store.update("jobs/"+j.id,{prj:null});LAST.set("jobs/"+j.id,jobSer(j))}catch(e){}}
+      EDIT=null;PJ=PJ.filter(x=>x!==p);PJSEL=null;schedule();prj();toast("Projekt gelöscht")}}
   pjBindRows()}
 function pjBindRows(){document.querySelectorAll("[data-pjj]").forEach(r=>r.onclick=()=>{const j=AU.find(x=>x.id===r.dataset.pjj);if(!j)return;if(j.ki)kiFresh(j).then(()=>resultModal(j));else jobModalK(j)})}
 // Auftrag einem Projekt zuordnen (nur das Feld prj, damit laufende Claude-Sitzungen nicht gestört werden)

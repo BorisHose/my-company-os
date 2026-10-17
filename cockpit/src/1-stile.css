@@ -416,3 +416,9 @@ img.olg{height:18px;max-width:60px;object-fit:contain;margin-right:6px;vertical-
 }
 
 .pbfoot{display:flex;flex-wrap:wrap;gap:8px;align-items:center;justify-content:space-between;margin:8px 0 0}
+
+/* v64 Projekt: Ansicht und Bearbeiten */
+.pjv{padding:6px 0;font-size:14px;min-height:22px}.pjvu{display:flex;align-items:center;gap:8px}.pjvb{white-space:pre-wrap}
+.pjst{display:inline-block;padding:2px 9px;border-radius:999px;font-size:12px;font-weight:600;background:#e7f6ee;color:#067647}.pjst.pausiert{background:#fff4d6;color:#8a5a00}.pjst.abgeschlossen{background:#eef0f4;color:#475467}
+.pjhb{display:flex;gap:6px;flex-wrap:wrap;text-transform:none;letter-spacing:0}
+#pjd.editing{background:#fffdf5}

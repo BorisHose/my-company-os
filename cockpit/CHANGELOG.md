@@ -1,5 +1,12 @@
 # Änderungen – Cockpit
 
+## 64 · 17.10.2026 · Projekt-Detail mit Bearbeitungsmodus (Wunsch Boris)
+- Die Projekt-Detailansicht startet im reinen Ansichtsmodus (Kunde, Status, Verantwortlich, Angelegt, Beschreibung, Backend-Verbindung, Aufträge, Verbrauch).
+- „✎ Bearbeiten“ wie in den übrigen Bereichen: erst dann Felder, Status, Backend verbinden/lösen und „Projekt löschen“; „Speichern“ schreibt, „Abbrechen“ verwirft. Während der Bearbeitung sind Projektwechsel, Organigrammwechsel und Übernahme gesperrt.
+- „+ Neues Projekt“ legt das Projekt direkt im Bearbeitungsmodus an; „Abbrechen“ verwirft es wieder.
+- „+ Auftrag in diesem Projekt“ nur in der Ansicht.
+- Smoke-Test: 97 Prüfungen.
+
 ## 63 · 17.10.2026 · Backend-Listen seitenweise (Grundsatz Boris)
 - Grundsatz: Listen aus Backend-Systemen werden immer seitenweise geladen (25 je Abruf, „Weitere 25 laden“), nie komplett vorab; wo die Schnittstelle es kann, die zuletzt angelegten zuerst.
 - Projekte übernehmen/verbinden: sellify lädt neueste zuerst (sort -registered) mit Anzeige „n von Gesamt“; Bodo seitenweise, Reihenfolge alphabetisch – die Bodo-Suche bietet laut Schnittstellenbeschreibung keine Sortierung nach Anlagedatum (Hinweis in der Liste).

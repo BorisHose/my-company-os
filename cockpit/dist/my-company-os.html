@@ -419,6 +419,12 @@ img.olg{height:18px;max-width:60px;object-fit:contain;margin-right:6px;vertical-
 
 .pbfoot{display:flex;flex-wrap:wrap;gap:8px;align-items:center;justify-content:space-between;margin:8px 0 0}
 
+/* v64 Projekt: Ansicht und Bearbeiten */
+.pjv{padding:6px 0;font-size:14px;min-height:22px}.pjvu{display:flex;align-items:center;gap:8px}.pjvb{white-space:pre-wrap}
+.pjst{display:inline-block;padding:2px 9px;border-radius:999px;font-size:12px;font-weight:600;background:#e7f6ee;color:#067647}.pjst.pausiert{background:#fff4d6;color:#8a5a00}.pjst.abgeschlossen{background:#eef0f4;color:#475467}
+.pjhb{display:flex;gap:6px;flex-wrap:wrap;text-transform:none;letter-spacing:0}
+#pjd.editing{background:#fffdf5}
+
 /* erzeugt von tools/dunkel.py – nicht von Hand ändern */
 :root[data-theme=dark]{color-scheme:dark;--bg:#0f141b;--panel:#171e29;--ink:#e4e8ef;--mut:#9aa4b4;--line:#2b3442;--acc:#5b8def;--accbg:#1c2b47;--warn:#f79009;--warnbg:#3a2615;--ok:#47cd89;--okbg:#12301f;--vio:#9b8afb;--viobg:#28213d;--teal:#36bffa;--tealbg:#11303a;--bodobg:#1d2939;--sellbg:#11303c}
 :root[data-theme=dark] body{background:var(--bg);color:var(--ink)}
@@ -871,6 +877,10 @@ img.olg{height:18px;max-width:60px;object-fit:contain;margin-right:6px;vertical-
 :root[data-theme=dark] .dkat th,:root[data-theme=dark] .dkat td{border:1px solid var(--line)}
 :root[data-theme=dark] .dkat th{background:#131a24}
 :root[data-theme=dark] .spr{border:1px solid var(--line);border-radius:7px}
+:root[data-theme=dark] .pjst{border-radius:999px;background:#123323;color:#47cd89}
+:root[data-theme=dark] .pjst.pausiert{background:#3a2e10;color:#fdb022}
+:root[data-theme=dark] .pjst.abgeschlossen{background:#262f3d;color:#b3bcc9}
+:root[data-theme=dark] #pjd.editing{background:#262414}
 :root[data-theme=dark] nav button.on{background:#2f6fdf;color:#fff}:root[data-theme=dark] body{background:var(--bg);color:var(--ink)}:root[data-theme=dark] input,:root[data-theme=dark] select,:root[data-theme=dark] textarea{background:#131a24;color:var(--ink);border-color:#3a4456}:root[data-theme=dark] .modal{background:#000000a6}:root[data-theme=dark] img.olg,:root[data-theme=dark] .av img{filter:none}
 @media (prefers-color-scheme:dark){:root[data-theme=auto]{color-scheme:dark;--bg:#0f141b;--panel:#171e29;--ink:#e4e8ef;--mut:#9aa4b4;--line:#2b3442;--acc:#5b8def;--accbg:#1c2b47;--warn:#f79009;--warnbg:#3a2615;--ok:#47cd89;--okbg:#12301f;--vio:#9b8afb;--viobg:#28213d;--teal:#36bffa;--tealbg:#11303a;--bodobg:#1d2939;--sellbg:#11303c}
 :root[data-theme=auto] body{background:var(--bg);color:var(--ink)}
@@ -1323,6 +1333,10 @@ img.olg{height:18px;max-width:60px;object-fit:contain;margin-right:6px;vertical-
 :root[data-theme=auto] .dkat th,:root[data-theme=auto] .dkat td{border:1px solid var(--line)}
 :root[data-theme=auto] .dkat th{background:#131a24}
 :root[data-theme=auto] .spr{border:1px solid var(--line);border-radius:7px}
+:root[data-theme=auto] .pjst{border-radius:999px;background:#123323;color:#47cd89}
+:root[data-theme=auto] .pjst.pausiert{background:#3a2e10;color:#fdb022}
+:root[data-theme=auto] .pjst.abgeschlossen{background:#262f3d;color:#b3bcc9}
+:root[data-theme=auto] #pjd.editing{background:#262414}
 :root[data-theme=auto] nav button.on{background:#2f6fdf;color:#fff}:root[data-theme=auto] body{background:var(--bg);color:var(--ink)}:root[data-theme=auto] input,:root[data-theme=auto] select,:root[data-theme=auto] textarea{background:#131a24;color:var(--ink);border-color:#3a4456}:root[data-theme=auto] .modal{background:#000000a6}:root[data-theme=auto] img.olg,:root[data-theme=auto] .av img{filter:none}}
 
 </style>
@@ -1387,7 +1401,7 @@ const COL=new Set();
 let PF="bodo",AF="bodo",GEN=false;
 const PK=[["bodo","Bodo"],["sellify","sellify"],["all","Andere"]];
 const PN={bodo:"Bodo",sellify:"sellify",all:"Andere",multi:"Bodo + sellify"};
-const VER="63";
+const VER="64";
 // Produktbereiche: fest im Programm hinterlegt (Entscheidung Boris 09.10.2026), keine Konfiguration in der Datenbank
 const PT={bodo:"Produktbereich Bodo (Bodo Solutions, Mitgliederverwaltung) – alles, was für Bodo-Kunden und das Bodo-System gebraucht wird. Fest im Programm hinterlegt.",sellify:"Produktbereich sellify (business//acts, CRM-Plattform) – alles, was für sellify-Kunden und das sellify-System gebraucht wird. Fest im Programm hinterlegt.",all:"Andere = produktunabhängig, z. B. Web-QA, E-Mail, Word/PDF. Fest im Programm hinterlegt."};
 let AFIL="all";
@@ -1412,7 +1426,7 @@ let SK=[];
 // ===== Bearbeitungsmodus: nichts ändert sich ohne ✎ → Speichern =====
 let EDIT=null; // {kind,id,sec,orig:Map(schlüssel → JSON vor dem Bearbeiten | null = neu angelegt)}
 let DP=[]; // Abteilungen (später Organigramm)
-const COLL=()=>({users:US,skills:SK,agents:AG,flows:FL,depts:DP});
+const COLL=()=>({users:US,skills:SK,agents:AG,flows:FL,depts:DP,projects:PJ});
 function curJSON(k){if(k==="meta/config")return JSON.stringify({groups:GR,globals:GLOBAL,settings:SET});const [c,id]=k.split("/"),o=COLL()[c].find(x=>x.id===id);return o?JSON.stringify(OUT[c](o)):null}
 const isEd=(kind,id,sec)=>!!EDIT&&EDIT.kind===kind&&(id==null||EDIT.id===id)&&(sec==null||EDIT.sec===sec);
 function blocked(){if(!EDIT)return false;toast("Erst den Bereich in Bearbeitung speichern oder abbrechen");const el=document.querySelector(".editing");if(el)el.scrollIntoView({block:"nearest",behavior:"smooth"});return true}
@@ -3005,11 +3019,11 @@ function prj(){if(!orgById(OC))OC=ORGS()[0].id;const O=orgById(OC),F=UI.pjf||"ak
     ${card(PJOHNE,"Ohne Projekt","Aufträge ohne Projektzuordnung","ohne")}
     <div class="btns" style="margin-top:10px"><button class="btn p" id="pjnew">+ Neues Projekt</button><button class="btn" id="pjimp" title="Aktive Projekte aus Bodo oder sellify übernehmen und verbinden">⇣ Aus Backend übernehmen …</button></div>
     <div class="hint">Projekte gehören zu ${esc(O.kurz||O.n)} und werden in Company OS geführt. Verbunden mit einem Bodo- oder sellify-Projekt legt Claude Aufgaben und Notizen eines Auftrags dort am Projekt an.</div>`;
-  document.querySelectorAll("[data-pjo]").forEach(b=>b.onclick=()=>{OC=b.dataset.pjo;PJSEL=null;prj()});
-  document.querySelectorAll("[data-pjf]").forEach(b=>b.onclick=()=>{UI.pjf=b.dataset.pjf;saveUI();PJSEL=null;prj()});
-  document.querySelectorAll("[data-pj]").forEach(b=>b.onclick=()=>{PJSEL=b.dataset.pj;prj()});
-  $("#pjnew").onclick=async()=>{const n=await askText("Name des neuen Projekts","");if(!n)return;const p={id:uid("pj"),org:OC,n,st:"aktiv",verantw:(ME()||{}).id||null,angelegt:new Date().toISOString()};PJ.push(p);PJSEL=p.id;UI.pjf="aktiv";saveUI();schedule();prj();toast("Projekt angelegt")};
-  $("#pjimp").onclick=()=>pjBodoDlg(null);
+  document.querySelectorAll("[data-pjo]").forEach(b=>b.onclick=()=>{if(blocked())return;OC=b.dataset.pjo;PJSEL=null;prj()});
+  document.querySelectorAll("[data-pjf]").forEach(b=>b.onclick=()=>{if(blocked())return;UI.pjf=b.dataset.pjf;saveUI();PJSEL=null;prj()});
+  document.querySelectorAll("[data-pj]").forEach(b=>b.onclick=()=>{if(b.dataset.pj!==PJSEL&&blocked())return;PJSEL=b.dataset.pj;prj()});
+  $("#pjnew").onclick=()=>{if(blocked())return;const p={id:uid("pj"),org:OC,n:"Neues Projekt",st:"aktiv",verantw:(ME()||{}).id||null,angelegt:new Date().toISOString()};PJ.push(p);PJSEL=p.id;UI.pjf="aktiv";saveUI();startEdit("projekt",p.id,null,["projects/"+p.id],true);prj();const n=$("#pjn");if(n){n.focus();n.select()}};
+  $("#pjimp").onclick=()=>{if(blocked())return;pjBodoDlg(null)};
   pjDetail()}
 function pjDetail(){const C=$("#pjd"),o=OC;
   const L=pjJobs(PJSEL,o),off=L.filter(j=>!isEnd(j)),fer=L.filter(j=>isEnd(j)).sort((a,b)=>String(b.fertig||"").localeCompare(String(a.fertig||"")));
@@ -3019,24 +3033,33 @@ function pjDetail(){const C=$("#pjd"),o=OC;
     <div class="flabel">Verbrauch</div>${vbPjHtml(L)}`;
   if(PJSEL===PJOHNE){C.innerHTML=`<h2>Ohne Projekt <span class="hint" style="margin:0 0 0 8px;text-transform:none;letter-spacing:0;font-weight:400">${esc((orgById(o)||{}).kurz||"")}</span></h2><div class="hint" style="margin:0 0 6px">Aufträge, die keinem Projekt zugeordnet sind. Zuordnen kannst du im Ergebnisfenster eines Auftrags unter „Projekt“.</div>${liste}`;pjBindRows();return}
   const p=pj(PJSEL);if(!p){C.innerHTML=`<div class="empty"><b>Kein Projekt gewählt</b>Lege links ein Projekt an oder übernimm aktive Projekte aus Bodo oder sellify.</div>`;return}
-  C.innerHTML=`<h2 style="justify-content:space-between"><span>▣ ${esc(p.n)}</span><span><button class="btn sm p" id="pjgo" ${(p.st||"aktiv")!=="aktiv"?"disabled title=\"Nur aktive Projekte nehmen neue Aufträge an\"":""}>+ Auftrag in diesem Projekt</button></span></h2>
-    <div class="row"><div class="field"><label>Name</label><input type="text" id="pjn" value="${esc(p.n||"")}"></div><div class="field"><label>Kunde / Bezug</label><input type="text" id="pjk" value="${esc(p.kunde||"")}" placeholder="z. B. Mieterverein Musterstadt"></div></div>
+  const pe=isEd("projekt",p.id),U=usr(p.verantw),stl=(PJST.find(x=>x[0]===(p.st||"aktiv"))||[,"Aktiv"])[1];
+  const bkTxt=p.bk?`Verbunden mit <b>${esc(PN[p.bk.sys]||p.bk.sys)}-Projekt „${esc(p.bk.n||"")}“</b>${p.bk.orgId?" im Mandanten "+esc(p.bk.orgN||p.bk.orgId):""}`:"";
+  const kopf=`<h2 style="justify-content:space-between"><span>▣ ${esc(p.n)}</span><span class="pjhb">${pe?"":`<button class="btn sm p" id="pjgo" ${(p.st||"aktiv")!=="aktiv"?"disabled title=\"Nur aktive Projekte nehmen neue Aufträge an\"":""}>+ Auftrag in diesem Projekt</button>`}${edBtns(pe,'id="pjed"')}</span></h2>`;
+  const ansicht=`<div class="pjview"><div class="row"><div class="field"><label>Kunde / Bezug</label><div class="pjv">${esc(p.kunde||"–")}</div></div><div class="field"><label>Status</label><div class="pjv"><span class="pjst ${esc(p.st||"aktiv")}">${esc(stl)}</span></div></div></div>
+    <div class="row"><div class="field"><label>Verantwortlich</label><div class="pjv pjvu">${U?av(U,26)+" "+esc(U.n):"– offen –"}</div></div><div class="field"><label>Angelegt</label><div class="pjv">${p.angelegt?esc(new Date(p.angelegt).toLocaleDateString("de-DE")):"–"}</div></div></div>
+    <div class="field"><label>Beschreibung</label><div class="pjv pjvb">${p.beschr?esc(p.beschr):'<span class="hint" style="margin:0">keine</span>'}</div></div>
+    <div class="field"><label>Backend</label>${p.bk?`<div class="pjlink"><span>${bkTxt}</span>${pjBk(p)}</div>`:'<div class="pjv"><span class="hint" style="margin:0">nicht verbunden – nur zur Einordnung in Company OS</span></div>'}</div></div>`;
+  const form=`<div class="row"><div class="field"><label>Name</label><input type="text" id="pjn" value="${esc(p.n||"")}"></div><div class="field"><label>Kunde / Bezug</label><input type="text" id="pjk" value="${esc(p.kunde||"")}" placeholder="z. B. Mieterverein Musterstadt"></div></div>
     <div class="row"><div class="field"><label>Status</label><div class="seg" id="pjst" style="margin:0">${PJST.map(([k,l])=>`<button data-pst="${k}" class="${k===(p.st||"aktiv")?"on":""}">${l}</button>`).join("")}</div></div><div class="field"><label>Verantwortlich</label>${usersSel("pjv",p.verantw||"","– offen –")}</div></div>
     <div class="field"><label>Beschreibung</label><textarea id="pjb" style="min-height:60px" placeholder="Worum geht es, was ist das Ziel?">${esc(p.beschr||"")}</textarea></div>
-    <div class="field"><label>Backend</label>${p.bk?`<div class="pjlink"><span>Verbunden mit <b>${esc(PN[p.bk.sys]||p.bk.sys)}-Projekt „${esc(p.bk.n||"")}“</b>${p.bk.orgId?" im Mandanten "+esc(p.bk.orgN||p.bk.orgId):""}</span>${pjBk(p)}<button class="btn sm" id="pjun">Verbindung lösen</button></div><div class="hint">Claude legt Aufgaben, Notizen und Termine eines Auftrags in diesem Projekt an. Buchungsdaten (Zeit, Verbrauch) werden später dorthin übergeben.</div>`:`<div class="btns" style="margin:0"><button class="btn sm" id="pjln">↔ Mit Backend-Projekt verbinden …</button></div><div class="hint">Ohne Verbindung dient das Projekt nur zur Einordnung in Company OS.</div>`}</div>
-    ${liste}
-    <div class="btns" style="margin-top:14px;justify-content:flex-end"><button class="btn d" id="pjdel">Projekt löschen</button></div>`;
-  const up=()=>{schedule()};
-  $("#pjn").oninput=e=>{p.n=e.target.value.trim()||p.n;up()};$("#pjn").onchange=()=>prj();
-  $("#pjk").oninput=e=>{p.kunde=e.target.value.trim();up()};$("#pjb").oninput=e=>{p.beschr=e.target.value;up()};
-  $("#pjv").onchange=e=>{p.verantw=e.target.value||null;up();prj()};
-  document.querySelectorAll("[data-pst]").forEach(b=>b.onclick=()=>{p.st=b.dataset.pst;up();prj()});
-  $("#pjgo").onclick=()=>{if(blocked())return;startModal(null,{org:p.org,prj:p.id})};
-  const un=$("#pjun");if(un)un.onclick=async()=>{if(await askOk("Verbindung zum "+(PN[p.bk.sys]||p.bk.sys)+"-Projekt „"+p.bk.n+"“ lösen? Das Projekt dort bleibt unverändert.","Verbindung lösen")){delete p.bk;up();prj()}};
-  const ln=$("#pjln");if(ln)ln.onclick=()=>pjBodoDlg(p);
-  $("#pjdel").onclick=async()=>{const n=AU.filter(j=>j.prj===p.id).length;if(!await askOk(n?"Projekt „"+p.n+"“ löschen? "+n+" Aufträge verlieren die Zuordnung und erscheinen unter „Ohne Projekt“.":"Projekt „"+p.n+"“ löschen?"))return;
-    for(const j of AU.filter(x=>x.prj===p.id)){delete j.prj;try{await Store.update("jobs/"+j.id,{prj:null});LAST.set("jobs/"+j.id,jobSer(j))}catch(e){}}
-    PJ=PJ.filter(x=>x!==p);PJSEL=null;schedule();prj();toast("Projekt gelöscht")};
+    <div class="field"><label>Backend</label>${p.bk?`<div class="pjlink"><span>${bkTxt}</span>${pjBk(p)}<button class="btn sm" id="pjun">Verbindung lösen</button></div><div class="hint">Claude legt Aufgaben, Notizen und Termine eines Auftrags in diesem Projekt an. Buchungsdaten (Zeit, Verbrauch) werden später dorthin übergeben.</div>`:`<div class="btns" style="margin:0"><button class="btn sm" id="pjln">↔ Mit Backend-Projekt verbinden …</button></div><div class="hint">Ohne Verbindung dient das Projekt nur zur Einordnung in Company OS.</div>`}</div>
+    <div class="btns" style="margin:4px 0 0"><button class="btn sm d" id="pjdel">Projekt löschen</button></div>`;
+  C.classList.toggle("editing",pe);
+  C.innerHTML=kopf+(pe?form:ansicht)+liste;
+  const eb=$("#pjed");if(eb)eb.onclick=()=>{if(startEdit("projekt",p.id,null,["projects/"+p.id]))pjDetail()};
+  bindEd(C,()=>prj());
+  const go=$("#pjgo");if(go)go.onclick=()=>{if(blocked())return;startModal(null,{org:p.org,prj:p.id})};
+  if(pe){
+    $("#pjn").oninput=e=>{p.n=e.target.value.trim()||p.n};
+    $("#pjk").oninput=e=>{p.kunde=e.target.value.trim()};$("#pjb").oninput=e=>{p.beschr=e.target.value};
+    $("#pjv").onchange=e=>{p.verantw=e.target.value||null};
+    document.querySelectorAll("[data-pst]").forEach(b=>b.onclick=()=>{p.st=b.dataset.pst;document.querySelectorAll("[data-pst]").forEach(x=>x.classList.toggle("on",x===b))});
+    const un=$("#pjun");if(un)un.onclick=async()=>{if(await askOk("Verbindung zum "+(PN[p.bk.sys]||p.bk.sys)+"-Projekt „"+p.bk.n+"“ lösen? Das Projekt dort bleibt unverändert. Wirksam mit „Speichern“.","Verbindung lösen")){delete p.bk;pjDetail()}};
+    const ln=$("#pjln");if(ln)ln.onclick=()=>pjBodoDlg(p);
+    $("#pjdel").onclick=async()=>{const n=AU.filter(j=>j.prj===p.id).length;if(!await askOk(n?"Projekt „"+p.n+"“ löschen? "+n+" Aufträge verlieren die Zuordnung und erscheinen unter „Ohne Projekt“.":"Projekt „"+p.n+"“ löschen?"))return;
+      for(const j of AU.filter(x=>x.prj===p.id)){delete j.prj;try{await Store.update("jobs/"+j.id,{prj:null});LAST.set("jobs/"+j.id,jobSer(j))}catch(e){}}
+      EDIT=null;PJ=PJ.filter(x=>x!==p);PJSEL=null;schedule();prj();toast("Projekt gelöscht")}}
   pjBindRows()}
 function pjBindRows(){document.querySelectorAll("[data-pjj]").forEach(r=>r.onclick=()=>{const j=AU.find(x=>x.id===r.dataset.pjj);if(!j)return;if(j.ki)kiFresh(j).then(()=>resultModal(j));else jobModalK(j)})}
 // Auftrag einem Projekt zuordnen (nur das Feld prj, damit laufende Claude-Sitzungen nicht gestört werden)

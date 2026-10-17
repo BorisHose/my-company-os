@@ -327,6 +327,19 @@ const check = (name, ok, info = '') => { CHECKS.push({ name, ok }); console.log(
   await p.evaluate(() => { document.getElementById('modal').innerHTML = ''; pjBodoDlg(null, 'bodo') }); await p.waitForTimeout(500);
   check('Paging Bodo: 25 je Abruf, Hinweis zur Reihenfolge', await p.evaluate(() => { const i = (window.__CI || []).filter(x => x && x.resourceType === 'project').pop(); return i.limit === 25 && !i.cursor && /alphabetisch/.test(document.querySelector('.pbfoot').textContent) }));
   await p.evaluate(() => { document.getElementById('modal').innerHTML = '' });
+  // ----- v64 Projekt: Ansicht und Bearbeiten -----
+  const pjE = await p.evaluate(async () => { document.getElementById('modal').innerHTML = ''; show('projects'); const x = PJ[0]; PJSEL = x.id; prj(); const R = {};
+    R.view = !document.querySelector('#pjn') && !!document.querySelector('#pjed') && !!document.querySelector('#pjgo');
+    document.querySelector('#pjed').click(); R.edit = !!document.querySelector('#pjn') && !document.querySelector('#pjgo');
+    const alt = x.n; const n = document.querySelector('#pjn'); n.value = 'Umbenannt'; n.dispatchEvent(new Event('input'));
+    R.blockt = (() => { const b = document.querySelector('[data-pjo]'); const oc = OC; b.click(); return OC === oc && !!EDIT })();
+    document.querySelector('[data-ecancel]').click(); R.zurueck = x.n === alt && !document.querySelector('#pjn');
+    document.querySelector('#pjed').click(); const m = document.querySelector('#pjn'); m.value = 'Gespeichert X'; m.dispatchEvent(new Event('input'));
+    document.querySelector('[data-esave]').click(); await new Promise(r => setTimeout(r, 1200)); R.saved = (window.__S['projects/' + x.id] || {}).n === 'Gespeichert X' && !EDIT;
+    const vor = PJ.length; document.querySelector('#pjnew').click(); R.neuEdit = PJ.length === vor + 1 && !!document.querySelector('#pjn'); const nid = PJSEL;
+    document.querySelector('[data-ecancel]').click(); await new Promise(r => setTimeout(r, 900)); R.neuWeg = PJ.length === vor && !window.__S['projects/' + nid];
+    return R });
+  check('Projekt: startet in der Ansicht, ✎ Bearbeiten, Abbrechen verwirft, Speichern speichert, Wechsel gesperrt, Neues Projekt im Bearbeiten', Object.values(pjE).every(Boolean), JSON.stringify(pjE));
   check('keine Laufzeitfehler', errs.length === 0, errs.slice(0, 3).join(' | '));
   await b.close();
   if (process.env.KEEP) fs.copyFileSync(tmp, path.join(ROOT, 'tests', '.keep.html')); fs.unlinkSync(tmp);
