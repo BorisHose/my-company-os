@@ -600,3 +600,16 @@ img.olg{height:18px;max-width:60px;object-fit:contain;margin-right:6px;vertical-
 .dx-filter .dx-pop{min-width:320px}
 @media(max-width:860px){.dx-tabs{padding:0 8px;flex-wrap:wrap;overflow:visible}.dx-tabs button{padding:9px 8px}.dx-tabs .sep{display:none}.dx-filter{padding:10px 12px}.dx-filter .avq{flex:1 1 100%}.dx-av .avtw{max-height:none}}
 @media(max-width:860px){.dx-filter{position:relative}.dx-filter .dx-dd{position:static}.dx-filter .dx-pop,.dx-filter .dx-pop.l{left:12px;right:12px;min-width:0;max-width:none}}
+/* Auftragsvorlagen (v79) */
+.vlrow{display:flex;gap:10px;align-items:center;width:100%;text-align:left;border:1px solid var(--line);background:#fff;border-radius:9px;padding:9px 11px;margin-bottom:6px;cursor:pointer;font:inherit;color:var(--ink)}
+.vlrow.on{border-color:var(--acc);background:#e8f0fd}
+.vlrow .t{flex:1;min-width:0}
+.vlrow .t small{display:block;color:var(--mut);font-size:12px}
+.vlsl{border:1px solid var(--line);border-radius:10px;padding:8px;background:#fff;min-height:120px}
+.vlsi{display:flex;gap:6px;align-items:center;padding:7px 9px;border:1px solid var(--line);border-radius:8px;margin-bottom:6px;font-size:13.5px}
+.vlsi .t{flex:1;min-width:0}
+.vlsl select{margin-top:4px}
+#vlw .dx-main input[type=search]{width:100%}
+@media(max-width:860px){#vlphl .avt th:nth-child(2),#vlphl .avt td:nth-child(2){min-width:0}#vlphl .avt input[type=text]{min-width:0!important}#vlbox .row{grid-template-columns:1fr!important}}
+#vlphl .avt{table-layout:fixed;width:100%}#vlphl .avt th{white-space:normal}#vlphl .avt th:first-child{width:34%}#vlphl .avt th:last-child{width:64px}#vlphl .avt input[type=text]{width:100%}
+@media(max-width:860px){.dx-head .dx-dd{position:static}.dx-head .dx-pop{left:12px;right:12px;min-width:0;max-width:none}}

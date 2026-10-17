@@ -352,7 +352,7 @@ const check = (name, ok, info = '') => { CHECKS.push({ name, ok }); console.log(
   await p.setViewportSize({ width: 1440, height: 900 });
   // ----- v66 Benutzer in den Einstellungen -----
   const bu = await p.evaluate(async () => { show('settings'); einst('darst'); document.querySelector('[data-sets="users"]').click(); await new Promise(r => setTimeout(r, 150));
-    const R = { nav: document.querySelectorAll('#setnav [data-sets]').length === SETSEC.length && SETSEC.length === 7, on: document.querySelector('#setnav .on').dataset.sets === 'users', liste: document.querySelectorAll('#setu #ulist .uitem').length > 0, edit: !!document.querySelector('#setu #uedit .etop'), setcAus: document.querySelector('#setc').hidden, kein: !document.querySelector('main#users') };
+    const R = { nav: document.querySelectorAll('#setnav [data-sets]').length === SETSEC.length && SETSEC.length === 8, on: document.querySelector('#setnav .on').dataset.sets === 'users', liste: document.querySelectorAll('#setu #ulist .uitem').length > 0, edit: !!document.querySelector('#setu #uedit .etop'), setcAus: document.querySelector('#setc').hidden, kein: !document.querySelector('main#users') };
     document.querySelector('[data-sets="ausf"]').click(); R.zurueck = !document.querySelector('#setc').hidden && document.querySelector('#setu').hidden && /Ausführung/.test(document.querySelector('#setc').textContent); return R });
   check('Benutzer eingebettet: Menü links bleibt, Liste und Bearbeitung rechts, Wechsel zurück', Object.values(bu).every(Boolean), JSON.stringify(bu));
   // ----- v67 Benutzerliste gleich hoch, Scrollbar bei vielen -----
@@ -550,6 +550,58 @@ const check = (name, ok, info = '') => { CHECKS.push({ name, ok }); console.log(
   const vw = await p.evaluate(() => [...document.querySelectorAll('#avdlg tbody tr[data-avj]')].every(t => AU.find(x => x.id === t.dataset.avj).st === 'wait'));
   check('Übersicht: Reiter „Wartet auf dich“ zeigt nur wartende', vw);
   await p.evaluate(() => avClose());
+  // ===== Auftragsvorlagen (Etappe 5) =====
+  await vClr(); await p.evaluate(() => { show('settings'); einst('vorl') }); await p.waitForTimeout(300);
+  await p.evaluate(() => { VLS.org = 'og-bodo'; einst('vorl') }); await p.waitForTimeout(200);
+  await p.click('#vlneu'); await p.waitForTimeout(300);
+  await p.fill('#vln', 'Begleitmail zum Angebot'); await p.fill('#vlt', 'Begleitmail [Kunde]'); await p.fill('#vled', 'Mail an [Kunde] wegen Angebot [Nummer]');
+  await p.click('#vlart [data-vla="agent"]'); await p.waitForTimeout(700);
+  await p.evaluate(() => { const r = document.querySelector('[data-phk="Kunde"]'); r.querySelector('input[type=text]').value = 'Firmenname'; r.querySelector('input[type=checkbox]').checked = true; const sa = document.querySelector('#vlsa'); if (sa && !sa.checked) sa.click(); document.querySelector('#vlprio [data-p="h"]').click(); document.querySelector('#vlfa').value = '3' });
+  await p.click('#vlok'); await p.waitForTimeout(900);
+  const t1 = await p.evaluate(() => { const v = VL.find(x => x.n === 'Begleitmail zum Angebot'); return v && { id: v.id, org: v.org, art: v.art, aid: v.aid, ph: v.ph, schnell: (SET.schnell || {})['og-bodo'], gespeichert: !!window.__S['vorlagen/' + v.id], prio: v.prio, faellig: v.faellig } });
+  check('Vorlagen: anlegen mit Platzhaltern (Pflicht), Agent, Schnellwahl für alle, Eingang-Priorität, gespeichert', t1 && t1.org === 'og-bodo' && t1.art === 'agent' && !!t1.aid && t1.ph.length === 2 && t1.ph[0].k === 'Kunde' && t1.ph[0].pf && t1.ph[0].h === 'Firmenname' && !t1.ph[1].pf && (t1.schnell || []).includes(t1.id) && t1.gespeichert && t1.prio === 'h' && t1.faellig === 3, JSON.stringify(t1));
+  await vClr(); await p.evaluate(() => { show('org'); startModal(null, { org: 'og-ba' }) }); await p.waitForTimeout(250);
+  const t2a = await p.evaluate(id => !document.querySelector(`#jvlb [data-vlq="${id}"]`), t1.id);
+  await vClr(); await p.evaluate(() => startModal(null, { org: 'og-bodo' })); await p.waitForTimeout(250);
+  const t2b = await p.evaluate(id => !!document.querySelector(`#jvlb [data-vlq="${id}"]`), t1.id);
+  check('Vorlagen: Schnellwahl nur in der eigenen Organisation (Bodo/sellify getrennt)', t2a && t2b, JSON.stringify([t2a, t2b]));
+  await p.click(`#jvlb [data-vlq="${t1.id}"]`); await p.waitForTimeout(250);
+  await p.fill('#dlg [data-k="Kunde"]', 'Kranz GmbH'); await p.click('#dlg [data-yes]'); await p.waitForTimeout(300);
+  const t3a = await p.evaluate(() => ({ t: document.querySelector('#jt').value, i: rtMd(document.querySelector('#ji')), art: (document.querySelector('#jart .on') || {}).dataset?.a, banner: !!document.querySelector('#jvlx') }));
+  const n3 = await p.evaluate(() => AU.length); await p.click('#modal #go'); await p.waitForTimeout(900);
+  const t3 = await p.evaluate(n => { const j = AU[0]; return { neu: AU.length > n, vorlage: j.vorlage, vorlageN: j.vorlageN, t: j.t, log: j.log[0][1] } }, n3);
+  check('Vorlagen: verwenden füllt Formular (Platzhalter ersetzt), Auftrag merkt sich die Vorlage', t3a.t === 'Begleitmail Kranz GmbH' && t3a.i === 'Mail an Kranz GmbH wegen Angebot [Nummer]' && t3a.art === 'agent' && t3a.banner && t3.neu && t3.vorlage === t1.id && t3.vorlageN === 'Begleitmail zum Angebot' && /mit Vorlage/.test(t3.log), JSON.stringify([t3a, t3]));
+  await vClr(); await p.evaluate(() => startModal(null, { org: 'og-bodo' })); await p.waitForTimeout(250);
+  await p.click(`#jvlb [data-vlq="${t1.id}"]`); await p.waitForTimeout(250); await p.click('#dlg [data-skip]'); await p.waitForTimeout(300);
+  const n4 = await p.evaluate(() => AU.length); await p.click('#modal #go'); await p.waitForTimeout(300);
+  const t4a = await p.evaluate(() => !!document.querySelector('#dlg') && /Pflicht/.test(document.querySelector('#dlg').textContent)); await p.click('#dlg [data-no]'); await p.waitForTimeout(300);
+  const t4 = await p.evaluate(n => AU.length === n, n4);
+  check('Vorlagen: offener Pflicht-Platzhalter wird vor dem Start gemeldet', t4a && t4, JSON.stringify([t4a, t4]));
+  await p.click('#jsm'); await p.waitForTimeout(300);
+  const t4b = await p.evaluate(() => ({ prio: (document.querySelector('#jprio .on') || {}).dataset?.p, due: document.querySelector('#jdue').value }));
+  check('Vorlagen: „Nur sammeln“ übernimmt Priorität und Fälligkeit der Vorlage', t4b.prio === 'h' && t4b.due === new Date(Date.now() + 3 * 864e5).toISOString().slice(0, 10), JSON.stringify(t4b));
+  const t5 = await p.evaluate(id => { const v = VL.find(x => x.id === id), alt = UI.me, altI = SET.inhaber; const ich = meId(); v.gilt = 'ich'; v.owner = ich; const andere = US.find(u => u.id !== ich);
+    UI.me = andere.id; SET.inhaber = ich; const r = { sicht: vlOrg('og-bodo').some(x => x.id === id), darf: vlDarf(v), schnell: vlSchnellAlle('og-bodo').some(x => x.id === id) };
+    UI.me = alt; SET.inhaber = altI; r.eigen = vlOrg('og-bodo').some(x => x.id === id) && vlDarf(v); v.gilt = 'alle'; return r }, t1.id);
+  check('Vorlagen: „nur ich“ für andere unsichtbar, Ändern nur Ersteller/Inhaber', !t5.sicht && !t5.darf && !t5.schnell && t5.eigen, JSON.stringify(t5));
+  await vClr(); await p.evaluate(id => jobView(AU.find(j => j.vorlage === id)), t1.id); await p.waitForTimeout(250);
+  await p.evaluate(() => document.querySelector('#jvvl').click()); await p.waitForTimeout(300);
+  const t6 = await p.evaluate(() => ({ ed: !!document.querySelector('#vlbox'), n: (document.querySelector('#vln') || {}).value }));
+  check('Vorlagen: „Als Vorlage speichern“ aus dem Auftrag öffnet den Editor vorausgefüllt', t6.ed && t6.n === 'Begleitmail Kranz GmbH', JSON.stringify(t6));
+  await vClr(); await p.evaluate(() => { show('settings'); VLS.org = 'og-bodo'; einst('vorl') }); await p.waitForTimeout(250);
+  await p.evaluate(id => document.querySelector(`[data-vlx="${id}"]`).click(), t1.id); await p.waitForTimeout(200); await p.click('#dlg [data-no]'); await p.waitForTimeout(200);
+  const t7a = await p.evaluate(id => VL.some(x => x.id === id), t1.id);
+  await p.evaluate(id => document.querySelector(`[data-vlx="${id}"]`).click(), t1.id); await p.waitForTimeout(200); await p.click('#dlg [data-yes]'); await p.waitForTimeout(900);
+  const t7 = await p.evaluate(id => ({ weg: !VL.some(x => x.id === id), schnell: !((SET.schnell || {})['og-bodo'] || []).includes(id), db: !window.__S['vorlagen/' + id], auftrag: AU.some(j => j.vorlage === id) }), t1.id);
+  check('Vorlagen: Löschen nur nach Bestätigung, aus Schnellwahl entfernt, Aufträge bleiben', t7a && t7.weg && t7.schnell && t7.db && t7.auftrag, JSON.stringify([t7a, t7]));
+  await p.evaluate(() => show('org'));
+  await p.setViewportSize({ width: 390, height: 844 }); await p.waitForTimeout(150);
+  const vmob = await p.evaluate(async () => { const W = innerWidth, out = {}; const leer = () => { document.getElementById('modal').innerHTML = '';['dlg', 'vlw', 'vlsa'].forEach(i => { const d = document.getElementById(i); if (d) d.remove() }) };
+    const zu = () => [...document.querySelectorAll('#modal *,#vlw *,#vlsa *,#dlg *')].filter(e => { const b = e.getBoundingClientRect(); return b.width && (b.right > W + 1 || b.left < -1) && !e.closest('.avtw') && !e.closest('.cv-wrap') }).length;
+    for (const [n, f] of [['neu', () => startModal(null, { org: 'og-bodo', art: 'agent' })], ['sammeln', () => startModal(null, { org: 'og-bodo', sm: 1 })], ['auftrag', () => jobView(AU.find(j => j.st === 'wait') || AU[0])], ['erledigt', () => jobView(AU.find(j => j.st === 'done') || AU[0])], ['vorlage', () => vlEditor(null, 'og-bodo')], ['wahl', () => vlWahl('og-bodo', () => { })], ['schnell', () => vlSchnell('og-bodo')]]) { leer(); f(); await new Promise(r => setTimeout(r, 200)); out[n] = zu(); if (out[n]) out[n + '_x'] = [...document.querySelectorAll('#modal *')].filter(e => { const b = e.getBoundingClientRect(); return b.width && (b.right > W + 1 || b.left < -1) && !e.closest('.avtw') && !e.closest('.cv-wrap') }).slice(0, 5).map(e => e.tagName + '.' + e.className + ' ' + (e.textContent || '').slice(0, 30)) }
+    leer(); return out });
+  check('Dialoge bei 390 px: nichts ragt über den Rand (Neuer Auftrag, Sammeln, Auftrag, Vorlage, Auswahl, Schnellwahl)', Object.values(vmob).every(n => n === 0), JSON.stringify(vmob));
+  await p.setViewportSize({ width: 1440, height: 900 });
   await vClr();
   check('keine Laufzeitfehler', errs.length === 0, errs.slice(0, 3).join(' | '));
   await b.close();

@@ -1,5 +1,16 @@
 # Änderungen – Cockpit
 
+## 79 · 17.10.2026 · Auftragsvorlagen mit Schnellwahl (Etappe 5)
+- Neue Sammlung `vorlagen` (über die Speicher-Schicht, gespeichert wie Projekte); `18h-vorlagen.js`. Jede Vorlage gehört zu genau einer Organisation und damit zu deren System (Bodo/sellify) – Auswahl, Schnellwahl und Verwaltung zeigen nur Vorlagen der gewählten Organisation. Kundeninstanzen sind über ihre eigene Datenbank getrennt.
+- „Neuer Auftrag“: Leiste mit „📋 Vorlage wählen …“ und Schnellwahl-Knöpfen in zwei Gruppen „Für alle“ und „Meine“ (je höchstens 4), „✎ Schnellwahl anpassen“. Auswahlfenster mit Suche, Filter (Alle/Für alle/Nur meine), Gruppen nach Abteilung, Vorschau und Nutzungszähler.
+- Platzhalter wie `[Kunde]`: werden vor dem Füllen abgefragt (Hinweis je Feld, Pflichtfelder), „überspringen“ möglich; offene Pflicht-Platzhalter werden vor dem Start gemeldet. Platzhalter sind im Text gelb markiert.
+- Vorlagen bringen auch Priorität und Fälligkeit („in N Tagen“) für den Eingang mit (gilt bei „Nur sammeln“/Sammeln).
+- Sichtbar für „alle Benutzer“ der Instanz oder „nur mich“ (Ordnungshilfe, kein Zugriffsschutz – die Anmeldung wird je Browser gewählt). Ändern dürfen Ersteller und Inhaber der Instanz; alle anderen können duplizieren. Schnellwahl „für alle“ ändert der Inhaber (`settings.schnell`), „meine“ steht am Benutzer (`schnell`, `schnellAus`) und gilt damit auf jedem Gerät.
+- Verwaltung unter ⚙ Einstellungen › Auftragsvorlagen: Liste je Organisation (Sichtbar für, Schnellwahl, genutzt), Bearbeiten, Duplizieren, freigeben/nur für mich, in andere Organisation kopieren (Agent, Abteilung, Prozess, Projekt dort neu wählen), Ausprobieren, Löschen mit Bestätigung. Editor im Aufbau von „Neuer Auftrag“ mit „＋ Platzhalter“ und automatisch erkannter Platzhalter-Tabelle.
+- Im Auftrag: Menü ⋯ › „📋 Als Vorlage speichern …“. Der Auftrag merkt sich `vorlage`/`vorlageN` („angelegt mit Vorlage …“ im Verlauf); spätere Änderungen an der Vorlage ändern bestehende Aufträge nicht.
+- Handy: Menüs im Fensterkopf über die volle Breite.
+- Smoke-Test: 131 Prüfungen (neu: Vorlage anlegen, Trennung Bodo/sellify, verwenden mit Platzhaltern, Pflicht-Hinweis, Sammeln mit Vorlagen-Priorität, „nur ich“/Rechte, „Als Vorlage speichern“, Löschen; alle Dialoge bei 390 px).
+
 ## 78 · 17.10.2026 · Übersicht „Aufträge“ neu (Etappe 4)
 - „Aufträge & Verlauf“ heißt „Aufträge“: eine Reiterreihe nach Status mit Zählern – Wartet auf dich · Läuft · Eingang · Alle offenen | Erledigt · Alle. „Alle“ zeigt offene und darunter erledigte Aufträge (Entscheidung Boris).
 - Filter als Auswahl oben statt Häkchen-Spalte links: Abteilung/Agent (wie bisher mit Zählern, Alle/Keine) und neu **Projekt** (Ohne Projekt + Projekte der Organisation, Mehrfachauswahl, gemerkt; gilt auch fürs Archiv). Zeitfenster und „Abgebrochene zeigen“ bei Erledigt und Alle; Sortierschalter im Eingang.

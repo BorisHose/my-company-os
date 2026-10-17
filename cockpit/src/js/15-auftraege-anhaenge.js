@@ -34,7 +34,7 @@ function startModal(f,keep){if(!keep)PEND=[];keep=keep||{};const SM=!!keep.sm;if
   const FLO=FL.filter(x=>!x.frei&&(x.p==="all"||!O.prod||x.p===O.prod));
   if(art==="ablauf"){f=f&&!f.frei&&FLO.includes(f)?f:FLO[0];if(!f){f=null}}else f=FREE();
   if(!f)return toast(art==="ablauf"?"Für diese Organisation gibt es noch keinen Prozess":"Systemablauf „Freie Aufgabe“ fehlt");
-  const AGO=AG.filter(a=>inOrg(a,O)),ag=art==="agent"?(AGO.find(a=>a.id===keep.aid)||AGO[0]):null,PR=keep.prio||"n";
+  const AGO=AG.filter(a=>inOrg(a,O)),ag=art==="agent"?(AGO.find(a=>a.id===keep.aid)||AGO[0]):null,PR=keep.prio||(SM&&keep.vlPrio)||"n";
   const SKL=art==="agent"?(ag?ag.s.map(id=>sk(id)).filter(Boolean).filter(x=>!["vorschlag","entwurf"].includes(srcOf(x))):[]):skOrg(O);
   const skc=SKL.some(x=>x.id===keep.sk)?keep.sk:"";
   const s=f.N.find(n=>n.type==="start");
@@ -50,13 +50,13 @@ function startModal(f,keep){if(!keep)PEND=[];keep=keep||{};const SM=!!keep.sm;if
    ${art==="ablauf"?`<label class="cb" style="margin:6px 0 0"><input type="checkbox" id="jki" ${keep.ki===false?'':'checked'}> Von Claude ausführen lassen</label><div class="hint">startet eine Sitzung in deinem Abo; ohne Häkchen pflegst du die Schritte selbst</div>`:""}`;
   $("#modal").innerHTML=`<div class="modal"><div class="box dx" id="jbox"><div class="dx-head"><h3>Neuer Auftrag${SM?' <span class="dx-pill inbox">📥 wird gesammelt</span>':""}</h3>
    <div class="dx-ctx"><span>Für</span><div class="seg" id="jorg">${ORGS().map(o=>`<button type="button" data-o="${o.id}" class="${o===O?'on':''}">${esc(o.kurz||o.n)}</button>`).join("")}</div><select id="jprj" aria-label="Projekt" title="${esc(pjOrg(O.id).length?"Projekt (optional). Mit Bodo verbundene Projekte: Claude legt alles dort am Projekt an.":"Noch keine Projekte – anlegen unter „Projekte“. Ohne Projekt geht es auch.")}">${pjOpts(O.id,pj(keep.prj)&&pj(keep.prj).org===O.id?keep.prj:"")}</select></div><button class="dx-x" id="mclose" title="Schließen">✕</button></div>
-   <div class="dx-body"><div class="dx-main">
+   ${vlLeiste(O,keep)}<div class="dx-body"><div class="dx-main">
     <div class="field"><label class="dx-lbl" for="jt">Kurzbezeichnung</label><input type="text" id="jt" placeholder="z. B. „Angebot Muster AG“" value="${esc(keep.t||"")}"></div>
     <label class="dx-lbl">${esc(art==="ablauf"?(f.start||"Eingabe"):"Auftrag")}</label>${rtLeiste()}<div id="ji" class="dx-ed" contenteditable="true" role="textbox" aria-multiline="true" aria-label="Auftrag" data-ph="${esc(PH)}">${keep.i?mdHtml(keep.i,{ed:1,ph:1}):""}</div>
     <div class="dx-drop"><div class="anhrow" id="janh"></div><label class="btn sm" style="cursor:pointer">📎 Bild anhängen<input type="file" id="jfile" accept="image/*" multiple style="display:none"></label><span>oder ins Textfeld einfügen (Strg+V) bzw. hineinziehen · höchstens 5 Bilder</span></div>
    </div><div class="dx-side">
     <div class="dx-sec"><h4><span class="dx-num">1</span>Wer erledigt den Auftrag?</h4>${wer}</div>
-    ${SM?`<div class="dx-sec dx-card v"><h4>📥 Für den Eingang</h4><label class="dx-lbl">Priorität</label><div class="seg" id="jprio">${PRIO.map(([k,l])=>`<button type="button" data-p="${k}" class="${k===PR?"on":""}">${l}</button>`).join("")}</div><label class="dx-lbl" style="margin-top:10px" for="jdue">Fällig bis</label><input type="date" id="jdue" value="${esc(keep.due||"")}"></div>`:""}
+    ${SM?`<div class="dx-sec dx-card v"><h4>📥 Für den Eingang</h4><label class="dx-lbl">Priorität</label><div class="seg" id="jprio">${PRIO.map(([k,l])=>`<button type="button" data-p="${k}" class="${k===PR?"on":""}">${l}</button>`).join("")}</div><label class="dx-lbl" style="margin-top:10px" for="jdue">Fällig bis</label><input type="date" id="jdue" value="${esc(keep.due||(SM&&keep.vlDue)||"")}"></div>`:""}
     <div class="dx-sec"><h4><span class="dx-num">2</span>Wie gründlich?</h4><div class="seg" id="jtp">${Object.entries(RUNNERS).map(([k,R])=>`<button type="button" data-tp="${k}" class="${k===TP?'on':''}">${esc(R.l)}</button>`).join("")}</div><input type="hidden" id="jtempo" value="${TP}"><div class="hint">Schnell: Datensätze, kurze Texte · Gründlich: Dokumente, Angebote, Analysen</div></div>
     <div class="dx-sec"><h4><span class="dx-num">3</span>Freigabe</h4><label class="cb" title="Nur für einfache CRM-Anlagen (Aufgabe, Kontakt, Notiz, Termin) mit eindeutigem System und Mandant."><input type="checkbox" id="jvorab" ${keep.vorab?'checked':''}> Ohne Rückfrage ausführen, wenn eindeutig <span style="cursor:help">ⓘ</span></label><div class="hint">Nur einfache CRM-Anlagen. E-Mails, Tickets, Änderungen und Löschen immer mit Freigabe.</div></div>
    </div></div>
@@ -72,7 +72,8 @@ function startModal(f,keep){if(!keep)PEND=[];keep=keep||{};const SM=!!keep.sm;if
   ji.addEventListener("drop",e=>{e.preventDefault();ji.classList.remove("drop");[...(e.dataTransfer.files||[])].forEach(f=>addPend(f))});
   $("#jfile").onchange=e=>{[...e.target.files].forEach(f=>addPend(f));e.target.value=""};
   const prio=()=>{const b=document.querySelector("#jprio .on");return b?b.dataset.p:PR};
-  const K=o=>({art,team:$("#jteam")?$("#jteam").value:TM,sm:SM,prio:SM?prio():PR,due:$("#jdue")?$("#jdue").value:"",org:O.id,aid:ag&&ag.id,abt:abt&&abt.id,sk:$("#jsk")?$("#jsk").value:"",t:$("#jt").value,i:rtMd($("#ji")),tempo:$("#jtempo").value,vorab:$("#jvorab").checked,prj:$("#jprj")?$("#jprj").value:"",ki:$("#jki")?$("#jki").checked:true,...o});
+  const K=o=>({vl:keep.vl,vlN:keep.vlN,vlPrio:keep.vlPrio,vlDue:keep.vlDue,art,team:$("#jteam")?$("#jteam").value:TM,sm:SM,prio:SM?prio():keep.prio,due:$("#jdue")?$("#jdue").value:"",org:O.id,aid:ag&&ag.id,abt:abt&&abt.id,sk:$("#jsk")?$("#jsk").value:"",t:$("#jt").value,i:rtMd($("#ji")),tempo:$("#jtempo").value,vorab:$("#jvorab").checked,prj:$("#jprj")?$("#jprj").value:"",ki:$("#jki")?$("#jki").checked:true,...o});
+  vlBind(O,keep,K);
   document.querySelectorAll("#jorg [data-o]").forEach(b=>b.onclick=()=>startModal(art==="ablauf"?f:null,K({org:b.dataset.o,sk:"",aid:null,prj:""})));
   document.querySelectorAll("#jart [data-a]").forEach(b=>b.onclick=()=>startModal(null,K({art:b.dataset.a,sk:""})));
   const jf=$("#jf");if(jf)jf.onchange=e=>startModal(FL.find(x=>x.id===e.target.value),K());
@@ -105,12 +106,13 @@ function startModal(f,keep){if(!keep)PEND=[];keep=keep||{};const SM=!!keep.sm;if
       else if(e.key==="Tab"){if(openState)close()}};
     q.onblur=()=>setTimeout(()=>{if(document.activeElement!==q&&openState)close()},120);
     draw()}}
-  const go=async sofort=>{if(GOBUSY)return;if(!s)return toast("Der Prozess braucht einen Start-Knoten");if(art==="agent"&&!ag)return toast("Bitte einen Agenten wählen");if((art==="abteilung"||SM)&&!abt)return toast("Bitte eine Abteilung wählen");if(art==="abteilung"&&!ABA.length)return toast("In dieser Abteilung ist noch kein Agent – bitte zuerst einen platzieren");
+  const go=async sofort=>{if(GOBUSY)return;if(!await vlPruefen(keep,$("#jt").value,rtMd($("#ji"))))return;if(!s)return toast("Der Prozess braucht einen Start-Knoten");if(art==="agent"&&!ag)return toast("Bitte einen Agenten wählen");if((art==="abteilung"||SM)&&!abt)return toast("Bitte eine Abteilung wählen");if(art==="abteilung"&&!ABA.length)return toast("In dieser Abteilung ist noch kein Agent – bitte zuerst einen platzieren");
     GOBUSY=true;let n;try{n=await nextJobNo()}finally{GOBUSY=false}const e=f.E.find(e=>e.f===s.id),nx=e&&nodeOf(f,e.t);
     const ki=art!=="ablauf"||$("#jki").checked,skv=$("#jsk")?$("#jsk").value:"";
     const j={id:"A-"+n,f,fid:f.id,art,org:O.id,...(SM?{prio:prio(),gesammelt:new Date().toISOString()}:{}),t:$("#jt").value||(art==="agent"?ag.n:art==="abteilung"?"Auftrag an "+tlName(O.id,abt.id,TM):art==="frei"?(skv&&sk(skv)?sk(skv).n:"Claude direkt"):"Neuer Auftrag"),in:rtMd($("#ji")),path:ki?[s.id]:[s.id].concat(nx?[nx.id]:[]),st:"run",log:ki?[[now(),"KI-Auftrag angelegt von "+ICH()+""+(art==="agent"?" – an "+ag.n:art==="abteilung"?" – an "+tlName(O.id,abt.id,TM)+" (KI-Teamleiter)":art==="frei"?" – Claude direkt":"")]]:[[now(),"Auftrag gestartet von "+ICH()+""],[now(),nx?nlabel(nx)+" – beginnt":"–"]]};
     if(SM){const d=$("#jdue").value;if(d)j.due=d;j.log=[[now(),"Aufgabe gesammelt von "+ICH()+""+(art==="agent"?" – für "+ag.n:" – für Abteilung "+abt.n)]];if(!sofort)j.st="inbox"}
     if(art==="agent")j.aid=ag.id;if(art==="abteilung"||SM)j.abt=abt.id;if(art==="abteilung"&&TM)j.team=TM;if(skv&&art!=="abteilung")j.sk=skv;{const pv=$("#jprj")&&$("#jprj").value;if(pv&&pj(pv)){j.prj=pv;j.log[0][1]+=" · Projekt „"+pj(pv).n+"“"}}
+    if(keep.vl){j.vorlage=keep.vl;j.vorlageN=keep.vlN||"";j.log[0][1]+=" · mit Vorlage „"+(keep.vlN||"")+"“"}
     if(ki){j.ki=1;j.tempo=$("#jtempo").value;if($("#jvorab").checked)j.vorab=1}
     if(PEND.length){j.anh=PEND.map(a=>({aid:a.aid,name:a.name,w:a.w,h:a.h,n:Math.ceil(a.data.length/CHUNK),kb:Math.round(a.data.length*.75/1024)}));PEND.forEach(a=>ANHDATA.set(a.aid,a.data));PEND=[]}jobPlatz(j);AU.unshift(j);close();
     if(SM&&!sofort){try{await anhSave(j);await Store.set("jobs/"+j.id,JSON.parse(jobSer(j)));LAST.set("jobs/"+j.id,jobSer(j))}catch(e){schedule()}toast("📥 In den Eingang von „"+abt.n+"“ gelegt");if(!$("#org").classList.contains("hide"))org();avRefresh();return}

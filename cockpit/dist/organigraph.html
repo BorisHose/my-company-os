@@ -602,6 +602,19 @@ img.olg{height:18px;max-width:60px;object-fit:contain;margin-right:6px;vertical-
 .dx-filter .dx-pop{min-width:320px}
 @media(max-width:860px){.dx-tabs{padding:0 8px;flex-wrap:wrap;overflow:visible}.dx-tabs button{padding:9px 8px}.dx-tabs .sep{display:none}.dx-filter{padding:10px 12px}.dx-filter .avq{flex:1 1 100%}.dx-av .avtw{max-height:none}}
 @media(max-width:860px){.dx-filter{position:relative}.dx-filter .dx-dd{position:static}.dx-filter .dx-pop,.dx-filter .dx-pop.l{left:12px;right:12px;min-width:0;max-width:none}}
+/* Auftragsvorlagen (v79) */
+.vlrow{display:flex;gap:10px;align-items:center;width:100%;text-align:left;border:1px solid var(--line);background:#fff;border-radius:9px;padding:9px 11px;margin-bottom:6px;cursor:pointer;font:inherit;color:var(--ink)}
+.vlrow.on{border-color:var(--acc);background:#e8f0fd}
+.vlrow .t{flex:1;min-width:0}
+.vlrow .t small{display:block;color:var(--mut);font-size:12px}
+.vlsl{border:1px solid var(--line);border-radius:10px;padding:8px;background:#fff;min-height:120px}
+.vlsi{display:flex;gap:6px;align-items:center;padding:7px 9px;border:1px solid var(--line);border-radius:8px;margin-bottom:6px;font-size:13.5px}
+.vlsi .t{flex:1;min-width:0}
+.vlsl select{margin-top:4px}
+#vlw .dx-main input[type=search]{width:100%}
+@media(max-width:860px){#vlphl .avt th:nth-child(2),#vlphl .avt td:nth-child(2){min-width:0}#vlphl .avt input[type=text]{min-width:0!important}#vlbox .row{grid-template-columns:1fr!important}}
+#vlphl .avt{table-layout:fixed;width:100%}#vlphl .avt th{white-space:normal}#vlphl .avt th:first-child{width:34%}#vlphl .avt th:last-child{width:64px}#vlphl .avt input[type=text]{width:100%}
+@media(max-width:860px){.dx-head .dx-dd{position:static}.dx-head .dx-pop{left:12px;right:12px;min-width:0;max-width:none}}
 
 /* erzeugt von tools/dunkel.py – nicht von Hand ändern */
 :root[data-theme=dark]{color-scheme:dark;--bg:#0f141b;--panel:#171e29;--ink:#e4e8ef;--mut:#9aa4b4;--line:#2b3442;--acc:#5b8def;--accbg:#1c2b47;--warn:#f79009;--warnbg:#3a2615;--ok:#47cd89;--okbg:#12301f;--vio:#9b8afb;--viobg:#28213d;--teal:#36bffa;--tealbg:#11303a;--bodobg:#1d2939;--sellbg:#11303c}
@@ -1161,6 +1174,11 @@ img.olg{height:18px;max-width:60px;object-fit:contain;margin-right:6px;vertical-
 :root[data-theme=dark] .dx-filter{border-bottom:1px solid var(--line);background:#141b25}
 :root[data-theme=dark] .dx-av .avtw{border:0;border-radius:0}
 :root[data-theme=dark] .avt tr.avsec td{background:#131a24;color:var(--mut)}
+:root[data-theme=dark] .vlrow{border:1px solid var(--line);background:#171e29;border-radius:9px;color:var(--ink)}
+:root[data-theme=dark] .vlrow.on{border-color:var(--acc);background:#1c2b47}
+:root[data-theme=dark] .vlrow .t small{color:var(--mut)}
+:root[data-theme=dark] .vlsl{border:1px solid var(--line);border-radius:10px;background:#171e29}
+:root[data-theme=dark] .vlsi{border:1px solid var(--line);border-radius:8px}
 :root[data-theme=dark] nav button.on{background:#2f6fdf;color:#fff}:root[data-theme=dark] body{background:var(--bg);color:var(--ink)}:root[data-theme=dark] input,:root[data-theme=dark] select,:root[data-theme=dark] textarea{background:#131a24;color:var(--ink);border-color:#3a4456}:root[data-theme=dark] .modal{background:#000000a6}:root[data-theme=dark] img.olg,:root[data-theme=dark] .av img{filter:none}
 @media (prefers-color-scheme:dark){:root[data-theme=auto]{color-scheme:dark;--bg:#0f141b;--panel:#171e29;--ink:#e4e8ef;--mut:#9aa4b4;--line:#2b3442;--acc:#5b8def;--accbg:#1c2b47;--warn:#f79009;--warnbg:#3a2615;--ok:#47cd89;--okbg:#12301f;--vio:#9b8afb;--viobg:#28213d;--teal:#36bffa;--tealbg:#11303a;--bodobg:#1d2939;--sellbg:#11303c}
 :root[data-theme=auto] body{background:var(--bg);color:var(--ink)}
@@ -1719,6 +1737,11 @@ img.olg{height:18px;max-width:60px;object-fit:contain;margin-right:6px;vertical-
 :root[data-theme=auto] .dx-filter{border-bottom:1px solid var(--line);background:#141b25}
 :root[data-theme=auto] .dx-av .avtw{border:0;border-radius:0}
 :root[data-theme=auto] .avt tr.avsec td{background:#131a24;color:var(--mut)}
+:root[data-theme=auto] .vlrow{border:1px solid var(--line);background:#171e29;border-radius:9px;color:var(--ink)}
+:root[data-theme=auto] .vlrow.on{border-color:var(--acc);background:#1c2b47}
+:root[data-theme=auto] .vlrow .t small{color:var(--mut)}
+:root[data-theme=auto] .vlsl{border:1px solid var(--line);border-radius:10px;background:#171e29}
+:root[data-theme=auto] .vlsi{border:1px solid var(--line);border-radius:8px}
 :root[data-theme=auto] nav button.on{background:#2f6fdf;color:#fff}:root[data-theme=auto] body{background:var(--bg);color:var(--ink)}:root[data-theme=auto] input,:root[data-theme=auto] select,:root[data-theme=auto] textarea{background:#131a24;color:var(--ink);border-color:#3a4456}:root[data-theme=auto] .modal{background:#000000a6}:root[data-theme=auto] img.olg,:root[data-theme=auto] .av img{filter:none}}
 
 </style>
@@ -1783,7 +1806,7 @@ const COL=new Set();
 let PF="bodo",AF="bodo",GEN=false;
 const PK=[["bodo","Bodo"],["sellify","sellify"],["all","Andere"]];
 const PN={bodo:"Bodo",sellify:"sellify",all:"Andere",multi:"Bodo + sellify"};
-const VER="78";
+const VER="79";
 // Produktbereiche: fest im Programm hinterlegt (Entscheidung Boris 09.10.2026), keine Konfiguration in der Datenbank
 const PT={bodo:"Produktbereich Bodo (Bodo Solutions, Mitgliederverwaltung) – alles, was für Bodo-Kunden und das Bodo-System gebraucht wird. Fest im Programm hinterlegt.",sellify:"Produktbereich sellify (business//acts, CRM-Plattform) – alles, was für sellify-Kunden und das sellify-System gebraucht wird. Fest im Programm hinterlegt.",all:"Andere = produktunabhängig, z. B. Web-QA, E-Mail, Word/PDF. Fest im Programm hinterlegt."};
 let AFIL="all";
@@ -3051,7 +3074,7 @@ function startModal(f,keep){if(!keep)PEND=[];keep=keep||{};const SM=!!keep.sm;if
   const FLO=FL.filter(x=>!x.frei&&(x.p==="all"||!O.prod||x.p===O.prod));
   if(art==="ablauf"){f=f&&!f.frei&&FLO.includes(f)?f:FLO[0];if(!f){f=null}}else f=FREE();
   if(!f)return toast(art==="ablauf"?"Für diese Organisation gibt es noch keinen Prozess":"Systemablauf „Freie Aufgabe“ fehlt");
-  const AGO=AG.filter(a=>inOrg(a,O)),ag=art==="agent"?(AGO.find(a=>a.id===keep.aid)||AGO[0]):null,PR=keep.prio||"n";
+  const AGO=AG.filter(a=>inOrg(a,O)),ag=art==="agent"?(AGO.find(a=>a.id===keep.aid)||AGO[0]):null,PR=keep.prio||(SM&&keep.vlPrio)||"n";
   const SKL=art==="agent"?(ag?ag.s.map(id=>sk(id)).filter(Boolean).filter(x=>!["vorschlag","entwurf"].includes(srcOf(x))):[]):skOrg(O);
   const skc=SKL.some(x=>x.id===keep.sk)?keep.sk:"";
   const s=f.N.find(n=>n.type==="start");
@@ -3067,13 +3090,13 @@ function startModal(f,keep){if(!keep)PEND=[];keep=keep||{};const SM=!!keep.sm;if
    ${art==="ablauf"?`<label class="cb" style="margin:6px 0 0"><input type="checkbox" id="jki" ${keep.ki===false?'':'checked'}> Von Claude ausführen lassen</label><div class="hint">startet eine Sitzung in deinem Abo; ohne Häkchen pflegst du die Schritte selbst</div>`:""}`;
   $("#modal").innerHTML=`<div class="modal"><div class="box dx" id="jbox"><div class="dx-head"><h3>Neuer Auftrag${SM?' <span class="dx-pill inbox">📥 wird gesammelt</span>':""}</h3>
    <div class="dx-ctx"><span>Für</span><div class="seg" id="jorg">${ORGS().map(o=>`<button type="button" data-o="${o.id}" class="${o===O?'on':''}">${esc(o.kurz||o.n)}</button>`).join("")}</div><select id="jprj" aria-label="Projekt" title="${esc(pjOrg(O.id).length?"Projekt (optional). Mit Bodo verbundene Projekte: Claude legt alles dort am Projekt an.":"Noch keine Projekte – anlegen unter „Projekte“. Ohne Projekt geht es auch.")}">${pjOpts(O.id,pj(keep.prj)&&pj(keep.prj).org===O.id?keep.prj:"")}</select></div><button class="dx-x" id="mclose" title="Schließen">✕</button></div>
-   <div class="dx-body"><div class="dx-main">
+   ${vlLeiste(O,keep)}<div class="dx-body"><div class="dx-main">
     <div class="field"><label class="dx-lbl" for="jt">Kurzbezeichnung</label><input type="text" id="jt" placeholder="z. B. „Angebot Muster AG“" value="${esc(keep.t||"")}"></div>
     <label class="dx-lbl">${esc(art==="ablauf"?(f.start||"Eingabe"):"Auftrag")}</label>${rtLeiste()}<div id="ji" class="dx-ed" contenteditable="true" role="textbox" aria-multiline="true" aria-label="Auftrag" data-ph="${esc(PH)}">${keep.i?mdHtml(keep.i,{ed:1,ph:1}):""}</div>
     <div class="dx-drop"><div class="anhrow" id="janh"></div><label class="btn sm" style="cursor:pointer">📎 Bild anhängen<input type="file" id="jfile" accept="image/*" multiple style="display:none"></label><span>oder ins Textfeld einfügen (Strg+V) bzw. hineinziehen · höchstens 5 Bilder</span></div>
    </div><div class="dx-side">
     <div class="dx-sec"><h4><span class="dx-num">1</span>Wer erledigt den Auftrag?</h4>${wer}</div>
-    ${SM?`<div class="dx-sec dx-card v"><h4>📥 Für den Eingang</h4><label class="dx-lbl">Priorität</label><div class="seg" id="jprio">${PRIO.map(([k,l])=>`<button type="button" data-p="${k}" class="${k===PR?"on":""}">${l}</button>`).join("")}</div><label class="dx-lbl" style="margin-top:10px" for="jdue">Fällig bis</label><input type="date" id="jdue" value="${esc(keep.due||"")}"></div>`:""}
+    ${SM?`<div class="dx-sec dx-card v"><h4>📥 Für den Eingang</h4><label class="dx-lbl">Priorität</label><div class="seg" id="jprio">${PRIO.map(([k,l])=>`<button type="button" data-p="${k}" class="${k===PR?"on":""}">${l}</button>`).join("")}</div><label class="dx-lbl" style="margin-top:10px" for="jdue">Fällig bis</label><input type="date" id="jdue" value="${esc(keep.due||(SM&&keep.vlDue)||"")}"></div>`:""}
     <div class="dx-sec"><h4><span class="dx-num">2</span>Wie gründlich?</h4><div class="seg" id="jtp">${Object.entries(RUNNERS).map(([k,R])=>`<button type="button" data-tp="${k}" class="${k===TP?'on':''}">${esc(R.l)}</button>`).join("")}</div><input type="hidden" id="jtempo" value="${TP}"><div class="hint">Schnell: Datensätze, kurze Texte · Gründlich: Dokumente, Angebote, Analysen</div></div>
     <div class="dx-sec"><h4><span class="dx-num">3</span>Freigabe</h4><label class="cb" title="Nur für einfache CRM-Anlagen (Aufgabe, Kontakt, Notiz, Termin) mit eindeutigem System und Mandant."><input type="checkbox" id="jvorab" ${keep.vorab?'checked':''}> Ohne Rückfrage ausführen, wenn eindeutig <span style="cursor:help">ⓘ</span></label><div class="hint">Nur einfache CRM-Anlagen. E-Mails, Tickets, Änderungen und Löschen immer mit Freigabe.</div></div>
    </div></div>
@@ -3089,7 +3112,8 @@ function startModal(f,keep){if(!keep)PEND=[];keep=keep||{};const SM=!!keep.sm;if
   ji.addEventListener("drop",e=>{e.preventDefault();ji.classList.remove("drop");[...(e.dataTransfer.files||[])].forEach(f=>addPend(f))});
   $("#jfile").onchange=e=>{[...e.target.files].forEach(f=>addPend(f));e.target.value=""};
   const prio=()=>{const b=document.querySelector("#jprio .on");return b?b.dataset.p:PR};
-  const K=o=>({art,team:$("#jteam")?$("#jteam").value:TM,sm:SM,prio:SM?prio():PR,due:$("#jdue")?$("#jdue").value:"",org:O.id,aid:ag&&ag.id,abt:abt&&abt.id,sk:$("#jsk")?$("#jsk").value:"",t:$("#jt").value,i:rtMd($("#ji")),tempo:$("#jtempo").value,vorab:$("#jvorab").checked,prj:$("#jprj")?$("#jprj").value:"",ki:$("#jki")?$("#jki").checked:true,...o});
+  const K=o=>({vl:keep.vl,vlN:keep.vlN,vlPrio:keep.vlPrio,vlDue:keep.vlDue,art,team:$("#jteam")?$("#jteam").value:TM,sm:SM,prio:SM?prio():keep.prio,due:$("#jdue")?$("#jdue").value:"",org:O.id,aid:ag&&ag.id,abt:abt&&abt.id,sk:$("#jsk")?$("#jsk").value:"",t:$("#jt").value,i:rtMd($("#ji")),tempo:$("#jtempo").value,vorab:$("#jvorab").checked,prj:$("#jprj")?$("#jprj").value:"",ki:$("#jki")?$("#jki").checked:true,...o});
+  vlBind(O,keep,K);
   document.querySelectorAll("#jorg [data-o]").forEach(b=>b.onclick=()=>startModal(art==="ablauf"?f:null,K({org:b.dataset.o,sk:"",aid:null,prj:""})));
   document.querySelectorAll("#jart [data-a]").forEach(b=>b.onclick=()=>startModal(null,K({art:b.dataset.a,sk:""})));
   const jf=$("#jf");if(jf)jf.onchange=e=>startModal(FL.find(x=>x.id===e.target.value),K());
@@ -3122,12 +3146,13 @@ function startModal(f,keep){if(!keep)PEND=[];keep=keep||{};const SM=!!keep.sm;if
       else if(e.key==="Tab"){if(openState)close()}};
     q.onblur=()=>setTimeout(()=>{if(document.activeElement!==q&&openState)close()},120);
     draw()}}
-  const go=async sofort=>{if(GOBUSY)return;if(!s)return toast("Der Prozess braucht einen Start-Knoten");if(art==="agent"&&!ag)return toast("Bitte einen Agenten wählen");if((art==="abteilung"||SM)&&!abt)return toast("Bitte eine Abteilung wählen");if(art==="abteilung"&&!ABA.length)return toast("In dieser Abteilung ist noch kein Agent – bitte zuerst einen platzieren");
+  const go=async sofort=>{if(GOBUSY)return;if(!await vlPruefen(keep,$("#jt").value,rtMd($("#ji"))))return;if(!s)return toast("Der Prozess braucht einen Start-Knoten");if(art==="agent"&&!ag)return toast("Bitte einen Agenten wählen");if((art==="abteilung"||SM)&&!abt)return toast("Bitte eine Abteilung wählen");if(art==="abteilung"&&!ABA.length)return toast("In dieser Abteilung ist noch kein Agent – bitte zuerst einen platzieren");
     GOBUSY=true;let n;try{n=await nextJobNo()}finally{GOBUSY=false}const e=f.E.find(e=>e.f===s.id),nx=e&&nodeOf(f,e.t);
     const ki=art!=="ablauf"||$("#jki").checked,skv=$("#jsk")?$("#jsk").value:"";
     const j={id:"A-"+n,f,fid:f.id,art,org:O.id,...(SM?{prio:prio(),gesammelt:new Date().toISOString()}:{}),t:$("#jt").value||(art==="agent"?ag.n:art==="abteilung"?"Auftrag an "+tlName(O.id,abt.id,TM):art==="frei"?(skv&&sk(skv)?sk(skv).n:"Claude direkt"):"Neuer Auftrag"),in:rtMd($("#ji")),path:ki?[s.id]:[s.id].concat(nx?[nx.id]:[]),st:"run",log:ki?[[now(),"KI-Auftrag angelegt von "+ICH()+""+(art==="agent"?" – an "+ag.n:art==="abteilung"?" – an "+tlName(O.id,abt.id,TM)+" (KI-Teamleiter)":art==="frei"?" – Claude direkt":"")]]:[[now(),"Auftrag gestartet von "+ICH()+""],[now(),nx?nlabel(nx)+" – beginnt":"–"]]};
     if(SM){const d=$("#jdue").value;if(d)j.due=d;j.log=[[now(),"Aufgabe gesammelt von "+ICH()+""+(art==="agent"?" – für "+ag.n:" – für Abteilung "+abt.n)]];if(!sofort)j.st="inbox"}
     if(art==="agent")j.aid=ag.id;if(art==="abteilung"||SM)j.abt=abt.id;if(art==="abteilung"&&TM)j.team=TM;if(skv&&art!=="abteilung")j.sk=skv;{const pv=$("#jprj")&&$("#jprj").value;if(pv&&pj(pv)){j.prj=pv;j.log[0][1]+=" · Projekt „"+pj(pv).n+"“"}}
+    if(keep.vl){j.vorlage=keep.vl;j.vorlageN=keep.vlN||"";j.log[0][1]+=" · mit Vorlage „"+(keep.vlN||"")+"“"}
     if(ki){j.ki=1;j.tempo=$("#jtempo").value;if($("#jvorab").checked)j.vorab=1}
     if(PEND.length){j.anh=PEND.map(a=>({aid:a.aid,name:a.name,w:a.w,h:a.h,n:Math.ceil(a.data.length/CHUNK),kb:Math.round(a.data.length*.75/1024)}));PEND.forEach(a=>ANHDATA.set(a.aid,a.data));PEND=[]}jobPlatz(j);AU.unshift(j);close();
     if(SM&&!sofort){try{await anhSave(j);await Store.set("jobs/"+j.id,JSON.parse(jobSer(j)));LAST.set("jobs/"+j.id,jobSer(j))}catch(e){schedule()}toast("📥 In den Eingang von „"+abt.n+"“ gelegt");if(!$("#org").classList.contains("hide"))org();avRefresh();return}
@@ -3535,8 +3560,8 @@ async function archivieren(){if(!neuSchema()||!await Store.lease("meta/archiv-la
     for(const x of (j.anh||[]))for(let i=0;i<(x.n||0);i++)await Store.del("anhaenge/"+x.aid+"_"+i);
     await Store.del("jobs/"+j.id);n++}
   return n}
-const OUT={depts:d=>d,users:u=>u,skills:s=>s,agents:a=>a,flows:f=>({...f,N:f.N.map(n=>{const {a,...r}=n;return {...r,aid:a?a.id:(r.aid??null)}})}),jobs:j=>{const {f,...r}=j;return {...r,fid:f?f.id:r.fid}},projects:p=>p};
-function snapshot(){const m=new Map();[["users",US],["skills",SK],["agents",AG],["flows",FL],["jobs",AU],["depts",DP],["projects",PJ]].forEach(([c,arr])=>arr.forEach(o=>{if(!o.id)o.id=uid(c.slice(0,2));const k=c+"/"+o.id;
+const OUT={depts:d=>d,users:u=>u,skills:s=>s,agents:a=>a,flows:f=>({...f,N:f.N.map(n=>{const {a,...r}=n;return {...r,aid:a?a.id:(r.aid??null)}})}),jobs:j=>{const {f,...r}=j;return {...r,fid:f?f.id:r.fid}},projects:p=>p,vorlagen:v=>v};
+function snapshot(){const m=new Map();[["users",US],["skills",SK],["agents",AG],["flows",FL],["jobs",AU],["depts",DP],["projects",PJ],["vorlagen",VL]].forEach(([c,arr])=>arr.forEach(o=>{if(!o.id)o.id=uid(c.slice(0,2));const k=c+"/"+o.id;
     if(EDIT&&EDIT.orig.has(k)){const v=EDIT.orig.get(k);if(v!==null)m.set(k,v);return}if(EDIT&&EDIT.newc&&EDIT.newc.includes(c))return;m.set(k,JSON.stringify(OUT[c](o)))}));
   if(EDIT)EDIT.orig.forEach((v,k)=>{if(v!==null&&k!=="meta/config"&&!m.has(k))m.set(k,v)}); // im Bearbeiten Gelöschtes erst beim Speichern löschen
   if(EDIT&&EDIT.orig.has("meta/config")){m.set("meta/config",EDIT.orig.get("meta/config"));return m}
@@ -3560,8 +3585,8 @@ async function boot(){
   if(!DB){RO=true;setSave("err","Speicher nicht verfügbar");emptyState("Speicher nicht verfügbar","Öffne das Cockpit angemeldet auf claude.ai, damit deine Daten geladen und gespeichert werden.");return}
   try{let umg=false;try{umg=await migrieren()}catch(e){console.warn("Umstellung auf Datenstand "+SCHEMA+" nicht möglich",e)}
     const m=await Store.get("meta/config");if(m&&m.settings)SET={...SET,...m.settings};
-    const D=await Promise.all([Store.list("skills"),Store.list("agents"),Store.list("flows"),jobsLaden(),Store.list("users"),Store.list("depts"),Store.list("projects")]);
-    [SK,AG,FL,AU,US,DP,PJ]=D;DP.sort((a,b)=>(a.ord??0)-(b.ord??0));US.sort((a,b)=>(a.ord??0)-(b.ord??0));if(m){const c=m;GR=[...(c.groups||[])];GLOBAL=[...(c.globals||[])];SET={...SET,...(c.settings||{})}}
+    const D=await Promise.all([Store.list("skills"),Store.list("agents"),Store.list("flows"),jobsLaden(),Store.list("users"),Store.list("depts"),Store.list("projects"),Store.list("vorlagen").catch(()=>[])]);
+    [SK,AG,FL,AU,US,DP,PJ,VL]=D;DP.sort((a,b)=>(a.ord??0)-(b.ord??0));US.sort((a,b)=>(a.ord??0)-(b.ord??0));if(m){const c=m;GR=[...(c.groups||[])];GLOBAL=[...(c.globals||[])];SET={...SET,...(c.settings||{})}}
     SK.sort((a,b)=>(a.ord??0)-(b.ord??0));AG.sort((a,b)=>(a.ord??0)-(b.ord??0));FL.sort((a,b)=>(a.ord??0)-(b.ord??0));AU.sort((a,b)=>(+b.id.slice(2)||0)-(+a.id.slice(2)||0));
     hydrate();const s0=snapshot();s0.forEach((v,k)=>LAST.set(k,v));if(migrateOrgs()){toast("Organisationen eingerichtet");schedule()}if(grMigrieren())schedule();if(nameMigrieren())schedule();[...GR,GR_OHNE].forEach(g=>COL.add(g.id));
     const f=agVis()[0];cur=f?f[1]:-1;fcur=FL.findIndex(x=>x.p===FF&&!x.frei);
@@ -3771,7 +3796,7 @@ function uhr(){const e=$("#clock");if(!e)return;const d=new Date();e.textContent
 setInterval(uhr,15000);
 function hdr(){uhr();const m=$("#me");if(m){const u=ME();m.innerHTML=av(u,30);m.title=u?"Angemeldet als "+u.n+" – Einstellungen öffnen":"Benutzer wählen";m.onclick=()=>einst("darst")}
   const g=$("#gear");if(g)g.onclick=()=>einst();}
-const SETSEC=[["darst","Darstellung"],["inst","Instanz"],["orgs","Organigramme"],["users","Benutzer"],["ausf","Ausführung"],["dienste","Anbindungen"],["sgr","Skill-Gruppen"]];
+const SETSEC=[["darst","Darstellung"],["inst","Instanz"],["orgs","Organigramme"],["users","Benutzer"],["ausf","Ausführung"],["dienste","Anbindungen"],["sgr","Skill-Gruppen"],["vorl","Auftragsvorlagen"]];
 function einst(sec){if(sec)UI.sets=sec;if(!SETSEC.some(s=>s[0]===UI.sets))UI.sets="darst";saveUI();if($("#settings").classList.contains("hide")){show("settings");return}
   const S=UI.sets;$("#setnav").innerHTML=SETSEC.map(([k,l])=>`<button class="setn ${k===S?"on":""}" data-sets="${k}">${l}</button>`).join("");
   document.querySelectorAll("[data-sets]").forEach(b=>b.onclick=()=>{if(b.dataset.sets!==S&&blocked())return;einst(b.dataset.sets)});
@@ -3811,6 +3836,7 @@ function einst(sec){if(sec)UI.sets=sec;if(!SETSEC.some(s=>s[0]===UI.sets))UI.set
     $("#sruns").onclick=kiRuns}
   else if(S==="dienste")dienstEinst(C)
   else if(S==="sgr")grEinst(C)
+  else if(S==="vorl")vlEinst(C)
 }
 // Logo einlesen: in 320×96 einpassen, Transparenz behalten (PNG)
 function logoKlein(file){return new Promise((res,rej)=>{const r=new FileReader();r.onload=()=>{const im=new Image();im.onload=()=>{const k=Math.min(1,320/im.width,96/im.height),w=Math.max(1,Math.round(im.width*k)),h=Math.max(1,Math.round(im.height*k)),c=document.createElement("canvas");c.width=w;c.height=h;c.getContext("2d").drawImage(im,0,0,w,h);res(c.toDataURL("image/png"))};im.onerror=rej;im.src=r.result};r.onerror=rej;r.readAsDataURL(file)})}
@@ -4024,6 +4050,190 @@ function grEinst(C){const ed=isEd("grp"),n=id=>SK.filter(s=>s.g===id).length,ohn
     if(!await askOk("Gruppe „"+g.n+"“ entfernen?"+(k?" "+k+" Skill"+(k===1?"":"s")+" stehen danach unter „Ohne Gruppe“.":""),"Entfernen"))return;
     SK.forEach(s=>{if(s.g===g.id)s.g=""});GR.splice(GR.indexOf(g),1);COL.delete(g.id);einst()});
   $("#grneu").onclick=async()=>{const v=await askText("Name der neuen Gruppe","");if(v&&grAnlegen(v))einst()}}
+
+// ===== Auftragsvorlagen (v79, Entscheidungen Boris 17.10.2026) =====
+// Vorlagen gehören zu genau einer Organisation (damit zu Bodo oder sellify) und liegen in der Datenbank der Instanz (Sammlung „vorlagen“).
+// Sichtbar für: „alle“ Benutzer der Instanz oder nur den Ersteller („ich“) – eine Ordnungshilfe, kein Zugriffsschutz (Anmeldung je Browser).
+// Ändern: Ersteller und Inhaber der Instanz; alle anderen dürfen duplizieren. Schnellwahl „für alle“ je Organisation in den Einstellungen
+// (settings.schnell), „meine“ am Benutzer (schnell, schnellAus). Der Auftrag merkt sich vorlage/vorlageN; spätere Änderungen an der Vorlage
+// verändern bestehende Aufträge nicht.
+let VL=[];const VLMAX=4;
+const meId=()=>(ME()||{}).id||"";
+const istInhaber=()=>!SET.inhaber||SET.inhaber===meId();
+const vlSicht=v=>v&&(v.gilt!=="ich"||v.owner===meId());
+const vlDarf=v=>!!v&&(v.owner===meId()||istInhaber());
+const vlOrg=o=>VL.filter(v=>v.org===o&&vlSicht(v)).sort((a,b)=>String(a.n).localeCompare(String(b.n),"de"));
+const vlNutz=v=>AU.filter(j=>j.vorlage===v.id);
+const vlZuletzt=v=>{const L=vlNutz(v).map(j=>(j.log&&j.log[0]&&j.log[0][0])||"").filter(Boolean);return L[0]||""};
+const vlPh=t=>[...new Set([...String(t||"").matchAll(/\[([^\]\n<>]{1,40})\](?!\()/g)].map(m=>m[1].trim()))];
+function vlFehlt(v){const F=[];if(v.art==="agent"&&!AG.some(a=>a.id===v.aid))F.push("Agent");if(v.art==="abteilung"&&!dept(v.abt))F.push("Abteilung");if(v.art==="ablauf"&&!FL.some(f=>f.id===v.fid))F.push("Prozess");if(v.sk&&!sk(v.sk))F.push("Skill");return F}
+function vlWer(v){if(v.art==="agent"){const a=AG.find(x=>x.id===v.aid);return a?a.n:"Agent (fehlt)"}if(v.art==="abteilung"){const d=dept(v.abt);return d?tlName(v.org,d.id,v.team||""):"Abteilung (fehlt)"}if(v.art==="ablauf"){const f=FL.find(x=>x.id===v.fid);return f?"Prozess „"+f.n+"“":"Prozess (fehlt)"}return "Claude direkt"+(v.sk&&sk(v.sk)?" · "+sk(v.sk).n:"")}
+const vlAbt=v=>v.art==="abteilung"?v.abt:v.art==="agent"?((AG.find(a=>a.id===v.aid)&&PL(AG.find(a=>a.id===v.aid),v.org).abt)||""):"";
+// Schnellwahl
+const vlSchnellAlle=o=>((SET.schnell||{})[o]||[]).map(id=>VL.find(v=>v.id===id)).filter(v=>v&&v.gilt!=="ich"&&v.org===o);
+const vlSchnellMein=o=>{const u=ME();return ((u&&u.schnell||{})[o]||[]).map(id=>VL.find(v=>v.id===id)).filter(v=>v&&vlSicht(v)&&v.org===o)};
+const vlAlleAus=o=>{const u=ME();return !!(u&&u.schnellAus&&u.schnellAus[o])};
+function vlLeiste(O,keep){const L=vlOrg(O.id);if(!L.length&&!keep.vl)return "";const v=keep.vl&&VL.find(x=>x.id===keep.vl);
+  if(v)return `<div class="dx-banner on" id="jvlb">📋 <span>Vorlage: <b>${esc(v.n)}</b> – alles änderbar, die Vorlage selbst bleibt unverändert</span><span style="flex:1"></span><button class="dx-lnk" id="jvlw">andere Vorlage</button><button class="dx-lnk" id="jvlx">✕ entfernen</button></div>`;
+  const A=vlAlleAus(O.id)?[]:vlSchnellAlle(O.id),M=vlSchnellMein(O.id).filter(x=>!A.includes(x));
+  return `<div class="dx-banner" id="jvlb"><button class="btn sm" id="jvlw">📋 Vorlage wählen …</button>${A.length?`<span class="g">Für alle</span>${A.map(x=>`<button class="dx-chip" data-vlq="${x.id}" title="${esc(x.d||vlWer(x))}">${esc(x.n)}</button>`).join("")}`:""}${M.length?`<span class="g v">Meine</span>${M.map(x=>`<button class="dx-chip v" data-vlq="${x.id}" title="${esc(x.d||vlWer(x))}">${esc(x.n)}</button>`).join("")}`:""}<span style="flex:1"></span><button class="dx-lnk" id="jvlsa">✎ Schnellwahl anpassen</button></div>`}
+// Bindung in „Neuer Auftrag“ (aufgerufen aus startModal); K = aktueller Formularstand
+function vlBind(O,keep,K){const voll=()=>!!($("#jt").value.trim()||rtMd($("#ji")).trim());
+  const nimm=async id=>{const v=VL.find(x=>x.id===id);if(!v)return;if(voll()&&!keep.vl&&!await askOk("Eingegebenes durch die Vorlage ersetzen?","Ersetzen",{text:"Kurzbezeichnung und Auftragstext werden durch die Vorlage „"+v.n+"“ ersetzt.",gefahr:false,nein:"Zurück"}))return;vlAnwenden(v,K())};
+  document.querySelectorAll("#jvlb [data-vlq]").forEach(b=>b.onclick=()=>nimm(b.dataset.vlq));
+  {const b=$("#jvlw");if(b)b.onclick=()=>vlWahl(O.id,nimm)}
+  {const b=$("#jvlx");if(b)b.onclick=()=>startModal(null,K({vl:null,vlN:null}))}
+  {const b=$("#jvlsa");if(b)b.onclick=()=>vlSchnell(O.id,()=>startModal(null,K()))}}
+// Vorlage anwenden: Platzhalter abfragen, dann „Neuer Auftrag“ füllen
+async function vlAnwenden(v,base){base=base||{};let t=v.t||"",i=v.in||"";const P=(v.ph||[]).filter(p=>vlPh(t+"\n"+i).includes(p.k));
+  if(P.length){const r=await vlPhDialog(v,P);if(r===null)return;Object.entries(r).forEach(([k,w])=>{if(!w)return;const re=new RegExp("\\["+k.replace(/[.*+?^${}()|[\]\\]/g,"\\$&")+"\\](?!\\()","g");t=t.replace(re,w);i=i.replace(re,w)})}
+  const F=vlFehlt(v);if(F.length)toast("Aus der Vorlage nicht mehr vorhanden: "+F.join(", ")+" – bitte neu wählen");
+  const due=v.faellig?new Date(Date.now()+v.faellig*864e5).toISOString().slice(0,10):(base.due||"");
+  const keep={...base,org:v.org,art:v.art||"frei",abt:v.abt||null,team:v.team||"",aid:v.aid||null,sk:v.sk||"",tempo:v.tempo||"schnell",vorab:!!v.vorab,prj:v.prj&&pj(v.prj)?v.prj:(base.prj||""),t,i,vl:v.id,vlN:v.n,ki:true};
+  if(base.sm||v.prio&&base.sm){keep.prio=v.prio||base.prio||"n";keep.due=due}else{keep.vlPrio=v.prio||"";keep.vlDue=due}
+  if(base.sm&&keep.art!=="agent")keep.art="abteilung";
+  startModal(v.art==="ablauf"?FL.find(f=>f.id===v.fid)||null:null,keep)}
+function vlPhDialog(v,P){return new Promise(res=>{const d=document.createElement("div");d.id="dlg";
+  d.innerHTML=`<div class="modal" style="z-index:40"><div class="box dx dx-dlg">${dlgKopf(v.n,"Bitte die Angaben für diesen Auftrag ergänzen")}<div class="dx-pad">${P.map((p,n)=>`<div class="field"><label class="dx-lbl" for="vlp${n}">${esc(p.k)}${p.pf?' <span style="color:#b42318">*</span>':""}</label><input type="text" id="vlp${n}" data-k="${esc(p.k)}"${p.h?` placeholder="${esc(p.h)}"`:""}>${p.h?`<div class="hint">${esc(p.h)}</div>`:""}</div>`).join("")}<button class="dx-lnk" data-skip>überspringen, später im Text ausfüllen</button></div>
+   <div class="dx-foot"><span class="dx-sum"></span><button class="btn" data-no>Zurück</button><button class="btn p" data-yes>Übernehmen</button></div></div></div>`;document.body.appendChild(d);
+  const done=v=>{d.remove();res(v)},val=()=>{const r={};d.querySelectorAll("[data-k]").forEach(i=>r[i.dataset.k]=i.value.trim());return r};
+  d.querySelector("[data-no]").onclick=d.querySelector(".dx-x").onclick=()=>done(null);d.querySelector("[data-skip]").onclick=()=>done({});
+  d.querySelector("[data-yes]").onclick=()=>{const r=val(),fe=P.filter(p=>p.pf&&!r[p.k]);if(fe.length){toast("Bitte ausfüllen: "+fe.map(p=>p.k).join(", "));return}done(r)};
+  d.addEventListener("keydown",e=>{if(e.key==="Escape"){e.stopPropagation();done(null)}if(e.key==="Enter"&&e.target.tagName==="INPUT"){e.preventDefault();d.querySelector("[data-yes]").click()}});
+  const f=d.querySelector("input");if(f)f.focus()})}
+// Pflicht-Platzhalter vor dem Start prüfen
+async function vlPruefen(keep,t,i){const v=keep.vl&&VL.find(x=>x.id===keep.vl);if(!v)return true;const offen=(v.ph||[]).filter(p=>p.pf&&vlPh(t+"\n"+i).includes(p.k)).map(p=>p.k);
+  if(!offen.length)return true;return askOk("Pflicht-Platzhalter noch offen","Trotzdem starten",{text:"Im Auftrag steht noch:",folgen:offen.map(k=>"["+k+"]"),nein:"Zurück zum Auftrag",gefahr:false})}
+// Auswahlfenster
+function vlWahl(o,pick,f0){const s={q:"",f:f0||"alle",sel:null};const box=document.createElement("div");box.id="vlw";document.body.appendChild(box);
+  const zu=()=>box.remove();
+  const draw=()=>{const O=orgById(o)||{},q=s.q.toLowerCase(),L=vlOrg(o).filter(v=>(s.f==="alle"||(s.f==="ich"?v.gilt==="ich":v.gilt!=="ich"))&&(!q||[v.n,v.d,v.t,vlWer(v)].some(x=>String(x||"").toLowerCase().includes(q))));
+    if(!L.some(v=>v.id===s.sel))s.sel=(L[0]||{}).id||null;const V=VL.find(v=>v.id===s.sel);
+    const G=[...new Set(L.map(v=>vlAbt(v)))].sort((a,b)=>(a?0:1)-(b?0:1)||String((dept(a)||{}).n).localeCompare(String((dept(b)||{}).n),"de"));
+    box.innerHTML=`<div class="modal" style="z-index:36"><div class="box dx" style="max-width:900px">${dlgKopf("Vorlage wählen",esc(O.kurz||O.n||"")+(O.prod?" · "+esc(PN[O.prod]||""):""))}
+     <div class="dx-body" style="grid-template-columns:minmax(0,1fr) 320px"><div class="dx-main" style="max-height:60vh;overflow:auto">
+      <input type="search" id="vlwq" placeholder="🔍 Vorlage suchen …" value="${esc(s.q)}">
+      <div style="display:flex;gap:6px;margin:10px 0">${[["alle","Alle"],["alle2","Für alle"],["ich","Nur meine"]].map(([k,l])=>`<button class="dx-chip ${s.f===k?"on":""}" data-vlwf="${k}">${l}</button>`).join("")}</div>
+      ${L.length?G.map(g=>`<div class="dx-lbl" style="margin-top:12px">${esc(g?(dept(g)||{}).n||"Abteilung":"Ohne Abteilung")}</div>${L.filter(v=>vlAbt(v)===g).map(v=>{const F=vlFehlt(v);return `<button class="vlrow ${v.id===s.sel?"on":""}" data-vlws="${v.id}"><span class="t"><b>${esc(v.n)}</b>${F.length?` <span class="dx-pill wait">⚠ ${esc(F.join(", "))} fehlt</span>`:""}${v.gilt==="ich"?' <span class="dx-pill inbox">persönlich</span>':""}<small>${esc(vlWer(v))}${(v.ph||[]).length?" · "+v.ph.length+" Platzhalter":""}</small></span><span class="hint" style="margin:0">${vlNutz(v).length}×</span></button>`}).join("")}`).join(""):`<div class="hint">${vlOrg(o).length?"Keine Vorlage passt zur Suche.":"Für diese Organisation gibt es noch keine Vorlagen – anlegen unter ⚙ Einstellungen › Auftragsvorlagen oder im Auftrag über ⋯ › „Als Vorlage speichern“."}</div>`}
+     </div><div class="dx-side">${V?`<div class="dx-h">${esc(V.n)}</div>${V.d?`<div class="hint" style="margin:0 0 8px">${esc(V.d)}</div>`:""}
+      <div class="dx-md" style="font-size:12.5px"><b>Wer:</b> ${esc(vlWer(V))}<br><b>Tempo:</b> ${esc(((RUNNERS[V.tempo||"schnell"]||{}).l||"").replace(/^\S+\s/,""))} · <b>Freigabe:</b> ${V.vorab?"ohne Rückfrage, wenn eindeutig":"immer"}${(V.ph||[]).length?`<br><b>Platzhalter:</b> ${V.ph.map(p=>`<span class="dx-ph">${esc(p.k)}</span>`).join(" ")}`:""}${V.prio&&V.prio!=="n"||V.faellig?`<br><b>Für den Eingang:</b> ${esc((PRIO.find(x=>x[0]===V.prio)||[0,"Normal"])[1])}${V.faellig?" · fällig in "+V.faellig+" Tag"+(V.faellig===1?"":"en"):""}`:""}<br><b>Sichtbar für:</b> ${V.gilt==="ich"?"nur "+esc((usr(V.owner)||{}).n||"Ersteller"):"alle Benutzer"}${usr(V.owner)?" · von "+esc(usr(V.owner).n):""}</div>
+      ${V.in||V.t?`<div class="dx-card" style="margin-top:10px;font-size:12.5px">${V.t?`<b>${mdInline(V.t,{ph:1})}</b>`:""}<div class="dx-md cut" style="font-size:12.5px">${mdHtml(V.in||"",{ph:1})}</div></div>`:""}`:'<div class="hint">Keine Vorlage gewählt.</div>'}</div></div>
+     <div class="dx-foot"><button class="dx-lnk" id="vlwv">⚙ Vorlagen verwalten</button><span class="dx-sum"></span><button class="btn" data-no>Abbrechen</button><button class="btn p" id="vlwok" ${V?"":"disabled"}>Vorlage verwenden</button></div></div></div>`;
+    box.querySelector(".dx-x").onclick=box.querySelector("[data-no]").onclick=zu;
+    const qi=box.querySelector("#vlwq");qi.oninput=()=>{s.q=qi.value;const p=qi.selectionStart;draw();const n=box.querySelector("#vlwq");n.focus();try{n.setSelectionRange(p,p)}catch(e){}};
+    box.querySelectorAll("[data-vlwf]").forEach(b=>b.onclick=()=>{s.f=b.dataset.vlwf;draw()});
+    box.querySelectorAll("[data-vlws]").forEach(b=>{b.onclick=()=>{s.sel=b.dataset.vlws;draw()};b.ondblclick=()=>{zu();pick(b.dataset.vlws)}});
+    box.querySelector("#vlwok").onclick=()=>{if(!s.sel)return;zu();pick(s.sel)};
+    box.querySelector("#vlwv").onclick=()=>{zu();$("#modal").innerHTML="";einst("vorl")}};
+  box.addEventListener("keydown",e=>{if(e.key==="Escape"){e.stopPropagation();zu()}});draw();setTimeout(()=>{const q=box.querySelector("#vlwq");if(q)q.focus()},0)}
+// Schnellwahl anpassen: zwei Listen je Organisation
+function vlSchnell(o,fertig){const u=ME();const A=[...((SET.schnell||{})[o]||[])].filter(id=>vlSchnellAlle(o).some(v=>v.id===id)),M=[...((u&&u.schnell||{})[o]||[])].filter(id=>vlSchnellMein(o).some(v=>v.id===id));let aus=vlAlleAus(o);
+  const darfA=istInhaber(),box=document.createElement("div");box.id="vlsa";document.body.appendChild(box);const zu=()=>box.remove();
+  const liste=(L,k,darf)=>`<div class="vlsl">${L.map((id,n)=>{const v=VL.find(x=>x.id===id);return `<div class="vlsi"><span class="t">${esc(v?v.n:id)}${v&&v.gilt==="ich"?' <span class="dx-pill inbox">persönlich</span>':""}</span>${darf?`<button class="ic" data-vlup="${k}|${n}" title="nach oben" ${n?"":"disabled"}>↑</button><button class="ic" data-vldn="${k}|${n}" title="nach unten" ${n<L.length-1?"":"disabled"}>↓</button><button class="ic" data-vlrm="${k}|${n}" title="entfernen">✕</button>`:""}</div>`}).join("")||'<div class="hint" style="margin:6px 4px">Noch keine Knöpfe.</div>'}
+    ${darf&&L.length<VLMAX?`<select data-vladd="${k}"><option value="">+ Vorlage hinzufügen …</option>${vlOrg(o).filter(v=>!L.includes(v.id)&&(k==="m"||v.gilt!=="ich")).map(v=>`<option value="${v.id}">${esc(v.n)}${v.gilt==="ich"?" (persönlich)":""}</option>`).join("")}</select>`:darf?`<div class="hint">Höchstens ${VLMAX} Knöpfe.</div>`:""}</div>`;
+  const draw=()=>{const O=orgById(o)||{};box.innerHTML=`<div class="modal" style="z-index:36"><div class="box dx" style="max-width:900px">${dlgKopf("Schnellwahl anpassen",esc(O.kurz||O.n||"")+(O.prod?" · "+esc(PN[O.prod]||""):""))}
+    <div class="dx-pad" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:16px">
+     <div><div class="dx-h">Für alle Benutzer<span class="hint" style="margin:0 0 0 auto;font-weight:400">${darfA?"gilt für jeden in dieser Instanz":"ändert: Inhaber der Instanz"}</span></div>${liste(A,"a",darfA)}</div>
+     <div><div class="dx-h" style="color:#6941c6">Meine${u?" (nur für "+esc(u.n)+")":""}<span class="hint" style="margin:0 0 0 auto;font-weight:400">${M.length} von ${VLMAX}</span></div>${u?liste(M,"m",true)+`<label class="cb" style="margin-top:10px"><input type="checkbox" id="vlaus" ${aus?"checked":""}> „Für alle“-Knöpfe bei mir ausblenden</label>`:'<div class="hint">Kein Benutzer gewählt (⚙ Einstellungen › Darstellung › Angemeldet als).</div>'}</div></div>
+    <div class="dx-foot"><span class="dx-sum">Vorschau: ${[...(aus?[]:A),...M.filter(x=>aus||!A.includes(x))].map(id=>`<span class="dx-chip ${A.includes(id)&&!aus?"":"v"}" style="cursor:default">${esc((VL.find(v=>v.id===id)||{}).n||"")}</span>`).join(" ")||"–"}</span><button class="btn" data-no>Abbrechen</button><button class="btn p" id="vlsok">Speichern</button></div></div></div>`;
+    box.querySelector(".dx-x").onclick=box.querySelector("[data-no]").onclick=zu;
+    const L=k=>k==="a"?A:M,mv=(k,n,d)=>{const x=L(k);[x[n],x[n+d]]=[x[n+d],x[n]];draw()};
+    box.querySelectorAll("[data-vlup]").forEach(b=>b.onclick=()=>{const [k,n]=b.dataset.vlup.split("|");mv(k,+n,-1)});
+    box.querySelectorAll("[data-vldn]").forEach(b=>b.onclick=()=>{const [k,n]=b.dataset.vldn.split("|");mv(k,+n,1)});
+    box.querySelectorAll("[data-vlrm]").forEach(b=>b.onclick=()=>{const [k,n]=b.dataset.vlrm.split("|");L(k).splice(+n,1);draw()});
+    box.querySelectorAll("[data-vladd]").forEach(s=>s.onchange=()=>{if(s.value){L(s.dataset.vladd).push(s.value);draw()}});
+    {const c=box.querySelector("#vlaus");if(c)c.onchange=()=>{aus=c.checked;draw()}}
+    box.querySelector("#vlsok").onclick=()=>{if(darfA){SET.schnell={...(SET.schnell||{}),[o]:A}}if(u){u.schnell={...(u.schnell||{}),[o]:M};u.schnellAus={...(u.schnellAus||{}),[o]:aus}}schedule();zu();toast("Schnellwahl gespeichert");if(fertig)fertig()}};
+  box.addEventListener("keydown",e=>{if(e.key==="Escape"){e.stopPropagation();zu()}});draw()}
+// Editor (Anlegen/Bearbeiten) – gleicher Aufbau wie „Neuer Auftrag“
+function vlEditor(v0,o,fertig){const neu=!v0||!VL.includes(v0);const E=JSON.parse(JSON.stringify(v0||{}));E.org=E.org||o;E.art=E.art||"frei";E.tempo=E.tempo||"schnell";E.gilt=E.gilt||"alle";E.ph=E.ph||[];
+  const u=ME();let sA=!!(!neu&&vlSchnellAlle(E.org).some(x=>x.id===E.id)),sM=!!(!neu&&vlSchnellMein(E.org).some(x=>x.id===E.id));
+  if(!neu&&!vlDarf(v0))return toast("Diese Vorlage dürfen nur der Ersteller und der Inhaber der Instanz ändern – „Duplizieren“ geht immer");
+  const sync=()=>{const g=id=>document.getElementById(id);if(!g("vln"))return;E.n=g("vln").value.trim();E.d=g("vld").value.trim();E.t=g("vlt").value;E.in=rtMd(g("vled"));
+    E.vorab=g("vlvorab").checked;const pr=document.querySelector("#vlprio .on");E.prio=pr?pr.dataset.p:"n";const fa=+g("vlfa").value;E.faellig=fa>0?Math.min(365,Math.round(fa)):null;E.prj=g("vlprj").checked&&g("vlprjs").value?g("vlprjs").value:null;
+    const sa=g("vlsa"),sm=g("vlsm");if(sa)sA=sa.checked;if(sm)sM=sm.checked;
+    const P=vlPh(E.t+"\n"+E.in);E.ph=P.map(k=>{const r=document.querySelector(`[data-phk="${CSS.escape(k)}"]`),alt=(E.ph||[]).find(p=>p.k===k)||{};return {k,h:r?r.querySelector("input[type=text]").value.trim():(alt.h||""),pf:r?r.querySelector("input[type=checkbox]").checked:!!alt.pf}})};
+  const draw=()=>{const O=orgById(E.org)||{},AGO=AG.filter(a=>inOrg(a,O)),DPO=deptsOf(O.id),FLO=FL.filter(x=>!x.frei&&(x.p==="all"||!O.prod||x.p===O.prod));
+    if(E.art==="agent"&&!AGO.some(a=>a.id===E.aid))E.aid=(AGO[0]||{}).id||null;if(E.art==="abteilung"&&!DPO.some(d=>d.id===E.abt))E.abt=(DPO[0]||{}).id||null;if(E.art==="ablauf"&&!FLO.some(f=>f.id===E.fid))E.fid=(FLO[0]||{}).id||null;
+    const d=E.art==="abteilung"&&dept(E.abt),TMS=d?teamOpts(O.id,d):[],ag=E.art==="agent"&&AG.find(a=>a.id===E.aid);
+    const SKL=E.art==="agent"?(ag?ag.s.map(id=>sk(id)).filter(Boolean):[]):E.art==="frei"?skOrg(O):[];
+    const ART=[["frei","Claude direkt"],["abteilung","Abteilung"],["agent","Bestimmter Agent"],["ablauf","Prozess"]];
+    $("#modal").innerHTML=`<div class="modal"><div class="box dx" id="vlbox"><div class="dx-head"><h3>${neu?"Neue Vorlage":"Vorlage bearbeiten"}</h3><div class="dx-ctx"><b>${esc(O.kurz||O.n||"")}</b>${O.prod?` <span class="dx-pill mut">${esc(PN[O.prod]||"")}</span>`:""}</div><button class="dx-x" id="vlx" title="Schließen">✕</button></div>
+     <div class="dx-body"><div class="dx-main">
+      <div class="row" style="grid-template-columns:1fr 1fr;gap:12px"><div class="field"><label class="dx-lbl" for="vln">Name der Vorlage</label><input type="text" id="vln" value="${esc(E.n||"")}" placeholder="z. B. Begleitmail zum Angebot"></div><div class="field"><label class="dx-lbl" for="vld">Kurzbeschreibung</label><input type="text" id="vld" value="${esc(E.d||"")}" placeholder="wofür die Vorlage gedacht ist"></div></div>
+      <div class="field"><label class="dx-lbl" for="vlt">Kurzbezeichnung des Auftrags</label><input type="text" id="vlt" value="${esc(E.t||"")}" placeholder="z. B. Begleitmail Angebot [Kunde]"></div>
+      <label class="dx-lbl">Auftragstext</label>${rtLeiste(1)}<div id="vled" class="dx-ed" contenteditable="true" role="textbox" aria-multiline="true" style="min-height:180px" data-ph="Text des späteren Auftrags. Stellen, die sich je Auftrag ändern, als Platzhalter wie [Kunde] schreiben.">${E.in?mdHtml(E.in,{ed:1,ph:1}):""}</div>
+      <div class="dx-card" style="margin-top:12px" id="vlphb"><h4>Platzhalter<span class="hint">aus Kurzbezeichnung und Text erkannt</span></h4><div id="vlphl"></div></div>
+     </div><div class="dx-side">
+      <div class="dx-sec"><h4><span class="dx-num">1</span>Wer erledigt den Auftrag?</h4><div class="dx-opts" id="vlart">${ART.map(([k,l])=>`<button type="button" data-vla="${k}" class="${k===E.art?"on":""}"><span><b>${l}</b></span></button>`).join("")}</div>
+       ${E.art==="abteilung"?`<div class="field"><label>Abteilung</label><select id="vlabt">${DPO.map(x=>`<option value="${x.id}" ${x.id===E.abt?"selected":""}>${esc(x.n)}</option>`).join("")}</select>${TMS.length?`<select id="vlteam" style="margin-top:6px"><option value="">Ganze Abteilung</option>${TMS.map(t=>`<option value="${t.id}" ${t.id===E.team?"selected":""}>Team ${esc(t.n)}</option>`).join("")}</select>`:""}</div>`:""}
+       ${E.art==="agent"?`<div class="field"><label>Agent</label><select id="vlag">${AGO.map(a=>`<option value="${a.id}" ${a.id===E.aid?"selected":""}>${esc(a.n)}</option>`).join("")}</select></div>`:""}
+       ${E.art==="ablauf"?`<div class="field"><label>Prozess</label><select id="vlf">${FLO.map(x=>`<option value="${x.id}" ${x.id===E.fid?"selected":""}>${esc(x.n)}</option>`).join("")}</select></div>`:""}
+       ${E.art==="frei"||E.art==="agent"?`<div class="field"><label>Skill</label><select id="vlsk"><option value="">${E.art==="agent"?"Agent entscheidet selbst":"Claude wählt selbst"}</option>${skOpts(SKL,E.sk)}</select></div>`:""}</div>
+      <div class="dx-sec"><h4><span class="dx-num">2</span>Tempo &amp; Freigabe</h4><div class="seg" id="vltp">${Object.entries(RUNNERS).map(([k,R])=>`<button type="button" data-tp="${k}" class="${k===E.tempo?"on":""}">${esc(R.l)}</button>`).join("")}</div><label class="cb" style="margin-top:8px"><input type="checkbox" id="vlvorab" ${E.vorab?"checked":""}> Ohne Rückfrage ausführen, wenn eindeutig</label></div>
+      <div class="dx-sec dx-card v"><h4>📥 Für den Eingang</h4><label class="dx-lbl">Priorität</label><div class="seg" id="vlprio">${PRIO.map(([k,l])=>`<button type="button" data-p="${k}" class="${k===(E.prio||"n")?"on":""}">${l}</button>`).join("")}</div><label class="dx-lbl" style="margin-top:10px" for="vlfa">Fällig in … Tagen</label><input type="number" id="vlfa" min="0" max="365" value="${E.faellig||""}" placeholder="leer = keine Fälligkeit" style="width:100%"><div class="hint">gilt beim Sammeln in den Eingang</div></div>
+      <div class="dx-sec dx-card"><h4>📋 Vorlage</h4><div class="hint" style="margin:0 0 8px">Organisation: <b>${esc(O.kurz||O.n||"")}</b>${O.prod?" · "+esc(PN[O.prod]||""):""} · fest</div>
+       <label class="dx-lbl">Sichtbar für</label><div class="seg" id="vlgilt"><button type="button" data-g="alle" class="${E.gilt!=="ich"?"on":""}">alle Benutzer</button><button type="button" data-g="ich" class="${E.gilt==="ich"?"on":""}">nur mich</button></div>
+       <label class="dx-lbl" style="margin-top:10px">Schnellwahl</label>${E.gilt!=="ich"&&istInhaber()?`<label class="cb"><input type="checkbox" id="vlsa" ${sA?"checked":""}> für alle Benutzer anzeigen</label>`:E.gilt!=="ich"?'<div class="hint" style="margin:0 0 4px">„Für alle“-Schnellwahl ändert der Inhaber der Instanz.</div>':""}${u?`<label class="cb"><input type="checkbox" id="vlsm" ${sM?"checked":""}> in meiner Schnellwahl</label>`:""}
+       <label class="cb" style="margin-top:8px"><input type="checkbox" id="vlprj" ${E.prj?"checked":""}> Projekt vorbelegen</label><select id="vlprjs" ${E.prj?"":"hidden"}>${pjOpts(O.id,E.prj||"")}</select></div>
+     </div></div>
+     <div class="dx-foot"><span class="dx-sum">${!neu&&usr(E.von)?"zuletzt geändert von "+esc(usr(E.von).n)+(E.geaendert?" · "+esc(new Date(E.geaendert).toLocaleDateString("de-DE")):""):neu?"Neue Vorlage für "+esc(O.kurz||O.n||""):""}</span><button class="btn" id="vlab">Abbrechen</button><button class="btn" id="vltry" title="„Neuer Auftrag“ mit dieser Vorlage öffnen, ohne zu speichern">Ausprobieren ▶</button><button class="btn p" id="vlok">Vorlage speichern</button></div></div></div>`;
+    const ed=$("#vled"),phl=()=>{sync();$("#vlphl").innerHTML=E.ph.length?`<div style="overflow-x:auto"><table class="avt" style="font-size:12.5px;min-width:0"><thead><tr><th>Name</th><th>Hinweis beim Ausfüllen</th><th>Pflicht</th></tr></thead><tbody>${E.ph.map(p=>`<tr data-phk="${esc(p.k)}"><td><span class="dx-ph">${esc(p.k)}</span></td><td><input type="text" value="${esc(p.h||"")}" placeholder="z. B. Firmenname, wie er im CRM steht" style="min-width:120px"></td><td><input type="checkbox" ${p.pf?"checked":""}></td></tr>`).join("")}</tbody></table></div>`:'<div class="hint" style="margin:0">Noch keine – mit „＋ Platzhalter“ einfügen oder [Name] in den Text schreiben.</div>'};
+    rtBind(ed,$("#vlbox .dx-tb"),{onPh:phl});let pt=null;const lazy=()=>{clearTimeout(pt);pt=setTimeout(phl,500)};ed.addEventListener("input",lazy);$("#vlt").addEventListener("input",lazy);phl();
+    const re=()=>{sync();draw()};
+    document.querySelectorAll("[data-vla]").forEach(b=>b.onclick=()=>{sync();E.art=b.dataset.vla;E.sk="";draw()});
+    {const s=$("#vlabt");if(s)s.onchange=()=>{E.abt=s.value;E.team="";re()}}{const s=$("#vlteam");if(s)s.onchange=()=>{E.team=s.value}}
+    {const s=$("#vlag");if(s)s.onchange=()=>{E.aid=s.value;E.sk="";re()}}{const s=$("#vlf");if(s)s.onchange=()=>{E.fid=s.value}}{const s=$("#vlsk");if(s)s.onchange=()=>{E.sk=s.value}}
+    document.querySelectorAll("#vltp [data-tp]").forEach(b=>b.onclick=()=>{E.tempo=b.dataset.tp;document.querySelectorAll("#vltp [data-tp]").forEach(x=>x.classList.toggle("on",x===b))});
+    document.querySelectorAll("#vlprio [data-p]").forEach(b=>b.onclick=()=>{document.querySelectorAll("#vlprio [data-p]").forEach(x=>x.classList.toggle("on",x===b))});
+    document.querySelectorAll("#vlgilt [data-g]").forEach(b=>b.onclick=()=>{sync();E.gilt=b.dataset.g;if(E.gilt==="ich")sA=false;draw()});
+    $("#vlprj").onchange=()=>{$("#vlprjs").hidden=!$("#vlprj").checked};
+    const zu=()=>{$("#modal").innerHTML="";if(fertig)fertig()};
+    $("#vlx").onclick=$("#vlab").onclick=async()=>{sync();if(JSON.stringify(E)!==START&&!await askOk("Änderungen an der Vorlage verwerfen?","Verwerfen",{nein:"Weiter bearbeiten"}))return;zu()};
+    $("#vltry").onclick=()=>{sync();$("#modal").innerHTML="";vlAnwenden({...E,id:null,n:E.n||"Entwurf"},{org:E.org})};
+    $("#vlok").onclick=()=>{sync();if(!E.n)return toast("Bitte einen Namen für die Vorlage angeben");
+      if(vlOrg(E.org).some(x=>x.id!==E.id&&x.n.toLowerCase()===E.n.toLowerCase()))return toast("Es gibt schon eine Vorlage mit diesem Namen");
+      if(!E.id)E.id=uid("vl");if(!E.owner)E.owner=meId();E.von=meId();E.geaendert=new Date().toISOString();
+      const v=VL.find(x=>x.id===E.id);if(v){Object.keys(v).forEach(k=>delete v[k]);Object.assign(v,E)}else VL.push(E);
+      if(istInhaber()){const L=((SET.schnell||{})[E.org]||[]).filter(id=>id!==E.id);if(sA&&E.gilt!=="ich"&&L.length<VLMAX)L.push(E.id);SET.schnell={...(SET.schnell||{}),[E.org]:L}}
+      if(u){const L=((u.schnell||{})[E.org]||[]).filter(id=>id!==E.id);if(sM&&L.length<VLMAX)L.push(E.id);u.schnell={...(u.schnell||{}),[E.org]:L}}
+      schedule();zu();toast("Vorlage „"+E.n+"“ gespeichert")}};
+  draw();sync();const START=JSON.stringify(E)}
+// Aus einem Auftrag eine Vorlage machen (Menü ⋯ im Auftrag)
+function vlAusAuftrag(j){vlEditor({n:j.t||"",org:jobOrg(j),art:j.art||"frei",abt:j.abt||null,team:j.team||"",aid:j.aid||null,fid:j.art==="ablauf"?j.fid:null,sk:j.sk||"",tempo:j.tempo||"schnell",vorab:!!j.vorab,t:j.t||"",in:j.in||"",gilt:"alle",prio:j.prio&&j.prio!=="n"?j.prio:"n"},jobOrg(j),()=>toast("Tipp: Kundenbezogenes im Text durch Platzhalter wie [Kunde] ersetzen"))}
+// Verwaltung: ⚙ Einstellungen › Auftragsvorlagen
+let VLS={org:null,q:"",g:"alle"};
+function vlEinst(C){if(!orgById(VLS.org))VLS.org=OC||(ORGS()[0]||{}).id;const o=VLS.org,O=orgById(o)||{},q=VLS.q.toLowerCase();
+  const L=vlOrg(o).filter(v=>(VLS.g==="alle"||(VLS.g==="ich"?v.gilt==="ich":v.gilt!=="ich"))&&(!q||[v.n,v.d,vlWer(v)].some(x=>String(x||"").toLowerCase().includes(q))));
+  const SA=vlSchnellAlle(o).map(v=>v.id),SM=vlSchnellMein(o).map(v=>v.id);
+  C.innerHTML=`<h2>Auftragsvorlagen</h2><div class="hint" style="margin:0 0 10px">Vorlagen füllen „Neuer Auftrag“ vor. Jede Vorlage gehört zu einer Organisation – Bodo- und sellify-Vorlagen werden nie gemischt. „Nur ich“ blendet eine Vorlage für andere aus (kein Zugriffsschutz: die Anmeldung wird je Browser gewählt).</div>
+   <div class="dx-filter" style="border:1px solid var(--line);border-radius:10px;margin-bottom:10px">${ORGS().length>1?`<div class="seg">${ORGS().map(x=>`<button data-vlo="${x.id}" class="${x.id===o?"on":""}">${esc(x.kurz||x.n)}${x.prod?" · "+esc(PN[x.prod]||""):""}</button>`).join("")}</div>`:""}
+    <input type="search" class="avq" id="vlq" placeholder="🔍 Suchen …" value="${esc(VLS.q)}"><div class="seg2">${[["alle","Alle"],["alle2","Für alle"],["ich","Nur meine"]].map(([k,l])=>`<button data-vlg="${k}" class="${VLS.g===k?"on":""}">${l}</button>`).join("")}</div>
+    <span style="flex:1"></span><button class="btn sm" id="vlsch">✎ Schnellwahl anpassen</button><button class="btn sm p" id="vlneu">+ Neue Vorlage</button></div>
+   <div class="avtw" style="max-height:none"><table class="avt"><thead><tr><th>Vorlage</th><th class="hm">Wer</th><th>Sichtbar für</th><th class="hm">Schnellwahl</th><th class="hm">Genutzt</th><th></th></tr></thead><tbody>
+   ${L.length?L.map(v=>{const F=vlFehlt(v);return `<tr><td class="t"><b>${esc(v.n)}${F.length?` <span class="dx-pill wait">⚠ ${esc(F.join(", "))} fehlt</span>`:""}</b><small>${esc(v.d||"")}${v.d&&(v.ph||[]).length?" · ":""}${(v.ph||[]).length?v.ph.length+" Platzhalter":""}${usr(v.owner)?" · von "+esc(usr(v.owner).n):""}</small></td>
+     <td class="hm sm">${esc(vlWer(v))}</td><td>${v.gilt==="ich"?`<span class="dx-pill inbox">nur ${esc((usr(v.owner)||{}).n||"Ersteller")}</span>`:'<span class="dx-pill run">alle Benutzer</span>'}</td>
+     <td class="hm sm">${SA.includes(v.id)?"⚡ für alle":""}${SA.includes(v.id)&&SM.includes(v.id)?" · ":""}${SM.includes(v.id)?"⚡ meine":""}${!SA.includes(v.id)&&!SM.includes(v.id)?"–":""}</td><td class="hm sm">${vlNutz(v).length}×</td>
+     <td class="ac"><details class="dx-dd"><summary class="btn sm">⋯</summary><div class="dx-pop">${vlDarf(v)?`<button data-vle="${v.id}">✎ Bearbeiten</button>`:""}<button data-vld="${v.id}">Duplizieren</button>${vlDarf(v)?`<button data-vlf="${v.id}">${v.gilt==="ich"?"Für alle Benutzer freigeben":"Nur für mich"}</button>`:""}${ORGS().length>1?`<button data-vlk="${v.id}">In andere Organisation kopieren …</button>`:""}<button data-vlt="${v.id}">Ausprobieren ▶</button>${vlDarf(v)?`<hr><button class="del" data-vlx="${v.id}">Löschen …</button>`:""}</div></details></td></tr>`}).join(""):`<tr><td colspan="6" class="avempty">${vlOrg(o).length?"Keine Vorlage passt zur Auswahl.":"Noch keine Vorlagen für "+esc(O.kurz||O.n||"")+". Mit „+ Neue Vorlage“ anlegen oder in einem fertigen Auftrag über ⋯ › „Als Vorlage speichern“."}</td></tr>`}
+   </tbody></table></div>`;
+  const re=()=>vlEinst(C);
+  C.querySelectorAll("[data-vlo]").forEach(b=>b.onclick=()=>{VLS.org=b.dataset.vlo;re()});
+  C.querySelectorAll("[data-vlg]").forEach(b=>b.onclick=()=>{VLS.g=b.dataset.vlg;re()});
+  {const i=$("#vlq");i.oninput=()=>{VLS.q=i.value;const p=i.selectionStart;re();const n=$("#vlq");n.focus();try{n.setSelectionRange(p,p)}catch(e){}}}
+  $("#vlneu").onclick=()=>vlEditor(null,o,re);$("#vlsch").onclick=()=>vlSchnell(o,re);
+  const V=id=>VL.find(v=>v.id===id);
+  C.querySelectorAll("[data-vle]").forEach(b=>b.onclick=()=>vlEditor(V(b.dataset.vle),o,re));
+  C.querySelectorAll("[data-vld]").forEach(b=>b.onclick=()=>{const v=V(b.dataset.vld),k=JSON.parse(JSON.stringify(v));delete k.id;delete k.owner;delete k.von;delete k.geaendert;k.n=v.n+" (Kopie)";if(v.gilt!=="ich"&&!vlDarf(v))k.gilt="ich";vlEditor(k,o,re)});
+  C.querySelectorAll("[data-vlf]").forEach(b=>b.onclick=()=>{const v=V(b.dataset.vlf);v.gilt=v.gilt==="ich"?"alle":"ich";if(v.gilt==="ich"&&SET.schnell&&SET.schnell[v.org])SET.schnell={...SET.schnell,[v.org]:SET.schnell[v.org].filter(id=>id!==v.id)};v.von=meId();v.geaendert=new Date().toISOString();schedule();re();toast(v.gilt==="ich"?"„"+v.n+"“ ist jetzt nur für dich sichtbar":"„"+v.n+"“ ist jetzt für alle Benutzer sichtbar")});
+  C.querySelectorAll("[data-vlk]").forEach(b=>b.onclick=async()=>{const v=V(b.dataset.vlk),Z=ORGS().filter(x=>x.id!==v.org);let z=Z[0];
+    if(Z.length>1){const n=await askText("In welche Organisation kopieren?",Z[0].kurz||Z[0].n,{bezug:"Möglich: "+Z.map(x=>x.kurz||x.n).join(", ")});z=Z.find(x=>(x.kurz||x.n).toLowerCase()===String(n||"").toLowerCase());if(!z)return n&&toast("Organisation nicht gefunden")}
+    const k=JSON.parse(JSON.stringify(v));delete k.id;delete k.owner;delete k.von;delete k.geaendert;k.org=z.id;k.prj=null;k.n=v.n;if(k.art==="agent"&&!AG.some(a=>a.id===k.aid&&inOrg(a,z)))k.aid=null;if(k.art==="abteilung"){k.abt=null;k.team=""}if(k.art==="ablauf"){const f=FL.find(x=>x.id===k.fid);if(f&&f.p!=="all"&&z.prod&&f.p!==z.prod)k.fid=null}
+    VLS.org=z.id;toast("Kopie für "+(z.kurz||z.n)+": Agent, Abteilung, Prozess und Projekt dort prüfen");vlEditor(k,z.id,re)});
+  C.querySelectorAll("[data-vlt]").forEach(b=>b.onclick=()=>vlAnwenden(V(b.dataset.vlt),{org:o}));
+  C.querySelectorAll("[data-vlx]").forEach(b=>b.onclick=async()=>{const v=V(b.dataset.vlx),n=vlNutz(v).length;
+    if(!await askOk("Vorlage „"+v.n+"“ löschen?","Endgültig löschen",{text:"Die Vorlage verschwindet aus der Auswahl und aus allen Schnellwahl-Leisten. "+(n?n+" Aufträge, die damit angelegt wurden, bleiben unverändert.":"Bisher wurde kein Auftrag damit angelegt."),nein:"Behalten"}))return;
+    VL=VL.filter(x=>x!==v);if(SET.schnell)Object.keys(SET.schnell).forEach(k=>SET.schnell[k]=SET.schnell[k].filter(id=>id!==v.id));US.forEach(u=>{if(u.schnell)Object.keys(u.schnell).forEach(k=>u.schnell[k]=u.schnell[k].filter(id=>id!==v.id))});schedule();re();toast("Vorlage gelöscht")});
+  C.querySelectorAll("details.dx-dd").forEach(d=>d.addEventListener("toggle",()=>{if(d.open)C.querySelectorAll("details.dx-dd[open]").forEach(x=>{if(x!==d)x.open=false})}))}
 
 boot();
 // Breitenregler Ablauf-Eigenschaften (rechts)

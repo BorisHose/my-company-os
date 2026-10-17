@@ -556,6 +556,11 @@
 :root[data-theme=dark] .dx-filter{border-bottom:1px solid var(--line);background:#141b25}
 :root[data-theme=dark] .dx-av .avtw{border:0;border-radius:0}
 :root[data-theme=dark] .avt tr.avsec td{background:#131a24;color:var(--mut)}
+:root[data-theme=dark] .vlrow{border:1px solid var(--line);background:#171e29;border-radius:9px;color:var(--ink)}
+:root[data-theme=dark] .vlrow.on{border-color:var(--acc);background:#1c2b47}
+:root[data-theme=dark] .vlrow .t small{color:var(--mut)}
+:root[data-theme=dark] .vlsl{border:1px solid var(--line);border-radius:10px;background:#171e29}
+:root[data-theme=dark] .vlsi{border:1px solid var(--line);border-radius:8px}
 :root[data-theme=dark] nav button.on{background:#2f6fdf;color:#fff}:root[data-theme=dark] body{background:var(--bg);color:var(--ink)}:root[data-theme=dark] input,:root[data-theme=dark] select,:root[data-theme=dark] textarea{background:#131a24;color:var(--ink);border-color:#3a4456}:root[data-theme=dark] .modal{background:#000000a6}:root[data-theme=dark] img.olg,:root[data-theme=dark] .av img{filter:none}
 @media (prefers-color-scheme:dark){:root[data-theme=auto]{color-scheme:dark;--bg:#0f141b;--panel:#171e29;--ink:#e4e8ef;--mut:#9aa4b4;--line:#2b3442;--acc:#5b8def;--accbg:#1c2b47;--warn:#f79009;--warnbg:#3a2615;--ok:#47cd89;--okbg:#12301f;--vio:#9b8afb;--viobg:#28213d;--teal:#36bffa;--tealbg:#11303a;--bodobg:#1d2939;--sellbg:#11303c}
 :root[data-theme=auto] body{background:var(--bg);color:var(--ink)}
@@ -1114,4 +1119,9 @@
 :root[data-theme=auto] .dx-filter{border-bottom:1px solid var(--line);background:#141b25}
 :root[data-theme=auto] .dx-av .avtw{border:0;border-radius:0}
 :root[data-theme=auto] .avt tr.avsec td{background:#131a24;color:var(--mut)}
+:root[data-theme=auto] .vlrow{border:1px solid var(--line);background:#171e29;border-radius:9px;color:var(--ink)}
+:root[data-theme=auto] .vlrow.on{border-color:var(--acc);background:#1c2b47}
+:root[data-theme=auto] .vlrow .t small{color:var(--mut)}
+:root[data-theme=auto] .vlsl{border:1px solid var(--line);border-radius:10px;background:#171e29}
+:root[data-theme=auto] .vlsi{border:1px solid var(--line);border-radius:8px}
 :root[data-theme=auto] nav button.on{background:#2f6fdf;color:#fff}:root[data-theme=auto] body{background:var(--bg);color:var(--ink)}:root[data-theme=auto] input,:root[data-theme=auto] select,:root[data-theme=auto] textarea{background:#131a24;color:var(--ink);border-color:#3a4456}:root[data-theme=auto] .modal{background:#000000a6}:root[data-theme=auto] img.olg,:root[data-theme=auto] .av img{filter:none}}

@@ -8,7 +8,7 @@ function uhr(){const e=$("#clock");if(!e)return;const d=new Date();e.textContent
 setInterval(uhr,15000);
 function hdr(){uhr();const m=$("#me");if(m){const u=ME();m.innerHTML=av(u,30);m.title=u?"Angemeldet als "+u.n+" – Einstellungen öffnen":"Benutzer wählen";m.onclick=()=>einst("darst")}
   const g=$("#gear");if(g)g.onclick=()=>einst();}
-const SETSEC=[["darst","Darstellung"],["inst","Instanz"],["orgs","Organigramme"],["users","Benutzer"],["ausf","Ausführung"],["dienste","Anbindungen"],["sgr","Skill-Gruppen"]];
+const SETSEC=[["darst","Darstellung"],["inst","Instanz"],["orgs","Organigramme"],["users","Benutzer"],["ausf","Ausführung"],["dienste","Anbindungen"],["sgr","Skill-Gruppen"],["vorl","Auftragsvorlagen"]];
 function einst(sec){if(sec)UI.sets=sec;if(!SETSEC.some(s=>s[0]===UI.sets))UI.sets="darst";saveUI();if($("#settings").classList.contains("hide")){show("settings");return}
   const S=UI.sets;$("#setnav").innerHTML=SETSEC.map(([k,l])=>`<button class="setn ${k===S?"on":""}" data-sets="${k}">${l}</button>`).join("");
   document.querySelectorAll("[data-sets]").forEach(b=>b.onclick=()=>{if(b.dataset.sets!==S&&blocked())return;einst(b.dataset.sets)});
@@ -48,6 +48,7 @@ function einst(sec){if(sec)UI.sets=sec;if(!SETSEC.some(s=>s[0]===UI.sets))UI.set
     $("#sruns").onclick=kiRuns}
   else if(S==="dienste")dienstEinst(C)
   else if(S==="sgr")grEinst(C)
+  else if(S==="vorl")vlEinst(C)
 }
 // Logo einlesen: in 320×96 einpassen, Transparenz behalten (PNG)
 function logoKlein(file){return new Promise((res,rej)=>{const r=new FileReader();r.onload=()=>{const im=new Image();im.onload=()=>{const k=Math.min(1,320/im.width,96/im.height),w=Math.max(1,Math.round(im.width*k)),h=Math.max(1,Math.round(im.height*k)),c=document.createElement("canvas");c.width=w;c.height=h;c.getContext("2d").drawImage(im,0,0,w,h);res(c.toDataURL("image/png"))};im.onerror=rej;im.src=r.result};r.onerror=rej;r.readAsDataURL(file)})}
