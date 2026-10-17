@@ -66,17 +66,19 @@ function pjJobField(j){const o=jobOrg(j);if(j.parent)return "";return `<div clas
 const bodoPjSt=s=>s==="active"?"aktiv":s==="paused"?"pausiert":"abgeschlossen";
 const sfPjSt=x=>x.done?"abgeschlossen":/paus|ruht|hold/i.test(((x.status||{}).name||{})["de-DE"]||"")?"pausiert":"aktiv";
 const PJSYS=["bodo","sellify"];
-// Treffer beider Systeme auf eine Form bringen: {id, title, url, st, owner, descr}
-async function pjSuche(sys,om,q,alle){const R=[];
-  if(sys==="bodo"){let cur=null;for(let i=0;i<4;i++){const inp={resourceType:"project",orgId:om.id,achsen:{status:alle?"alle":"aktiv"},limit:50};if(q)inp.query=q;if(cur)inp.cursor=cur;
-      const r=await bodo("bodo_search",inp);((r&&r.items)||[]).forEach(x=>{const d=x.data||{};R.push({id:String(x.id),title:x.title||d.name||"",url:x.url||"",st:bodoPjSt(d.projectStatus),owner:d.ownerName||"",descr:d.description||""})});cur=r&&r.hasMore&&r.nextCursor;if(!cur)break}}
-  else{let off=0;for(let i=0;i<4;i++){const params={limit:50,offset:off};if(!alle)params.done=false;if(q)params.q=q;
-      const r=await sellify("sellify_project",{action:"list",params});((r&&r.items)||[]).forEach(x=>{const o=x.responsible||{};R.push({id:String(x.id),title:(x.name||"")+(x.number?" ("+x.number+")":""),n:x.name||"",url:x.webUrl||"",st:sfPjSt(x),owner:[o.firstName,o.lastName].filter(Boolean).join(" "),descr:x.description||""})});
-      if(!(r&&r.hasMore))break;off=r.nextOffset||off+50}}
-  return R}
+// Grundsatz Backend-Listen (Vorgabe Boris 17.10.2026): immer seitenweise laden (PJSEITE je Abruf) und, wo die Schnittstelle es kann, die zuletzt angelegten zuerst.
+// Eine Seite = {items:[{id, title, n, url, st, owner, descr}], next: Fortsetzungsmarke oder null, total: Gesamtzahl falls bekannt, neuZuerst: true/false}
+const PJSEITE=25;
+async function pjSeite(sys,om,q,alle,next){
+  if(sys==="bodo"){const inp={resourceType:"project",orgId:om.id,achsen:{status:alle?"alle":"aktiv"},limit:PJSEITE};if(q)inp.query=q;if(next)inp.cursor=next;
+    const r=await bodo("bodo_search",inp);
+    return {items:((r&&r.items)||[]).map(x=>{const d=x.data||{};return {id:String(x.id),title:x.title||d.name||"",n:x.title||d.name||"",url:x.url||"",st:bodoPjSt(d.projectStatus),owner:d.ownerName||"",descr:d.description||""}}),next:r&&r.hasMore&&r.nextCursor||null,total:null,neuZuerst:false}}
+  const params={limit:PJSEITE,offset:next||0,sort:"-registered"};if(!alle)params.done=false;if(q)params.q=q;
+  const r=await sellify("sellify_project",{action:"list",params});
+  return {items:((r&&r.items)||[]).map(x=>{const o=x.responsible||{};return {id:String(x.id),title:(x.name||"")+(x.number?" ("+x.number+")":""),n:x.name||"",url:x.webUrl||"",st:sfPjSt(x),owner:[o.firstName,o.lastName].filter(Boolean).join(" "),descr:x.description||""}}),next:r&&r.hasMore?(r.nextOffset||(next||0)+PJSEITE):null,total:r&&r.total!=null?r.total:null,neuZuerst:true}}
 function pjBodoDlg(p,sys0){const O=orgById(OC),M=ownOrgs(),dp=dienstVon(O,"projekt");
   let sys=sys0||(dp&&PJSYS.includes(dp.sys)?dp.sys:O.pjSys||(O.prod==="sellify"?"sellify":"bodo"));
-  let om=M.find(m=>m.id===(dp&&dp.sys==="bodo"&&dp.orgId?dp.orgId:(O.pjBodo||"")))||M[0],q="",alle=false,R=[],busy=false,err="";
+  let om=M.find(m=>m.id===(dp&&dp.sys==="bodo"&&dp.orgId?dp.orgId:(O.pjBodo||"")))||M[0],q="",alle=false,R=[],busy=false,err="",nxt=null,tot=null,neu=true;const SEL=new Set();
   const close=modalBox(`<div class="bhead"><h3>${p?"„"+esc(p.n)+"“ mit Backend-Projekt verbinden":"Projekte aus dem Backend übernehmen"}</h3><button class="ic" id="mclose" style="font-size:18px">✕</button></div>
     <div class="row"><div class="field"><label>System</label><div class="seg" id="pbs" style="margin:0">${PJSYS.map(k=>`<button data-pbs="${k}" class="${k===sys?"on":""}">${esc(SYSKAT[k].n)}</button>`).join("")}</div></div><div class="field" id="pbmf"></div></div>
     <div class="field"><label>Suche</label><input type="search" id="pbq" placeholder="Projektname …"></div>
@@ -88,17 +90,19 @@ function pjBodoDlg(p,sys0){const O=orgById(OC),M=ownOrgs(),dp=dienstVon(O,"proje
     f.innerHTML=M.length?`<label>Bodo-Mandant</label><select id="pbm">${M.map(m=>`<option value="${m.id}" ${m===om?"selected":""}>${esc(m.name)}</option>`).join("")}</select>`:`<label>Bodo-Mandant</label><div class="warnbox">Keine eigenen Bodo-Mandanten hinterlegt – ⚙ Einstellungen › Anbindungen</div>`;
     const s=$("#pbm");if(s)s.onchange=e=>{om=M.find(m=>m.id===e.target.value);load()}};
   const verb=r=>PJ.find(x=>x.bk&&x.bk.sys===sys&&String(x.bk.id)===r.id);
-  const draw=()=>{const b=$("#pbl");if(!b)return;if(busy){b.innerHTML=`<div class="hint">Lade Projekte aus ${esc(SYSKAT[sys].n)} …</div>`;return}if(err){b.innerHTML=`<div class="warnbox">${esc(err)}</div>`;return}
-    b.innerHTML=R.length?R.map(r=>{const v=verb(r);return `<label class="pbr ${v?"dis":""}">${p?`<button class="btn sm" data-pbp="${esc(r.id)}" ${v?"disabled":""}>Verbinden</button>`:`<input type="checkbox" data-pbc="${esc(r.id)}" ${v?"disabled":""}>`}<span><b>${esc(r.title)}</b><small>${esc(r.st)}${r.owner?" · "+esc(r.owner):""}${v?" · bereits verbunden mit „"+esc(v.n)+"“":""}</small></span><a href="${esc(r.url||"#")}" target="_blank" rel="noopener" title="In ${esc(SYSKAT[sys].n)} öffnen">↗</a></label>`}).join(""):'<div class="hint">Keine Projekte gefunden.</div>';
+  const draw=()=>{const b=$("#pbl");if(!b)return;if(busy&&!R.length){b.innerHTML=`<div class="hint">Lade Projekte aus ${esc(SYSKAT[sys].n)} …</div>`;return}if(err&&!R.length){b.innerHTML=`<div class="warnbox">${esc(err)}</div>`;return}
+    b.innerHTML=R.length?R.map(r=>{const v=verb(r);return `<label class="pbr ${v?"dis":""}">${p?`<button class="btn sm" data-pbp="${esc(r.id)}" ${v?"disabled":""}>Verbinden</button>`:`<input type="checkbox" data-pbc="${esc(r.id)}" ${v?"disabled":""} ${!v&&SEL.has(r.id)?"checked":""}>`}<span><b>${esc(r.title)}</b><small>${esc(r.st)}${r.owner?" · "+esc(r.owner):""}${v?" · bereits verbunden mit „"+esc(v.n)+"“":""}</small></span><a href="${esc(r.url||"#")}" target="_blank" rel="noopener" title="In ${esc(SYSKAT[sys].n)} öffnen">↗</a></label>`}).join(""):'<div class="hint">Keine Projekte gefunden.</div>';
+    if(R.length)b.innerHTML+=`<div class="pbfoot"><span class="hint" style="margin:0">${R.length}${tot!=null?" von "+tot:""} geladen · ${neu?"neueste zuerst":"Reihenfolge von "+esc(SYSKAT[sys].n)+" (alphabetisch) – nach Anlagedatum sortieren bietet die Schnittstelle noch nicht"}</span>${err?`<span class="warnbox" style="margin:0">${esc(err)}</span>`:""}${nxt?`<button class="btn sm" id="pbmore" ${busy?"disabled":""}>${busy?"lädt …":"Weitere "+PJSEITE+" laden"}</button>`:""}</div>`;
+    {const m=$("#pbmore");if(m)m.onclick=e=>{e.preventDefault();load(true)}}
     document.querySelectorAll("[data-pbp]").forEach(x=>x.onclick=e=>{e.preventDefault();const r=R.find(y=>y.id===x.dataset.pbp);p.bk=pjBkVon(r,sys,om);if(!p.beschr&&r.descr)p.beschr=r.descr;merk();schedule();close();prj();toast("Mit "+SYSKAT[sys].n+"-Projekt verbunden")});
-    document.querySelectorAll("[data-pbc]").forEach(x=>x.onchange=()=>{$("#pbok").disabled=!document.querySelector("[data-pbc]:checked")})};
+    document.querySelectorAll("[data-pbc]").forEach(x=>x.onchange=()=>{x.checked?SEL.add(x.dataset.pbc):SEL.delete(x.dataset.pbc);$("#pbok").disabled=!SEL.size});const ok0=$("#pbok");if(ok0)ok0.disabled=!SEL.size};
   const merk=()=>{O.pjSys=sys;if(sys==="bodo"&&om)O.pjBodo=om.id};
-  let tq=null,lauf=0;const load=async()=>{const n=++lauf;busy=true;err="";R=[];draw();if(sys==="bodo"&&!om){busy=false;draw();return}
-    try{const L=await pjSuche(sys,om,q,alle);if(n!==lauf)return;R=L}catch(e){if(n!==lauf)return;err=sys==="bodo"?mcpMsg(e):sfMsg(e)}busy=false;draw()};
-  document.querySelectorAll("[data-pbs]").forEach(b=>b.onclick=()=>{sys=b.dataset.pbs;document.querySelectorAll("[data-pbs]").forEach(x=>x.classList.toggle("on",x===b));mand();load()});
+  let tq=null,lauf=0;const load=async(weiter)=>{const n=++lauf;busy=true;err="";if(!weiter){R=[];nxt=null;tot=null}draw();if(sys==="bodo"&&!om){busy=false;draw();return}
+    try{const P=await pjSeite(sys,om,q,alle,weiter?nxt:null);if(n!==lauf)return;const ids=new Set(R.map(x=>x.id));R=R.concat(P.items.filter(x=>!ids.has(x.id)));nxt=P.next;tot=P.total;neu=P.neuZuerst}catch(e){if(n!==lauf)return;err=sys==="bodo"?mcpMsg(e):sfMsg(e)}busy=false;draw()};
+  document.querySelectorAll("[data-pbs]").forEach(b=>b.onclick=()=>{sys=b.dataset.pbs;SEL.clear();document.querySelectorAll("[data-pbs]").forEach(x=>x.classList.toggle("on",x===b));mand();load()});
   $("#pba").onchange=e=>{alle=e.target.checked;load()};
   $("#pbq").oninput=e=>{clearTimeout(tq);tq=setTimeout(()=>{q=e.target.value.trim();load()},400)};
-  const ok=$("#pbok");if(ok)ok.onclick=()=>{const S=[...document.querySelectorAll("[data-pbc]:checked")].map(c=>R.find(r=>r.id===c.dataset.pbc)).filter(Boolean);
+  const ok=$("#pbok");if(ok)ok.onclick=()=>{const S=[...SEL].map(id=>R.find(r=>r.id===id)).filter(Boolean);
     S.forEach(r=>{const u=US.find(x=>x.aktiv!==false&&r.owner&&x.n===r.owner);PJ.push({id:uid("pj"),org:OC,n:r.n||r.title||"Projekt",st:r.st,beschr:r.descr||"",verantw:u?u.id:null,bk:pjBkVon(r,sys,om),angelegt:new Date().toISOString()})});
     merk();schedule();close();PJSEL=null;prj();toast(S.length+" Projekt"+(S.length===1?"":"e")+" aus "+SYSKAT[sys].n+" übernommen")};
   mand();load()}

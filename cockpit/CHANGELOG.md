@@ -1,5 +1,11 @@
 # Änderungen – Cockpit
 
+## 63 · 17.10.2026 · Backend-Listen seitenweise (Grundsatz Boris)
+- Grundsatz: Listen aus Backend-Systemen werden immer seitenweise geladen (25 je Abruf, „Weitere 25 laden“), nie komplett vorab; wo die Schnittstelle es kann, die zuletzt angelegten zuerst.
+- Projekte übernehmen/verbinden: sellify lädt neueste zuerst (sort -registered) mit Anzeige „n von Gesamt“; Bodo seitenweise, Reihenfolge alphabetisch – die Bodo-Suche bietet laut Schnittstellenbeschreibung keine Sortierung nach Anlagedatum (Hinweis in der Liste).
+- Angekreuzte Projekte bleiben beim Nachladen ausgewählt.
+- Smoke-Test: 96 Prüfungen.
+
 ## 62 · 17.10.2026 · sellify-Projekte (Hinweis Boris)
 - Projekte lassen sich jetzt auch aus sellify übernehmen bzw. mit einem sellify-Projekt verbinden („⇣ Aus Backend übernehmen …“, „↔ Mit Backend-Projekt verbinden …“, Umschalter Bodo · sellify; sellify ohne Mandant). Vorbelegt ist das System des Dienstes „Projekt“, sonst das Produkt des Organigramms.
 - Status aus sellify: abgeschlossen (done), pausiert (Statusname), sonst aktiv; Projektnummer im Titel der Trefferliste.

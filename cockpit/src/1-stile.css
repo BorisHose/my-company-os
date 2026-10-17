@@ -414,3 +414,5 @@ img.olg{height:18px;max-width:60px;object-fit:contain;margin-right:6px;vertical-
   .eshead{flex-wrap:wrap;gap:6px}
   table.map{display:block;overflow-x:auto;max-width:100%}
 }
+
+.pbfoot{display:flex;flex-wrap:wrap;gap:8px;align-items:center;justify-content:space-between;margin:8px 0 0}
